@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Panel de Administración</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #4a6491;
+            --success: #27ae60;
+            --danger: #e74c3c;
+            --warning: #f39c12;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --info: #3498db;
+            --profit: #2ecc71;
+            --capital: #9b59b6;
+            --background: #f5f7fa;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --radius: 16px;
+            --header-height: 60px;
+            --footer-height: 70px;
+            --safe-area-top: env(safe-area-inset-top);
+            --safe-area-bottom: env(safe-area-inset-bottom);
+        }
+        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+            padding: 0;
+            background-attachment: fixed;
+            overflow-x: hidden;
+        }
+        
+        /* Header estilo app móvil */
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: var(--header-height);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding-top: var(--safe-area-top);
+            z-index: 1000;
+        }
+        
+        .app-header h1 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-align: center;
+        }
+        
+        .app-header .subtitle {
+            font-size: 0.85rem;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+        
+        /* Contenedor principal */
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            padding: calc(var(--header-height) + 15px) 15px calc(var(--footer-height) + 15px);
+            min-height: 100vh;
+        }
+        
+        /* Tarjeta estilo iOS */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .card-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            color: white;
+            font-size: 1.2rem;
+        }
+        
+        .card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        
+        /* Inputs estilo iOS */
+        .input-group {
+            margin-bottom: 20px;
+        }
+        
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 1rem;
+        }
+        
+        .input-field {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid #e0e0e0;
+            font-size: 1.1rem;
+            background: #f8f9fa;
+            transition: all 0.2s;
+        }
+        
+        .input-field:focus {
+            outline: none;
+            border-color: var(--secondary);
+            background: white;
+            box-shadow: 0 0 0 3px rgba(74, 100, 145, 0.1);
+        }
+        
+        /* Botones estilo iOS */
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: none;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-align: center;
+            transition: all 0.2s;
+            margin-bottom: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: linear-gradient(135deg, var(--warning), #e67e22);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+            color: white;
+        }
+        
+        .btn-info {
+            background: linear-gradient(135deg, var(--info), #2980b9);
+            color: white;
+        }
+        
+        /* Listas estilo iOS */
+        .list {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow);
+            margin-bottom: 16px;
+        }
+        
+        .list-item {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .list-item:last-child {
+            border-bottom: none;
+        }
+        
+        .list-item-content {
+            flex: 1;
+        }
+        
+        .list-item-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: var(--primary);
+        }
+        
+        .list-item-subtitle {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        .list-item-action {
+            color: var(--secondary);
+            font-weight: 600;
+            cursor: pointer;
+            padding: 8px 16px;
+            border-radius: 8px;
+            background: rgba(74, 100, 145, 0.1);
+            transition: all 0.2s;
+        }
+        
+        .list-item-action:active {
+            background: rgba(74, 100, 145, 0.2);
+        }
+        
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 16px;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+        
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 8px 0;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #6c757d;
+        }
+        
+        /* Modal de configuración */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        
+        .modal.active {
+            opacity: 1;
+            pointer-events: all;
+        }
+        
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: transform 0.3s;
+        }
+        
+        .modal.active .modal-content {
+            transform: translateY(0);
+        }
+        
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes slideIn {
+            from { transform: translateX(100%); }
+            to { transform: translateX(0); }
+        }
+        
+        /* Estados de carga */
+        .loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+        
+        .loading::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            margin: -10px 0 0 -10px;
+            border: 2px solid transparent;
+            border-top: 2px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            top: calc(var(--header-height) + 20px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: linear-gradient(135deg, var(--success), #2ecc71);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            z-index: 1500;
+            font-weight: 600;
+            text-align: center;
+            max-width: 90%;
+            animation: slideIn 0.3s ease;
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, var(--danger), #c0392b);
+        }
+        
+        /* Barra de navegación inferior */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+            z-index: 100;
+            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            padding-bottom: calc(12px + var(--safe-area-bottom));
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #6c757d;
+            font-size: 0.75rem;
+            transition: color 0.2s;
+            flex: 1;
+        }
+        
+        .nav-item.active {
+            color: var(--secondary);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        
+        /* Ajustes para pantallas muy pequeñas */
+        @media (max-width: 350px) {
+            .container {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+            
+            .card {
+                padding: 16px;
+            }
+            
+            .btn {
+                padding: 14px;
+            }
+        }
+        
+        /* Efectos de toque mejorados */
+        .touch-feedback:active {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Scroll personalizado */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header de la app -->
+    <header class="app-header">
+        <div>
+            <h1>Panel de Administración</h1>
+            <div class="subtitle">Sistema de control</div>
+        </div>
+    </header>
+    
+    <!-- Contenido principal -->
+    <div class="container">
+        <!-- Panel Admin -->
+        <div id="panel-admin">
+            <div id="admin-content">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-chart-bar"></i></div>
+                        <div class="card-title">Estadísticas</div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-label">Activos</div>
+                            <div class="stat-value" id="stat-activos">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Ingresos Hoy</div>
+                            <div class="stat-value" id="stat-ingresos">Bs. 0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Clientes Hoy</div>
+                            <div class="stat-value" id="stat-clientes">0</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-label">Mensual</div>
+                            <div class="stat-value" id="stat-mensual">Bs. 0</div>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px;">
+                        <button id="btn-actualizar" class="btn btn-info" style="flex: 1;">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
+                        <button id="btn-sincronizar" class="btn btn-primary" style="flex: 1;">
+                            <i class="fas fa-cloud-upload-alt"></i> Sincronizar
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-users"></i></div>
+                        <div class="card-title">Clientes Activos</div>
+                    </div>
+                    
+                    <div id="cuerpo-tabla-admin">
+                        <!-- Los clientes activos se cargarán aquí -->
+                    </div>
+                    
+                    <div id="sin-clientes" style="text-align: center; padding: 20px; color: #6c757d;">
+                        <i class="fas fa-users-slash" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        No hay clientes activos
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <div class="card-icon"><i class="fas fa-tasks"></i></div>
+                        <div class="card-title">Acciones</div>
+                    </div>
+                    
+                    <button id="btn-limpiar-dia" class="btn btn-danger">
+                        <i class="fas fa-broom"></i> Limpiar Registros del Día
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+    <!-- Modal de configuración -->
+    <div class="modal" id="config-modal">
+        <div class="modal-content">
+            <div class="card-header">
+                <div class="card-icon"><i class="fas fa-cog"></i></div>
+                <div class="card-title">Configuración</div>
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Tarifa por hora (Bs.)</label>
+                <input type="number" id="tarifa-hora" class="input-field" min="1" step="0.5" value="15">
+            </div>
+            
+            <div class="input-group">
+                <label class="input-label">Tarifa por minuto (Bs.)</label>
+                <input type="number" id="tarifa-minuto" class="input-field" min="0.01" step="0.01" value="0.25">
+            </div>
+            
+            <button id="guardar-config" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar
+            </button>
+            <button id="cerrar-config" class="btn" style="background: #f0f0f0; color: #333;">
+                <i class="fas fa-times"></i> Cancelar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let clientesActivos = JSON.parse(localStorage.getItem('clientesActivos')) || [];
+        let historial = JSON.parse(localStorage.getItem('historial')) || [];
+        let tarifaHora = parseFloat(localStorage.getItem('tarifaHora')) || 15;
+        let tarifaMinuto = parseFloat(localStorage.getItem('tarifaMinuto')) || 0.25;
+        
+        // CONFIGURACIÓN DE SUPABASE - DATOS DIRECTAMENTE EN EL CÓDIGO
+        const dbUrl = "https://xzvlvsloonaxxgsfcoha.supabase.co";
+        const dbKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inh6dmx2c2xvb25heHhnc2Zjb2hhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjAyODg5MzIsImV4cCI6MjA3NTg2NDkzMn0.Tm08Y0yEGz_jeX4S1OqkHJQmCW4ATXsgghHHiuTI9O8";
+        
+        let supabaseClient = null;
+        
+        // Elementos DOM
+        const cuerpoTablaAdmin = document.getElementById('cuerpo-tabla-admin');
+        const tarifaHoraInput = document.getElementById('tarifa-hora');
+        const tarifaMinutoInput = document.getElementById('tarifa-minuto');
+        const guardarConfigBtn = document.getElementById('guardar-config');
+        const statActivos = document.getElementById('stat-activos');
+        const statIngresos = document.getElementById('stat-ingresos');
+        const statClientes = document.getElementById('stat-clientes');
+        const statMensual = document.getElementById('stat-mensual');
+        const btnActualizar = document.getElementById('btn-actualizar');
+        const btnLimpiarDia = document.getElementById('btn-limpiar-dia');
+        const btnSincronizar = document.getElementById('btn-sincronizar');
+        const configModal = document.getElementById('config-modal');
+        const cerrarConfigBtn = document.getElementById('cerrar-config');
+        const sinClientes = document.getElementById('sin-clientes');
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', function() {
+            cargarConfiguracion();
+            actualizarEstadisticas();
+            actualizarTablaAdmin();
+            inicializarSupabase();
+            
+            // Configurar eventos de botones
+            btnActualizar.addEventListener('click', function() {
+                actualizarTablaAdmin();
+                actualizarEstadisticas();
+                cargarEstadisticasBD();
+                mostrarNotificacion("Datos actualizados");
+            });
+            btnLimpiarDia.addEventListener('click', limpiarRegistrosDia);
+            btnSincronizar.addEventListener('click', sincronizarConBD);
+            guardarConfigBtn.addEventListener('click', guardarConfiguracion);
+            cerrarConfigBtn.addEventListener('click', function() {
+                configModal.classList.remove('active');
+            });
+            
+            // Abrir modal de configuración con doble tap en el header
+            let tapCount = 0;
+            document.querySelector('.app-header').addEventListener('click', function() {
+                tapCount++;
+                if (tapCount === 2) {
+                    configModal.classList.add('active');
+                    tapCount = 0;
+                }
+                setTimeout(() => { tapCount = 0; }, 300);
+            });
+            
+            // Configurar navegación inferior
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    if (this.querySelector('.nav-icon').innerHTML.includes('fa-cog')) {
+                        configModal.classList.add('active');
+                    }
+                });
+            });
+        });
+        
+        // Funciones de Supabase
+        function inicializarSupabase() {
+            if (dbUrl && dbKey) {
+                try {
+                    supabaseClient = supabase.createClient(dbUrl, dbKey);
+                    testConexionDB();
+                } catch (error) {
+                    console.error("Error al inicializar Supabase:", error);
+                }
+            }
+        }
+        
+        async function testConexionDB() {
+            if (!dbUrl || !dbKey) {
+                return;
+            }
+            
+            try {
+                supabaseClient = supabase.createClient(dbUrl, dbKey);
+                const { data, error } = await supabaseClient
+                    .from('estadisticas')
+                    .select('*')
+                    .limit(1);
+                
+                if (!error) {
+                    console.log("Conexión exitosa a Supabase");
+                    cargarEstadisticasBD();
+                }
+            } catch (error) {
+                console.error("Error al conectar con Supabase:", error);
+            }
+        }
+        
+        async function cargarEstadisticasBD() {
+            if (!supabaseClient) return;
+            
+            try {
+                const hoy = new Date().toISOString().split('T')[0];
+                
+                const { data, error } = await supabaseClient
+                    .from('estadisticas')
+                    .select('*')
+                    .eq('fecha', hoy)
+                    .single();
+                
+                if (error && error.code !== 'PGRST116') {
+                    throw error;
+                }
+                
+                if (data) {
+                    statActivos.textContent = data.clientes_activos || 0;
+                    statIngresos.textContent = `Bs. ${(data.ingresos_hoy || 0).toFixed(2)}`;
+                    statClientes.textContent = data.clientes_hoy || 0;
+                    
+                    const mesActual = new Date().toISOString().substring(0, 7);
+                    const { data: datosMensual, error: errorMensual } = await supabaseClient
+                        .from('estadisticas')
+                        .select('ingresos_hoy')
+                        .gte('fecha', `${mesActual}-01`)
+                        .lte('fecha', `${mesActual}-31`);
+                    
+                    if (!errorMensual && datosMensual) {
+                        const ingresosMensual = datosMensual.reduce((sum, item) => sum + (item.ingresos_hoy || 0), 0);
+                        statMensual.textContent = `Bs. ${ingresosMensual.toFixed(2)}`;
+                    }
+                }
+            } catch (error) {
+                console.error("Error al cargar estadísticas desde BD:", error);
+            }
+        }
+        
+        async function actualizarEstadisticasBD() {
+            if (!supabaseClient) return;
+            
+            try {
+                const hoy = new Date().toISOString().split('T')[0];
+                
+                const ingresosHoy = historial
+                    .filter(reg => reg.fecha === hoy && reg.estado !== "forzado")
+                    .reduce((sum, reg) => sum + reg.monto, 0);
+                
+                const clientesHoy = new Set(historial
+                    .filter(reg => reg.fecha === hoy)
+                    .map(reg => reg.codigo)).size;
+                
+                const { data: registroExistente, error: errorConsulta } = await supabaseClient
+                    .from('estadisticas')
+                    .select('*')
+                    .eq('fecha', hoy)
+                    .single();
+                
+                if (errorConsulta && errorConsulta.code !== 'PGRST116') {
+                    throw errorConsulta;
+                }
+                
+                const datosEstadisticas = {
+                    fecha: hoy,
+                    clientes_activos: clientesActivos.length,
+                    ingresos_hoy: ingresosHoy,
+                    clientes_hoy: clientesHoy,
+                    actualizado_en: new Date().toISOString()
+                };
+                
+                let error;
+                
+                if (registroExistente) {
+                    const { error: errorUpdate } = await supabaseClient
+                        .from('estadisticas')
+                        .update(datosEstadisticas)
+                        .eq('fecha', hoy);
+                    error = errorUpdate;
+                } else {
+                    const { error: errorInsert } = await supabaseClient
+                        .from('estadisticas')
+                        .insert([datosEstadisticas]);
+                    error = errorInsert;
+                }
+                
+                if (error) {
+                    throw error;
+                }
+                
+                console.log("Estadísticas actualizadas en Supabase");
+            } catch (error) {
+                console.error("Error al actualizar estadísticas en BD:", error);
+            }
+        }
+        
+        async function sincronizarConBD() {
+            if (!supabaseClient) {
+                mostrarNotificacion("Error: No se pudo conectar", "error");
+                return;
+            }
+            
+            btnSincronizar.classList.add('loading');
+            
+            try {
+                await actualizarEstadisticasBD();
+                await cargarEstadisticasBD();
+                mostrarNotificacion("Datos sincronizados");
+            } catch (error) {
+                console.error("Error al sincronizar con BD:", error);
+                mostrarNotificacion("Error al sincronizar", "error");
+            } finally {
+                btnSincronizar.classList.remove('loading');
+            }
+        }
+        
+        // Funciones del módulo administrador
+        function actualizarTablaAdmin() {
+            cuerpoTablaAdmin.innerHTML = '';
+            
+            if (clientesActivos.length === 0) {
+                sinClientes.style.display = 'block';
+                return;
+            }
+            
+            sinClientes.style.display = 'none';
+            
+            clientesActivos.forEach(cliente => {
+                const horaEntrada = new Date(cliente.horaEntrada);
+                const ahora = new Date();
+                const tiempoMs = ahora.getTime() - horaEntrada.getTime();
+                const tiempoMinutos = Math.floor(tiempoMs / (1000 * 60));
+                const monto = calcularMonto(tiempoMinutos);
+                
+                const listItem = document.createElement('div');
+                listItem.className = 'list-item touch-feedback';
+                listItem.innerHTML = `
+                    <div class="list-item-content">
+                        <div class="list-item-title">${cliente.codigoOriginal}</div>
+                        <div class="list-item-subtitle">Entrada: ${formatearHora(horaEntrada)} | Tiempo: ${formatearTiempo(tiempoMinutos)}</div>
+                        <div class="list-item-subtitle">Monto: Bs. ${monto.toFixed(2)}</div>
+                    </div>
+                    <div class="list-item-action" onclick="forzarSalidaAdmin(${cliente.id})">Forzar Salida</div>
+                `;
+                
+                cuerpoTablaAdmin.appendChild(listItem);
+            });
+        }
+        
+        function forzarSalidaAdmin(clienteId) {
+            if (!confirm("¿Forzar salida de este cliente?")) {
+                return;
+            }
+            
+            const clienteIndex = clientesActivos.findIndex(cliente => cliente.id === clienteId);
+            
+            if (clienteIndex === -1) {
+                alert("Error: Cliente no encontrado");
+                return;
+            }
+            
+            const cliente = clientesActivos[clienteIndex];
+            const horaEntrada = new Date(cliente.horaEntrada);
+            const horaSalida = new Date();
+            const tiempoMs = horaSalida.getTime() - horaEntrada.getTime();
+            const tiempoMinutos = Math.floor(tiempoMs / (1000 * 60));
+            const monto = calcularMonto(tiempoMinutos);
+            
+            const registro = {
+                id: Date.now(),
+                codigo: cliente.codigoOriginal,
+                horaEntrada: cliente.horaEntrada,
+                horaSalida: horaSalida.toISOString(),
+                tiempoMinutos: tiempoMinutos,
+                monto: monto,
+                estado: "forzado",
+                fecha: new Date().toISOString().split('T')[0]
+            };
+            
+            historial.push(registro);
+            guardarHistorial();
+            
+            clientesActivos.splice(clienteIndex, 1);
+            guardarClientes();
+            actualizarEstadisticasBD();
+            
+            mostrarNotificacion(`Salida forzada: Bs. ${monto.toFixed(2)}`);
+            actualizarTablaAdmin();
+            actualizarEstadisticas();
+        }
+        
+        function limpiarRegistrosDia() {
+            if (!confirm("¿Limpiar todos los registros del día?")) {
+                return;
+            }
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            historial = historial.filter(reg => reg.fecha !== hoy);
+            clientesActivos = [];
+            
+            guardarHistorial();
+            guardarClientes();
+            actualizarEstadisticasBD();
+            
+            actualizarTablaAdmin();
+            actualizarEstadisticas();
+            mostrarNotificacion("Registros del día eliminados");
+        }
+        
+        function actualizarEstadisticas() {
+            statActivos.textContent = clientesActivos.length;
+            
+            const hoy = new Date().toISOString().split('T')[0];
+            const ingresosHoy = historial
+                .filter(reg => reg.fecha === hoy && reg.estado !== "forzado")
+                .reduce((sum, reg) => sum + reg.monto, 0);
+            statIngresos.textContent = `Bs. ${ingresosHoy.toFixed(2)}`;
+            
+            const clientesHoy = new Set(historial
+                .filter(reg => reg.fecha === hoy)
+                .map(reg => reg.codigo)).size;
+            statClientes.textContent = clientesHoy;
+            
+            const mesActual = new Date().toISOString().substring(0, 7);
+            const ingresosMensual = historial
+                .filter(reg => reg.fecha.substring(0, 7) === mesActual && reg.estado !== "forzado")
+                .reduce((sum, reg) => sum + reg.monto, 0);
+            statMensual.textContent = `Bs. ${ingresosMensual.toFixed(2)}`;
+        }
+        
+        // Funciones de utilidad
+        function calcularMonto(tiempoMinutos) {
+            return tiempoMinutos * tarifaMinuto;
+        }
+        
+        function formatearHora(fecha) {
+            return fecha.toLocaleTimeString('es-BO', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+        }
+        
+        function formatearTiempo(minutos) {
+            const horas = Math.floor(minutos / 60);
+            const mins = minutos % 60;
+            
+            if (horas === 0) {
+                return `${mins} min`;
+            } else if (mins === 0) {
+                return `${horas} h`;
+            } else {
+                return `${horas} h ${mins} min`;
+            }
+        }
+        
+        function guardarClientes() {
+            localStorage.setItem('clientesActivos', JSON.stringify(clientesActivos));
+        }
+        
+        function guardarHistorial() {
+            localStorage.setItem('historial', JSON.stringify(historial));
+        }
+        
+        function cargarConfiguracion() {
+            tarifaHoraInput.value = tarifaHora;
+            tarifaMinutoInput.value = tarifaMinuto;
+        }
+        
+        function guardarConfiguracion() {
+            tarifaHora = parseFloat(tarifaHoraInput.value);
+            tarifaMinuto = parseFloat(tarifaMinutoInput.value);
+            
+            localStorage.setItem('tarifaHora', tarifaHora);
+            localStorage.setItem('tarifaMinuto', tarifaMinuto);
+            
+            configModal.classList.remove('active');
+            mostrarNotificacion("Configuración guardada");
+        }
+        
+        // Función para mostrar notificaciones
+        function mostrarNotificacion(mensaje, tipo = 'success') {
+            const notificacion = document.createElement('div');
+            notificacion.className = `notification ${tipo === 'error' ? 'error' : ''}`;
+            notificacion.textContent = mensaje;
+            
+            document.body.appendChild(notificacion);
+            
+            setTimeout(() => {
+                document.body.removeChild(notificacion);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
