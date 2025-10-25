@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Admin - ENTEL</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <!-- SheetJS para Excel -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <style>
+        :root {
+            --entel-color: #00A9E0;
+            --entel-dark: #0080b3;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        
+        .app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        /* Header estilo app móvil */
+        .app-header {
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+            color: white;
+            padding: 15px 20px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .app-header h1 {
+            font-size: 1.4rem;
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        
+        /* Navegación tipo app móvil */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: white;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: #6c757d;
+            font-size: 0.7rem;
+            padding: 5px 10px;
+            border-radius: 10px;
+            transition: all 0.3s;
+            flex: 1;
+            max-width: 25%;
+        }
+        
+        .nav-item.active {
+            color: var(--entel-color);
+        }
+        
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-bottom: 3px;
+        }
+        
+        /* Contenido principal */
+        .app-content {
+            padding: 20px 15px;
+            padding-bottom: 80px; /* Espacio para la navegación inferior */
+        }
+        
+        /* Tarjetas estilo app */
+        .app-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            margin-bottom: 20px;
+            border: none;
+            overflow: hidden;
+        }
+        
+        .app-card-header {
+            background-color: #f8f9fa;
+            border-bottom: 1px solid #e9ecef;
+            padding: 15px 20px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .app-card-body {
+            padding: 20px;
+        }
+        
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: var(--entel-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Botones */
+        .app-btn {
+            border-radius: 10px;
+            padding: 12px 20px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+        
+        .app-btn-primary {
+            background: var(--entel-color);
+            color: white;
+        }
+        
+        .app-btn-primary:hover {
+            background: var(--entel-dark);
+            transform: translateY(-2px);
+        }
+        
+        .app-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+        
+        .app-btn-success {
+            background: #28a745;
+            color: white;
+        }
+        
+        .app-btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+        
+        /* Estados */
+        .status-badge {
+            border-radius: 20px;
+            padding: 5px 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+            display: inline-block;
+        }
+        
+        .status-nuevo {
+            background-color: #28a745;
+            color: white;
+        }
+        
+        .status-corte {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        /* Tablas responsivas */
+        .table-responsive {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        
+        .table th {
+            font-weight: 600;
+            font-size: 0.85rem;
+            background-color: #f8f9fa;
+        }
+        
+        .table td {
+            font-size: 0.8rem;
+            vertical-align: middle;
+        }
+        
+        /* Filtros */
+        .filter-card {
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .filter-full {
+            grid-column: 1 / -1;
+        }
+        
+        /* Modal mejorado para móvil */
+        .modal-content {
+            border-radius: 15px;
+            border: none;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+            color: white;
+            border-bottom: none;
+            border-radius: 15px 15px 0 0;
+        }
+        
+        .modal-footer {
+            border-top: none;
+            padding: 15px 20px 20px;
+        }
+        
+        /* Formularios */
+        .app-form-control {
+            border-radius: 10px;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s;
+            font-size: 0.9rem;
+        }
+        
+        .app-form-control:focus {
+            border-color: var(--entel-color);
+            box-shadow: 0 0 0 2px rgba(0,169,224,0.2);
+        }
+        
+        /* Acciones */
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            font-size: 0.8rem;
+        }
+        
+        /* Gráficos responsivos */
+        .chart-container {
+            position: relative;
+            height: 250px;
+            width: 100%;
+        }
+        
+        /* Utilidades */
+        .text-entel {
+            color: var(--entel-color);
+        }
+        
+        .bg-entel {
+            background-color: var(--entel-color);
+        }
+        
+        .section-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #333;
+        }
+        
+        /* Responsive adicional */
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 768px;
+                box-shadow: 0 0 15px rgba(0,0,0,0.1);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+            
+            .filter-row {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+        }
+        
+        /* Animaciones */
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <div class="app-header">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1><i class="bi bi-telephone-fill me-2"></i>ENTEL Admin</h1>
+                    <small>Panel de Administración</small>
+                </div>
+                <div class="d-flex align-items-center">
+                    <div class="user-avatar me-2">
+                        <span>A</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="app-content">
+            <!-- Dashboard Section -->
+            <div id="dashboardSection" class="fade-in">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">Dashboard</h2>
+                    <div>
+                        <button class="btn app-btn app-btn-primary me-2" id="exportDashboardBtn">
+                            <i class="bi bi-download me-1"></i> Exportar
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Estadísticas -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalRecharges">0</div>
+                        <div class="stat-label">Total Recargas</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalUsers">0</div>
+                        <div class="stat-label">Total Usuarios</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="nuevoCount">0</div>
+                        <div class="stat-label">Estado: Nuevo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="corteCount">0</div>
+                        <div class="stat-label">Estado: Corte</div>
+                    </div>
+                </div>
+
+                <!-- Actividad Reciente -->
+                <div class="app-card">
+                    <div class="app-card-header d-flex justify-content-between align-items-center">
+                        <span>Actividad Reciente</span>
+                        <small><a href="#" class="text-entel text-decoration-none" id="viewAllRecharges">Ver todo</a></small>
+                    </div>
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0" id="recentActivityTable">
+                                <thead>
+                                    <tr>
+                                        <th>Usuario</th>
+                                        <th>Teléfono</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recentActivityBody">
+                                    <!-- Los datos se cargarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="loadingRecent" class="loading-spinner d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Users Section -->
+            <div id="usersSection" class="fade-in d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">Gestión de Usuarios</h2>
+                    <button class="btn app-btn app-btn-primary" id="addUserBtn">
+                        <i class="bi bi-plus-circle me-1"></i> Nuevo Usuario
+                    </button>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0" id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th>Usuario</th>
+                                        <th>Nombre</th>
+                                        <th>Recargas</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="usersTableBody">
+                                    <!-- Los datos se cargarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="loadingUsers" class="loading-spinner d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recharges Section -->
+            <div id="rechargesSection" class="fade-in d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">Todas las Recargas</h2>
+                    <div>
+                        <button class="btn app-btn app-btn-success me-2" id="exportRechargesExcelBtn">
+                            <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                        </button>
+                        <button class="btn app-btn app-btn-danger" id="exportRechargesPdfBtn">
+                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filter-card">
+                    <div class="filter-row">
+                        <div class="filter-full">
+                            <label class="form-label">Usuario</label>
+                            <select class="form-select app-form-control" id="userFilter">
+                                <option value="">Todos los usuarios</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div>
+                            <label class="form-label">Estado</label>
+                            <select class="form-select app-form-control" id="statusFilter">
+                                <option value="">Todos</option>
+                                <option value="NUEVO">Nuevo</option>
+                                <option value="CORTE">Corte</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">Fecha Desde</label>
+                            <input type="date" class="form-control app-form-control" id="dateFrom">
+                        </div>
+                    </div>
+                    <div class="filter-row">
+                        <div>
+                            <label class="form-label">Fecha Hasta</label>
+                            <input type="date" class="form-control app-form-control" id="dateTo">
+                        </div>
+                        <div class="d-flex align-items-end">
+                            <button class="btn app-btn app-btn-primary w-100 me-2" id="applyFiltersBtn">
+                                <i class="bi bi-funnel me-1"></i> Filtrar
+                            </button>
+                            <button class="btn app-btn app-btn-secondary w-100" id="clearFiltersBtn">
+                                <i class="bi bi-x-circle me-1"></i> Limpiar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="app-card">
+                    <div class="app-card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover mb-0" id="rechargesTable">
+                                <thead>
+                                    <tr>
+                                        <th>Usuario</th>
+                                        <th>Teléfono</th>
+                                        <th>Estado</th>
+                                        <th>Fecha</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="rechargesTableBody">
+                                    <!-- Los datos se cargarán aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="loadingRecharges" class="loading-spinner d-none">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reports Section -->
+            <div id="reportsSection" class="fade-in d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="section-title">Reportes y Estadísticas</h2>
+                    <button class="btn app-btn app-btn-primary" id="exportReportsBtn">
+                        <i class="bi bi-download me-1"></i> Exportar
+                    </button>
+                </div>
+
+                <div class="row">
+                    <div class="col-12 mb-4">
+                        <div class="app-card">
+                            <div class="app-card-header">
+                                Distribución por Estado
+                            </div>
+                            <div class="app-card-body">
+                                <div class="chart-container">
+                                    <canvas id="statusDistributionChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-4">
+                        <div class="app-card">
+                            <div class="app-card-header">
+                                Recargas por Usuario
+                            </div>
+                            <div class="app-card-body">
+                                <div class="chart-container">
+                                    <canvas id="userRechargesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Navegación Inferior -->
+        <div class="bottom-nav">
+            <a href="#" class="nav-item active" data-section="dashboard">
+                <i class="bi bi-speedometer2"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="#" class="nav-item" data-section="users">
+                <i class="bi bi-people"></i>
+                <span>Usuarios</span>
+            </a>
+            <a href="#" class="nav-item" data-section="recharges">
+                <i class="bi bi-telephone"></i>
+                <span>Recargas</span>
+            </a>
+            <a href="#" class="nav-item" data-section="reports">
+                <i class="bi bi-graph-up"></i>
+                <span>Reportes</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Modal para Usuarios -->
+    <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalLabel">Agregar Usuario</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <input type="hidden" id="userId">
+                        <div class="mb-3">
+                            <label for="userUsername" class="form-label">Usuario</label>
+                            <input type="text" class="form-control app-form-control" id="userUsername" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userPassword" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control app-form-control" id="userPassword" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="userName" class="form-label">Nombre Completo</label>
+                            <input type="text" class="form-control app-form-control" id="userName" required>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn app-btn app-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn app-btn app-btn-primary" id="saveUserBtn">Guardar Usuario</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Editar Recarga -->
+    <div class="modal fade" id="editRechargeModal" tabindex="-1" aria-labelledby="editRechargeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editRechargeModalLabel">Editar Recarga</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="editRechargeForm">
+                        <input type="hidden" id="editRechargeId">
+                        <div class="mb-3">
+                            <label for="editPhoneNumber" class="form-label">Número de Teléfono</label>
+                            <input type="tel" class="form-control app-form-control" id="editPhoneNumber" 
+                                   pattern="[0-9]{8}" maxlength="8" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="editStatus" class="form-label">Estado</label>
+                            <select class="form-select app-form-control" id="editStatus" required>
+                                <option value="NUEVO">Nuevo</option>
+                                <option value="CORTE">Corte</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn app-btn app-btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn app-btn app-btn-primary" id="saveRechargeBtn">Guardar Cambios</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://zrbhhiayfaedatwlzqch.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYmhoaWF5ZmFlZGF0d2x6cWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExMTcwMjgsImV4cCI6MjA3NjY5MzAyOH0.b97mGNErXGRuIorOPTf6m1awGlIyrXaAI4VS65aR-5o';
+
+        let allRecharges = [];
+        let allUsers = [];
+        let filteredRecharges = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdminPanel();
+        });
+
+        function initializeAdminPanel() {
+            // Configurar navegación
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Actualizar clase activa
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                });
+            });
+
+            // Configurar botones
+            document.getElementById('addUserBtn').addEventListener('click', showAddUserModal);
+            document.getElementById('saveUserBtn').addEventListener('click', saveUser);
+            document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
+            document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+            document.getElementById('exportDashboardBtn').addEventListener('click', exportDashboard);
+            document.getElementById('exportRechargesExcelBtn').addEventListener('click', exportRechargesToExcel);
+            document.getElementById('exportRechargesPdfBtn').addEventListener('click', exportRechargesToPDF);
+            document.getElementById('exportReportsBtn').addEventListener('click', exportReports);
+            document.getElementById('viewAllRecharges').addEventListener('click', function(e) {
+                e.preventDefault();
+                showSection('recharges');
+                document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                document.querySelector('.nav-item[data-section="recharges"]').classList.add('active');
+            });
+            document.getElementById('saveRechargeBtn').addEventListener('click', saveRechargeChanges);
+
+            // Cargar datos iniciales
+            loadDashboardData();
+        }
+
+        function showSection(section) {
+            // Ocultar todas las secciones
+            document.getElementById('dashboardSection').classList.add('d-none');
+            document.getElementById('usersSection').classList.add('d-none');
+            document.getElementById('rechargesSection').classList.add('d-none');
+            document.getElementById('reportsSection').classList.add('d-none');
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(section + 'Section').classList.remove('d-none');
+            
+            // Cargar datos específicos de la sección si es necesario
+            if (section === 'users') {
+                loadUsersData();
+            } else if (section === 'recharges') {
+                loadRechargesData();
+            } else if (section === 'reports') {
+                loadReportsData();
+            }
+        }
+
+        async function loadDashboardData() {
+            showLoading('loadingRecent');
+            try {
+                // Cargar todas las recargas
+                const rechargesResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history?order=created_at.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!rechargesResponse.ok) throw new Error('Error al cargar recargas');
+                allRecharges = await rechargesResponse.json();
+                filteredRecharges = [...allRecharges];
+
+                // Cargar usuarios
+                const usersResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/users`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!usersResponse.ok) throw new Error('Error al cargar usuarios');
+                allUsers = await usersResponse.json();
+
+                // Actualizar estadísticas
+                updateDashboardStats();
+                updateRecentActivity();
+
+            } catch (error) {
+                console.error('Error al cargar datos del dashboard:', error);
+                alert('Error al cargar datos. Verifique su conexión.');
+            } finally {
+                hideLoading('loadingRecent');
+            }
+        }
+
+        function updateDashboardStats() {
+            // Total recargas
+            document.getElementById('totalRecharges').textContent = allRecharges.length;
+            
+            // Total usuarios
+            document.getElementById('totalUsers').textContent = allUsers.length;
+            
+            // Contar por estado
+            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
+            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            
+            document.getElementById('nuevoCount').textContent = nuevoCount;
+            document.getElementById('corteCount').textContent = corteCount;
+        }
+
+        function updateRecentActivity() {
+            const tbody = document.getElementById('recentActivityBody');
+            const recentRecharges = allRecharges.slice(0, 5); // Últimas 5 recargas
+            
+            tbody.innerHTML = recentRecharges.map(recharge => `
+                <tr>
+                    <td>${recharge.user_name}</td>
+                    <td>${recharge.phone_number}</td>
+                    <td>
+                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                            ${recharge.estado}
+                        </span>
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-outline-primary action-btn" onclick="editRecharge(${recharge.id})" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteRecharge(${recharge.id})" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function loadUsersData() {
+            showLoading('loadingUsers');
+            try {
+                const tbody = document.getElementById('usersTableBody');
+                
+                // Contar recargas por usuario
+                const userRechargeCounts = {};
+                allRecharges.forEach(recharge => {
+                    userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
+                });
+
+                tbody.innerHTML = allUsers.map(user => `
+                    <tr>
+                        <td>${user.username}</td>
+                        <td>${user.nombre}</td>
+                        <td>${userRechargeCounts[user.id] || 0}</td>
+                        <td class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary action-btn" onclick="editUser(${user.id})" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteUser(${user.id})" ${user.username === 'admin' ? 'disabled' : ''} title="Eliminar">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `).join('');
+
+            } catch (error) {
+                console.error('Error al cargar usuarios:', error);
+                alert('Error al cargar usuarios');
+            } finally {
+                hideLoading('loadingUsers');
+            }
+        }
+
+        async function loadRechargesData() {
+            showLoading('loadingRecharges');
+            try {
+                const tbody = document.getElementById('rechargesTableBody');
+                
+                // Llenar filtro de usuarios
+                const userFilter = document.getElementById('userFilter');
+                const uniqueUsers = [...new Set(allRecharges.map(r => r.user_name))];
+                userFilter.innerHTML = '<option value="">Todos los usuarios</option>' + 
+                    uniqueUsers.map(user => `<option value="${user}">${user}</option>`).join('');
+
+                // Mostrar recargas filtradas
+                displayFilteredRecharges();
+
+            } catch (error) {
+                console.error('Error al cargar recargas:', error);
+                alert('Error al cargar recargas');
+            } finally {
+                hideLoading('loadingRecharges');
+            }
+        }
+
+        function displayFilteredRecharges() {
+            const tbody = document.getElementById('rechargesTableBody');
+            
+            tbody.innerHTML = filteredRecharges.map(recharge => `
+                <tr>
+                    <td>${recharge.user_name}</td>
+                    <td>${recharge.phone_number}</td>
+                    <td>
+                        <select class="form-select form-select-sm status-select" onchange="updateRechargeStatus(${recharge.id}, this.value)">
+                            <option value="NUEVO" ${recharge.estado === 'NUEVO' ? 'selected' : ''}>Nuevo</option>
+                            <option value="CORTE" ${recharge.estado === 'CORTE' ? 'selected' : ''}>Corte</option>
+                        </select>
+                    </td>
+                    <td>${formatDate(recharge.timestamp)}</td>
+                    <td class="action-buttons">
+                        <button class="btn btn-sm btn-outline-primary action-btn" onclick="editRecharge(${recharge.id})" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteRecharge(${recharge.id})" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function applyFilters() {
+            const userFilter = document.getElementById('userFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const dateFrom = document.getElementById('dateFrom').value;
+            const dateTo = document.getElementById('dateTo').value;
+
+            filteredRecharges = allRecharges.filter(recharge => {
+                let match = true;
+                
+                if (userFilter && recharge.user_name !== userFilter) {
+                    match = false;
+                }
+                
+                if (statusFilter && recharge.estado !== statusFilter) {
+                    match = false;
+                }
+                
+                if (dateFrom) {
+                    const rechargeDate = new Date(recharge.timestamp.split(' ')[0].split('/').reverse().join('-'));
+                    const fromDate = new Date(dateFrom);
+                    if (rechargeDate < fromDate) match = false;
+                }
+                
+                if (dateTo) {
+                    const rechargeDate = new Date(recharge.timestamp.split(' ')[0].split('/').reverse().join('-'));
+                    const toDate = new Date(dateTo);
+                    if (rechargeDate > toDate) match = false;
+                }
+                
+                return match;
+            });
+
+            displayFilteredRecharges();
+        }
+
+        function clearFilters() {
+            document.getElementById('userFilter').value = '';
+            document.getElementById('statusFilter').value = '';
+            document.getElementById('dateFrom').value = '';
+            document.getElementById('dateTo').value = '';
+            
+            filteredRecharges = [...allRecharges];
+            displayFilteredRecharges();
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const parts = dateString.split(' ')[0].split('/');
+            if (parts.length === 3) {
+                return `${parts[0]}/${parts[1]}`;
+            }
+            return dateString;
+        }
+
+        function showAddUserModal() {
+            document.getElementById('userModalLabel').textContent = 'Agregar Usuario';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
+        }
+
+        async function saveUser() {
+            const userId = document.getElementById('userId').value;
+            const username = document.getElementById('userUsername').value;
+            const password = document.getElementById('userPassword').value;
+            const name = document.getElementById('userName').value;
+
+            if (!username || !password || !name) {
+                alert('Por favor, complete todos los campos');
+                return;
+            }
+
+            try {
+                const userData = {
+                    username: username,
+                    password: password,
+                    nombre: name
+                };
+
+                let response;
+                if (userId) {
+                    // Actualizar usuario existente
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(userData)
+                        }
+                    );
+                } else {
+                    // Crear nuevo usuario
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/users`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(userData)
+                        }
+                    );
+                }
+
+                if (!response.ok) throw new Error('Error al guardar usuario');
+
+                // Cerrar modal y recargar datos
+                bootstrap.Modal.getInstance(document.getElementById('userModal')).hide();
+                loadDashboardData(); // Recargar todos los datos
+                if (document.getElementById('usersSection').classList.contains('d-none') === false) {
+                    loadUsersData();
+                }
+
+                alert('Usuario guardado exitosamente');
+
+            } catch (error) {
+                console.error('Error al guardar usuario:', error);
+                alert('Error al guardar usuario');
+            }
+        }
+
+        function editRecharge(rechargeId) {
+            const recharge = allRecharges.find(r => r.id === rechargeId);
+            if (!recharge) return;
+
+            document.getElementById('editRechargeModalLabel').textContent = 'Editar Recarga';
+            document.getElementById('editRechargeId').value = recharge.id;
+            document.getElementById('editPhoneNumber').value = recharge.phone_number;
+            document.getElementById('editStatus').value = recharge.estado;
+
+            const modal = new bootstrap.Modal(document.getElementById('editRechargeModal'));
+            modal.show();
+        }
+
+        async function saveRechargeChanges() {
+            const rechargeId = document.getElementById('editRechargeId').value;
+            const phoneNumber = document.getElementById('editPhoneNumber').value;
+            const status = document.getElementById('editStatus').value;
+
+            if (!phoneNumber || phoneNumber.length !== 8) {
+                alert('Por favor, ingrese un número de teléfono válido de 8 dígitos');
+                return;
+            }
+
+            try {
+                const rechargeData = {
+                    phone_number: phoneNumber,
+                    estado: status,
+                    command: `*222*2*${phoneNumber}*20*1#`
+                };
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history?id=eq.${rechargeId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(rechargeData)
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al actualizar recarga');
+
+                // Actualizar datos locales
+                const rechargeIndex = allRecharges.findIndex(r => r.id === parseInt(rechargeId));
+                if (rechargeIndex !== -1) {
+                    allRecharges[rechargeIndex].phone_number = phoneNumber;
+                    allRecharges[rechargeIndex].estado = status;
+                    allRecharges[rechargeIndex].command = `*222*2*${phoneNumber}*20*1#`;
+                }
+
+                const filteredIndex = filteredRecharges.findIndex(r => r.id === parseInt(rechargeId));
+                if (filteredIndex !== -1) {
+                    filteredRecharges[filteredIndex].phone_number = phoneNumber;
+                    filteredRecharges[filteredIndex].estado = status;
+                    filteredRecharges[filteredIndex].command = `*222*2*${phoneNumber}*20*1#`;
+                }
+
+                // Cerrar modal y actualizar vistas
+                bootstrap.Modal.getInstance(document.getElementById('editRechargeModal')).hide();
+                
+                // Actualizar todas las vistas
+                updateDashboardStats();
+                updateRecentActivity();
+                if (document.getElementById('rechargesSection').classList.contains('d-none') === false) {
+                    displayFilteredRecharges();
+                }
+
+                alert('Recarga actualizada exitosamente');
+
+            } catch (error) {
+                console.error('Error al actualizar recarga:', error);
+                alert('Error al actualizar recarga');
+            }
+        }
+
+        async function updateRechargeStatus(rechargeId, newStatus) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history?id=eq.${rechargeId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({ estado: newStatus })
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al actualizar estado');
+
+                // Actualizar datos locales
+                const recharge = allRecharges.find(r => r.id === rechargeId);
+                if (recharge) {
+                    recharge.estado = newStatus;
+                }
+
+                const filteredRecharge = filteredRecharges.find(r => r.id === rechargeId);
+                if (filteredRecharge) {
+                    filteredRecharge.estado = newStatus;
+                }
+
+                // Actualizar dashboard
+                updateDashboardStats();
+                updateRecentActivity();
+
+            } catch (error) {
+                console.error('Error al actualizar estado:', error);
+                alert('Error al actualizar el estado');
+            }
+        }
+
+        async function deleteRecharge(rechargeId) {
+            if (!confirm('¿Está seguro de que desea eliminar esta recarga?')) return;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history?id=eq.${rechargeId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al eliminar recarga');
+
+                // Actualizar datos locales
+                allRecharges = allRecharges.filter(r => r.id !== rechargeId);
+                filteredRecharges = filteredRecharges.filter(r => r.id !== rechargeId);
+
+                // Recargar vistas
+                if (document.getElementById('dashboardSection').classList.contains('d-none') === false) {
+                    updateDashboardStats();
+                    updateRecentActivity();
+                }
+                if (document.getElementById('rechargesSection').classList.contains('d-none') === false) {
+                    displayFilteredRecharges();
+                }
+
+                alert('Recarga eliminada exitosamente');
+
+            } catch (error) {
+                console.error('Error al eliminar recarga:', error);
+                alert('Error al eliminar recarga');
+            }
+        }
+
+        async function deleteUser(userId) {
+            if (!confirm('¿Está seguro de que desea eliminar este usuario? También se eliminarán todas sus recargas.')) return;
+
+            try {
+                // Primero eliminar las recargas del usuario
+                const deleteRechargesResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history?user_id=eq.${userId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!deleteRechargesResponse.ok) throw new Error('Error al eliminar recargas del usuario');
+
+                // Luego eliminar el usuario
+                const deleteUserResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/users?id=eq.${userId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!deleteUserResponse.ok) throw new Error('Error al eliminar usuario');
+
+                // Actualizar datos locales
+                allUsers = allUsers.filter(u => u.id !== userId);
+                allRecharges = allRecharges.filter(r => r.user_id !== userId);
+                filteredRecharges = filteredRecharges.filter(r => r.user_id !== userId);
+
+                // Recargar vistas
+                loadDashboardData();
+                if (document.getElementById('usersSection').classList.contains('d-none') === false) {
+                    loadUsersData();
+                }
+
+                alert('Usuario eliminado exitosamente');
+
+            } catch (error) {
+                console.error('Error al eliminar usuario:', error);
+                alert('Error al eliminar usuario');
+            }
+        }
+
+        function editUser(userId) {
+            const user = allUsers.find(u => u.id === userId);
+            if (!user) return;
+
+            document.getElementById('userModalLabel').textContent = 'Editar Usuario';
+            document.getElementById('userId').value = user.id;
+            document.getElementById('userUsername').value = user.username;
+            document.getElementById('userPassword').value = user.password;
+            document.getElementById('userName').value = user.nombre;
+
+            const modal = new bootstrap.Modal(document.getElementById('userModal'));
+            modal.show();
+        }
+
+        function loadReportsData() {
+            // Gráfico de distribución por estado
+            const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
+            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
+            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            
+            new Chart(statusCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Nuevo', 'Corte'],
+                    datasets: [{
+                        data: [nuevoCount, corteCount],
+                        backgroundColor: ['#28a745', '#dc3545'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de recargas por usuario
+            const userCtx = document.getElementById('userRechargesChart').getContext('2d');
+            const userRechargeCounts = {};
+            allRecharges.forEach(recharge => {
+                userRechargeCounts[recharge.user_name] = (userRechargeCounts[recharge.user_name] || 0) + 1;
+            });
+            
+            const userLabels = Object.keys(userRechargeCounts);
+            const userData = Object.values(userRechargeCounts);
+            
+            new Chart(userCtx, {
+                type: 'bar',
+                data: {
+                    labels: userLabels,
+                    datasets: [{
+                        label: 'Recargas',
+                        data: userData,
+                        backgroundColor: '#00A9E0',
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportDashboard() {
+            exportToPDF('Dashboard', allRecharges);
+        }
+
+        function exportRechargesToExcel() {
+            exportToExcel(filteredRecharges, 'Recargas_ENTEL');
+        }
+
+        function exportRechargesToPDF() {
+            exportToPDF('Recargas', filteredRecharges);
+        }
+
+        function exportReports() {
+            exportToPDF('Reportes', allRecharges);
+        }
+
+        function exportToPDF(title, data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(18);
+            doc.setTextColor(0, 169, 224);
+            doc.text(`Reporte ${title} - ENTEL`, 20, 20);
+            
+            // Información
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, 20, 30);
+            doc.text(`Total registros: ${data.length}`, 20, 37);
+            
+            // Tabla
+            const tableColumn = ["Usuario", "Teléfono", "Estado", "Fecha"];
+            const tableRows = [];
+            
+            data.forEach(item => {
+                const rowData = [
+                    item.user_name,
+                    item.phone_number,
+                    item.estado,
+                    item.timestamp
+                ];
+                tableRows.push(rowData);
+            });
+            
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 45,
+                theme: 'grid',
+                styles: {
+                    fontSize: 10,
+                    cellPadding: 3
+                },
+                headStyles: {
+                    fillColor: [0, 169, 224],
+                    textColor: 255
+                }
+            });
+            
+            doc.save(`Reporte_${title}_ENTEL_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        function exportToExcel(data, filename) {
+            // Preparar datos para Excel
+            const excelData = data.map(item => ({
+                'Usuario': item.user_name,
+                'Teléfono': item.phone_number,
+                'Estado': item.estado,
+                'Fecha': item.timestamp,
+                'Comando': item.command
+            }));
+            
+            // Crear libro de trabajo
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            
+            // Agregar hoja al libro
+            XLSX.utils.book_append_sheet(wb, ws, 'Recargas');
+            
+            // Exportar
+            XLSX.writeFile(wb, `${filename}_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).classList.remove('d-none');
+        }
+
+        function hideLoading(elementId) {
+            document.getElementById(elementId).classList.add('d-none');
+        }
+
+        // Hacer las funciones accesibles globalmente para los event handlers
+        window.updateRechargeStatus = updateRechargeStatus;
+        window.deleteRecharge = deleteRecharge;
+        window.deleteUser = deleteUser;
+        window.editUser = editUser;
+        window.editRecharge = editRecharge;
+    </script>
+</body>
+</html>
