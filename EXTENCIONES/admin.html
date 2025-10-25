@@ -363,6 +363,30 @@
             align-items: center;
             padding: 40px;
         }
+        
+        /* Buscador */
+        .search-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        
+        .search-input {
+            padding-left: 40px;
+            border-radius: 10px;
+            height: 45px;
+            border: 1px solid #e0e0e0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6c757d;
+            z-index: 5;
+        }
     </style>
 </head>
 <body>
@@ -493,6 +517,12 @@
                             <i class="bi bi-file-earmark-pdf me-1"></i> PDF
                         </button>
                     </div>
+                </div>
+
+                <!-- Buscador de números -->
+                <div class="search-container">
+                    <i class="bi bi-search search-icon"></i>
+                    <input type="text" class="form-control search-input" id="phoneSearch" placeholder="Buscar por número de teléfono...">
                 </div>
 
                 <!-- Filtros -->
@@ -740,6 +770,9 @@
                 document.querySelector('.nav-item[data-section="recharges"]').classList.add('active');
             });
             document.getElementById('saveRechargeBtn').addEventListener('click', saveRechargeChanges);
+            
+            // Configurar buscador de números
+            document.getElementById('phoneSearch').addEventListener('input', searchPhoneNumbers);
 
             // Cargar datos iniciales
             loadDashboardData();
@@ -972,8 +1005,26 @@
             document.getElementById('statusFilter').value = '';
             document.getElementById('dateFrom').value = '';
             document.getElementById('dateTo').value = '';
+            document.getElementById('phoneSearch').value = '';
             
             filteredRecharges = [...allRecharges];
+            displayFilteredRecharges();
+        }
+
+        function searchPhoneNumbers() {
+            const searchTerm = document.getElementById('phoneSearch').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                // Si no hay término de búsqueda, aplicar los filtros existentes
+                applyFilters();
+                return;
+            }
+            
+            // Filtrar por número de teléfono
+            filteredRecharges = allRecharges.filter(recharge => {
+                return recharge.phone_number.includes(searchTerm);
+            });
+            
             displayFilteredRecharges();
         }
 
