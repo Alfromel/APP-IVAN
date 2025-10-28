@@ -202,6 +202,11 @@
             color: white;
         }
         
+        .app-btn-warning {
+            background: #ffc107;
+            color: #212529;
+        }
+        
         /* Estados */
         .status-badge {
             border-radius: 20px;
@@ -510,6 +515,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="section-title">Todas las Recargas</h2>
                     <div>
+                        <button class="btn app-btn app-btn-warning me-2" id="clearAllHistoryBtn">
+                            <i class="bi bi-trash me-1"></i> Borrar Historial
+                        </button>
                         <button class="btn app-btn app-btn-success me-2" id="exportRechargesExcelBtn">
                             <i class="bi bi-file-earmark-excel me-1"></i> Excel
                         </button>
@@ -773,6 +781,9 @@
             
             // Configurar buscador de números
             document.getElementById('phoneSearch').addEventListener('input', searchPhoneNumbers);
+            
+            // Configurar botón para borrar historial
+            document.getElementById('clearAllHistoryBtn').addEventListener('click', clearAllHistory);
 
             // Cargar datos iniciales
             loadDashboardData();
@@ -1026,6 +1037,48 @@
             });
             
             displayFilteredRecharges();
+        }
+
+        async function clearAllHistory() {
+            if (!confirm('¿ESTÁ SEGURO DE QUE DESEA BORRAR TODO EL HISTORIAL DE RECARGAS?\n\nEsta acción eliminará permanentemente todas las recargas de todos los usuarios y no se puede deshacer.')) {
+                return;
+            }
+
+            try {
+                showLoading('loadingRecharges');
+                
+                // Eliminar todas las recargas
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al borrar el historial');
+
+                // Actualizar datos locales
+                allRecharges = [];
+                filteredRecharges = [];
+
+                // Recargar vistas
+                updateDashboardStats();
+                updateRecentActivity();
+                displayFilteredRecharges();
+
+                alert('Historial de recargas borrado exitosamente');
+
+            } catch (error) {
+                console.error('Error al borrar historial:', error);
+                alert('Error al borrar el historial de recargas');
+            } finally {
+                hideLoading('loadingRecharges');
+            }
         }
 
         function formatDate(dateString) {
