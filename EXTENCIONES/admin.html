@@ -17,8 +17,10 @@
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <style>
         :root {
-            --entel-color: #00A9E0;
-            --entel-dark: #0080b3;
+            --entel-color: #0096D6;
+            --entel-dark: #0077B3;
+            --entel-light: #33B1E6;
+            --entel-accent: #FF6B00;
         }
         
         * {
@@ -32,6 +34,7 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             min-height: 100vh;
             overflow-x: hidden;
+            font-size: 14px;
         }
         
         .app-container {
@@ -40,38 +43,45 @@
             background: white;
             min-height: 100vh;
             position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
         }
         
-        /* Header estilo app móvil */
+        /* Header estilo app móvil - MÁS COMPACTO */
         .app-header {
             background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 15px;
             position: sticky;
             top: 0;
             z-index: 1000;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         }
         
         .app-header h1 {
-            font-size: 1.4rem;
+            font-size: 1.2rem;
             margin: 0;
-            font-weight: 600;
+            font-weight: 700;
+        }
+        
+        .app-header small {
+            font-size: 0.75rem;
+            opacity: 0.9;
         }
         
         .user-avatar {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.25);
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            font-size: 1.2rem;
+            font-size: 1rem;
+            border: 2px solid rgba(255,255,255,0.5);
         }
         
-        /* Navegación tipo app móvil */
+        /* Navegación tipo app móvil - MÁS COMPACTA */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -80,9 +90,10 @@
             background: white;
             display: flex;
             justify-content: space-around;
-            padding: 10px 0;
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            padding: 10px 0 8px;
+            box-shadow: 0 -2px 8px rgba(0,0,0,0.08);
             z-index: 1000;
+            border-top: 1px solid #e9ecef;
         }
         
         .nav-item {
@@ -91,8 +102,8 @@
             align-items: center;
             text-decoration: none;
             color: #6c757d;
-            font-size: 0.7rem;
-            padding: 5px 10px;
+            font-size: 0.65rem;
+            padding: 4px 8px;
             border-radius: 10px;
             transition: all 0.3s;
             flex: 1;
@@ -101,80 +112,101 @@
         
         .nav-item.active {
             color: var(--entel-color);
+            background-color: rgba(0, 150, 214, 0.08);
         }
         
         .nav-item i {
-            font-size: 1.2rem;
-            margin-bottom: 3px;
+            font-size: 1.1rem;
+            margin-bottom: 2px;
         }
         
-        /* Contenido principal */
+        /* Contenido principal - MÁS COMPACTO */
         .app-content {
-            padding: 20px 15px;
-            padding-bottom: 80px; /* Espacio para la navegación inferior */
+            padding: 15px 12px;
+            padding-bottom: 70px; /* Espacio reducido para la navegación inferior */
         }
         
-        /* Tarjetas estilo app */
+        /* Tarjetas estilo app - MÁS COMPACTAS */
         .app-card {
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-            margin-bottom: 20px;
+            border-radius: 14px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 16px;
             border: none;
             overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .app-card-header {
-            background-color: #f8f9fa;
-            border-bottom: 1px solid #e9ecef;
-            padding: 15px 20px;
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+            color: white;
+            border-bottom: none;
+            padding: 12px 16px;
             font-weight: 600;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
         }
         
         .app-card-body {
-            padding: 20px;
+            padding: 16px;
         }
         
-        /* Estadísticas */
+        /* Estadísticas - MÁS COMPACTAS */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 15px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
         
         .stat-card {
             background: white;
-            border-radius: 12px;
-            padding: 20px;
+            border-radius: 14px;
+            padding: 16px;
             text-align: center;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+            border-left: 3px solid var(--entel-color);
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
         }
         
         .stat-number {
-            font-size: 1.8rem;
-            font-weight: bold;
+            font-size: 1.6rem;
+            font-weight: 800;
             color: var(--entel-color);
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
         
         .stat-label {
             color: #6c757d;
-            font-size: 0.85rem;
+            font-size: 0.75rem;
+            font-weight: 500;
         }
         
-        /* Botones */
+        /* Botones - MÁS COMPACTOS */
         .app-btn {
             border-radius: 10px;
-            padding: 12px 20px;
+            padding: 10px 14px;
             font-weight: 600;
             border: none;
-            transition: all 0.3s;
+            transition: all 0.2s;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+        }
+        
+        .app-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
         }
         
         .app-btn-primary {
@@ -184,7 +216,6 @@
         
         .app-btn-primary:hover {
             background: var(--entel-dark);
-            transform: translateY(-2px);
         }
         
         .app-btn-secondary {
@@ -207,18 +238,23 @@
             color: #212529;
         }
         
+        .app-btn-accent {
+            background: var(--entel-accent);
+            color: white;
+        }
+        
         /* Botón pequeño para borrar historial */
         .app-btn-small {
-            padding: 8px 12px;
-            font-size: 0.8rem;
+            padding: 8px 10px;
+            font-size: 0.75rem;
         }
         
         /* Estados */
         .status-badge {
-            border-radius: 20px;
-            padding: 5px 12px;
-            font-size: 0.75rem;
-            font-weight: 500;
+            border-radius: 16px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
             display: inline-block;
         }
         
@@ -232,96 +268,119 @@
             color: white;
         }
         
-        /* Tablas responsivas */
+        /* Tablas responsivas - MÁS COMPACTAS */
         .table-responsive {
             border-radius: 10px;
             overflow: hidden;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.04);
         }
         
         .table th {
-            font-weight: 600;
-            font-size: 0.85rem;
-            background-color: #f8f9fa;
+            font-weight: 700;
+            font-size: 0.8rem;
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+            color: white;
+            border: none;
+            padding: 10px 12px;
         }
         
         .table td {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             vertical-align: middle;
+            padding: 10px 12px;
+            border-bottom: 1px solid #f5f5f5;
         }
         
-        /* Filtros */
+        .table tbody tr:hover {
+            background-color: rgba(0, 150, 214, 0.04);
+        }
+        
+        /* Filtros - MÁS COMPACTOS */
         .filter-card {
             background: white;
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
         
         .filter-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
         
         .filter-full {
             grid-column: 1 / -1;
         }
         
-        /* Modal mejorado para móvil */
+        /* Modal mejorado para móvil - MÁS COMPACTO */
         .modal-content {
-            border-radius: 15px;
+            border-radius: 16px;
             border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
         }
         
         .modal-header {
             background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
             color: white;
             border-bottom: none;
-            border-radius: 15px 15px 0 0;
+            border-radius: 16px 16px 0 0;
+            padding: 16px;
         }
         
         .modal-footer {
             border-top: none;
-            padding: 15px 20px 20px;
+            padding: 16px;
+            background-color: #f8f9fa;
+            border-radius: 0 0 16px 16px;
         }
         
-        /* Formularios */
+        /* Formularios - MÁS COMPACTOS */
         .app-form-control {
             border-radius: 10px;
-            padding: 12px 15px;
-            border: 1px solid #e0e0e0;
-            transition: all 0.3s;
-            font-size: 0.9rem;
+            padding: 10px 12px;
+            border: 1px solid #e5e5e5;
+            transition: all 0.2s;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
         }
         
         .app-form-control:focus {
             border-color: var(--entel-color);
-            box-shadow: 0 0 0 2px rgba(0,169,224,0.2);
+            box-shadow: 0 0 0 2px rgba(0,150,214,0.15);
         }
         
-        /* Acciones */
+        /* Acciones - MÁS COMPACTAS */
         .action-buttons {
             display: flex;
-            gap: 5px;
+            gap: 6px;
+            justify-content: center;
         }
         
         .action-btn {
-            width: 35px;
-            height: 35px;
+            width: 32px;
+            height: 32px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             border: none;
             font-size: 0.8rem;
+            transition: all 0.2s;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
         }
         
-        /* Gráficos responsivos */
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.12);
+        }
+        
+        /* Gráficos responsivos - MÁS COMPACTOS */
         .chart-container {
             position: relative;
-            height: 250px;
+            height: 200px;
             width: 100%;
         }
         
@@ -336,16 +395,28 @@
         
         .section-title {
             font-size: 1.3rem;
-            font-weight: 600;
-            margin-bottom: 20px;
+            font-weight: 700;
+            margin-bottom: 16px;
             color: #333;
+            position: relative;
+            padding-bottom: 8px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+            border-radius: 2px;
         }
         
         /* Responsive adicional */
         @media (min-width: 768px) {
             .app-container {
                 max-width: 768px;
-                box-shadow: 0 0 15px rgba(0,0,0,0.1);
             }
             
             .stats-grid {
@@ -359,11 +430,11 @@
         
         /* Animaciones */
         .fade-in {
-            animation: fadeIn 0.5s ease-in;
+            animation: fadeIn 0.4s ease-in;
         }
         
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
+            from { opacity: 0; transform: translateY(8px); }
             to { opacity: 1; transform: translateY(0); }
         }
         
@@ -372,31 +443,153 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 40px;
+            padding: 30px;
         }
         
-        /* Buscador */
+        /* Buscador - MÁS COMPACTO */
         .search-container {
             position: relative;
-            margin-bottom: 15px;
+            margin-bottom: 16px;
         }
         
         .search-input {
             padding-left: 40px;
             border-radius: 10px;
-            height: 45px;
-            border: 1px solid #e0e0e0;
+            height: 44px;
+            border: 1px solid #e5e5e5;
             width: 100%;
-            font-size: 0.9rem;
+            font-size: 0.85rem;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.06);
         }
         
         .search-icon {
             position: absolute;
-            left: 15px;
+            left: 12px;
             top: 50%;
             transform: translateY(-50%);
             color: #6c757d;
             z-index: 5;
+            font-size: 1rem;
+        }
+        
+        /* Notificaciones - MÁS COMPACTAS */
+        .notification {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 12px 16px;
+            border-radius: 10px;
+            color: white;
+            font-weight: 500;
+            z-index: 1100;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            font-size: 0.85rem;
+            max-width: 300px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+        }
+        
+        /* Badge para contadores */
+        .badge-counter {
+            position: absolute;
+            top: -6px;
+            right: -6px;
+            background-color: var(--entel-accent);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.65rem;
+            font-weight: bold;
+        }
+        
+        /* Selectores de estado mejorados - MÁS COMPACTOS */
+        .status-select {
+            border-radius: 6px;
+            padding: 5px 8px;
+            font-size: 0.75rem;
+            border: 1px solid #e5e5e5;
+            background-color: white;
+            transition: all 0.2s;
+        }
+        
+        .status-select:focus {
+            border-color: var(--entel-color);
+            box-shadow: 0 0 0 1px rgba(0,150,214,0.15);
+        }
+        
+        /* Botón de actualización */
+        .refresh-btn {
+            background: transparent;
+            border: none;
+            color: var(--entel-color);
+            font-size: 1.1rem;
+            transition: transform 0.4s;
+            padding: 6px;
+        }
+        
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+        
+        .refresh-btn.loading {
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Ajustes adicionales para mejor acomodación */
+        .form-label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #555;
+        }
+        
+        .modal-title {
+            font-size: 1.1rem;
+        }
+        
+        .mb-3 {
+            margin-bottom: 12px !important;
+        }
+        
+        .mb-4 {
+            margin-bottom: 16px !important;
+        }
+        
+        .me-2 {
+            margin-right: 8px !important;
+        }
+        
+        .me-3 {
+            margin-right: 12px !important;
+        }
+        
+        .me-1 {
+            margin-right: 4px !important;
         }
     </style>
 </head>
@@ -410,12 +603,18 @@
                     <small>Panel de Administración</small>
                 </div>
                 <div class="d-flex align-items-center">
-                    <div class="user-avatar me-2">
+                    <button class="btn refresh-btn me-3" id="refreshDataBtn" title="Actualizar datos">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <div class="user-avatar">
                         <span>A</span>
                     </div>
                 </div>
             </div>
         </div>
+
+        <!-- Notificaciones -->
+        <div id="notification" class="notification d-none"></div>
 
         <!-- Contenido Principal -->
         <div class="app-content">
@@ -424,8 +623,8 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="section-title">Dashboard</h2>
                     <div>
-                        <button class="btn app-btn app-btn-primary me-2" id="exportDashboardBtn">
-                            <i class="bi bi-download me-1"></i> Exportar
+                        <button class="btn app-btn app-btn-primary" id="exportDashboardBtn" title="Exportar dashboard">
+                            <i class="bi bi-download"></i>
                         </button>
                     </div>
                 </div>
@@ -454,7 +653,7 @@
                 <div class="app-card">
                     <div class="app-card-header d-flex justify-content-between align-items-center">
                         <span>Actividad Reciente</span>
-                        <small><a href="#" class="text-entel text-decoration-none" id="viewAllRecharges">Ver todo</a></small>
+                        <small><a href="#" class="text-white text-decoration-none" id="viewAllRecharges">Ver todo</a></small>
                     </div>
                     <div class="app-card-body p-0">
                         <div class="table-responsive">
@@ -485,8 +684,8 @@
             <div id="usersSection" class="fade-in d-none">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="section-title">Gestión de Usuarios</h2>
-                    <button class="btn app-btn app-btn-primary" id="addUserBtn">
-                        <i class="bi bi-plus-circle me-1"></i> Nuevo Usuario
+                    <button class="btn app-btn app-btn-primary" id="addUserBtn" title="Agregar usuario">
+                        <i class="bi bi-person-plus"></i>
                     </button>
                 </div>
 
@@ -524,11 +723,11 @@
                         <button class="btn app-btn app-btn-warning app-btn-small me-2" id="clearAllHistoryBtn" title="Borrar todo el historial">
                             <i class="bi bi-trash"></i>
                         </button>
-                        <button class="btn app-btn app-btn-success me-2" id="exportRechargesExcelBtn">
-                            <i class="bi bi-file-earmark-excel me-1"></i> Excel
+                        <button class="btn app-btn app-btn-success me-2" id="exportRechargesExcelBtn" title="Exportar a Excel">
+                            <i class="bi bi-file-earmark-excel"></i>
                         </button>
-                        <button class="btn app-btn app-btn-danger" id="exportRechargesPdfBtn">
-                            <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                        <button class="btn app-btn app-btn-danger" id="exportRechargesPdfBtn" title="Exportar a PDF">
+                            <i class="bi bi-file-earmark-pdf"></i>
                         </button>
                     </div>
                 </div>
@@ -610,8 +809,8 @@
             <div id="reportsSection" class="fade-in d-none">
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h2 class="section-title">Reportes y Estadísticas</h2>
-                    <button class="btn app-btn app-btn-primary" id="exportReportsBtn">
-                        <i class="bi bi-download me-1"></i> Exportar
+                    <button class="btn app-btn app-btn-primary" id="exportReportsBtn" title="Exportar reportes">
+                        <i class="bi bi-download"></i>
                     </button>
                 </div>
 
@@ -749,6 +948,8 @@
         let allRecharges = [];
         let allUsers = [];
         let filteredRecharges = [];
+        let autoRefreshInterval;
+        let statusChart, userChart;
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminPanel();
@@ -784,6 +985,7 @@
                 document.querySelector('.nav-item[data-section="recharges"]').classList.add('active');
             });
             document.getElementById('saveRechargeBtn').addEventListener('click', saveRechargeChanges);
+            document.getElementById('refreshDataBtn').addEventListener('click', refreshData);
             
             // Configurar buscador de números
             document.getElementById('phoneSearch').addEventListener('input', searchPhoneNumbers);
@@ -793,6 +995,9 @@
 
             // Cargar datos iniciales
             loadDashboardData();
+            
+            // Iniciar actualización automática cada 30 segundos
+            startAutoRefresh();
         }
 
         function showSection(section) {
@@ -853,7 +1058,7 @@
 
             } catch (error) {
                 console.error('Error al cargar datos del dashboard:', error);
-                alert('Error al cargar datos. Verifique su conexión.');
+                showNotification('Error al cargar datos. Verifique su conexión.', 'error');
             } finally {
                 hideLoading('loadingRecent');
             }
@@ -928,7 +1133,7 @@
 
             } catch (error) {
                 console.error('Error al cargar usuarios:', error);
-                alert('Error al cargar usuarios');
+                showNotification('Error al cargar usuarios', 'error');
             } finally {
                 hideLoading('loadingUsers');
             }
@@ -950,7 +1155,7 @@
 
             } catch (error) {
                 console.error('Error al cargar recargas:', error);
-                alert('Error al cargar recargas');
+                showNotification('Error al cargar recargas', 'error');
             } finally {
                 hideLoading('loadingRecharges');
             }
@@ -1077,11 +1282,11 @@
                 updateRecentActivity();
                 displayFilteredRecharges();
 
-                alert('Historial de recargas borrado exitosamente');
+                showNotification('Historial de recargas borrado exitosamente', 'success');
 
             } catch (error) {
                 console.error('Error al borrar historial:', error);
-                alert('Error al borrar el historial de recargas');
+                showNotification('Error al borrar el historial de recargas', 'error');
             } finally {
                 hideLoading('loadingRecharges');
             }
@@ -1112,7 +1317,7 @@
             const name = document.getElementById('userName').value;
 
             if (!username || !password || !name) {
-                alert('Por favor, complete todos los campos');
+                showNotification('Por favor, complete todos los campos', 'error');
                 return;
             }
 
@@ -1165,11 +1370,11 @@
                     loadUsersData();
                 }
 
-                alert('Usuario guardado exitosamente');
+                showNotification('Usuario guardado exitosamente', 'success');
 
             } catch (error) {
                 console.error('Error al guardar usuario:', error);
-                alert('Error al guardar usuario');
+                showNotification('Error al guardar usuario', 'error');
             }
         }
 
@@ -1192,7 +1397,7 @@
             const status = document.getElementById('editStatus').value;
 
             if (!phoneNumber || phoneNumber.length !== 8) {
-                alert('Por favor, ingrese un número de teléfono válido de 8 dígitos');
+                showNotification('Por favor, ingrese un número de teléfono válido de 8 dígitos', 'error');
                 return;
             }
 
@@ -1244,11 +1449,11 @@
                     displayFilteredRecharges();
                 }
 
-                alert('Recarga actualizada exitosamente');
+                showNotification('Recarga actualizada exitosamente', 'success');
 
             } catch (error) {
                 console.error('Error al actualizar recarga:', error);
-                alert('Error al actualizar recarga');
+                showNotification('Error al actualizar recarga', 'error');
             }
         }
 
@@ -1285,9 +1490,11 @@
                 updateDashboardStats();
                 updateRecentActivity();
 
+                showNotification('Estado actualizado correctamente', 'success');
+
             } catch (error) {
                 console.error('Error al actualizar estado:', error);
-                alert('Error al actualizar el estado');
+                showNotification('Error al actualizar el estado', 'error');
             }
         }
 
@@ -1322,11 +1529,11 @@
                     displayFilteredRecharges();
                 }
 
-                alert('Recarga eliminada exitosamente');
+                showNotification('Recarga eliminada exitosamente', 'success');
 
             } catch (error) {
                 console.error('Error al eliminar recarga:', error);
-                alert('Error al eliminar recarga');
+                showNotification('Error al eliminar recarga', 'error');
             }
         }
 
@@ -1375,11 +1582,11 @@
                     loadUsersData();
                 }
 
-                alert('Usuario eliminado exitosamente');
+                showNotification('Usuario eliminado exitosamente', 'success');
 
             } catch (error) {
                 console.error('Error al eliminar usuario:', error);
-                alert('Error al eliminar usuario');
+                showNotification('Error al eliminar usuario', 'error');
             }
         }
 
@@ -1398,12 +1605,16 @@
         }
 
         function loadReportsData() {
+            // Destruir gráficos existentes si existen
+            if (statusChart) statusChart.destroy();
+            if (userChart) userChart.destroy();
+            
             // Gráfico de distribución por estado
             const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
             const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
             const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
             
-            new Chart(statusCtx, {
+            statusChart = new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Nuevo', 'Corte'],
@@ -1435,14 +1646,14 @@
             const userLabels = Object.keys(userRechargeCounts);
             const userData = Object.values(userRechargeCounts);
             
-            new Chart(userCtx, {
+            userChart = new Chart(userCtx, {
                 type: 'bar',
                 data: {
                     labels: userLabels,
                     datasets: [{
                         label: 'Recargas',
                         data: userData,
-                        backgroundColor: '#00A9E0',
+                        backgroundColor: '#0096D6',
                         borderWidth: 0
                     }]
                 },
@@ -1485,7 +1696,7 @@
             
             // Título
             doc.setFontSize(18);
-            doc.setTextColor(0, 169, 224);
+            doc.setTextColor(0, 150, 214);
             doc.text(`Reporte ${title} - ENTEL`, 20, 20);
             
             // Información
@@ -1518,7 +1729,7 @@
                     cellPadding: 3
                 },
                 headStyles: {
-                    fillColor: [0, 169, 224],
+                    fillColor: [0, 150, 214],
                     textColor: 255
                 }
             });
@@ -1553,6 +1764,35 @@
 
         function hideLoading(elementId) {
             document.getElementById(elementId).classList.add('d-none');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function refreshData() {
+            const refreshBtn = document.getElementById('refreshDataBtn');
+            refreshBtn.classList.add('loading');
+            
+            loadDashboardData().then(() => {
+                setTimeout(() => {
+                    refreshBtn.classList.remove('loading');
+                    showNotification('Datos actualizados correctamente', 'success');
+                }, 500);
+            });
+        }
+
+        function startAutoRefresh() {
+            // Actualizar datos automáticamente cada 30 segundos
+            autoRefreshInterval = setInterval(() => {
+                loadDashboardData();
+            }, 30000);
         }
 
         // Hacer las funciones accesibles globalmente para los event handlers
