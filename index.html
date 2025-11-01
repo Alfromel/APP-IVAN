@@ -6,9 +6,9 @@
     <title>TOKTOK - Dueño</title>
     
     <!-- Meta tags PWA -->
-    <meta name="theme-color" content="#00b894">
+    <meta name="theme-color" content="#6a11cb">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TOKTOK">
     <meta name="description" content="Panel de control para dueños y CEO de TOKTOK">
     <meta name="keywords" content="toktok, panel, control, dueño, ceo, reportes">
@@ -36,129 +36,64 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
         
+        :root {
+            --primary: #9d4edd;
+            --secondary: #6a11cb;
+            --dark-bg: #0f0521;
+            --card-bg: rgba(30, 10, 60, 0.7);
+            --text-primary: #ffffff;
+            --text-secondary: #c8b6ff;
+        }
+        
         body {
-            background-color: #f8f9fa;
-            color: #1d1d1f;
-            max-width: 100%;
-            margin: 0 auto;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e0a3c 100%);
+            color: var(--text-primary);
             height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             display: flex;
             flex-direction: column;
             -webkit-tap-highlight-color: transparent;
             padding: 20px;
-            opacity: 0;
-            animation: fadeInBody 0.5s ease forwards;
         }
         
-        /* Pantalla de carga instantánea */
-        #loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            animation: fadeOut 0.8s ease forwards;
-            animation-delay: 0.8s;
-        }
-        
-        .loading-container {
-            text-align: center;
-        }
-        
-        .logo {
-            font-size: 3.5rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #00b894, #00a085);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 15px;
-            letter-spacing: 1px;
-        }
-        
-        .subtitle {
-            font-size: 1.1rem;
-            color: #8e8e93;
-            font-weight: 500;
-            margin-bottom: 30px;
-        }
-        
-        .loading-circle {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            margin: 0 auto 25px;
-            border: 3px solid rgba(0, 184, 148, 0.2);
-            border-top: 3px solid #00b894;
-            animation: spin 1s linear infinite;
-        }
-        
-        .progress-text {
-            font-size: 0.9rem;
-            color: #8e8e93;
-        }
-        
-        /* Animaciones */
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        @keyframes fadeOut {
-            0% { opacity: 1; }
-            100% { opacity: 0; visibility: hidden; }
-        }
-        
-        @keyframes fadeInBody {
-            0% { opacity: 0; }
-            100% { opacity: 1; }
-        }
-        
-        /* Encabezado */
+        /* Encabezado ultra compacto */
         .header {
             text-align: center;
-            margin-bottom: 30px;
-            padding-top: 10px;
-            animation: fadeInUp 0.5s ease forwards;
-            opacity: 0;
+            margin-bottom: 20px;
+            padding-top: 5px;
         }
         
         .company-name {
-            font-size: 2.2rem;
+            font-size: 1.6rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #00b894, #00a085);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 5px;
+            margin-bottom: 2px;
+            letter-spacing: 0.3px;
         }
         
         .user-role {
-            font-size: 1.1rem;
-            color: #8e8e93;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
             font-weight: 500;
         }
         
-        /* Accesos Rápidos */
+        /* Grid de botones ultra compactos */
         .quick-access-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-top: 20px;
+            gap: 10px;
+            margin-top: 10px;
         }
         
         .quick-access-item {
-            background-color: white;
-            border-radius: 20px;
-            padding: 25px 15px;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(106, 17, 203, 0.1));
+            border-radius: 14px;
+            padding: 15px 8px;
             text-align: center;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
-            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -166,33 +101,51 @@
             justify-content: center;
             text-decoration: none;
             color: inherit;
-            -webkit-tap-highlight-color: rgba(0, 184, 148, 0.1);
-            border: 2px solid transparent;
-            animation: fadeInUp 0.5s ease forwards;
+            border: 1px solid rgba(157, 78, 221, 0.2);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            min-height: 80px;
+        }
+        
+        .quick-access-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(106, 17, 203, 0.15));
             opacity: 0;
+            transition: opacity 0.2s ease;
         }
         
         .quick-access-item:active {
-            transform: scale(0.95);
-            background-color: #f1f9f7;
-            border-color: #00b894;
+            transform: scale(0.96);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2));
+        }
+        
+        .quick-access-item:active::before {
+            opacity: 1;
         }
         
         .icon-container {
-            width: 70px;
-            height: 70px;
-            border-radius: 20px;
-            background: linear-gradient(135deg, rgba(0, 184, 148, 0.1), rgba(0, 160, 133, 0.15));
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(106, 17, 203, 0.3));
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 15px;
-            transition: all 0.3s ease;
+            margin-bottom: 8px;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
         }
         
         .quick-access-item:active .icon-container {
-            transform: scale(1.1);
-            background: linear-gradient(135deg, #00b894, #00a085);
+            transform: scale(1.08);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
         }
         
         .quick-access-item:active .icon-container i {
@@ -200,73 +153,59 @@
         }
         
         .icon-container i {
-            font-size: 1.8rem;
-            color: #00b894;
-            transition: all 0.3s ease;
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
         }
         
         .quick-access-item h3 {
-            font-size: 1.1rem;
-            color: #1d1d1f;
-            font-weight: 700;
-            margin-bottom: 8px;
+            font-size: 0.8rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
         }
         
-        .quick-access-item p {
-            font-size: 0.85rem;
-            color: #8e8e93;
-            line-height: 1.3;
+        /* Efectos de brillo en los bordes */
+        .quick-access-item::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.5), rgba(106, 17, 203, 0.3));
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.2s ease;
         }
         
-        /* Animación de entrada */
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+        .quick-access-item:active::after {
+            opacity: 1;
         }
-        
-        .quick-access-item:nth-child(1) { animation-delay: 0.2s; }
-        .quick-access-item:nth-child(2) { animation-delay: 0.3s; }
         
         /* Botón de instalación PWA */
         #installButton {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #00b894, #00a085);
+            bottom: 15px;
+            right: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 12px 20px;
-            font-size: 0.9rem;
+            padding: 8px 14px;
+            font-size: 0.75rem;
             font-weight: 600;
-            box-shadow: 0 4px 15px rgba(0, 184, 148, 0.3);
+            box-shadow: 0 4px 12px rgba(157, 78, 221, 0.4);
             cursor: pointer;
             display: none;
             z-index: 1000;
             transition: all 0.3s ease;
         }
         
-        #installButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0, 184, 148, 0.4);
-        }
-        
         #installButton:active {
-            transform: translateY(0);
-        }
-        
-        /* Efecto de pulso sutil en hover (para dispositivos con mouse) */
-        @media (hover: hover) {
-            .quick-access-item:hover {
-                transform: translateY(-5px);
-                box-shadow: 0 8px 25px rgba(0, 184, 148, 0.15);
-            }
+            transform: scale(0.95);
         }
         
         /* Estilos para modo standalone (PWA instalada) */
@@ -282,26 +221,37 @@
                 display: none !important;
             }
         }
+        
+        /* Animaciones sutiles */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .quick-access-item {
+            animation: fadeInUp 0.3s ease forwards;
+            opacity: 0;
+        }
+        
+        .quick-access-item:nth-child(1) { animation-delay: 0.1s; }
+        .quick-access-item:nth-child(2) { animation-delay: 0.15s; }
+        .quick-access-item:nth-child(3) { animation-delay: 0.2s; }
     </style>
 </head>
 <body>
-    <!-- Pantalla de carga instantánea -->
-    <div id="loading-screen">
-        <div class="loading-container">
-            <div class="logo">TOKTOK</div>
-            <div class="subtitle">Panel de Control</div>
-            <div class="loading-circle"></div>
-            <div class="progress-text">CARGANDO...</div>
-        </div>
-    </div>
-    
-    <!-- Encabezado -->
+    <!-- Encabezado ultra compacto -->
     <div class="header">
         <h1 class="company-name">TOKTOK</h1>
         <p class="user-role">Dueño / CEO</p>
     </div>
     
-    <!-- Accesos Rápidos -->
+    <!-- Accesos Rápidos Ultra Compactos -->
     <div class="quick-access-grid">
         <a href="EXTENCIONES/R.T.html" class="quick-access-item">
             <div class="icon-container">
@@ -317,13 +267,12 @@
             <h3>Reportes J</h3>
         </a>
 
-          <a href="EXTENCIONES/admin.html" class="quick-access-item">
+        <a href="EXTENCIONES/admin.html" class="quick-access-item">
             <div class="icon-container">
-                <i class="fas fa-box-open"></i>
+                <i class="fas fa-chart-line"></i>
             </div>
             <h3>Entel</h3>
         </a>
-        
     </div>
     
     <!-- Botón de instalación PWA -->
@@ -335,15 +284,13 @@
         // Efecto táctil mejorado para móviles
         document.querySelectorAll('.quick-access-item').forEach(item => {
             item.addEventListener('touchstart', function() {
-                this.style.transform = 'scale(0.95)';
-                this.style.backgroundColor = '#f1f9f7';
-                this.style.borderColor = '#00b894';
+                this.style.transform = 'scale(0.96)';
+                this.style.background = 'linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2))';
             });
             
             item.addEventListener('touchend', function() {
                 this.style.transform = '';
-                this.style.backgroundColor = '';
-                this.style.borderColor = '';
+                this.style.background = '';
             });
         });
         
@@ -405,7 +352,4 @@
         });
     </script>
 </body>
-
 </html>
-
-
