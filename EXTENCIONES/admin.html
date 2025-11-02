@@ -293,6 +293,7 @@
         
         .table tbody tr:hover {
             background-color: rgba(0, 150, 214, 0.04);
+            cursor: pointer;
         }
         
         /* Filtros - MÁS COMPACTOS */
@@ -306,7 +307,7 @@
         
         .filter-row {
             display: grid;
-            grid-template-columns: 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 12px;
             margin-bottom: 12px;
         }
@@ -424,7 +425,7 @@
             }
             
             .filter-row {
-                grid-template-columns: 1fr 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
             }
         }
         
@@ -591,6 +592,63 @@
         .me-1 {
             margin-right: 4px !important;
         }
+        
+        /* Detalles de recarga */
+        .recharge-detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .recharge-detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        .recharge-detail-label {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .recharge-detail-value {
+            color: #333;
+        }
+        
+        .command-box {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 10px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            word-break: break-all;
+        }
+        
+        /* Barra de progreso para borrado de historial */
+        .progress-container {
+            margin: 20px 0;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+            background-color: #e9ecef;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, var(--entel-color) 0%, var(--entel-dark) 100%);
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            text-align: center;
+            font-size: 0.8rem;
+            color: #6c757d;
+            margin-top: 5px;
+        }
     </style>
 </head>
 <body>
@@ -663,7 +721,7 @@
                                         <th>Usuario</th>
                                         <th>Teléfono</th>
                                         <th>Estado</th>
-                                        <th>Acciones</th>
+                                        <th>Fecha</th>
                                     </tr>
                                 </thead>
                                 <tbody id="recentActivityBody">
@@ -738,46 +796,6 @@
                     <input type="text" class="form-control search-input" id="phoneSearch" placeholder="Buscar por número de teléfono...">
                 </div>
 
-                <!-- Filtros -->
-                <div class="filter-card">
-                    <div class="filter-row">
-                        <div class="filter-full">
-                            <label class="form-label">Usuario</label>
-                            <select class="form-select app-form-control" id="userFilter">
-                                <option value="">Todos los usuarios</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="filter-row">
-                        <div>
-                            <label class="form-label">Estado</label>
-                            <select class="form-select app-form-control" id="statusFilter">
-                                <option value="">Todos</option>
-                                <option value="NUEVO">Nuevo</option>
-                                <option value="CORTE">Corte</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="form-label">Fecha Desde</label>
-                            <input type="date" class="form-control app-form-control" id="dateFrom">
-                        </div>
-                    </div>
-                    <div class="filter-row">
-                        <div>
-                            <label class="form-label">Fecha Hasta</label>
-                            <input type="date" class="form-control app-form-control" id="dateTo">
-                        </div>
-                        <div class="d-flex align-items-end">
-                            <button class="btn app-btn app-btn-primary w-100 me-2" id="applyFiltersBtn">
-                                <i class="bi bi-funnel me-1"></i> Filtrar
-                            </button>
-                            <button class="btn app-btn app-btn-secondary w-100" id="clearFiltersBtn">
-                                <i class="bi bi-x-circle me-1"></i> Limpiar
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
                 <div class="app-card">
                     <div class="app-card-body p-0">
                         <div class="table-responsive">
@@ -788,7 +806,7 @@
                                         <th>Teléfono</th>
                                         <th>Estado</th>
                                         <th>Fecha</th>
-                                        <th>Acciones</th>
+                                        <th>Hora</th>
                                     </tr>
                                 </thead>
                                 <tbody id="rechargesTableBody">
@@ -835,6 +853,18 @@
                             <div class="app-card-body">
                                 <div class="chart-container">
                                     <canvas id="userRechargesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-4">
+                        <div class="app-card">
+                            <div class="app-card-header">
+                                Recargas por Día (Última Semana)
+                            </div>
+                            <div class="app-card-body">
+                                <div class="chart-container">
+                                    <canvas id="dailyRechargesChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -897,6 +927,28 @@
         </div>
     </div>
 
+    <!-- Modal para Detalles de Recarga -->
+    <div class="modal fade" id="rechargeDetailModal" tabindex="-1" aria-labelledby="rechargeDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rechargeDetailModalLabel">Detalles de Recarga</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="rechargeDetailContent">
+                        <!-- Los detalles se cargarán aquí -->
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn app-btn app-btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn app-btn app-btn-primary" id="editRechargeBtn">Editar</button>
+                    <button type="button" class="btn app-btn app-btn-danger" id="deleteRechargeBtn">Eliminar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal para Editar Recarga -->
     <div class="modal fade" id="editRechargeModal" tabindex="-1" aria-labelledby="editRechargeModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -930,6 +982,39 @@
         </div>
     </div>
 
+    <!-- Modal para Borrar Todo el Historial -->
+    <div class="modal fade" id="clearHistoryModal" tabindex="-1" aria-labelledby="clearHistoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="clearHistoryModalLabel">Borrar Todo el Historial</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="alert alert-warning">
+                        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                        <strong>ADVERTENCIA:</strong> Esta acción eliminará permanentemente todas las recargas de todos los usuarios y no se puede deshacer.
+                    </div>
+                    <p>¿Está seguro de que desea continuar?</p>
+                    
+                    <div id="progressSection" class="d-none">
+                        <div class="progress-container">
+                            <div class="progress">
+                                <div id="progressBar" class="progress-bar" style="width: 0%"></div>
+                            </div>
+                            <div id="progressText" class="progress-text">0% completado</div>
+                        </div>
+                        <div id="progressDetails" class="text-center small text-muted"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn app-btn app-btn-secondary" data-bs-dismiss="modal" id="cancelClearBtn">Cancelar</button>
+                    <button type="button" class="btn app-btn app-btn-danger" id="confirmClearBtn">Borrar Todo</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- jQuery -->
@@ -949,7 +1034,8 @@
         let allUsers = [];
         let filteredRecharges = [];
         let autoRefreshInterval;
-        let statusChart, userChart;
+        let statusChart, userChart, dailyChart;
+        let currentRechargeId = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminPanel();
@@ -972,8 +1058,6 @@
             // Configurar botones
             document.getElementById('addUserBtn').addEventListener('click', showAddUserModal);
             document.getElementById('saveUserBtn').addEventListener('click', saveUser);
-            document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
-            document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
             document.getElementById('exportDashboardBtn').addEventListener('click', exportDashboard);
             document.getElementById('exportRechargesExcelBtn').addEventListener('click', exportRechargesToExcel);
             document.getElementById('exportRechargesPdfBtn').addEventListener('click', exportRechargesToPDF);
@@ -986,12 +1070,20 @@
             });
             document.getElementById('saveRechargeBtn').addEventListener('click', saveRechargeChanges);
             document.getElementById('refreshDataBtn').addEventListener('click', refreshData);
+            document.getElementById('editRechargeBtn').addEventListener('click', showEditRechargeModal);
+            document.getElementById('deleteRechargeBtn').addEventListener('click', deleteCurrentRecharge);
             
             // Configurar buscador de números
             document.getElementById('phoneSearch').addEventListener('input', searchPhoneNumbers);
             
             // Configurar botón para borrar historial
-            document.getElementById('clearAllHistoryBtn').addEventListener('click', clearAllHistory);
+            document.getElementById('clearAllHistoryBtn').addEventListener('click', showClearHistoryModal);
+            
+            // Configurar botones del modal de borrado
+            document.getElementById('confirmClearBtn').addEventListener('click', clearAllHistory);
+            document.getElementById('cancelClearBtn').addEventListener('click', function() {
+                bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal')).hide();
+            });
 
             // Cargar datos iniciales
             loadDashboardData();
@@ -1083,8 +1175,10 @@
             const tbody = document.getElementById('recentActivityBody');
             const recentRecharges = allRecharges.slice(0, 5); // Últimas 5 recargas
             
-            tbody.innerHTML = recentRecharges.map(recharge => `
-                <tr>
+            tbody.innerHTML = recentRecharges.map(recharge => {
+                const dateTime = parseDateTime(recharge.timestamp);
+                return `
+                <tr onclick="showRechargeDetail(${recharge.id})">
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
@@ -1092,16 +1186,9 @@
                             ${recharge.estado}
                         </span>
                     </td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-outline-primary action-btn" onclick="editRecharge(${recharge.id})" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteRecharge(${recharge.id})" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
+                    <td>${dateTime.date}</td>
                 </tr>
-            `).join('');
+            `}).join('');
         }
 
         async function loadUsersData() {
@@ -1142,14 +1229,6 @@
         async function loadRechargesData() {
             showLoading('loadingRecharges');
             try {
-                const tbody = document.getElementById('rechargesTableBody');
-                
-                // Llenar filtro de usuarios
-                const userFilter = document.getElementById('userFilter');
-                const uniqueUsers = [...new Set(allRecharges.map(r => r.user_name))];
-                userFilter.innerHTML = '<option value="">Todos los usuarios</option>' + 
-                    uniqueUsers.map(user => `<option value="${user}">${user}</option>`).join('');
-
                 // Mostrar recargas filtradas
                 displayFilteredRecharges();
 
@@ -1164,141 +1243,251 @@
         function displayFilteredRecharges() {
             const tbody = document.getElementById('rechargesTableBody');
             
-            tbody.innerHTML = filteredRecharges.map(recharge => `
-                <tr>
+            tbody.innerHTML = filteredRecharges.map(recharge => {
+                const dateTime = parseDateTime(recharge.timestamp);
+                return `
+                <tr onclick="showRechargeDetail(${recharge.id})">
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <select class="form-select form-select-sm status-select" onchange="updateRechargeStatus(${recharge.id}, this.value)">
-                            <option value="NUEVO" ${recharge.estado === 'NUEVO' ? 'selected' : ''}>Nuevo</option>
-                            <option value="CORTE" ${recharge.estado === 'CORTE' ? 'selected' : ''}>Corte</option>
-                        </select>
+                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                            ${recharge.estado}
+                        </span>
                     </td>
-                    <td>${formatDate(recharge.timestamp)}</td>
-                    <td class="action-buttons">
-                        <button class="btn btn-sm btn-outline-primary action-btn" onclick="editRecharge(${recharge.id})" title="Editar">
-                            <i class="bi bi-pencil"></i>
-                        </button>
-                        <button class="btn btn-sm btn-outline-danger action-btn" onclick="deleteRecharge(${recharge.id})" title="Eliminar">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    </td>
+                    <td>${dateTime.date}</td>
+                    <td>${dateTime.time}</td>
                 </tr>
-            `).join('');
-        }
-
-        function applyFilters() {
-            const userFilter = document.getElementById('userFilter').value;
-            const statusFilter = document.getElementById('statusFilter').value;
-            const dateFrom = document.getElementById('dateFrom').value;
-            const dateTo = document.getElementById('dateTo').value;
-
-            filteredRecharges = allRecharges.filter(recharge => {
-                let match = true;
-                
-                if (userFilter && recharge.user_name !== userFilter) {
-                    match = false;
-                }
-                
-                if (statusFilter && recharge.estado !== statusFilter) {
-                    match = false;
-                }
-                
-                if (dateFrom) {
-                    const rechargeDate = new Date(recharge.timestamp.split(' ')[0].split('/').reverse().join('-'));
-                    const fromDate = new Date(dateFrom);
-                    if (rechargeDate < fromDate) match = false;
-                }
-                
-                if (dateTo) {
-                    const rechargeDate = new Date(recharge.timestamp.split(' ')[0].split('/').reverse().join('-'));
-                    const toDate = new Date(dateTo);
-                    if (rechargeDate > toDate) match = false;
-                }
-                
-                return match;
-            });
-
-            displayFilteredRecharges();
-        }
-
-        function clearFilters() {
-            document.getElementById('userFilter').value = '';
-            document.getElementById('statusFilter').value = '';
-            document.getElementById('dateFrom').value = '';
-            document.getElementById('dateTo').value = '';
-            document.getElementById('phoneSearch').value = '';
-            
-            filteredRecharges = [...allRecharges];
-            displayFilteredRecharges();
+            `}).join('');
         }
 
         function searchPhoneNumbers() {
             const searchTerm = document.getElementById('phoneSearch').value.toLowerCase().trim();
             
             if (searchTerm === '') {
-                // Si no hay término de búsqueda, aplicar los filtros existentes
-                applyFilters();
-                return;
+                // Si no hay término de búsqueda, mostrar todas las recargas
+                filteredRecharges = [...allRecharges];
+            } else {
+                // Filtrar por número de teléfono
+                filteredRecharges = allRecharges.filter(recharge => {
+                    return recharge.phone_number.includes(searchTerm);
+                });
             }
-            
-            // Filtrar por número de teléfono
-            filteredRecharges = allRecharges.filter(recharge => {
-                return recharge.phone_number.includes(searchTerm);
-            });
             
             displayFilteredRecharges();
         }
 
-        async function clearAllHistory() {
-            if (!confirm('¿ESTÁ SEGURO DE QUE DESEA BORRAR TODO EL HISTORIAL DE RECARGAS?\n\nEsta acción eliminará permanentemente todas las recargas de todos los usuarios y no se puede deshacer.')) {
-                return;
-            }
+        function showRechargeDetail(rechargeId) {
+            const recharge = allRecharges.find(r => r.id === rechargeId);
+            if (!recharge) return;
 
+            currentRechargeId = rechargeId;
+            const dateTime = parseDateTime(recharge.timestamp);
+            
+            document.getElementById('rechargeDetailModalLabel').textContent = `Recarga #${recharge.id}`;
+            
+            const detailContent = document.getElementById('rechargeDetailContent');
+            detailContent.innerHTML = `
+                <div class="recharge-detail-item">
+                    <span class="recharge-detail-label">Usuario:</span>
+                    <span class="recharge-detail-value">${recharge.user_name}</span>
+                </div>
+                <div class="recharge-detail-item">
+                    <span class="recharge-detail-label">Teléfono:</span>
+                    <span class="recharge-detail-value">${recharge.phone_number}</span>
+                </div>
+                <div class="recharge-detail-item">
+                    <span class="recharge-detail-label">Estado:</span>
+                    <span class="recharge-detail-value">
+                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                            ${recharge.estado}
+                        </span>
+                    </span>
+                </div>
+                <div class="recharge-detail-item">
+                    <span class="recharge-detail-label">Fecha:</span>
+                    <span class="recharge-detail-value">${dateTime.date}</span>
+                </div>
+                <div class="recharge-detail-item">
+                    <span class="recharge-detail-label">Hora:</span>
+                    <span class="recharge-detail-value">${dateTime.time}</span>
+                </div>
+                <div class="recharge-detail-item">
+                    <span class="recharge-detail-label">Comando:</span>
+                    <div class="command-box">${recharge.command || `*222*2*${recharge.phone_number}*20*1#`}</div>
+                </div>
+            `;
+
+            const modal = new bootstrap.Modal(document.getElementById('rechargeDetailModal'));
+            modal.show();
+        }
+
+        function showEditRechargeModal() {
+            const recharge = allRecharges.find(r => r.id === currentRechargeId);
+            if (!recharge) return;
+
+            document.getElementById('editRechargeModalLabel').textContent = 'Editar Recarga';
+            document.getElementById('editRechargeId').value = recharge.id;
+            document.getElementById('editPhoneNumber').value = recharge.phone_number;
+            document.getElementById('editStatus').value = recharge.estado;
+
+            // Cerrar el modal de detalles
+            bootstrap.Modal.getInstance(document.getElementById('rechargeDetailModal')).hide();
+            
+            // Abrir el modal de edición
+            const modal = new bootstrap.Modal(document.getElementById('editRechargeModal'));
+            modal.show();
+        }
+
+        function deleteCurrentRecharge() {
+            if (currentRechargeId) {
+                deleteRecharge(currentRechargeId);
+                bootstrap.Modal.getInstance(document.getElementById('rechargeDetailModal')).hide();
+            }
+        }
+
+        function parseDateTime(timestamp) {
+            if (!timestamp) return { date: '', time: '' };
+            
+            // Formato esperado: "DD/MM/YYYY HH:MM:SS"
+            const parts = timestamp.split(' ');
+            if (parts.length === 2) {
+                return {
+                    date: parts[0],
+                    time: parts[1]
+                };
+            }
+            
+            // Si no tiene el formato esperado, devolver valores por defecto
+            return {
+                date: timestamp,
+                time: ''
+            };
+        }
+
+        function showClearHistoryModal() {
+            // Mostrar el modal de confirmación
+            const modal = new bootstrap.Modal(document.getElementById('clearHistoryModal'));
+            modal.show();
+            
+            // Ocultar la sección de progreso inicialmente
+            document.getElementById('progressSection').classList.add('d-none');
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressText').textContent = '0% completado';
+        }
+
+        async function clearAllHistory() {
+            // Ocultar el botón de confirmación y mostrar la barra de progreso
+            document.getElementById('confirmClearBtn').classList.add('d-none');
+            document.getElementById('progressSection').classList.remove('d-none');
+            
             try {
-                showLoading('loadingRecharges');
+                let page = 0;
+                let totalDeleted = 0;
+                let hasMoreData = true;
                 
-                // Eliminar todas las recargas
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/recharge_history`,
+                // Obtener el total de registros para calcular el progreso
+                const countResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/recharge_history?select=id`,
                     {
-                        method: 'DELETE',
                         headers: {
                             'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
                         }
                     }
                 );
-
-                if (!response.ok) throw new Error('Error al borrar el historial');
-
+                
+                if (!countResponse.ok) throw new Error('Error al obtener el conteo de registros');
+                const allRecords = await countResponse.json();
+                const totalRecords = allRecords.length;
+                
+                // Función para eliminar una página de registros
+                const deletePage = async (pageNum) => {
+                    const limit = 100;
+                    const offset = pageNum * limit;
+                    
+                    // Obtener los IDs de los registros en esta página
+                    const idsResponse = await fetch(
+                        `${SUPABASE_URL}/rest/v1/recharge_history?select=id&order=id&limit=${limit}&offset=${offset}`,
+                        {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
+                        }
+                    );
+                    
+                    if (!idsResponse.ok) throw new Error('Error al obtener IDs de registros');
+                    const records = await idsResponse.json();
+                    
+                    if (records.length === 0) {
+                        hasMoreData = false;
+                        return 0;
+                    }
+                    
+                    // Crear una lista de IDs para eliminar
+                    const idsToDelete = records.map(record => record.id);
+                    
+                    // Eliminar los registros usando una consulta IN
+                    const deleteResponse = await fetch(
+                        `${SUPABASE_URL}/rest/v1/recharge_history?id=in.(${idsToDelete.join(',')})`,
+                        {
+                            method: 'DELETE',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            }
+                        }
+                    );
+                    
+                    if (!deleteResponse.ok) throw new Error('Error al eliminar registros');
+                    
+                    return records.length;
+                };
+                
+                // Eliminar registros página por página
+                while (hasMoreData) {
+                    const deletedCount = await deletePage(page);
+                    totalDeleted += deletedCount;
+                    
+                    // Actualizar la barra de progreso
+                    const progress = Math.min(100, Math.round((totalDeleted / totalRecords) * 100));
+                    document.getElementById('progressBar').style.width = `${progress}%`;
+                    document.getElementById('progressText').textContent = `${progress}% completado`;
+                    document.getElementById('progressDetails').textContent = `Eliminados ${totalDeleted} de ${totalRecords} registros`;
+                    
+                    page++;
+                    
+                    // Pequeña pausa para no sobrecargar la API
+                    await new Promise(resolve => setTimeout(resolve, 500));
+                }
+                
                 // Actualizar datos locales
                 allRecharges = [];
                 filteredRecharges = [];
-
+                
                 // Recargar vistas
                 updateDashboardStats();
                 updateRecentActivity();
                 displayFilteredRecharges();
-
+                
+                // Mostrar mensaje de éxito
                 showNotification('Historial de recargas borrado exitosamente', 'success');
-
+                
+                // Cerrar el modal después de un breve retraso
+                setTimeout(() => {
+                    bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal')).hide();
+                    // Restaurar el botón de confirmación
+                    document.getElementById('confirmClearBtn').classList.remove('d-none');
+                }, 1000);
+                
             } catch (error) {
                 console.error('Error al borrar historial:', error);
                 showNotification('Error al borrar el historial de recargas', 'error');
-            } finally {
-                hideLoading('loadingRecharges');
+                
+                // Restaurar el botón de confirmación en caso de error
+                document.getElementById('confirmClearBtn').classList.remove('d-none');
             }
-        }
-
-        function formatDate(dateString) {
-            if (!dateString) return '';
-            const parts = dateString.split(' ')[0].split('/');
-            if (parts.length === 3) {
-                return `${parts[0]}/${parts[1]}`;
-            }
-            return dateString;
         }
 
         function showAddUserModal() {
@@ -1378,19 +1567,6 @@
             }
         }
 
-        function editRecharge(rechargeId) {
-            const recharge = allRecharges.find(r => r.id === rechargeId);
-            if (!recharge) return;
-
-            document.getElementById('editRechargeModalLabel').textContent = 'Editar Recarga';
-            document.getElementById('editRechargeId').value = recharge.id;
-            document.getElementById('editPhoneNumber').value = recharge.phone_number;
-            document.getElementById('editStatus').value = recharge.estado;
-
-            const modal = new bootstrap.Modal(document.getElementById('editRechargeModal'));
-            modal.show();
-        }
-
         async function saveRechargeChanges() {
             const rechargeId = document.getElementById('editRechargeId').value;
             const phoneNumber = document.getElementById('editPhoneNumber').value;
@@ -1454,47 +1630,6 @@
             } catch (error) {
                 console.error('Error al actualizar recarga:', error);
                 showNotification('Error al actualizar recarga', 'error');
-            }
-        }
-
-        async function updateRechargeStatus(rechargeId, newStatus) {
-            try {
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/recharge_history?id=eq.${rechargeId}`,
-                    {
-                        method: 'PATCH',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify({ estado: newStatus })
-                    }
-                );
-
-                if (!response.ok) throw new Error('Error al actualizar estado');
-
-                // Actualizar datos locales
-                const recharge = allRecharges.find(r => r.id === rechargeId);
-                if (recharge) {
-                    recharge.estado = newStatus;
-                }
-
-                const filteredRecharge = filteredRecharges.find(r => r.id === rechargeId);
-                if (filteredRecharge) {
-                    filteredRecharge.estado = newStatus;
-                }
-
-                // Actualizar dashboard
-                updateDashboardStats();
-                updateRecentActivity();
-
-                showNotification('Estado actualizado correctamente', 'success');
-
-            } catch (error) {
-                console.error('Error al actualizar estado:', error);
-                showNotification('Error al actualizar el estado', 'error');
             }
         }
 
@@ -1608,6 +1743,7 @@
             // Destruir gráficos existentes si existen
             if (statusChart) statusChart.destroy();
             if (userChart) userChart.destroy();
+            if (dailyChart) dailyChart.destroy();
             
             // Gráfico de distribución por estado
             const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
@@ -1672,6 +1808,67 @@
                     }
                 }
             });
+
+            // Gráfico de recargas por día (última semana)
+            const dailyCtx = document.getElementById('dailyRechargesChart').getContext('2d');
+            const dailyData = getDailyRechargeData();
+            
+            dailyChart = new Chart(dailyCtx, {
+                type: 'line',
+                data: {
+                    labels: dailyData.labels,
+                    datasets: [{
+                        label: 'Recargas por Día',
+                        data: dailyData.counts,
+                        backgroundColor: 'rgba(0, 150, 214, 0.1)',
+                        borderColor: '#0096D6',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function getDailyRechargeData() {
+            // Obtener datos de los últimos 7 días
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                last7Days.push(date.toISOString().split('T')[0]);
+            }
+            
+            // Formatear fechas para mostrar
+            const labels = last7Days.map(date => {
+                const d = new Date(date);
+                return `${d.getDate()}/${d.getMonth() + 1}`;
+            });
+            
+            // Contar recargas por día
+            const counts = last7Days.map(date => {
+                return allRecharges.filter(recharge => {
+                    const rechargeDate = recharge.timestamp.split(' ')[0];
+                    const formattedRechargeDate = rechargeDate.split('/').reverse().join('-');
+                    return formattedRechargeDate === date;
+                }).length;
+            });
+            
+            return { labels, counts };
         }
 
         function exportDashboard() {
@@ -1796,11 +1993,10 @@
         }
 
         // Hacer las funciones accesibles globalmente para los event handlers
-        window.updateRechargeStatus = updateRechargeStatus;
+        window.showRechargeDetail = showRechargeDetail;
         window.deleteRecharge = deleteRecharge;
         window.deleteUser = deleteUser;
         window.editUser = editUser;
-        window.editRecharge = editRecharge;
     </script>
 </body>
 </html>
