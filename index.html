@@ -48,7 +48,7 @@
         body {
             background: linear-gradient(135deg, var(--dark-bg) 0%, #1e0a3c 100%);
             color: var(--text-primary);
-            height: 100vh;
+            min-height: 100vh;
             overflow-x: hidden;
             display: flex;
             flex-direction: column;
@@ -185,6 +185,124 @@
             opacity: 1;
         }
         
+        /* Sección de accesos para escritorio */
+        .desktop-section {
+            margin-top: 25px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(157, 78, 221, 0.2);
+        }
+        
+        .section-title {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 600;
+        }
+        
+        .desktop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        
+        .desktop-item {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(106, 17, 203, 0.15));
+            border-radius: 14px;
+            padding: 18px 10px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: inherit;
+            border: 1px solid rgba(157, 78, 221, 0.3);
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+            min-height: 90px;
+        }
+        
+        .desktop-item::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2));
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .desktop-item:active {
+            transform: scale(0.96);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(106, 17, 203, 0.25));
+        }
+        
+        .desktop-item:active::before {
+            opacity: 1;
+        }
+        
+        .desktop-icon-container {
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.35));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .desktop-item:active .desktop-icon-container {
+            transform: scale(1.08);
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        }
+        
+        .desktop-item:active .desktop-icon-container i {
+            color: white;
+        }
+        
+        .desktop-icon-container i {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            transition: all 0.2s ease;
+        }
+        
+        .desktop-item h3 {
+            font-size: 0.85rem;
+            color: var(--text-primary);
+            font-weight: 600;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .desktop-item::after {
+            content: '';
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            right: -1px;
+            bottom: -1px;
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.6), rgba(106, 17, 203, 0.4));
+            border-radius: 15px;
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        
+        .desktop-item:active::after {
+            opacity: 1;
+        }
+        
         /* Botón de instalación PWA */
         #installButton {
             position: fixed;
@@ -242,6 +360,14 @@
         .quick-access-item:nth-child(1) { animation-delay: 0.1s; }
         .quick-access-item:nth-child(2) { animation-delay: 0.15s; }
         .quick-access-item:nth-child(3) { animation-delay: 0.2s; }
+        
+        .desktop-item {
+            animation: fadeInUp 0.4s ease forwards;
+            opacity: 0;
+        }
+        
+        .desktop-item:nth-child(1) { animation-delay: 0.25s; }
+        .desktop-item:nth-child(2) { animation-delay: 0.3s; }
     </style>
 </head>
 <body>
@@ -275,6 +401,26 @@
         </a>
     </div>
     
+    <!-- Accesos Rápidos para Escritorio -->
+    <div class="desktop-section">
+        <h2 class="section-title">Accesos Rápidos para Escritorio</h2>
+        <div class="desktop-grid">
+            <a href="ges.html" class="desktop-item">
+                <div class="desktop-icon-container">
+                    <i class="fas fa-cogs"></i>
+                </div>
+                <h3>Gestor de Tienda</h3>
+            </a>
+            
+            <a href="car.html" class="desktop-item">
+                <div class="desktop-icon-container">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <h3>Gestor de Ambiente Juego</h3>
+            </a>
+        </div>
+    </div>
+    
     <!-- Botón de instalación PWA -->
     <button id="installButton" aria-label="Instalar aplicación">
         <i class="fas fa-download"></i> Instalar App
@@ -282,7 +428,7 @@
 
     <script>
         // Efecto táctil mejorado para móviles
-        document.querySelectorAll('.quick-access-item').forEach(item => {
+        document.querySelectorAll('.quick-access-item, .desktop-item').forEach(item => {
             item.addEventListener('touchstart', function() {
                 this.style.transform = 'scale(0.96)';
                 this.style.background = 'linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2))';
