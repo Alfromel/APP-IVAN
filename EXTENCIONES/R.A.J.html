@@ -8,19 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #4a6491;
+            --primary: #4A235A;
+            --secondary: #ffffff;
             --success: #27ae60;
             --danger: #e74c3c;
             --warning: #f39c12;
             --light: #f8f9fa;
-            --dark: #343a40;
+            --dark: #2C0A3A;
             --info: #3498db;
             --profit: #2ecc71;
             --capital: #9b59b6;
-            --background: #f5f7fa;
+            --background: #6C3483;
             --card-bg: #ffffff;
-            --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
             --radius: 16px;
             --header-height: 60px;
             --footer-height: 70px;
@@ -34,11 +34,13 @@
             padding: 0;
             -webkit-tap-highlight-color: transparent;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            transform: translateZ(0);
+            will-change: transform, opacity;
         }
         
         body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #333;
+            background: linear-gradient(135deg, #4A235A 0%, #6C3483 100%);
+            color: #fff;
             min-height: 100vh;
             padding: 0;
             background-attachment: fixed;
@@ -52,10 +54,10 @@
             left: 0;
             right: 0;
             height: var(--header-height);
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(74, 35, 90, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -66,14 +68,15 @@
         .app-header h1 {
             font-size: 1.4rem;
             font-weight: 700;
-            color: var(--primary);
+            color: var(--secondary);
             text-align: center;
         }
         
         .app-header .subtitle {
             font-size: 0.85rem;
-            opacity: 0.7;
+            opacity: 0.8;
             font-weight: 400;
+            color: var(--secondary);
         }
         
         /* Contenedor principal */
@@ -104,7 +107,7 @@
             width: 40px;
             height: 40px;
             border-radius: 12px;
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            background: linear-gradient(135deg, var(--primary), #6C3483);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -144,9 +147,9 @@
         
         .input-field:focus {
             outline: none;
-            border-color: var(--secondary);
+            border-color: var(--primary);
             background: white;
-            box-shadow: 0 0 0 3px rgba(74, 100, 145, 0.1);
+            box-shadow: 0 0 0 3px rgba(74, 35, 90, 0.1);
         }
         
         /* Botones estilo iOS */
@@ -162,14 +165,15 @@
             margin-bottom: 12px;
             position: relative;
             overflow: hidden;
+            transform: translateZ(0);
         }
         
         .btn:active {
-            transform: scale(0.98);
+            transform: scale(0.98) translateZ(0);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--secondary), var(--primary));
+            background: linear-gradient(135deg, var(--primary), #6C3483);
             color: white;
         }
         
@@ -230,45 +234,54 @@
         }
         
         .list-item-action {
-            color: var(--secondary);
+            color: var(--primary);
             font-weight: 600;
             cursor: pointer;
             padding: 8px 16px;
             border-radius: 8px;
-            background: rgba(74, 100, 145, 0.1);
+            background: rgba(74, 35, 90, 0.1);
             transition: all 0.2s;
         }
         
         .list-item-action:active {
-            background: rgba(74, 100, 145, 0.2);
+            background: rgba(74, 35, 90, 0.2);
         }
         
-        /* Estadísticas */
+        /* Estadísticas - COMPACTAS Y MEJOR ESPACIADAS */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 10px;
             margin-bottom: 20px;
         }
         
         .stat-card {
-            background: var(--card-bg);
-            border-radius: var(--radius);
-            padding: 16px;
+            background: linear-gradient(135deg, #4A235A, #6C3483);
+            border-radius: 12px;
+            padding: 14px;
             text-align: center;
             box-shadow: var(--shadow);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
         }
         
         .stat-value {
-            font-size: 1.8rem;
+            font-size: 1.4rem;
             font-weight: 700;
-            color: var(--primary);
-            margin: 8px 0;
+            color: var(--secondary);
+            margin: 4px 0;
+            line-height: 1.2;
         }
         
         .stat-label {
-            font-size: 0.9rem;
-            color: #6c757d;
+            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.8);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         /* Modal de configuración */
@@ -309,7 +322,7 @@
             transform: translateY(0);
         }
         
-        /* Animaciones */
+        /* Animaciones optimizadas para fluidez */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
@@ -373,7 +386,7 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(255, 255, 255, 0.95);
+            background: rgba(74, 35, 90, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex;
@@ -381,7 +394,7 @@
             padding: 12px 0;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             z-index: 100;
-            border-top: 1px solid rgba(0, 0, 0, 0.1);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
             padding-bottom: calc(12px + var(--safe-area-bottom));
         }
         
@@ -390,7 +403,7 @@
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            color: #6c757d;
+            color: rgba(255, 255, 255, 0.7);
             font-size: 0.75rem;
             transition: color 0.2s;
             flex: 1;
@@ -419,6 +432,19 @@
             .btn {
                 padding: 14px;
             }
+            
+            .stat-card {
+                padding: 12px;
+                min-height: 70px;
+            }
+            
+            .stat-value {
+                font-size: 1.2rem;
+            }
+            
+            .stat-label {
+                font-size: 0.7rem;
+            }
         }
         
         /* Efectos de toque mejorados */
@@ -436,8 +462,15 @@
         }
         
         ::-webkit-scrollbar-thumb {
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(255, 255, 255, 0.2);
             border-radius: 2px;
+        }
+        
+        /* Optimizaciones de rendimiento */
+        .card, .list, .stat-card, .btn {
+            transform: translateZ(0);
+            will-change: transform;
+            backface-visibility: hidden;
         }
     </style>
 </head>
