@@ -196,22 +196,22 @@
         }
         
         .btn-success {
-            background: var(--success);
+            background: var(--accent);
             color: var(--white);
         }
         
         .btn-warning {
-            background: var(--warning);
+            background: var(--accent);
             color: var(--white);
         }
         
         .btn-danger {
-            background: var(--danger);
+            background: var(--accent);
             color: var(--white);
         }
         
         .btn-info {
-            background: var(--info);
+            background: var(--accent);
             color: var(--white);
         }
         
@@ -241,18 +241,18 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 70%;
-            height: 150px;
-            border: 4px solid var(--accent-light);
+            width: 200px;
+            height: 200px;
+            border: 4px solid var(--accent);
             border-radius: 12px;
             box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.7);
             animation: pulse 2s infinite;
         }
         
         @keyframes pulse {
-            0% { border-color: var(--accent-light); }
+            0% { border-color: var(--accent); }
             50% { border-color: #b39ddb; box-shadow: 0 0 0 1000px rgba(0, 0, 0, 0.5); }
-            100% { border-color: var(--accent-light); }
+            100% { border-color: var(--accent); }
         }
         
         .scanner-status {
@@ -264,12 +264,12 @@
         }
         
         .active {
-            background: var(--success);
+            background: var(--accent);
             color: var(--white);
         }
         
         .inactive {
-            background: var(--danger);
+            background: #333;
             color: var(--white);
         }
         
@@ -311,7 +311,7 @@
         }
         
         .list-item-action {
-            color: var(--accent-light);
+            color: var(--accent);
             font-weight: 600;
         }
         
@@ -345,7 +345,7 @@
         .total-amount {
             font-size: 2.2rem;
             font-weight: 700;
-            color: var(--accent-light);
+            color: var(--accent);
             margin: 10px 0;
         }
         
@@ -394,7 +394,7 @@
             top: calc(var(--header-height) + 20px);
             left: 50%;
             transform: translateX(-50%);
-            background: var(--success);
+            background: var(--accent);
             color: var(--white);
             padding: 16px 24px;
             border-radius: 12px;
@@ -501,7 +501,8 @@
             }
             
             .scan-area {
-                height: 120px;
+                width: 180px;
+                height: 180px;
             }
         }
     </style>
@@ -938,18 +939,18 @@
                             <div class="list-item-title">${product.name}</div>
                             <div class="list-item-subtitle">$${product.price.toFixed(2)} c/u</div>
                             <div class="quantity-controls">
-                                <button onclick="decreaseQuantity(${index})" class="quantity-btn" style="background: var(--danger); color: var(--white);">
+                                <button onclick="decreaseQuantity(${index})" class="quantity-btn" style="background: var(--accent); color: var(--white);">
                                     <i class="fas fa-minus"></i>
                                 </button>
                                 <span style="font-weight: 600;">${product.quantity}</span>
-                                <button onclick="increaseQuantity(${index})" class="quantity-btn" style="background: var(--success); color: var(--white);">
+                                <button onclick="increaseQuantity(${index})" class="quantity-btn" style="background: var(--accent); color: var(--white);">
                                     <i class="fas fa-plus"></i>
                                 </button>
                             </div>
                         </div>
                         <div class="list-item-action">
                             <div style="font-weight: 700; margin-bottom: 4px;">$${subtotal.toFixed(2)}</div>
-                            <button onclick="removeProduct(${index})" style="background: var(--danger); color: var(--white); border: none; border-radius: 8px; padding: 6px 12px; font-size: 0.9rem;">
+                            <button onclick="removeProduct(${index})" style="background: var(--accent); color: var(--white); border: none; border-radius: 8px; padding: 6px 12px; font-size: 0.9rem;">
                                 <i class="fas fa-trash"></i>
                             </button>
                         </div>
