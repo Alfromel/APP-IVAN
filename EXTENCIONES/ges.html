@@ -596,7 +596,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-dollar-sign"></i>
                     </div>
-                    <div class="stat-value" id="inventory-value">$0</div>
+                    <div class="stat-value" id="inventory-value">Bs 0</div>
                     <div class="stat-label">Valor Inventario</div>
                 </div>
                 <div class="stat-card">
@@ -610,21 +610,21 @@
                     <div class="stat-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
-                    <div class="stat-value" id="daily-earnings">$0</div>
+                    <div class="stat-value" id="daily-earnings">Bs 0</div>
                     <div class="stat-label">Ganancias del Día</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-piggy-bank"></i>
                     </div>
-                    <div class="stat-value" id="daily-capital">$0</div>
+                    <div class="stat-value" id="daily-capital">Bs 0</div>
                     <div class="stat-label">Capital del Día</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-icon">
                         <i class="fas fa-chart-bar"></i>
                     </div>
-                    <div class="stat-value" id="daily-profit">$0</div>
+                    <div class="stat-value" id="daily-profit">Bs 0</div>
                     <div class="stat-label">Ganancias Netas</div>
                 </div>
             </div>
@@ -694,8 +694,8 @@
                         <div class="qrcode-info" id="qrcode-info" style="display: none;">
                             <h3><i class="fas fa-info-circle"></i> Información del Producto</h3>
                             <p><strong>Nombre:</strong> <span id="info-name"></span></p>
-                            <p><strong>Precio Compra:</strong> $<span id="info-purchase-price"></span></p>
-                            <p><strong>Precio Venta:</strong> $<span id="info-price"></span></p>
+                            <p><strong>Precio Compra:</strong> Bs <span id="info-purchase-price"></span></p>
+                            <p><strong>Precio Venta:</strong> Bs <span id="info-price"></span></p>
                             <p><strong>Stock:</strong> <span id="info-stock"></span> unidades</p>
                             <p><strong>Fecha Vencimiento:</strong> <span id="info-expiration"></span></p>
                             <p><strong>ID:</strong> <span id="info-id"></span></p>
@@ -714,7 +714,7 @@
                 <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
                     <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
                         <div style="font-size:0.85rem;color:#6c757d;">Ganancias Totales</div>
-                        <div id="daily-total-earnings" style="font-size:1.4rem;font-weight:700;color:var(--primary);">$0.00</div>
+                        <div id="daily-total-earnings" style="font-size:1.4rem;font-weight:700;color:var(--primary);">Bs 0.00</div>
                     </div>
                     <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
                         <div style="font-size:0.85rem;color:#6c757d;">Ventas Hoy</div>
@@ -722,11 +722,11 @@
                     </div>
                     <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
                         <div style="font-size:0.85rem;color:#6c757d;">Capital Invertido</div>
-                        <div id="daily-total-capital" style="font-size:1.4rem;font-weight:700;color:var(--capital);">$0.00</div>
+                        <div id="daily-total-capital" style="font-size:1.4rem;font-weight:700;color:var(--capital);">Bs 0.00</div>
                     </div>
                     <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
                         <div style="font-size:0.85rem;color:#6c757d;">Ganancias Netas</div>
-                        <div id="daily-total-profit" style="font-size:1.4rem;font-weight:700;color:var(--profit);">$0.00</div>
+                        <div id="daily-total-profit" style="font-size:1.4rem;font-weight:700;color:var(--profit);">Bs 0.00</div>
                     </div>
                 </div>
                 <div style="margin-top:15px;">
@@ -1392,8 +1392,8 @@
                 row.innerHTML = `
                     <td>${product.id}</td>
                     <td>${product.name}</td>
-                    <td>$${product.purchase_price.toFixed(2)}</td>
-                    <td>$${product.price.toFixed(2)}</td>
+                    <td>Bs ${product.purchase_price.toFixed(2)}</td>
+                    <td>Bs ${product.price.toFixed(2)}</td>
                     <td class="${stockClass}">${product.stock}</td>
                     <td class="${expirationClass}">${expirationStatus}</td>
                     <td>${stockStatus}</td>
@@ -1423,7 +1423,7 @@
             // Actualizar estadísticas
             productsCount.textContent = totalProducts;
             totalStock.textContent = totalStockValue;
-            inventoryValue.textContent = `$${totalInventoryValue.toFixed(2)}`;
+            inventoryValue.textContent = `Bs ${totalInventoryValue.toFixed(2)}`;
             lowStockCount.textContent = lowStockItems;
         }
 
@@ -1440,7 +1440,7 @@
                     .single();
 
                 if (!dailyError && dailyData) {
-                    document.getElementById('daily-total-earnings').textContent = `$${(dailyData.total_earnings || 0).toFixed(2)}`;
+                    document.getElementById('daily-total-earnings').textContent = `Bs ${(dailyData.total_earnings || 0).toFixed(2)}`;
                     document.getElementById('daily-total-sales').textContent = `${dailyData.total_sales || 0}`;
                 } else {
                     // Si no hay tabla, calcular a partir de sales
@@ -1452,10 +1452,10 @@
 
                     if (!salesErr && salesData) {
                         const totalEarnings = salesData.reduce((sum, s) => sum + (s.total_amount || 0), 0);
-                        document.getElementById('daily-total-earnings').textContent = `$${totalEarnings.toFixed(2)}`;
+                        document.getElementById('daily-total-earnings').textContent = `Bs ${totalEarnings.toFixed(2)}`;
                         document.getElementById('daily-total-sales').textContent = `${salesData.length}`;
                     } else {
-                        document.getElementById('daily-total-earnings').textContent = '$0.00';
+                        document.getElementById('daily-total-earnings').textContent = 'Bs 0.00';
                         document.getElementById('daily-total-sales').textContent = '0';
                     }
                 }
@@ -1500,7 +1500,7 @@
                         itemsHtml = items.map(it => {
                             const p = (prods || []).find(x => x.id === it.product_id);
                             const name = p ? p.name : `ID:${it.product_id}`;
-                            return `<div style="font-size:0.95rem;">${name} x${it.quantity} — $${(it.price||0).toFixed(2)}</div>`;
+                            return `<div style="font-size:0.95rem;">${name} x${it.quantity} — Bs ${(it.price||0).toFixed(2)}</div>`;
                         }).join('');
                     } else {
                         itemsHtml = '<div style="color:#6c757d;">No hay detalles.</div>';
@@ -1509,7 +1509,7 @@
                     const createdAt = new Date(sale.created_at).toLocaleTimeString();
                     const saleHtml = `
                         <div style="padding:10px;border-bottom:1px solid #f0f0f0;margin-bottom:8px;">
-                            <div style="font-weight:700;">Venta #${sale.id} — $${(sale.total_amount||0).toFixed(2)} <span style="font-weight:400;color:#6c757d;">(${createdAt})</span></div>
+                            <div style="font-weight:700;">Venta #${sale.id} — Bs ${(sale.total_amount||0).toFixed(2)} <span style="font-weight:400;color:#6c757d;">(${createdAt})</span></div>
                             <div style="margin-top:6px;">${itemsHtml}</div>
                         </div>
                     `;
@@ -1519,7 +1519,7 @@
 
             } catch (err) {
                 console.error('Error en loadDailyReport:', err);
-                const totalE = document.getElementById('daily-total-earnings'); if (totalE) totalE.textContent = '$0.00';
+                const totalE = document.getElementById('daily-total-earnings'); if (totalE) totalE.textContent = 'Bs 0.00';
                 const totalS = document.getElementById('daily-total-sales'); if (totalS) totalS.textContent = '0';
                 const listEl = document.getElementById('daily-sales-list'); if (listEl) listEl.innerHTML = '<div style="color:#c0392b;">Error cargando reporte.</div>';
             }
@@ -1579,13 +1579,13 @@
                 const netProfit = totalEarnings - totalCapital;
                 
                 // Actualizar estadísticas en la interfaz
-                dailyEarnings.textContent = `$${totalEarnings.toFixed(2)}`;
-                dailyCapital.textContent = `$${totalCapital.toFixed(2)}`;
-                dailyProfit.textContent = `$${netProfit.toFixed(2)}`;
+                dailyEarnings.textContent = `Bs ${totalEarnings.toFixed(2)}`;
+                dailyCapital.textContent = `Bs ${totalCapital.toFixed(2)}`;
+                dailyProfit.textContent = `Bs ${netProfit.toFixed(2)}`;
                 
                 // Actualizar también en el reporte diario
-                document.getElementById('daily-total-capital').textContent = `$${totalCapital.toFixed(2)}`;
-                document.getElementById('daily-total-profit').textContent = `$${netProfit.toFixed(2)}`;
+                document.getElementById('daily-total-capital').textContent = `Bs ${totalCapital.toFixed(2)}`;
+                document.getElementById('daily-total-profit').textContent = `Bs ${netProfit.toFixed(2)}`;
                 
             } catch (error) {
                 console.error('Error actualizando estadísticas financieras:', error);
