@@ -8,17 +8,19 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #2c3e50;
-            --secondary: #4a6491;
+            --primary: #4A235A;
+            --secondary: #ffffff;
             --success: #27ae60;
             --danger: #e74c3c;
             --warning: #f39c12;
             --light: #f8f9fa;
-            --dark: #343a40;
+            --dark: #2C0A3A;
             --info: #3498db;
             --profit: #2ecc71;
             --capital: #9b59b6;
-            --background: #f5f7fa;
+            --background: #6C3483;
+            --card-bg: #ffffff;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
         
         * {
@@ -29,8 +31,8 @@
         }
         
         body {
-            background-color: var(--background);
-            color: #333;
+            background: linear-gradient(135deg, #4A235A 0%, #6C3483 100%);
+            color: white;
             line-height: 1.5;
             padding: 0;
             margin: 0;
@@ -40,17 +42,18 @@
         
         /* Header estilo app móvil */
         .app-header {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: rgba(74, 35, 90, 0.95);
             color: white;
-            padding: 15px 20px 20px;
+            padding: 15px 20px 15px;
             position: sticky;
             top: 0;
             z-index: 100;
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
         }
         
         .app-header h1 {
-            font-size: 1.5rem;
+            font-size: 1.4rem;
             font-weight: 600;
             margin-bottom: 5px;
             display: flex;
@@ -59,108 +62,110 @@
         }
         
         .app-header .subtitle {
-            font-size: 0.9rem;
-            opacity: 0.9;
+            font-size: 0.85rem;
+            opacity: 0.8;
         }
         
         /* Contenedor principal */
         .container {
             padding: 15px;
-            padding-bottom: 80px; /* Espacio para la barra de navegación inferior */
+            padding-bottom: 70px;
         }
         
-        /* Tarjetas de estadísticas principales */
+        /* Tarjetas de estadísticas principales - COMPACTAS */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         
         .stat-card {
-            background: white;
+            background: linear-gradient(135deg, #4A235A, #6C3483);
             border-radius: 12px;
-            padding: 15px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 14px;
+            box-shadow: var(--shadow);
             text-align: center;
-            transition: transform 0.2s, box-shadow 0.2s;
-        }
-        
-        .stat-card:active {
-            transform: scale(0.98);
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 80px;
+            color: white;
         }
         
         .stat-icon {
-            font-size: 1.5rem;
-            margin-bottom: 8px;
-            color: var(--secondary);
+            font-size: 1.2rem;
+            margin-bottom: 6px;
+            color: rgba(255, 255, 255, 0.9);
         }
         
         .stat-value {
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             font-weight: 700;
-            color: var(--primary);
-            margin: 5px 0;
+            margin: 4px 0;
+            line-height: 1.2;
         }
         
         .stat-label {
-            color: #6c757d;
-            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.75rem;
             font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         /* Secciones de contenido */
         .section {
-            background: white;
+            background: var(--card-bg);
             border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            padding: 16px;
+            margin-bottom: 15px;
+            box-shadow: var(--shadow);
         }
         
         .section-header {
             display: flex;
             align-items: center;
             gap: 10px;
-            margin-bottom: 15px;
+            margin-bottom: 12px;
             padding-bottom: 10px;
             border-bottom: 1px solid #f0f0f0;
         }
         
         .section-header h2 {
-            font-size: 1.2rem;
+            font-size: 1.1rem;
             color: var(--primary);
             font-weight: 600;
         }
         
         .section-header i {
-            color: var(--secondary);
+            color: var(--primary);
         }
         
-        /* Resumen financiero */
+        /* Resumen financiero - COMPACTO */
         .summary-cards {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
+            gap: 10px;
+            margin-bottom: 15px;
         }
         
         .summary-card {
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
             background: #f8f9fa;
             text-align: center;
         }
         
         .summary-label {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: #6c757d;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
         
         .summary-value {
-            font-size: 1.3rem;
+            font-size: 1.1rem;
             font-weight: 700;
         }
         
@@ -183,43 +188,43 @@
         /* Lista de ventas */
         .sales-list {
             background: #f8f9fa;
-            padding: 15px;
+            padding: 12px;
             border-radius: 10px;
-            max-height: 300px;
+            max-height: 250px;
             overflow-y: auto;
         }
         
         .sale-item {
-            padding: 12px;
+            padding: 10px;
             border-bottom: 1px solid #e9ecef;
-            margin-bottom: 10px;
+            margin-bottom: 8px;
             background: white;
             border-radius: 8px;
         }
         
         .sale-header {
             font-weight: 700;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             display: flex;
             justify-content: space-between;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
         
         .sale-time {
             font-weight: 400;
             color: #6c757d;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
         }
         
         .sale-details {
-            margin-top: 8px;
+            margin-top: 6px;
         }
         
         .product-item {
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-            padding-left: 10px;
-            border-left: 2px solid var(--secondary);
+            font-size: 0.8rem;
+            margin-bottom: 4px;
+            padding-left: 8px;
+            border-left: 2px solid var(--primary);
         }
         
         /* Barra de navegación inferior */
@@ -228,12 +233,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: white;
+            background: rgba(74, 35, 90, 0.95);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
+            padding: 10px 0;
             box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
             z-index: 100;
+            backdrop-filter: blur(10px);
         }
         
         .nav-item {
@@ -241,8 +247,8 @@
             flex-direction: column;
             align-items: center;
             text-decoration: none;
-            color: #6c757d;
-            font-size: 0.75rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.7rem;
             transition: color 0.2s;
         }
         
@@ -251,16 +257,16 @@
         }
         
         .nav-icon {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
+            font-size: 1.1rem;
+            margin-bottom: 3px;
         }
         
         /* Notificaciones */
         .notification {
             position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
+            top: 15px;
+            right: 15px;
+            padding: 12px 20px;
             border-radius: 10px;
             color: white;
             font-weight: 600;
@@ -287,12 +293,13 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 15px;
             color: #6c757d;
+            font-size: 0.9rem;
         }
         
         .loading i {
-            margin-right: 10px;
+            margin-right: 8px;
         }
         
         /* Mejoras para pantallas muy pequeñas */
@@ -303,6 +310,24 @@
             
             .summary-cards {
                 grid-template-columns: 1fr;
+            }
+            
+            .container {
+                padding: 12px;
+                padding-bottom: 65px;
+            }
+            
+            .section {
+                padding: 14px;
+            }
+            
+            .stat-card {
+                padding: 12px;
+                min-height: 75px;
+            }
+            
+            .stat-value {
+                font-size: 1.2rem;
             }
         }
         
@@ -414,8 +439,8 @@
                 </div>
             </div>
             
-            <div style="margin-top: 20px;">
-                <h3 style="margin-bottom: 15px; color: var(--primary); font-size: 1.1rem;">Ventas Recientes</h3>
+            <div style="margin-top: 15px;">
+                <h3 style="margin-bottom: 12px; color: var(--primary); font-size: 1rem;">Ventas Recientes</h3>
                 <div id="daily-sales-list" class="sales-list">
                     <div class="loading">
                         <i class="fas fa-spinner fa-spin"></i> Cargando...
@@ -554,12 +579,12 @@
 
                 if (recentErr) {
                     console.error('Error cargando ventas recientes:', recentErr);
-                    if (listEl) listEl.innerHTML = '<div style="color:#c0392b; text-align:center; padding:20px;">No se pudieron cargar las ventas recientes.</div>';
+                    if (listEl) listEl.innerHTML = '<div style="color:#c0392b; text-align:center; padding:15px; font-size:0.85rem;">No se pudieron cargar las ventas recientes.</div>';
                     return;
                 }
 
                 if (!recentSales || recentSales.length === 0) {
-                    if (listEl) listEl.innerHTML = '<div style="color:#6c757d; text-align:center; padding:20px;">No hay ventas hoy.</div>';
+                    if (listEl) listEl.innerHTML = '<div style="color:#6c757d; text-align:center; padding:15px; font-size:0.85rem;">No hay ventas hoy.</div>';
                     return;
                 }
 
@@ -584,7 +609,7 @@
                             return `<div class="product-item">${name} x${it.quantity} — $${(it.price||0).toFixed(2)}</div>`;
                         }).join('');
                     } else {
-                        itemsHtml = '<div style="color:#6c757d; font-size:0.85rem;">No hay detalles.</div>';
+                        itemsHtml = '<div style="color:#6c757d; font-size:0.8rem;">No hay detalles.</div>';
                     }
 
                     const createdAt = new Date(sale.created_at).toLocaleTimeString();
@@ -610,7 +635,7 @@
                 if (totalS) totalS.textContent = '0';
                 
                 const listEl = document.getElementById('daily-sales-list'); 
-                if (listEl) listEl.innerHTML = '<div style="color:#c0392b; text-align:center; padding:20px;">Error cargando reporte.</div>';
+                if (listEl) listEl.innerHTML = '<div style="color:#c0392b; text-align:center; padding:15px; font-size:0.85rem;">Error cargando reporte.</div>';
             }
         }
         
