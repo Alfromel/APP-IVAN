@@ -368,6 +368,25 @@
         
         .desktop-item:nth-child(1) { animation-delay: 0.25s; }
         .desktop-item:nth-child(2) { animation-delay: 0.3s; }
+        
+        /* Media queries para mostrar/ocultar secciones según el dispositivo */
+        @media (max-width: 768px) {
+            .desktop-section {
+                display: none;
+            }
+            .quick-access-grid {
+                display: grid;
+            }
+        }
+        
+        @media (min-width: 769px) {
+            .quick-access-grid {
+                display: none;
+            }
+            .desktop-section {
+                display: block;
+            }
+        }
     </style>
 </head>
 <body>
