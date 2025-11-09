@@ -1115,19 +1115,8 @@
         async function loadDashboardData() {
             showLoading('loadingRecent');
             try {
-                // Cargar todas las recargas
-                const rechargesResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/recharge_history?order=created_at.desc`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
-                    }
-                );
-
-                if (!rechargesResponse.ok) throw new Error('Error al cargar recargas');
-                allRecharges = await rechargesResponse.json();
+                // Cargar todas las recargas usando paginación para evitar el límite de 1000
+                allRecharges = await fetchAllRecharges();
                 filteredRecharges = [...allRecharges];
 
                 // Cargar usuarios
@@ -1156,9 +1145,56 @@
             }
         }
 
+        // Función mejorada para obtener todas las recargas sin límite de 1000
+        async function fetchAllRecharges() {
+            let allRecharges = [];
+            let page = 0;
+            const limit = 1000; // Máximo por página según Supabase
+            let hasMoreData = true;
+            
+            try {
+                while (hasMoreData) {
+                    const offset = page * limit;
+                    
+                    const response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/recharge_history?order=created_at.desc&limit=${limit}&offset=${offset}`,
+                        {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
+                        }
+                    );
+                    
+                    if (!response.ok) throw new Error('Error al cargar recargas');
+                    
+                    const pageData = await response.json();
+                    
+                    if (pageData.length === 0) {
+                        hasMoreData = false;
+                    } else {
+                        allRecharges = allRecharges.concat(pageData);
+                        page++;
+                        
+                        // Si obtenemos menos de 'limit' registros, significa que hemos llegado al final
+                        if (pageData.length < limit) {
+                            hasMoreData = false;
+                        }
+                    }
+                }
+                
+                console.log(`Se cargaron ${allRecharges.length} recargas en total`);
+                return allRecharges;
+                
+            } catch (error) {
+                console.error('Error al cargar todas las recargas:', error);
+                throw error;
+            }
+        }
+
         function updateDashboardStats() {
             // Total recargas
-            document.getElementById('totalRecharges').textContent = allRecharges.length;
+            document.getElementById('totalRecharges').textContent = allRecharges.length.toLocaleString();
             
             // Total usuarios
             document.getElementById('totalUsers').textContent = allUsers.length;
@@ -1167,8 +1203,8 @@
             const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
             const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
             
-            document.getElementById('nuevoCount').textContent = nuevoCount;
-            document.getElementById('corteCount').textContent = corteCount;
+            document.getElementById('nuevoCount').textContent = nuevoCount.toLocaleString();
+            document.getElementById('corteCount').textContent = corteCount.toLocaleString();
         }
 
         function updateRecentActivity() {
@@ -1206,7 +1242,7 @@
                     <tr>
                         <td>${user.username}</td>
                         <td>${user.nombre}</td>
-                        <td>${userRechargeCounts[user.id] || 0}</td>
+                        <td>${(userRechargeCounts[user.id] || 0).toLocaleString()}</td>
                         <td class="action-buttons">
                             <button class="btn btn-sm btn-outline-primary action-btn" onclick="editUser(${user.id})" title="Editar">
                                 <i class="bi bi-pencil"></i>
@@ -1386,18 +1422,7 @@
                 let hasMoreData = true;
                 
                 // Obtener el total de registros para calcular el progreso
-                const countResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/recharge_history?select=id`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
-                        }
-                    }
-                );
-                
-                if (!countResponse.ok) throw new Error('Error al obtener el conteo de registros');
-                const allRecords = await countResponse.json();
+                const allRecords = await fetchAllRecharges();
                 const totalRecords = allRecords.length;
                 
                 // Función para eliminar una página de registros
