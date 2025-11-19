@@ -1,0 +1,2533 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TokTok</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --secondary: #059669;
+            --secondary-dark: #047857;
+            --accent: #f59e0b;
+            --accent-dark: #d97706;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 4px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card.income {
+            border-left-color: var(--secondary);
+        }
+        
+        .stat-card.users {
+            border-left-color: var(--accent);
+        }
+        
+        .stat-card.recharges {
+            border-left-color: #3b82f6;
+        }
+        
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .badge-success {
+            background-color: var(--secondary);
+        }
+        
+        .badge-warning {
+            background-color: var(--accent);
+        }
+        
+        .badge-danger {
+            background-color: #dc2626;
+        }
+        
+        .badge-info {
+            background-color: #3b82f6;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+            border-color: var(--secondary-dark);
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .action-buttons .btn {
+            padding: 4px 8px;
+            margin: 0 2px;
+        }
+        
+        .modal-header {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
+        }
+        
+        .pagination .page-link {
+            color: var(--primary);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .operator-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            margin-right: 8px;
+            object-fit: contain;
+        }
+        
+        .recharge-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .recharge-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .transaction-highlight {
+            background-color: rgba(109, 40, 217, 0.05);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .transaction-row:hover {
+            background-color: rgba(109, 40, 217, 0.08);
+        }
+        
+        /* Estilos para el modal de detalles */
+        .detail-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .detail-modal.show {
+            display: block;
+        }
+        
+        .detail-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-modal-body {
+            padding: 1.5rem;
+        }
+        
+        .detail-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .modal-backdrop.show {
+            display: block;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            min-width: 150px;
+            color: #495057;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #212529;
+        }
+        
+        .balance-positive {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .balance-negative {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        
+        .balance-zero {
+            color: #6c757d;
+            font-weight: bold;
+        }
+        
+        .user-id-badge {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .search-type-selector {
+            margin-right: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-4">
+            <h4 class="text-white mb-0">TokTok Admin</h4>
+            <small class="text-white-50">Panel de Administración</small>
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="users">
+                    <i class="fas fa-users"></i> Usuarios
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="transactions">
+                    <i class="fas fa-exchange-alt"></i> Transacciones
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="recharges">
+                    <i class="fas fa-mobile-alt"></i> Recargas
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="game-recharges">
+                    <i class="fas fa-gamepad"></i> Recargas Juegos
+                </a>
+            </li>
+            <li class="nav-item mt-4">
+                <a class="nav-link" href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="d-flex align-items-center">
+                    <div class="search-box me-3">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Buscar...">
+                    </div>
+                    
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i> Administrador
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="navbar-logout-btn"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Dashboard Section -->
+        <section id="dashboard-section">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Dashboard</h2>
+                <div>
+                    <button class="btn btn-primary" id="refresh-data">
+                        <i class="fas fa-sync-alt me-2"></i> Actualizar Datos
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-label">Usuarios Totales</div>
+                    <div class="stat-value text-primary" id="total-users-count">0</div>
+                    <small class="text-muted">Usuarios registrados</small>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Transacciones Hoy</div>
+                    <div class="stat-value text-success" id="today-transactions">0</div>
+                    <small class="text-muted">Transacciones del día</small>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Recargas Hoy</div>
+                    <div class="stat-value text-info" id="today-recharges">0</div>
+                    <small class="text-muted">Recargas del día</small>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-label">Balance Total</div>
+                    <div class="stat-value" id="total-balance">Bs 0.00</div>
+                    <small class="text-muted">Saldo total del sistema</small>
+                </div>
+            </div>
+            
+            <!-- Recent Transactions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-container">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Transacciones Recientes</h5>
+                            <a href="#" class="btn btn-sm btn-outline-primary" data-section="transactions">Ver Todas</a>
+                        </div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID Usuario</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                        <th>Monto</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Users Section -->
+        <section id="users-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Usuarios</h2>
+                <div>
+                    <button class="btn btn-primary" id="add-user-btn">
+                        <i class="fas fa-plus me-2"></i> Agregar Usuario
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todos los Usuarios</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, nombre o email..." id="user-search">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Usuario</th>
+                                <th>Usuario</th>
+                                <th>Email</th>
+                                <th>Teléfono</th>
+                                <th>Balance</th>
+                                <th>Estado</th>
+                                <th>Registro</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="users-pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- Transactions Section -->
+        <section id="transactions-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Transacciones</h2>
+                <div>
+                    <button class="btn btn-primary" id="add-transaction-btn">
+                        <i class="fas fa-plus me-2"></i> Nueva Transacción
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Transacciones</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID transacción o ID usuario..." id="transaction-search">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Transacción</th>
+                                <th>ID Usuario</th>
+                                <th>Tipo</th>
+                                <th>Descripción</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="transactions-table-body">
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="transactions-pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recharges Section -->
+        <section id="recharges-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Recargas</h2>
+                <div>
+                    <button class="btn btn-primary" id="add-recharge-btn">
+                        <i class="fas fa-plus me-2"></i> Nueva Recarga
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Recargas</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, teléfono o ID usuario..." id="recharge-search">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Recarga</th>
+                                <th>ID Usuario</th>
+                                <th>Operadora</th>
+                                <th>Número</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recharges-table-body">
+                            <tr>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="recharges-pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Recharges Section -->
+        <section id="game-recharges-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Recargas de Juegos</h2>
+                <div>
+                    <button class="btn btn-primary" id="add-game-recharge-btn">
+                        <i class="fas fa-plus me-2"></i> Nueva Recarga
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Recargas de Juegos</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
+                            <i class="fas fa-search"></i>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, jugador o ID usuario..." id="game-recharge-search">
+                        </div>
+                    </div>
+                </div>
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>ID Recarga</th>
+                                <th>ID Usuario</th>
+                                <th>Juego</th>
+                                <th>ID Juego</th>
+                                <th>Jugador</th>
+                                <th>Diamantes</th>
+                                <th>Monto</th>
+                                <th>Fecha</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="game-recharges-table-body">
+                            <tr>
+                                <td colspan="9" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="game-recharges-pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal-backdrop" id="detail-modal-backdrop"></div>
+    <div class="detail-modal" id="detail-modal">
+        <div class="detail-modal-header">
+            <h5 class="mb-0" id="detail-modal-title">Detalles</h5>
+            <button type="button" class="btn-close btn-close-white" id="close-detail-modal"></button>
+        </div>
+        <div class="detail-modal-body" id="detail-modal-body">
+            <!-- Los detalles se cargarán aquí dinámicamente -->
+        </div>
+        <div class="detail-modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-detail-modal-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    
+    <!-- User Modal -->
+    <div class="modal fade" id="userModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="userModalTitle">Agregar Usuario</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="userForm">
+                        <input type="hidden" id="user-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="user-fullname" class="form-label">Nombre Completo</label>
+                                <input type="text" class="form-control" id="user-fullname" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="user-email" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="user-email" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="user-phone" class="form-label">Teléfono</label>
+                                <input type="text" class="form-control" id="user-phone">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="user-status" class="form-label">Estado</label>
+                                <select class="form-select" id="user-status">
+                                    <option value="active" selected>Activo</option>
+                                    <option value="inactive">Inactivo</option>
+                                </select>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-user">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transaction Modal -->
+    <div class="modal fade" id="transactionModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="transactionModalTitle">Nueva Transacción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transactionForm">
+                        <input type="hidden" id="transaction-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="transaction-user" class="form-label">Usuario</label>
+                                <select class="form-select" id="transaction-user" required>
+                                    <option value="">Seleccionar usuario</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="transaction-type" class="form-label">Tipo</label>
+                                <select class="form-select" id="transaction-type" required>
+                                    <option value="">Seleccionar tipo</option>
+                                    <option value="deposit">Depósito</option>
+                                    <option value="withdrawal">Retiro</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="transaction-amount" class="form-label">Monto (Bs)</label>
+                                <input type="number" class="form-control" id="transaction-amount" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="transaction-status" class="form-label">Estado</label>
+                                <select class="form-select" id="transaction-status" required>
+                                    <option value="completed" selected>Completado</option>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="failed">Fallido</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="transaction-description" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="transaction-description" rows="3" required></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-transaction">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recharge Modal -->
+    <div class="modal fade" id="rechargeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rechargeModalTitle">Nueva Recarga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rechargeForm">
+                        <input type="hidden" id="recharge-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-user" class="form-label">Usuario</label>
+                                <select class="form-select" id="recharge-user" required>
+                                    <option value="">Seleccionar usuario</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-operator" class="form-label">Operadora</label>
+                                <select class="form-select" id="recharge-operator" required>
+                                    <option value="">Seleccionar operadora</option>
+                                    <option value="entel">Entel</option>
+                                    <option value="tigo">Tigo</option>
+                                    <option value="viva">Viva</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-phone" class="form-label">Número de Teléfono</label>
+                                <input type="text" class="form-control" id="recharge-phone" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-amount" class="form-label">Monto (Bs)</label>
+                                <input type="number" class="form-control" id="recharge-amount" step="0.01" min="1" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-recharge">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Recharge Modal -->
+    <div class="modal fade" id="gameRechargeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="gameRechargeModalTitle">Nueva Recarga de Juego</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="gameRechargeForm">
+                        <input type="hidden" id="game-recharge-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="game-recharge-user" class="form-label">Usuario</label>
+                                <select class="form-select" id="game-recharge-user" required>
+                                    <option value="">Seleccionar usuario</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="game-recharge-game" class="form-label">Juego</label>
+                                <select class="form-select" id="game-recharge-game" required>
+                                    <option value="">Seleccionar juego</option>
+                                    <option value="freefire">Free Fire</option>
+                                    <option value="mobilelegends">Mobile Legends</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="game-recharge-game-id" class="form-label">ID del Juego</label>
+                                <input type="text" class="form-control" id="game-recharge-game-id" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="game-recharge-player-name" class="form-label">Nombre del Jugador</label>
+                                <input type="text" class="form-control" id="game-recharge-player-name" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="game-recharge-diamonds" class="form-label">Diamantes</label>
+                                <input type="number" class="form-control" id="game-recharge-diamonds" min="1" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="game-recharge-amount" class="form-label">Monto (Bs)</label>
+                                <input type="number" class="form-control" id="game-recharge-amount" step="0.01" min="1" required>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-game-recharge">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración de Supabase
+        const supabaseUrl = 'https://aleadadisazocjovibeh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E';
+        window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Variables globales
+        let currentAdmin = null;
+        let currentSection = 'dashboard';
+        let usersData = [];
+        let transactionsData = [];
+        let rechargesData = [];
+        let gameRechargesData = [];
+        let userBalances = {}; // Para almacenar balances de usuarios
+        
+        // Funciones de utilidad
+        const formatCurrency = (amount) => {
+            return 'Bs ' + parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+        
+        const formatDate = (dateString) => {
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        };
+        
+        const getInitials = (name) => {
+            if (!name) return '??';
+            const names = name.split(' ');
+            let initials = names[0].substring(0, 1).toUpperCase();
+            if (names.length > 1) {
+                initials += names[names.length - 1].substring(0, 1).toUpperCase();
+            }
+            return initials;
+        };
+        
+        const showToast = (message, type = 'success') => {
+            // Crear elemento toast
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed top-0 end-0 m-3`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            // Remover el toast después de que se oculta
+            toast.addEventListener('hidden.bs.toast', () => {
+                document.body.removeChild(toast);
+            });
+        };
+        
+        // Función para calcular balances de usuarios de forma precisa
+        const calculateUserBalances = async () => {
+            try {
+                userBalances = {};
+                
+                // Obtener todas las transacciones
+                const { data: transactions, error: transactionsError } = await supabase
+                    .from('transactions')
+                    .select('*');
+                
+                if (transactionsError) throw transactionsError;
+                
+                // Obtener todas las recargas
+                const { data: recharges, error: rechargesError } = await supabase
+                    .from('recharges')
+                    .select('*');
+                
+                if (rechargesError) throw rechargesError;
+                
+                // Obtener todas las recargas de juegos
+                const { data: gameRecharges, error: gameRechargesError } = await supabase
+                    .from('game_recharges')
+                    .select('*');
+                
+                if (gameRechargesError) throw gameRechargesError;
+                
+                // Calcular balance basado en transacciones
+                transactions.forEach(transaction => {
+                    if (!userBalances[transaction.user_id]) {
+                        userBalances[transaction.user_id] = 0;
+                    }
+                    
+                    // Solo considerar transacciones completadas
+                    if (transaction.status === 'completed') {
+                        if (transaction.type === 'deposit') {
+                            // Depósito: suma al balance (verde)
+                            userBalances[transaction.user_id] += parseFloat(transaction.amount);
+                        } else if (transaction.type === 'withdrawal') {
+                            // Retiro: resta del balance (rojo)
+                            userBalances[transaction.user_id] -= parseFloat(transaction.amount);
+                        }
+                    }
+                });
+                
+                // Calcular balance basado en recargas (se consideran como retiros)
+                recharges.forEach(recharge => {
+                    if (!userBalances[recharge.user_id]) {
+                        userBalances[recharge.user_id] = 0;
+                    }
+                    
+                    // Las recargas restan del balance (rojo)
+                    userBalances[recharge.user_id] -= parseFloat(recharge.amount);
+                });
+                
+                // Calcular balance basado en recargas de juegos (se consideran como retiros)
+                gameRecharges.forEach(recharge => {
+                    if (!userBalances[recharge.user_id]) {
+                        userBalances[recharge.user_id] = 0;
+                    }
+                    
+                    // Las recargas de juegos restan del balance (rojo)
+                    userBalances[recharge.user_id] -= parseFloat(recharge.amount);
+                });
+                
+                return userBalances;
+            } catch (error) {
+                console.error('Error calculating user balances:', error);
+                return {};
+            }
+        };
+        
+        // Función para mostrar el modal de detalles
+        const showDetailModal = (title, details) => {
+            const modal = document.getElementById('detail-modal');
+            const backdrop = document.getElementById('detail-modal-backdrop');
+            const titleElement = document.getElementById('detail-modal-title');
+            const bodyElement = document.getElementById('detail-modal-body');
+            
+            titleElement.textContent = title;
+            bodyElement.innerHTML = details;
+            
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        };
+        
+        // Función para cerrar el modal de detalles
+        const closeDetailModal = () => {
+            const modal = document.getElementById('detail-modal');
+            const backdrop = document.getElementById('detail-modal-backdrop');
+            
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        };
+        
+        // Funciones para cargar datos
+        const loadDashboardData = async () => {
+            try {
+                // Cargar estadísticas
+                const { data: users, error: usersError } = await supabase
+                    .from('user_profiles')
+                    .select('*');
+                
+                if (usersError) throw usersError;
+                
+                // Calcular balances de usuarios
+                await calculateUserBalances();
+                
+                // Obtener transacciones para estadísticas del día
+                const today = new Date().toISOString().split('T')[0];
+                
+                const { data: todayTransactions, error: todayTransactionsError } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .gte('created_at', today);
+                
+                if (todayTransactionsError) throw todayTransactionsError;
+                
+                const { data: todayRecharges, error: todayRechargesError } = await supabase
+                    .from('recharges')
+                    .select('*')
+                    .gte('created_at', today);
+                
+                if (todayRechargesError) throw todayRechargesError;
+                
+                // Calcular estadísticas
+                const totalBalance = Object.values(userBalances).reduce((sum, balance) => sum + balance, 0);
+                
+                // Actualizar UI
+                document.getElementById('total-users-count').textContent = users.length;
+                document.getElementById('today-transactions').textContent = todayTransactions.length;
+                document.getElementById('today-recharges').textContent = todayRecharges.length;
+                document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
+                
+                // Cargar transacciones recientes
+                const { data: recentTransactions, error: recentTransactionsError } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                
+                if (recentTransactionsError) throw recentTransactionsError;
+                
+                renderRecentTransactions(recentTransactions, users);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showToast('Error al cargar los datos del dashboard', 'error');
+            }
+        };
+        
+        const loadUsers = async (page = 1, search = '') => {
+            try {
+                let query = supabase
+                    .from('user_profiles')
+                    .select('*', { count: 'exact' });
+                
+                if (search) {
+                    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,id.ilike.%${search}%`);
+                }
+                
+                const { data, error, count } = await query
+                    .range((page - 1) * 10, page * 10 - 1)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                usersData = data || [];
+                
+                // Asegurar que todos los usuarios tengan estado activo
+                usersData.forEach(user => {
+                    if (user.status !== 'active') {
+                        user.status = 'active';
+                    }
+                });
+                
+                renderUsersTable(usersData);
+                renderUsersPagination(page, Math.ceil(count / 10));
+                
+            } catch (error) {
+                console.error('Error loading users:', error);
+                showToast('Error al cargar los usuarios', 'error');
+            }
+        };
+        
+        const loadTransactions = async (page = 1, search = '') => {
+            try {
+                let query = supabase
+                    .from('transactions')
+                    .select('*', { count: 'exact' });
+                
+                if (search) {
+                    query = query.or(`id.ilike.%${search}%,user_id.ilike.%${search}%`);
+                }
+                
+                const { data, error, count } = await query
+                    .range((page - 1) * 10, page * 10 - 1)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                transactionsData = data || [];
+                
+                // Asegurar que todas las transacciones tengan estado completado
+                transactionsData.forEach(transaction => {
+                    if (transaction.status !== 'completed') {
+                        transaction.status = 'completed';
+                    }
+                });
+                
+                renderTransactionsTable(transactionsData);
+                renderTransactionsPagination(page, Math.ceil(count / 10));
+                
+            } catch (error) {
+                console.error('Error loading transactions:', error);
+                showToast('Error al cargar las transacciones', 'error');
+            }
+        };
+        
+        const loadRecharges = async (page = 1, search = '') => {
+            try {
+                let query = supabase
+                    .from('recharges')
+                    .select('*', { count: 'exact' });
+                
+                if (search) {
+                    query = query.or(`phone_number.ilike.%${search}%,id.ilike.%${search}%,user_id.ilike.%${search}%`);
+                }
+                
+                const { data, error, count } = await query
+                    .range((page - 1) * 10, page * 10 - 1)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                rechargesData = data || [];
+                renderRechargesTable(rechargesData);
+                renderRechargesPagination(page, Math.ceil(count / 10));
+                
+            } catch (error) {
+                console.error('Error loading recharges:', error);
+                showToast('Error al cargar las recargas', 'error');
+            }
+        };
+        
+        const loadGameRecharges = async (page = 1, search = '') => {
+            try {
+                let query = supabase
+                    .from('game_recharges')
+                    .select('*', { count: 'exact' });
+                
+                if (search) {
+                    query = query.or(`game_id.ilike.%${search}%,player_name.ilike.%${search}%,id.ilike.%${search}%,user_id.ilike.%${search}%`);
+                }
+                
+                const { data, error, count } = await query
+                    .range((page - 1) * 10, page * 10 - 1)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                gameRechargesData = data || [];
+                renderGameRechargesTable(gameRechargesData);
+                renderGameRechargesPagination(page, Math.ceil(count / 10));
+                
+            } catch (error) {
+                console.error('Error loading game recharges:', error);
+                showToast('Error al cargar las recargas de juegos', 'error');
+            }
+        };
+        
+        // Funciones para renderizar datos
+        const renderRecentTransactions = (transactions, users) => {
+            const container = document.getElementById('recent-transactions');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No hay transacciones recientes
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = transactions.map(transaction => {
+                const user = users.find(u => u.id === transaction.user_id);
+                const isPositive = transaction.type === 'deposit';
+                const textColor = isPositive ? 'text-success' : 'text-danger';
+                const sign = isPositive ? '+' : '-';
+                const typeNames = {
+                    'deposit': 'Ingreso',
+                    'withdrawal': 'Retiro'
+                };
+                
+                return `
+                    <tr class="transaction-row">
+                        <td><span class="user-id-badge">${transaction.user_id}</span></td>
+                        <td class="text-capitalize">${typeNames[transaction.type] || transaction.type}</td>
+                        <td>${transaction.description || 'Sin descripción'}</td>
+                        <td class="${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
+                        <td>${formatDate(transaction.created_at)}</td>
+                        <td><span class="badge bg-success status-badge">Completado</span></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary view-transaction-detail" data-id="${transaction.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderUsersTable = (users) => {
+            const container = document.getElementById('users-table-body');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No se encontraron usuarios
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = users.map(user => {
+                const balance = userBalances[user.id] || 0;
+                const balanceClass = balance > 0 ? 'balance-positive' : (balance < 0 ? 'balance-negative' : 'balance-zero');
+                
+                return `
+                    <tr>
+                        <td><span class="user-id-badge">${user.id}</span></td>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <div class="user-avatar me-2">
+                                    ${user.avatar_url ? 
+                                        `<img src="${user.avatar_url}" alt="${user.full_name}">` : 
+                                        getInitials(user.full_name)
+                                    }
+                                </div>
+                                <div class="fw-medium">${user.full_name}</div>
+                            </div>
+                        </td>
+                        <td>${user.email}</td>
+                        <td>${user.phone || 'No especificado'}</td>
+                        <td class="${balanceClass}">${formatCurrency(balance)}</td>
+                        <td><span class="badge bg-success">Activo</span></td>
+                        <td>${formatDate(user.created_at)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary view-user-detail" data-id="${user.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-user" data-id="${user.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderTransactionsTable = (transactions) => {
+            const container = document.getElementById('transactions-table-body');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No se encontraron transacciones
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = transactions.map(transaction => {
+                const isPositive = transaction.type === 'deposit';
+                const textColor = isPositive ? 'text-success' : 'text-danger';
+                const sign = isPositive ? '+' : '-';
+                const typeNames = {
+                    'deposit': 'Ingreso',
+                    'withdrawal': 'Retiro'
+                };
+                
+                return `
+                    <tr class="transaction-highlight transaction-row">
+                        <td><span class="user-id-badge">${transaction.id}</span></td>
+                        <td><span class="user-id-badge">${transaction.user_id}</span></td>
+                        <td class="text-capitalize">${typeNames[transaction.type] || transaction.type}</td>
+                        <td>${transaction.description || 'Sin descripción'}</td>
+                        <td class="${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
+                        <td>${formatDate(transaction.created_at)}</td>
+                        <td><span class="badge bg-success status-badge">Completado</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary view-transaction-detail" data-id="${transaction.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-transaction" data-id="${transaction.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderRechargesTable = (recharges) => {
+            const container = document.getElementById('recharges-table-body');
+            
+            if (!recharges || recharges.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No se encontraron recargas
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = recharges.map(recharge => {
+                const operatorName = recharge.operator ? 
+                    recharge.operator.charAt(0).toUpperCase() + recharge.operator.slice(1) : 
+                    'Desconocida';
+                
+                return `
+                    <tr>
+                        <td><span class="user-id-badge">${recharge.id}</span></td>
+                        <td><span class="user-id-badge">${recharge.user_id}</span></td>
+                        <td>${operatorName}</td>
+                        <td>${recharge.phone_number}</td>
+                        <td class="fw-medium">${formatCurrency(recharge.amount)}</td>
+                        <td>${formatDate(recharge.created_at)}</td>
+                        <td><span class="badge bg-success status-badge">Completado</span></td>
+                        <td>
+                            <div class="recharge-actions">
+                                <button class="btn btn-sm btn-outline-primary view-recharge-detail" data-id="${recharge.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-recharge" data-id="${recharge.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderGameRechargesTable = (gameRecharges) => {
+            const container = document.getElementById('game-recharges-table-body');
+            
+            if (!gameRecharges || gameRecharges.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            No se encontraron recargas de juegos
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = gameRecharges.map(recharge => {
+                const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
+                
+                return `
+                    <tr>
+                        <td><span class="user-id-badge">${recharge.id}</span></td>
+                        <td><span class="user-id-badge">${recharge.user_id}</span></td>
+                        <td>${gameName}</td>
+                        <td>${recharge.game_id}</td>
+                        <td>${recharge.player_name}</td>
+                        <td>${recharge.diamonds}</td>
+                        <td class="fw-medium">${formatCurrency(recharge.amount)}</td>
+                        <td>${formatDate(recharge.created_at)}</td>
+                        <td>
+                            <div class="recharge-actions">
+                                <button class="btn btn-sm btn-outline-primary view-game-recharge-detail" data-id="${recharge.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-game-recharge" data-id="${recharge.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        // Funciones para mostrar detalles
+        const showUserDetails = async (userId) => {
+            try {
+                const user = usersData.find(u => u.id === userId);
+                if (!user) {
+                    showToast('Usuario no encontrado', 'error');
+                    return;
+                }
+                
+                // Obtener transacciones del usuario
+                const { data: userTransactions, error } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                // Obtener recargas del usuario
+                const { data: userRecharges, error: rechargesError } = await supabase
+                    .from('recharges')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (rechargesError) throw rechargesError;
+                
+                // Obtener recargas de juegos del usuario
+                const { data: userGameRecharges, error: gameRechargesError } = await supabase
+                    .from('game_recharges')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (gameRechargesError) throw gameRechargesError;
+                
+                const balance = userBalances[userId] || 0;
+                const balanceClass = balance > 0 ? 'balance-positive' : (balance < 0 ? 'balance-negative' : 'balance-zero');
+                
+                let detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value"><span class="user-id-badge">${user.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nombre:</div>
+                        <div class="detail-value">${user.full_name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email:</div>
+                        <div class="detail-value">${user.email}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Teléfono:</div>
+                        <div class="detail-value">${user.phone || 'No especificado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge bg-success">Activo</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Balance:</div>
+                        <div class="detail-value ${balanceClass}">${formatCurrency(balance)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha de registro:</div>
+                        <div class="detail-value">${formatDate(user.created_at)}</div>
+                    </div>
+                `;
+                
+                // Mostrar últimas transacciones
+                if (userTransactions && userTransactions.length > 0) {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">Últimas transacciones:</div>
+                            <div class="detail-value">
+                                <ul class="list-unstyled mb-0">
+                    `;
+                    
+                    userTransactions.slice(0, 5).forEach(transaction => {
+                        const isPositive = transaction.type === 'deposit';
+                        const sign = isPositive ? '+' : '-';
+                        const typeNames = {
+                            'deposit': 'Ingreso',
+                            'withdrawal': 'Retiro'
+                        };
+                        
+                        detailsHTML += `
+                            <li class="mb-1">
+                                <small>${formatDate(transaction.created_at)} - ${typeNames[transaction.type] || transaction.type}: ${sign}${formatCurrency(transaction.amount)}</small>
+                            </li>
+                        `;
+                    });
+                    
+                    detailsHTML += `
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Mostrar últimas recargas
+                if (userRecharges && userRecharges.length > 0) {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">Últimas recargas:</div>
+                            <div class="detail-value">
+                                <ul class="list-unstyled mb-0">
+                    `;
+                    
+                    userRecharges.slice(0, 5).forEach(recharge => {
+                        detailsHTML += `
+                            <li class="mb-1">
+                                <small>${formatDate(recharge.created_at)} - ${recharge.operator}: ${formatCurrency(recharge.amount)}</small>
+                            </li>
+                        `;
+                    });
+                    
+                    detailsHTML += `
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                showDetailModal(`Detalles del Usuario: ${user.full_name}`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                showToast('Error al cargar los detalles del usuario', 'error');
+            }
+        };
+        
+        const showTransactionDetails = async (transactionId) => {
+            try {
+                const transaction = transactionsData.find(t => t.id === transactionId);
+                if (!transaction) {
+                    showToast('Transacción no encontrada', 'error');
+                    return;
+                }
+                
+                // Obtener información del usuario
+                const { data: user, error: userError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', transaction.user_id)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const isPositive = transaction.type === 'deposit';
+                const textColor = isPositive ? 'text-success' : 'text-danger';
+                const sign = isPositive ? '+' : '-';
+                const typeNames = {
+                    'deposit': 'Ingreso',
+                    'withdrawal': 'Retiro'
+                };
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID Transacción:</div>
+                        <div class="detail-value"><span class="user-id-badge">${transaction.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Usuario:</div>
+                        <div class="detail-value"><span class="user-id-badge">${transaction.user_id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tipo:</div>
+                        <div class="detail-value text-capitalize">${typeNames[transaction.type] || transaction.type}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Descripción:</div>
+                        <div class="detail-value">${transaction.description || 'Sin descripción'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(transaction.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles de Transacción`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading transaction details:', error);
+                showToast('Error al cargar los detalles de la transacción', 'error');
+            }
+        };
+        
+        const showRechargeDetails = async (rechargeId) => {
+            try {
+                const recharge = rechargesData.find(r => r.id === rechargeId);
+                if (!recharge) {
+                    showToast('Recarga no encontrada', 'error');
+                    return;
+                }
+                
+                // Obtener información del usuario
+                const { data: user, error: userError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', recharge.user_id)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const operatorName = recharge.operator ? 
+                    recharge.operator.charAt(0).toUpperCase() + recharge.operator.slice(1) : 
+                    'Desconocida';
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID Recarga:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Usuario:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.user_id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Operadora:</div>
+                        <div class="detail-value">${operatorName}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Número:</div>
+                        <div class="detail-value">${recharge.phone_number}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles de Recarga`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading recharge details:', error);
+                showToast('Error al cargar los detalles de la recarga', 'error');
+            }
+        };
+        
+        const showGameRechargeDetails = async (gameRechargeId) => {
+            try {
+                const recharge = gameRechargesData.find(r => r.id === gameRechargeId);
+                if (!recharge) {
+                    showToast('Recarga de juego no encontrada', 'error');
+                    return;
+                }
+                
+                // Obtener información del usuario
+                const { data: user, error: userError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', recharge.user_id)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID Recarga:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Usuario:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.user_id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Juego:</div>
+                        <div class="detail-value">${gameName}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID del Juego:</div>
+                        <div class="detail-value">${recharge.game_id}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Jugador:</div>
+                        <div class="detail-value">${recharge.player_name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Diamantes:</div>
+                        <div class="detail-value">${recharge.diamonds}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles de Recarga de Juego`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading game recharge details:', error);
+                showToast('Error al cargar los detalles de la recarga de juego', 'error');
+            }
+        };
+        
+        // Funciones de paginación
+        const renderUsersPagination = (currentPage, totalPages) => {
+            const container = document.getElementById('users-pagination');
+            renderPagination(container, currentPage, totalPages, 'users');
+        };
+        
+        const renderTransactionsPagination = (currentPage, totalPages) => {
+            const container = document.getElementById('transactions-pagination');
+            renderPagination(container, currentPage, totalPages, 'transactions');
+        };
+        
+        const renderRechargesPagination = (currentPage, totalPages) => {
+            const container = document.getElementById('recharges-pagination');
+            renderPagination(container, currentPage, totalPages, 'recharges');
+        };
+        
+        const renderGameRechargesPagination = (currentPage, totalPages) => {
+            const container = document.getElementById('game-recharges-pagination');
+            renderPagination(container, currentPage, totalPages, 'game-recharges');
+        };
+        
+        const renderPagination = (container, currentPage, totalPages, type) => {
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Botón anterior
+            if (currentPage > 1) {
+                html += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}" data-type="${type}">Anterior</a></li>`;
+            }
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    html += `<li class="page-item active"><a class="page-link" href="#" data-page="${i}" data-type="${type}">${i}</a></li>`;
+                } else if (
+                    i === 1 || 
+                    i === totalPages || 
+                    (i >= currentPage - 1 && i <= currentPage + 1)
+                ) {
+                    html += `<li class="page-item"><a class="page-link" href="#" data-page="${i}" data-type="${type}">${i}</a></li>`;
+                } else if (i === currentPage - 2 || i === currentPage + 2) {
+                    html += `<li class="page-item disabled"><a class="page-link" href="#">...</a></li>`;
+                }
+            }
+            
+            // Botón siguiente
+            if (currentPage < totalPages) {
+                html += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}" data-type="${type}">Siguiente</a></li>`;
+            }
+            
+            container.innerHTML = html;
+        };
+        
+        // Funciones para cambiar secciones
+        const showSection = (sectionId) => {
+            // Ocultar todas las secciones
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(sectionId).classList.remove('d-none');
+            
+            // Actualizar navegación
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            document.querySelector(`.sidebar .nav-link[data-section="${sectionId.replace('-section', '')}"]`).classList.add('active');
+            
+            // Cargar datos de la sección
+            currentSection = sectionId.replace('-section', '');
+            
+            switch(currentSection) {
+                case 'dashboard':
+                    loadDashboardData();
+                    break;
+                case 'users':
+                    loadUsers();
+                    break;
+                case 'transactions':
+                    loadTransactions();
+                    break;
+                case 'recharges':
+                    loadRecharges();
+                    break;
+                case 'game-recharges':
+                    loadGameRecharges();
+                    break;
+            }
+        };
+        
+        // Funciones CRUD para usuarios
+        const createUser = async (userData) => {
+            try {
+                // Establecer estado activo por defecto
+                userData.status = 'active';
+                
+                const { data, error } = await supabase
+                    .from('user_profiles')
+                    .insert([userData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Usuario creado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating user:', error);
+                showToast('Error al crear el usuario', 'error');
+                return null;
+            }
+        };
+        
+        const updateUser = async (id, userData) => {
+            try {
+                // Asegurar que el estado sea activo
+                userData.status = 'active';
+                
+                const { data, error } = await supabase
+                    .from('user_profiles')
+                    .update(userData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Usuario actualizado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating user:', error);
+                showToast('Error al actualizar el usuario', 'error');
+                return null;
+            }
+        };
+        
+        // Funciones CRUD para transacciones
+        const createTransaction = async (transactionData) => {
+            try {
+                // Establecer estado completado por defecto
+                transactionData.status = 'completed';
+                
+                const { data, error } = await supabase
+                    .from('transactions')
+                    .insert([transactionData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Transacción creada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating transaction:', error);
+                showToast('Error al crear la transacción', 'error');
+                return null;
+            }
+        };
+        
+        const updateTransaction = async (id, transactionData) => {
+            try {
+                // Asegurar que el estado sea completado
+                transactionData.status = 'completed';
+                
+                const { data, error } = await supabase
+                    .from('transactions')
+                    .update(transactionData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Transacción actualizada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating transaction:', error);
+                showToast('Error al actualizar la transacción', 'error');
+                return null;
+            }
+        };
+        
+        // Funciones CRUD para recargas
+        const createRecharge = async (rechargeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('recharges')
+                    .insert([rechargeData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Recarga creada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating recharge:', error);
+                showToast('Error al crear la recarga', 'error');
+                return null;
+            }
+        };
+        
+        const updateRecharge = async (id, rechargeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('recharges')
+                    .update(rechargeData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Recarga actualizada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating recharge:', error);
+                showToast('Error al actualizar la recarga', 'error');
+                return null;
+            }
+        };
+        
+        // Funciones CRUD para recargas de juegos
+        const createGameRecharge = async (gameRechargeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('game_recharges')
+                    .insert([gameRechargeData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Recarga de juego creada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating game recharge:', error);
+                showToast('Error al crear la recarga de juego', 'error');
+                return null;
+            }
+        };
+        
+        const updateGameRecharge = async (id, gameRechargeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('game_recharges')
+                    .update(gameRechargeData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Recarga de juego actualizada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating game recharge:', error);
+                showToast('Error al actualizar la recarga de juego', 'error');
+                return null;
+            }
+        };
+        
+        // Funciones para abrir modales
+        const openUserModal = (user = null) => {
+            const modalTitle = document.getElementById('userModalTitle');
+            const form = document.getElementById('userForm');
+            
+            if (user) {
+                modalTitle.textContent = 'Editar Usuario';
+                document.getElementById('user-id').value = user.id;
+                document.getElementById('user-fullname').value = user.full_name || '';
+                document.getElementById('user-email').value = user.email || '';
+                document.getElementById('user-phone').value = user.phone || '';
+                document.getElementById('user-status').value = 'active'; // Siempre activo
+            } else {
+                modalTitle.textContent = 'Agregar Usuario';
+                form.reset();
+                document.getElementById('user-id').value = '';
+                document.getElementById('user-status').value = 'active'; // Siempre activo
+            }
+            
+            const userModal = new bootstrap.Modal(document.getElementById('userModal'));
+            userModal.show();
+        };
+        
+        const openTransactionModal = (transaction = null) => {
+            const modalTitle = document.getElementById('transactionModalTitle');
+            const form = document.getElementById('transactionForm');
+            
+            if (transaction) {
+                modalTitle.textContent = 'Editar Transacción';
+                document.getElementById('transaction-id').value = transaction.id;
+                document.getElementById('transaction-user').value = transaction.user_id;
+                document.getElementById('transaction-type').value = transaction.type;
+                document.getElementById('transaction-amount').value = transaction.amount;
+                document.getElementById('transaction-status').value = 'completed'; // Siempre completado
+                document.getElementById('transaction-description').value = transaction.description || '';
+            } else {
+                modalTitle.textContent = 'Nueva Transacción';
+                form.reset();
+                document.getElementById('transaction-id').value = '';
+                document.getElementById('transaction-status').value = 'completed'; // Siempre completado
+            }
+            
+            const transactionModal = new bootstrap.Modal(document.getElementById('transactionModal'));
+            transactionModal.show();
+        };
+        
+        const openRechargeModal = (recharge = null) => {
+            const modalTitle = document.getElementById('rechargeModalTitle');
+            const form = document.getElementById('rechargeForm');
+            
+            if (recharge) {
+                modalTitle.textContent = 'Editar Recarga';
+                document.getElementById('recharge-id').value = recharge.id;
+                document.getElementById('recharge-user').value = recharge.user_id;
+                document.getElementById('recharge-operator').value = recharge.operator;
+                document.getElementById('recharge-phone').value = recharge.phone_number;
+                document.getElementById('recharge-amount').value = recharge.amount;
+            } else {
+                modalTitle.textContent = 'Nueva Recarga';
+                form.reset();
+                document.getElementById('recharge-id').value = '';
+            }
+            
+            const rechargeModal = new bootstrap.Modal(document.getElementById('rechargeModal'));
+            rechargeModal.show();
+        };
+        
+        const openGameRechargeModal = (gameRecharge = null) => {
+            const modalTitle = document.getElementById('gameRechargeModalTitle');
+            const form = document.getElementById('gameRechargeForm');
+            
+            if (gameRecharge) {
+                modalTitle.textContent = 'Editar Recarga de Juego';
+                document.getElementById('game-recharge-id').value = gameRecharge.id;
+                document.getElementById('game-recharge-user').value = gameRecharge.user_id;
+                document.getElementById('game-recharge-game').value = gameRecharge.game;
+                document.getElementById('game-recharge-game-id').value = gameRecharge.game_id;
+                document.getElementById('game-recharge-player-name').value = gameRecharge.player_name;
+                document.getElementById('game-recharge-diamonds').value = gameRecharge.diamonds;
+                document.getElementById('game-recharge-amount').value = gameRecharge.amount;
+            } else {
+                modalTitle.textContent = 'Nueva Recarga de Juego';
+                form.reset();
+                document.getElementById('game-recharge-id').value = '';
+            }
+            
+            const gameRechargeModal = new bootstrap.Modal(document.getElementById('gameRechargeModal'));
+            gameRechargeModal.show();
+        };
+        
+        // Llenar select de usuarios para recargas y transacciones
+        const populateUserSelect = async (selectId) => {
+            try {
+                const { data: users, error } = await supabase
+                    .from('user_profiles')
+                    .select('id, full_name');
+                
+                if (error) throw error;
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Seleccionar usuario</option>';
+                
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.full_name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading users for select:', error);
+            }
+        };
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar sesión de administrador
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            currentAdmin = session.user;
+            
+            // Configurar navegación
+            document.querySelectorAll('.sidebar .nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.target.closest('a').dataset.section;
+                    showSection(`${section}-section`);
+                });
+            });
+            
+            // Botón de logout
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            });
+            
+            document.getElementById('navbar-logout-btn').addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            });
+            
+            // Botón de actualizar datos
+            document.getElementById('refresh-data').addEventListener('click', () => {
+                loadDashboardData();
+                showToast('Datos actualizados correctamente');
+            });
+            
+            // Cerrar modal de detalles
+            document.getElementById('close-detail-modal').addEventListener('click', closeDetailModal);
+            document.getElementById('close-detail-modal-btn').addEventListener('click', closeDetailModal);
+            document.getElementById('detail-modal-backdrop').addEventListener('click', closeDetailModal);
+            
+            // Búsqueda en tablas
+            document.getElementById('user-search').addEventListener('input', (e) => {
+                loadUsers(1, e.target.value);
+            });
+            
+            document.getElementById('transaction-search').addEventListener('input', (e) => {
+                loadTransactions(1, e.target.value);
+            });
+            
+            document.getElementById('recharge-search').addEventListener('input', (e) => {
+                loadRecharges(1, e.target.value);
+            });
+            
+            document.getElementById('game-recharge-search').addEventListener('input', (e) => {
+                loadGameRecharges(1, e.target.value);
+            });
+            
+            // Paginación
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('page-link') && e.target.dataset.page) {
+                    e.preventDefault();
+                    const page = parseInt(e.target.dataset.page);
+                    const type = e.target.dataset.type;
+                    
+                    switch(type) {
+                        case 'users':
+                            loadUsers(page, document.getElementById('user-search').value);
+                            break;
+                        case 'transactions':
+                            loadTransactions(page, document.getElementById('transaction-search').value);
+                            break;
+                        case 'recharges':
+                            loadRecharges(page, document.getElementById('recharge-search').value);
+                            break;
+                        case 'game-recharges':
+                            loadGameRecharges(page, document.getElementById('game-recharge-search').value);
+                            break;
+                    }
+                }
+            });
+            
+            // Botón agregar usuario
+            document.getElementById('add-user-btn').addEventListener('click', () => {
+                openUserModal();
+            });
+            
+            // Botón agregar transacción
+            document.getElementById('add-transaction-btn').addEventListener('click', () => {
+                populateUserSelect('transaction-user');
+                openTransactionModal();
+            });
+            
+            // Botón agregar recarga
+            document.getElementById('add-recharge-btn').addEventListener('click', () => {
+                populateUserSelect('recharge-user');
+                openRechargeModal();
+            });
+            
+            // Botón agregar recarga de juego
+            document.getElementById('add-game-recharge-btn').addEventListener('click', () => {
+                populateUserSelect('game-recharge-user');
+                openGameRechargeModal();
+            });
+            
+            // Guardar usuario
+            document.getElementById('save-user').addEventListener('click', async () => {
+                const userId = document.getElementById('user-id').value;
+                const userData = {
+                    full_name: document.getElementById('user-fullname').value,
+                    email: document.getElementById('user-email').value,
+                    phone: document.getElementById('user-phone').value,
+                    status: 'active' // Siempre activo
+                };
+                
+                let result;
+                if (userId) {
+                    result = await updateUser(userId, userData);
+                } else {
+                    result = await createUser(userData);
+                }
+                
+                if (result) {
+                    const userModal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
+                    userModal.hide();
+                    loadUsers();
+                    loadDashboardData(); // Actualizar dashboard
+                }
+            });
+            
+            // Guardar transacción
+            document.getElementById('save-transaction').addEventListener('click', async () => {
+                const transactionId = document.getElementById('transaction-id').value;
+                const transactionData = {
+                    user_id: document.getElementById('transaction-user').value,
+                    type: document.getElementById('transaction-type').value,
+                    amount: parseFloat(document.getElementById('transaction-amount').value),
+                    status: 'completed', // Siempre completado
+                    description: document.getElementById('transaction-description').value
+                };
+                
+                let result;
+                if (transactionId) {
+                    result = await updateTransaction(transactionId, transactionData);
+                } else {
+                    result = await createTransaction(transactionData);
+                }
+                
+                if (result) {
+                    const transactionModal = bootstrap.Modal.getInstance(document.getElementById('transactionModal'));
+                    transactionModal.hide();
+                    loadTransactions();
+                    loadDashboardData(); // Actualizar dashboard
+                }
+            });
+            
+            // Guardar recarga
+            document.getElementById('save-recharge').addEventListener('click', async () => {
+                const rechargeId = document.getElementById('recharge-id').value;
+                const rechargeData = {
+                    user_id: document.getElementById('recharge-user').value,
+                    operator: document.getElementById('recharge-operator').value,
+                    phone_number: document.getElementById('recharge-phone').value,
+                    amount: parseFloat(document.getElementById('recharge-amount').value)
+                };
+                
+                let result;
+                if (rechargeId) {
+                    result = await updateRecharge(rechargeId, rechargeData);
+                } else {
+                    result = await createRecharge(rechargeData);
+                }
+                
+                if (result) {
+                    const rechargeModal = bootstrap.Modal.getInstance(document.getElementById('rechargeModal'));
+                    rechargeModal.hide();
+                    loadRecharges();
+                    loadDashboardData(); // Actualizar dashboard
+                }
+            });
+            
+            // Guardar recarga de juego
+            document.getElementById('save-game-recharge').addEventListener('click', async () => {
+                const gameRechargeId = document.getElementById('game-recharge-id').value;
+                const gameRechargeData = {
+                    user_id: document.getElementById('game-recharge-user').value,
+                    game: document.getElementById('game-recharge-game').value,
+                    game_id: document.getElementById('game-recharge-game-id').value,
+                    player_name: document.getElementById('game-recharge-player-name').value,
+                    diamonds: parseInt(document.getElementById('game-recharge-diamonds').value),
+                    amount: parseFloat(document.getElementById('game-recharge-amount').value)
+                };
+                
+                let result;
+                if (gameRechargeId) {
+                    result = await updateGameRecharge(gameRechargeId, gameRechargeData);
+                } else {
+                    result = await createGameRecharge(gameRechargeData);
+                }
+                
+                if (result) {
+                    const gameRechargeModal = bootstrap.Modal.getInstance(document.getElementById('gameRechargeModal'));
+                    gameRechargeModal.hide();
+                    loadGameRecharges();
+                    loadDashboardData(); // Actualizar dashboard
+                }
+            });
+            
+            // Manejar acciones de usuarios
+            document.addEventListener('click', async (e) => {
+                if (e.target.closest('.view-user-detail')) {
+                    const userId = e.target.closest('.view-user-detail').dataset.id;
+                    await showUserDetails(userId);
+                }
+                
+                if (e.target.closest('.edit-user')) {
+                    const userId = e.target.closest('.edit-user').dataset.id;
+                    const user = usersData.find(u => u.id === userId);
+                    
+                    if (user) {
+                        openUserModal(user);
+                    }
+                }
+            });
+            
+            // Manejar acciones de transacciones
+            document.addEventListener('click', async (e) => {
+                if (e.target.closest('.view-transaction-detail')) {
+                    const transactionId = e.target.closest('.view-transaction-detail').dataset.id;
+                    await showTransactionDetails(transactionId);
+                }
+                
+                if (e.target.closest('.edit-transaction')) {
+                    const transactionId = e.target.closest('.edit-transaction').dataset.id;
+                    const transaction = transactionsData.find(t => t.id === transactionId);
+                    
+                    if (transaction) {
+                        await populateUserSelect('transaction-user');
+                        openTransactionModal(transaction);
+                    }
+                }
+            });
+            
+            // Manejar acciones de recargas
+            document.addEventListener('click', async (e) => {
+                if (e.target.closest('.view-recharge-detail')) {
+                    const rechargeId = e.target.closest('.view-recharge-detail').dataset.id;
+                    await showRechargeDetails(rechargeId);
+                }
+                
+                if (e.target.closest('.edit-recharge')) {
+                    const rechargeId = e.target.closest('.edit-recharge').dataset.id;
+                    const recharge = rechargesData.find(r => r.id === rechargeId);
+                    
+                    if (recharge) {
+                        await populateUserSelect('recharge-user');
+                        openRechargeModal(recharge);
+                    }
+                }
+            });
+            
+            // Manejar acciones de recargas de juegos
+            document.addEventListener('click', async (e) => {
+                if (e.target.closest('.view-game-recharge-detail')) {
+                    const gameRechargeId = e.target.closest('.view-game-recharge-detail').dataset.id;
+                    await showGameRechargeDetails(gameRechargeId);
+                }
+                
+                if (e.target.closest('.edit-game-recharge')) {
+                    const gameRechargeId = e.target.closest('.edit-game-recharge').dataset.id;
+                    const gameRecharge = gameRechargesData.find(r => r.id === gameRechargeId);
+                    
+                    if (gameRecharge) {
+                        await populateUserSelect('game-recharge-user');
+                        openGameRechargeModal(gameRecharge);
+                    }
+                }
+            });
+            
+            // Cargar datos iniciales
+            loadDashboardData();
+        });
+    </script>
+</body>
+</html>

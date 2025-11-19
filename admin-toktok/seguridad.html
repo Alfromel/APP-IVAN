@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Seguridad - TokTok</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#6d28d9">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --safe-area-inset-top: env(safe-area-inset-top);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding-top: var(--safe-area-inset-top);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .mobile-app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px;
+        }
+        
+        .mobile-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: calc(12px + var(--safe-area-inset-top));
+        }
+        
+        .mobile-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .mobile-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin: 16px;
+            overflow: hidden;
+        }
+        
+        .security-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 16px;
+            border-bottom: 1px solid #f1f5f9;
+        }
+        
+        .security-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            font-size: 18px;
+            color: white;
+            flex-shrink: 0;
+        }
+        
+        .security-details {
+            flex: 1;
+        }
+        
+        .security-title {
+            font-size: 14px;
+            font-weight: 500;
+            color: #1e293b;
+            margin-bottom: 4px;
+        }
+        
+        .security-description {
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .security-warning {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            padding: 12px 16px;
+            margin: 16px;
+            border-radius: 8px;
+        }
+        
+        .security-warning-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #d97706;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .security-warning-title i {
+            margin-right: 6px;
+        }
+        
+        .security-warning-text {
+            font-size: 12px;
+            color: #92400e;
+        }
+        
+        .support-info {
+            padding: 16px;
+            text-align: center;
+            font-size: 12px;
+            color: #64748b;
+        }
+        
+        .support-info a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-header-title">Seguridad</div>
+            <div class="mobile-header-actions">
+                <a href="dashboard.html" class="text-purple-600">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="mobile-content">
+            <!-- Advertencia importante -->
+            <div class="security-warning">
+                <div class="security-warning-title">
+                    <i class="fas fa-exclamation-triangle"></i> Importante
+                </div>
+                <div class="security-warning-text">
+                    Tus saldos y transacciones son seguras, pero siempre verifica los datos ingresados.
+                </div>
+            </div>
+            
+            <!-- Información de recargas -->
+            <div class="mobile-card">
+                <div class="security-item">
+                    <div class="security-icon" style="background-color: #059669;">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="security-details">
+                        <div class="security-title">Recargas</div>
+                        <div class="security-description">
+                            Las recargas llegarán al número que ingreses. Verifica que el número sea correcto antes de confirmar.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de credenciales -->
+            <div class="mobile-card">
+                <div class="security-item">
+                    <div class="security-icon" style="background-color: #dc2626;">
+                        <i class="fas fa-key"></i>
+                    </div>
+                    <div class="security-details">
+                        <div class="security-title">Contraseña segura</div>
+                        <div class="security-description">
+                            Tu correo y contraseña son únicos. Usa una contraseña indescifrable pero fácil de recordar, preferiblemente con números.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="security-item">
+                    <div class="security-icon" style="background-color: #2563eb;">
+                        <i class="fas fa-user-lock"></i>
+                    </div>
+                    <div class="security-details">
+                        <div class="security-title">Protección de cuenta</div>
+                        <div class="security-description">
+                            No compartas tus credenciales con nadie. TokTok nunca te pedirá tu contraseña por mensaje o llamada.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información de soporte -->
+            <div class="mobile-card">
+                <div class="security-item">
+                    <div class="security-icon" style="background-color: #7c3aed;">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <div class="security-details">
+                        <div class="security-title">Soporte técnico</div>
+                        <div class="security-description">
+                            Para cualquier reclamo o problema de seguridad, contacta a nuestro equipo de soporte en la sección de Ayuda.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajustar altura para dispositivos móviles
+            const setVh = () => {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+            
+            setVh();
+            window.addEventListener('resize', setVh);
+        });
+    </script>
+</body>
+</html>

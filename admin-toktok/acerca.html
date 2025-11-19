@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Acerca de - TokTok</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#6d28d9">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --safe-area-inset-top: env(safe-area-inset-top);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding-top: var(--safe-area-inset-top);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .mobile-app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px;
+        }
+        
+        .mobile-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: calc(12px + var(--safe-area-inset-top));
+        }
+        
+        .mobile-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .about-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin: 16px;
+            overflow: hidden;
+            padding: 20px;
+        }
+        
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 32px;
+            color: white;
+        }
+        
+        .app-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1e293b;
+            text-align: center;
+            margin-bottom: 5px;
+        }
+        
+        .app-slogan {
+            font-size: 14px;
+            color: #64748b;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .about-section {
+            margin-bottom: 20px;
+        }
+        
+        .about-section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .about-section-title i {
+            margin-right: 8px;
+        }
+        
+        .about-section-content {
+            font-size: 14px;
+            color: #64748b;
+            line-height: 1.6;
+        }
+        
+        .feature-list {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .feature-list li {
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .feature-list li:before {
+            content: "•";
+            color: var(--primary);
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+        
+        .developer-info {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 16px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .developer-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .developer-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .version-info {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 12px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-header-title">Acerca de TokTok</div>
+            <div class="mobile-header-actions">
+                <a href="dashboard.html" class="text-purple-600">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="mobile-content">
+            <div class="about-card">
+                <div class="app-icon">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                
+                <h1 class="app-title">TokTok</h1>
+                <p class="app-slogan">Tu billetera digital rápida y segura</p>
+                
+                <div class="about-section">
+                    <h2 class="about-section-title">
+                        <i class="fas fa-info-circle"></i> ¿Qué es TokTok?
+                    </h2>
+                    <p class="about-section-content">
+                        TokTok es una aplicación web desarrollada para brindar accesibilidad y facilidad 
+                        a los usuarios en la gestión de sus recargas y pagos. Nuestra plataforma ofrece 
+                        promociones exclusivas y mejores precios para que disfrutes al máximo de tus 
+                        servicios favoritos.
+                    </p>
+                </div>
+                
+                <div class="about-section">
+                    <h2 class="about-section-title">
+                        <i class="fas fa-star"></i> Funcionalidades
+                    </h2>
+                    <ul class="feature-list">
+                        <li>Recargas móviles para todas las operadoras (Tigo, Entel, Viva)</li>
+                        <li>Sistema de balance para gestionar tu saldo</li>
+                        <li>Recargas para juegos como Free Fire y Mobile Legends</li>
+                        <li>Transferencias rápidas y seguras entre usuarios</li>
+                        <li>Historial detallado de transacciones</li>
+                        <li>Promociones exclusivas y precios especiales</li>
+                        <li>Interfaz intuitiva y fácil de usar</li>
+                    </ul>
+                </div>
+                
+                <div class="about-section">
+                    <h2 class="about-section-title">
+                        <i class="fas fa-mobile-alt"></i> Recargas Disponibles
+                    </h2>
+                    <p class="about-section-content">
+                        Con TokTok puedes realizar recargas para:
+                    </p>
+                    <ul class="feature-list">
+                        <li>Recargas móviles (Tigo, Entel, Viva)</li>
+                        <li>Recargas para Free Fire</li>
+                        <li>Recargas para Mobile Legends</li>
+                    </ul>
+                </div>
+                
+                <div class="developer-info">
+                    <div class="developer-title">Desarrollado por</div>
+                    <div class="developer-name">GC Dream Core</div>
+                    <div class="developer-name">Desarrollador: RMGC</div>
+                </div>
+                
+                <div class="version-info">
+                    Versión 1.2.0 • 2025
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajustar altura para dispositivos móviles
+            const setVh = () => {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+            
+            setVh();
+            window.addEventListener('resize', setVh);
+        });
+    </script>
+</body>
+</html>

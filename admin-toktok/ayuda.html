@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ayuda - TokTok</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#6d28d9">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --safe-area-inset-top: env(safe-area-inset-top);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #1e293b;
+            padding-top: var(--safe-area-inset-top);
+            -webkit-tap-highlight-color: transparent;
+        }
+        
+        .mobile-app-container {
+            max-width: 100%;
+            margin: 0 auto;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .mobile-content {
+            flex: 1;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 20px;
+        }
+        
+        .mobile-header {
+            position: sticky;
+            top: 0;
+            z-index: 40;
+            background: white;
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: calc(12px + var(--safe-area-inset-top));
+        }
+        
+        .mobile-header-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        
+        .support-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            margin: 16px;
+            overflow: hidden;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .support-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 24px;
+            color: white;
+        }
+        
+        .support-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 10px;
+        }
+        
+        .support-description {
+            font-size: 14px;
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        
+        .support-schedule {
+            background-color: #f0f9ff;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border-left: 4px solid #0ea5e9;
+        }
+        
+        .support-schedule-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #0c4a6e;
+            margin-bottom: 4px;
+        }
+        
+        .support-schedule-time {
+            font-size: 13px;
+            color: #0369a1;
+        }
+        
+        .support-button {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+            margin-bottom: 12px;
+            border: none;
+            transition: all 0.2s;
+        }
+        
+        .support-button:active {
+            transform: scale(0.98);
+        }
+        
+        .button-call {
+            background-color: #059669;
+            color: white;
+        }
+        
+        .button-whatsapp {
+            background-color: #25D366;
+            color: white;
+        }
+        
+        .support-contact {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #64748b;
+        }
+        
+        .support-contact a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="mobile-app-container">
+        <!-- Header -->
+        <div class="mobile-header">
+            <div class="mobile-header-title">Ayuda y Soporte</div>
+            <div class="mobile-header-actions">
+                <a href="dashboard.html" class="text-purple-600">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Contenido principal -->
+        <div class="mobile-content">
+            <div class="support-card">
+                <div class="support-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                
+                <h2 class="support-title">Soporte TokTok</h2>
+                
+                <p class="support-description">
+                    Nuestro equipo de soporte está listo para ayudarte con cualquier problema o consulta que tengas sobre tu cuenta, transacciones o la aplicación.
+                </p>
+                
+                <div class="support-schedule">
+                    <div class="support-schedule-title">
+                        <i class="fas fa-clock"></i> Horario de atención
+                    </div>
+                    <div class="support-schedule-time">
+                        Lunes a Domingo de 8:00 AM a 10:00 PM
+                    </div>
+                </div>
+                
+                <button class="support-button button-call" onclick="llamarOperador()">
+                    <i class="fas fa-phone-alt"></i> Llamar a un operador
+                </button>
+                
+                <button class="support-button button-whatsapp" onclick="abrirWhatsApp()">
+                    <i class="fab fa-whatsapp"></i> Hablar por WhatsApp
+                </button>
+                
+                <div class="support-contact">
+                    Número directo: <a href="tel:+591 73246446">+591 73246446</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function llamarOperador() {
+            if (confirm("¿Deseas llamar a nuestro operador al +59173246446?")) {
+                window.location.href = "tel:+59173246446";
+            }
+        }
+        
+        function abrirWhatsApp() {
+            // Número en formato internacional sin espacios ni signos plus
+            const numero = "59173246446";
+            // Mensaje predefinido
+            const mensaje = "Hola, necesito ayuda con TokTok";
+            // Abrir WhatsApp
+            window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            // Ajustar altura para dispositivos móviles
+            const setVh = () => {
+                const vh = window.innerHeight * 0.01;
+                document.documentElement.style.setProperty('--vh', `${vh}px`);
+            };
+            
+            setVh();
+            window.addEventListener('resize', setVh);
+        });
+    </script>
+</body>
+</html>
