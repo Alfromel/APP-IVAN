@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOKTOK - Dueño</title>
+    <title>TOKTOK - Panel CEO</title>
     
     <!-- Meta tags PWA -->
-    <meta name="theme-color" content="#6a11cb">
+    <meta name="theme-color" content="#7c3aed">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TOKTOK">
@@ -33,66 +33,124 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
         
         :root {
-            --primary: #9d4edd;
-            --secondary: #6a11cb;
-            --dark-bg: #0f0521;
-            --card-bg: rgba(30, 10, 60, 0.7);
+            --primary: #8b5cf6;
+            --primary-dark: #7c3aed;
+            --primary-light: #a78bfa;
+            --accent: #c4b5fd;
+            --dark-bg: #0f0f23;
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-hover: rgba(255, 255, 255, 0.08);
             --text-primary: #ffffff;
-            --text-secondary: #c8b6ff;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --border: rgba(255, 255, 255, 0.1);
+            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --entel: #ef4444;
+            --tigo: #06d6a0;
+            --viva: #fbbf24;
+            --bcp: #10b981;
+            --tienda: #f97316;
+            --juegos: #8b5cf6;
+            --inventario: #3b82f6;
         }
         
         body {
-            background: linear-gradient(135deg, var(--dark-bg) 0%, #1e0a3c 100%);
+            background: linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-            display: flex;
-            flex-direction: column;
-            -webkit-tap-highlight-color: transparent;
-            padding: 20px;
+            padding: 16px;
+            position: relative;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 40% 40%, rgba(196, 181, 253, 0.05) 0%, transparent 50%);
+            pointer-events: none;
+            z-index: -1;
         }
         
-        /* Encabezado ultra compacto */
+        /* Header compacto */
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            padding-top: 5px;
+            margin-bottom: 24px;
+            padding: 8px 0;
         }
         
         .company-name {
-            font-size: 1.6rem;
+            font-size: 1.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 2px;
-            letter-spacing: 0.3px;
+            margin-bottom: 4px;
+            letter-spacing: -0.5px;
         }
         
         .user-role {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
+            font-size: 0.75rem;
+            color: var(--text-muted);
             font-weight: 500;
+            background: rgba(139, 92, 246, 0.1);
+            padding: 4px 12px;
+            border-radius: 12px;
+            display: inline-block;
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            backdrop-filter: blur(10px);
         }
         
-        /* Grid de botones ultra compactos */
+        /* Secciones compactas */
+        .section {
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 0;
+        }
+        
+        .section-title i {
+            font-size: 0.9rem;
+            color: var(--primary-light);
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Grid móvil ultra compacto */
+        .mobile-section {
+            display: block;
+        }
+        
         .quick-access-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 10px;
+            gap: 12px;
         }
         
         .quick-access-item {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15), rgba(106, 17, 203, 0.1));
-            border-radius: 14px;
-            padding: 15px 8px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 16px 8px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             display: flex;
@@ -101,8 +159,8 @@
             justify-content: center;
             text-decoration: none;
             color: inherit;
-            border: 1px solid rgba(157, 78, 221, 0.2);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
             min-height: 80px;
@@ -115,25 +173,23 @@
             left: 0;
             right: 0;
             height: 100%;
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(106, 17, 203, 0.15));
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(124, 58, 237, 0.03));
             opacity: 0;
             transition: opacity 0.2s ease;
         }
         
-        .quick-access-item:active {
-            transform: scale(0.96);
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2));
-        }
-        
-        .quick-access-item:active::before {
-            opacity: 1;
+        .quick-access-item:hover, .quick-access-item:active {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+            background: var(--card-hover);
+            border-color: rgba(139, 92, 246, 0.3);
         }
         
         .icon-container {
-            width: 40px;
-            height: 40px;
+            width: 36px;
+            height: 36px;
             border-radius: 10px;
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(106, 17, 203, 0.3));
+            background: rgba(139, 92, 246, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
@@ -141,21 +197,19 @@
             transition: all 0.2s ease;
             position: relative;
             z-index: 1;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
         
-        .quick-access-item:active .icon-container {
-            transform: scale(1.08);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+        .quick-access-item:hover .icon-container {
+            transform: scale(1.05);
+            background: rgba(139, 92, 246, 0.15);
         }
         
-        .quick-access-item:active .icon-container i {
-            color: white;
-        }
-        
-        .icon-container i {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-            transition: all 0.2s ease;
+        .icon-container img {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            border-radius: 4px;
         }
         
         .quick-access-item h3 {
@@ -164,54 +218,90 @@
             font-weight: 600;
             position: relative;
             z-index: 1;
+            margin-bottom: 2px;
         }
         
-        /* Efectos de brillo en los bordes */
-        .quick-access-item::after {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.5), rgba(106, 17, 203, 0.3));
-            border-radius: 15px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.2s ease;
+        .quick-access-item p {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
         }
         
-        .quick-access-item:active::after {
-            opacity: 1;
+        /* Colores específicos para cada categoría */
+        .operadoras .quick-access-item:nth-child(1) .icon-container {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        .operadoras .quick-access-item:nth-child(1):hover .icon-container {
+            background: rgba(239, 68, 68, 0.15);
         }
         
-        /* Sección de accesos para escritorio */
+        .operadoras .quick-access-item:nth-child(2) .icon-container {
+            background: rgba(6, 214, 160, 0.1);
+            border-color: rgba(6, 214, 160, 0.2);
+        }
+        .operadoras .quick-access-item:nth-child(2):hover .icon-container {
+            background: rgba(6, 214, 160, 0.15);
+        }
+        
+        .operadoras .quick-access-item:nth-child(3) .icon-container {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+        .operadoras .quick-access-item:nth-child(3):hover .icon-container {
+            background: rgba(251, 191, 36, 0.15);
+        }
+        
+        .banco .quick-access-item .icon-container {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        .banco .quick-access-item:hover .icon-container {
+            background: rgba(16, 185, 129, 0.15);
+        }
+        
+        .tiendas .quick-access-item:nth-child(1) .icon-container {
+            background: rgba(249, 115, 22, 0.1);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+        .tiendas .quick-access-item:nth-child(1):hover .icon-container {
+            background: rgba(249, 115, 22, 0.15);
+        }
+        
+        .tiendas .quick-access-item:nth-child(2) .icon-container {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .tiendas .quick-access-item:nth-child(2):hover .icon-container {
+            background: rgba(139, 92, 246, 0.15);
+        }
+        
+        .inventario .quick-access-item .icon-container {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+        .inventario .quick-access-item:hover .icon-container {
+            background: rgba(59, 130, 246, 0.15);
+        }
+        
+        /* Sección escritorio ultra compacta */
         .desktop-section {
-            margin-top: 25px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(157, 78, 221, 0.2);
-        }
-        
-        .section-title {
-            font-size: 1rem;
-            color: var(--text-secondary);
-            margin-bottom: 15px;
-            text-align: center;
-            font-weight: 600;
+            margin-top: 0;
         }
         
         .desktop-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            gap: 12px;
         }
         
         .desktop-item {
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2), rgba(106, 17, 203, 0.15));
-            border-radius: 14px;
-            padding: 18px 10px;
+            background: var(--card-bg);
+            border-radius: 12px;
+            padding: 20px 12px;
             text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            box-shadow: var(--shadow);
             transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             display: flex;
@@ -220,61 +310,45 @@
             justify-content: center;
             text-decoration: none;
             color: inherit;
-            border: 1px solid rgba(157, 78, 221, 0.3);
-            backdrop-filter: blur(10px);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
             position: relative;
             overflow: hidden;
-            min-height: 90px;
+            min-height: 100px;
         }
         
-        .desktop-item::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 100%;
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2));
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-        
-        .desktop-item:active {
-            transform: scale(0.96);
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.3), rgba(106, 17, 203, 0.25));
-        }
-        
-        .desktop-item:active::before {
-            opacity: 1;
+        .desktop-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
+            background: var(--card-hover);
+            border-color: rgba(139, 92, 246, 0.4);
         }
         
         .desktop-icon-container {
             width: 44px;
             height: 44px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.35));
+            border-radius: 10px;
+            background: rgba(139, 92, 246, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 10px;
+            margin-bottom: 12px;
             transition: all 0.2s ease;
             position: relative;
             z-index: 1;
+            border: 1px solid rgba(139, 92, 246, 0.2);
         }
         
-        .desktop-item:active .desktop-icon-container {
+        .desktop-item:hover .desktop-icon-container {
             transform: scale(1.08);
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            background: rgba(139, 92, 246, 0.15);
         }
         
-        .desktop-item:active .desktop-icon-container i {
-            color: white;
-        }
-        
-        .desktop-icon-container i {
-            font-size: 1.3rem;
-            color: var(--text-secondary);
-            transition: all 0.2s ease;
+        .desktop-icon-container img {
+            width: 24px;
+            height: 24px;
+            object-fit: contain;
+            border-radius: 5px;
         }
         
         .desktop-item h3 {
@@ -283,50 +357,103 @@
             font-weight: 600;
             position: relative;
             z-index: 1;
+            margin-bottom: 4px;
         }
         
-        .desktop-item::after {
-            content: '';
-            position: absolute;
-            top: -1px;
-            left: -1px;
-            right: -1px;
-            bottom: -1px;
-            background: linear-gradient(135deg, rgba(157, 78, 221, 0.6), rgba(106, 17, 203, 0.4));
-            border-radius: 15px;
-            z-index: -1;
-            opacity: 0;
-            transition: opacity 0.2s ease;
+        .desktop-item p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            position: relative;
+            z-index: 1;
         }
         
-        .desktop-item:active::after {
-            opacity: 1;
+        /* Colores específicos para escritorio */
+        .operadoras-desk .desktop-item:nth-child(1) .desktop-icon-container {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.2);
+        }
+        .operadoras-desk .desktop-item:nth-child(1):hover .desktop-icon-container {
+            background: rgba(239, 68, 68, 0.15);
         }
         
-        /* Botón de instalación PWA */
+        .operadoras-desk .desktop-item:nth-child(2) .desktop-icon-container {
+            background: rgba(6, 214, 160, 0.1);
+            border-color: rgba(6, 214, 160, 0.2);
+        }
+        .operadoras-desk .desktop-item:nth-child(2):hover .desktop-icon-container {
+            background: rgba(6, 214, 160, 0.15);
+        }
+        
+        .operadoras-desk .desktop-item:nth-child(3) .desktop-icon-container {
+            background: rgba(251, 191, 36, 0.1);
+            border-color: rgba(251, 191, 36, 0.2);
+        }
+        .operadoras-desk .desktop-item:nth-child(3):hover .desktop-icon-container {
+            background: rgba(251, 191, 36, 0.15);
+        }
+        
+        .banco-desk .desktop-item .desktop-icon-container {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: rgba(16, 185, 129, 0.2);
+        }
+        .banco-desk .desktop-item:hover .desktop-icon-container {
+            background: rgba(16, 185, 129, 0.15);
+        }
+        
+        .tiendas-desk .desktop-item:nth-child(1) .desktop-icon-container {
+            background: rgba(249, 115, 22, 0.1);
+            border-color: rgba(249, 115, 22, 0.2);
+        }
+        .tiendas-desk .desktop-item:nth-child(1):hover .desktop-icon-container {
+            background: rgba(249, 115, 22, 0.15);
+        }
+        
+        .tiendas-desk .desktop-item:nth-child(2) .desktop-icon-container {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.2);
+        }
+        .tiendas-desk .desktop-item:nth-child(2):hover .desktop-icon-container {
+            background: rgba(139, 92, 246, 0.15);
+        }
+        
+        .inventario-desk .desktop-item .desktop-icon-container {
+            background: rgba(59, 130, 246, 0.1);
+            border-color: rgba(59, 130, 246, 0.2);
+        }
+        .inventario-desk .desktop-item:hover .desktop-icon-container {
+            background: rgba(59, 130, 246, 0.15);
+        }
+        
+        /* Botón de instalación PWA compacto */
         #installButton {
             position: fixed;
-            bottom: 15px;
-            right: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            bottom: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 8px 14px;
+            padding: 10px 16px;
             font-size: 0.75rem;
             font-weight: 600;
-            box-shadow: 0 4px 12px rgba(157, 78, 221, 0.4);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
             cursor: pointer;
             display: none;
             z-index: 1000;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.3);
         }
         
-        #installButton:active {
-            transform: scale(0.95);
+        #installButton:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 25px rgba(139, 92, 246, 0.5);
         }
         
-        /* Estilos para modo standalone (PWA instalada) */
+        /* Estilos para modo standalone */
         @media all and (display-mode: standalone) {
             body {
                 padding-top: env(safe-area-inset-top);
@@ -366,22 +493,22 @@
             opacity: 0;
         }
         
-        .desktop-item:nth-child(1) { animation-delay: 0.25s; }
-        .desktop-item:nth-child(2) { animation-delay: 0.3s; }
-        .desktop-item:nth-child(3) { animation-delay: 0.35s; }
+        .desktop-item:nth-child(1) { animation-delay: 0.2s; }
+        .desktop-item:nth-child(2) { animation-delay: 0.25s; }
+        .desktop-item:nth-child(3) { animation-delay: 0.3s; }
         
-        /* Media queries para mostrar/ocultar secciones según el dispositivo */
+        /* Media queries - Separación total móvil/escritorio */
         @media (max-width: 768px) {
             .desktop-section {
                 display: none;
             }
-            .quick-access-grid {
-                display: grid;
+            .mobile-section {
+                display: block;
             }
         }
         
         @media (min-width: 769px) {
-            .quick-access-grid {
+            .mobile-section {
                 display: none;
             }
             .desktop-section {
@@ -397,87 +524,205 @@
         <p class="user-role">Dueño / CEO</p>
     </div>
     
-    <!-- Accesos Rápidos Ultra Compactos -->
-    <div class="quick-access-grid">
-        <a href="EXTENCIONES/R.T.html" class="quick-access-item">
-            <div class="icon-container">
-                <i class="fas fa-store"></i>
-            </div>
-            <h3>Reportes Tienda</h3>
-        </a>
-        
-        <a href="EXTENCIONES/R.A.J.html" class="quick-access-item">
-            <div class="icon-container">
-                <i class="fas fa-box-open"></i>
-            </div>
-            <h3>Reportes J</h3>
-        </a>
+    <!-- Sección Móvil - SOLO VISIBLE EN MÓVIL -->
+    <div class="mobile-section">
+        <!-- Sección Operadoras -->
+        <div class="section operadoras">
+            <h2 class="section-title"><i class="fas fa-sim-card"></i> TOKTOK</h2>
+            <div class="quick-access-grid">
+                <a href="EXTENCIONES/admin.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de Entel -->
+                        <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
+                    </div>
+                    <h3>Entel</h3>
+                    <p>Estadísticas</p>
+                </a>
+                
+                <a href="EXTENCIONES/tigo.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de Tigo -->
+                        <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
+                    </div>
+                    <h3>Tigo</h3>
+                    <p>Gestión</p>
+                </a>
+                
+                <a href="EXTENCIONES/viva.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de Viva -->
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
+                    </div>
+                    <h3>Viva</h3>
+                    <p>Administración</p>
+                </a>
 
-        <a href="EXTENCIONES/admin.html" class="quick-access-item">
-            <div class="icon-container">
-                <i class="fas fa-chart-line"></i>
+                                <a href="EXTENCIONES/bcp-admin.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de BCP -->
+                        <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
+                    </div>
+                    <h3>BCP</h3>
+                    <p>Gestión</p>
+                </a>
             </div>
-            <h3>Entel</h3>
-        </a>
-                        <a href="EXTENCIONES/bcp-admin.html" class="desktop-item">
-                <div class="desktop-icon-container">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>BCP</h3>
-            </a>
+        </div>
+        
+
+        
+        <!-- Sección Tiendas -->
+        <div class="section tiendas">
+            <h2 class="section-title"><i class="fas fa-store"></i> Tiendas</h2>
+            <div class="quick-access-grid">
+                <a href="EXTENCIONES/R.T.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de Tienda -->
+                        <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
+                    </div>
+                    <h3>Tienda</h3>
+                    <p>Reportes</p>
+                </a>
+                
+                <a href="EXTENCIONES/R.A.J.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de Juegos -->
+                        <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
+                    </div>
+                    <h3>Juegos</h3>
+                    <p>Ambiente</p>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Sección Inventario -->
+        <div class="section inventario">
+            <h2 class="section-title"><i class="fas fa-boxes"></i> Inventario</h2>
+            <div class="quick-access-grid">
+                <a href="EXTENCIONES/inventario.html" class="quick-access-item">
+                    <div class="icon-container">
+                        <!-- Cambia esta URL por el logo de Inventario -->
+                        <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
+                    </div>
+                    <h3>Inventario</h3>
+                    <p>Gestión</p>
+                </a>
+            </div>
+        </div>
     </div>
     
-    <!-- Accesos Rápidos para Escritorio -->
+    <!-- Sección Escritorio - SOLO VISIBLE EN ESCRITORIO -->
     <div class="desktop-section">
-        <h2 class="section-title">Accesos Rápidos para Escritorio</h2>
-        <div class="desktop-grid">
-            <a href="EXTENCIONES/ges.html" class="desktop-item">
-                <div class="desktop-icon-container">
-                    <i class="fas fa-cogs"></i>
-                </div>
-                <h3>Gestor de Tienda</h3>
-            </a>
-            
-            <a href="EXTENCIONES/car.html" class="desktop-item">
-                <div class="desktop-icon-container">
-                    <i class="fas fa-gamepad"></i>
-                </div>
-                <h3>Gestor de Ambiente Juego</h3>
-            </a>
-            
-            <a href="EXTENCIONES/adescrit.html" class="desktop-item">
-                <div class="desktop-icon-container">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>Entel</h3>
-            </a>
+        <!-- Operadoras Escritorio -->
+        <div class="section operadoras-desk">
+            <h2 class="section-title"><i class="fas fa-sim-card"></i> TokTok</h2>
+            <div class="desktop-grid">
+                <a href="EXTENCIONES/admin.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Entel -->
+                        <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
+                    </div>
+                    <h3>Entel</h3>
+                    <p>Admin</p>
+                </a>
+                
+                <a href="EXTENCIONES/tigo-escritorio.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Tigo -->
+                        <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
+                    </div>
+                    <h3>Tigo</h3>
+                    <p>Admin</p>
+                </a>
+                
+                <a href="EXTENCIONES/viva-escritorio.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Viva -->
+                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
+                    </div>
+                    <h3>Viva</h3>
+                    <p>Admin</p>
+                </a>
 
-                  <a href="admin-toktok/index.html" class="desktop-item">
-                <div class="desktop-icon-container">
-                    <i class="fas fa-chart-line"></i>
-                </div>
-                <h3>TokTok Admin</h3>
-            </a>
+                                <a href="EXTENCIONES/bcp-escritorio.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de BCP -->
+                        <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
+                    </div>
+                    <h3>BCP</h3>
+                    <p>Admin</p>
+                </a>
 
+                                <a href="EXTENCIONES/ges.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Tienda -->
+                        <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
+                    </div>
+                    <h3>Tienda</h3>
+                    <p>Gestión completa</p>
+                </a>
+
+                                <a href="EXTENCIONES/car.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Juegos -->
+                        <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
+                    </div>
+                    <h3>Juegos</h3>
+                    <p>Ambiente de juego</p>
+                </a>
+
+            </div>
+        </div>
+        
+
+        
+        <!-- Inventario Escritorio -->
+        <div class="section inventario-desk">
+            <h2 class="section-title"><i class="fas fa-boxes"></i> Inventario</h2>
+            <div class="desktop-grid">
+                <a href="EXTENCIONES/inventario-escritorio.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Inventario -->
+                        <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
+                    </div>
+                    <h3>Inventario</h3>
+                    <p>Gestión Chips</p>
+                </a>
+                
+                <a href="EXTENCIONES/asistencia.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Asistencia -->
+                        <img src="https://cdn-icons-png.flaticon.com/512/4854/4854344.png" alt="Asistencia">
+                    </div>
+                    <h3>Asistencia</h3>
+                    <p>Control personal</p>
+                </a>
+                
+                <a href="admin-toktok/index.html" class="desktop-item">
+                    <div class="desktop-icon-container">
+                        <!-- Cambia esta URL por el logo de Admin -->
+                        <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Admin">
+                    </div>
+                    <h3>TokTok Admin</h3>
+                    <p>Panel principal</p>
+                </a>
+            </div>
         </div>
     </div>
     
     <!-- Botón de instalación PWA -->
     <button id="installButton" aria-label="Instalar aplicación">
-        <i class="fas fa-download"></i> Instalar App
+        <i class="fas fa-download"></i> Instalar
     </button>
 
     <script>
         // Efecto táctil mejorado para móviles
         document.querySelectorAll('.quick-access-item, .desktop-item').forEach(item => {
             item.addEventListener('touchstart', function() {
-                this.style.transform = 'scale(0.96)';
-                this.style.background = 'linear-gradient(135deg, rgba(157, 78, 221, 0.25), rgba(106, 17, 203, 0.2))';
+                this.style.transform = 'translateY(-1px) scale(0.98)';
             });
             
             item.addEventListener('touchend', function() {
                 this.style.transform = '';
-                this.style.background = '';
             });
         });
         
@@ -505,7 +750,7 @@
             // Guarda el evento para que pueda ser activado después
             deferredPrompt = e;
             // Muestra el botón de instalación
-            installButton.style.display = 'block';
+            installButton.style.display = 'flex';
             
             installButton.addEventListener('click', () => {
                 // Oculta el botón de instalación
@@ -540,7 +785,3 @@
     </script>
 </body>
 </html>
-
-
-
-
