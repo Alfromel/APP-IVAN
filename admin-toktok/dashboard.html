@@ -1045,21 +1045,7 @@
                 
                 if (transactionsError) throw transactionsError;
                 
-                // Obtener todas las recargas
-                const { data: recharges, error: rechargesError } = await supabase
-                    .from('recharges')
-                    .select('*');
-                
-                if (rechargesError) throw rechargesError;
-                
-                // Obtener todas las recargas de juegos
-                const { data: gameRecharges, error: gameRechargesError } = await supabase
-                    .from('game_recharges')
-                    .select('*');
-                
-                if (gameRechargesError) throw gameRechargesError;
-                
-                // Calcular balance basado en transacciones
+                // Calcular balance basado únicamente en transacciones
                 transactions.forEach(transaction => {
                     if (!userBalances[transaction.user_id]) {
                         userBalances[transaction.user_id] = 0;
@@ -1077,25 +1063,7 @@
                     }
                 });
                 
-                // Calcular balance basado en recargas (se consideran como retiros)
-                recharges.forEach(recharge => {
-                    if (!userBalances[recharge.user_id]) {
-                        userBalances[recharge.user_id] = 0;
-                    }
-                    
-                    // Las recargas restan del balance (rojo)
-                    userBalances[recharge.user_id] -= parseFloat(recharge.amount);
-                });
-                
-                // Calcular balance basado en recargas de juegos (se consideran como retiros)
-                gameRecharges.forEach(recharge => {
-                    if (!userBalances[recharge.user_id]) {
-                        userBalances[recharge.user_id] = 0;
-                    }
-                    
-                    // Las recargas de juegos restan del balance (rojo)
-                    userBalances[recharge.user_id] -= parseFloat(recharge.amount);
-                });
+                // NO restar recargas ni recargas de juegos porque ya están incluidas en las transacciones
                 
                 return userBalances;
             } catch (error) {
