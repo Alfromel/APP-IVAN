@@ -1,0 +1,1833 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventario de Chips - Admin</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <!-- Flatpickr para fechas -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <style>
+        :root {
+            --entel-color: #0088CC;
+            --tigo-color: #005EB8;
+            --viva-color: #78BE20;
+            --primary-color: #4a6fa5;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --sidebar-width: 240px;
+            --header-height: 60px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background-color: #f0f2f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        
+        .app-container {
+            display: flex;
+            height: 100vh;
+            background: white;
+            position: relative;
+            box-shadow: 0 0 15px rgba(0,0,0,0.08);
+        }
+        
+        /* Sidebar */
+        .app-sidebar {
+            width: var(--sidebar-width);
+            background: #2c3e50;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            transition: width 0.3s;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+        }
+        
+        .sidebar-header {
+            padding: 20px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .sidebar-header h1 {
+            font-size: 1.3rem;
+            margin: 0;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .sidebar-header h1 i {
+            margin-right: 8px;
+        }
+        
+        .sidebar-nav {
+            flex: 1;
+            padding: 20px 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .nav-item:hover {
+            background: rgba(255,255,255,0.05);
+            color: white;
+        }
+        
+        .nav-item.active {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            border-left-color: #667eea;
+        }
+        
+        .nav-item i {
+            font-size: 1.2rem;
+            margin-right: 12px;
+            width: 24px;
+            text-align: center;
+        }
+        
+        .nav-item span {
+            font-weight: 500;
+        }
+        
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            border: 2px solid rgba(255,255,255,0.5);
+            margin-right: 10px;
+        }
+        
+        .user-info {
+            flex: 1;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            color: rgba(255,255,255,0.6);
+        }
+        
+        /* Main Content */
+        .app-main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        /* Header */
+        .app-header {
+            height: var(--header-height);
+            background: white;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            border-bottom: 1px solid #e9ecef;
+            z-index: 100;
+        }
+        
+        .header-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: #333;
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+        }
+        
+        /* Contenido principal */
+        .app-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: #f8f9fa;
+        }
+        
+        /* Tarjetas */
+        .app-card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            border: none;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .app-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        
+        .app-card-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-bottom: none;
+            padding: 14px 20px;
+            font-weight: 600;
+            font-size: 1rem;
+        }
+        
+        .app-card-body {
+            padding: 20px;
+        }
+        
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            transition: transform 0.2s;
+            border-left: 4px solid;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-card.entel {
+            border-left-color: var(--entel-color);
+        }
+        
+        .stat-card.tigo {
+            border-left-color: var(--tigo-color);
+        }
+        
+        .stat-card.viva {
+            border-left-color: var(--viva-color);
+        }
+        
+        .stat-card.en-uso {
+            border-left-color: var(--success-color);
+        }
+        
+        .stat-card.por-usar {
+            border-left-color: var(--warning-color);
+        }
+        
+        .stat-number {
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card.entel .stat-number { color: var(--entel-color); }
+        .stat-card.tigo .stat-number { color: var(--tigo-color); }
+        .stat-card.viva .stat-number { color: var(--viva-color); }
+        .stat-card.en-uso .stat-number { color: var(--success-color); }
+        .stat-card.por-usar .stat-number { color: var(--warning-color); }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+        
+        /* Botones */
+        .app-btn {
+            border-radius: 6px;
+            padding: 10px 16px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.08);
+        }
+        
+        .app-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        
+        .app-btn-primary {
+            background: #667eea;
+            color: white;
+        }
+        
+        .app-btn-success {
+            background: var(--success-color);
+            color: white;
+        }
+        
+        .app-btn-warning {
+            background: var(--warning-color);
+            color: #212529;
+        }
+        
+        .app-btn-danger {
+            background: var(--danger-color);
+            color: white;
+        }
+        
+        .app-btn-entel {
+            background: var(--entel-color);
+            color: white;
+        }
+        
+        .app-btn-tigo {
+            background: var(--tigo-color);
+            color: white;
+        }
+        
+        .app-btn-viva {
+            background: var(--viva-color);
+            color: white;
+        }
+        
+        /* Badges de estado */
+        .badge-estado {
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .badge-activo {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .badge-inactivo {
+            background-color: #fff3cd;
+            color: #856404;
+        }
+        
+        .badge-vencido {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        /* Tablas */
+        .table th {
+            font-weight: 700;
+            font-size: 0.85rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 15px;
+        }
+        
+        .table td {
+            font-size: 0.85rem;
+            vertical-align: middle;
+            padding: 12px 15px;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .table tbody tr:hover {
+            background-color: rgba(102, 126, 234, 0.04);
+        }
+        
+        /* Loading */
+        .loading-spinner {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px;
+        }
+        
+        /* Filtros */
+        .filter-card {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        /* Utilidades */
+        .section-title {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: #333;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 50px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+        }
+        
+        /* Animaciones */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* Notificaciones */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 14px 18px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1100;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.12);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            font-size: 0.9rem;
+            max-width: 350px;
+        }
+        
+        .notification.show {
+            transform: translateX(0);
+        }
+        
+        .notification.success {
+            background: linear-gradient(135deg, #28a745 0%, #218838 100%);
+        }
+        
+        .notification.error {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        }
+        
+        .notification.info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        /* Botón de actualización */
+        .refresh-btn {
+            background: transparent;
+            border: none;
+            color: #667eea;
+            font-size: 1.2rem;
+            transition: transform 0.4s;
+            padding: 8px;
+            margin-right: 10px;
+        }
+        
+        .refresh-btn:hover {
+            transform: rotate(180deg);
+        }
+        
+        .refresh-btn.loading {
+            animation: spin 0.8s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Chips por vencer */
+        .chip-vencimiento {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid;
+        }
+        
+        .chip-vencimiento.entel { border-left-color: var(--entel-color); background: rgba(0, 136, 204, 0.05); }
+        .chip-vencimiento.tigo { border-left-color: var(--tigo-color); background: rgba(0, 94, 184, 0.05); }
+        .chip-vencimiento.viva { border-left-color: var(--viva-color); background: rgba(120, 190, 32, 0.05); }
+        
+        .chip-vencimiento.critico { border-left-color: var(--danger-color); background: rgba(220, 53, 69, 0.05); }
+        
+        /* Responsive para escritorio */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .app-sidebar {
+                width: 70px;
+            }
+            
+            .sidebar-header h1 span,
+            .nav-item span,
+            .user-info {
+                display: none;
+            }
+            
+            .nav-item {
+                justify-content: center;
+                padding: 15px;
+            }
+            
+            .nav-item i {
+                margin-right: 0;
+            }
+            
+            .sidebar-footer {
+                justify-content: center;
+            }
+            
+            .user-avatar {
+                margin-right: 0;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .app-sidebar {
+                position: fixed;
+                left: -100%;
+                z-index: 1000;
+                height: 100%;
+            }
+            
+            .app-sidebar.show {
+                left: 0;
+            }
+            
+            .sidebar-overlay {
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background: rgba(0,0,0,0.5);
+                z-index: 999;
+                display: none;
+            }
+            
+            .sidebar-overlay.show {
+                display: block;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+        }
+        
+        /* Botón para mostrar/ocultar menú en móvil */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: #333;
+            margin-right: 15px;
+        }
+        
+        /* Colores de operadoras */
+        .text-entel { color: var(--entel-color); }
+        .text-tigo { color: var(--tigo-color); }
+        .text-viva { color: var(--viva-color); }
+        
+        .bg-entel { background-color: var(--entel-color); }
+        .bg-tigo { background-color: var(--tigo-color); }
+        .bg-viva { background-color: var(--viva-color); }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="app-sidebar">
+            <div class="sidebar-header">
+                <h1><i class="bi bi-sim"></i> <span>Inventario de Chips</span></h1>
+            </div>
+            
+            <div class="sidebar-nav">
+                <a href="#" class="nav-item active" data-section="dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="nav-item" data-section="inventario">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#" class="nav-item" data-section="categorias">
+                    <i class="bi bi-folder"></i>
+                    <span>Categorías</span>
+                </a>
+                <a href="#" class="nav-item" data-section="reportes">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Reportes</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-avatar">
+                    <span>A</span>
+                </div>
+                <div class="user-info">
+                    <div class="user-name">Administrador</div>
+                    <div class="user-role">Sistema de Chips</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Main Content -->
+        <div class="app-main">
+            <!-- Header -->
+            <div class="app-header">
+                <div class="d-flex align-items-center">
+                    <button class="menu-toggle">
+                        <i class="bi bi-list"></i>
+                    </button>
+                    <h2 class="header-title" id="currentSectionTitle">Dashboard</h2>
+                </div>
+                <div class="header-actions">
+                    <button class="btn refresh-btn" id="refreshDataBtn" title="Actualizar datos">
+                        <i class="bi bi-arrow-clockwise"></i>
+                    </button>
+                    <button class="btn app-btn app-btn-primary" id="addChipBtn">
+                        <i class="bi bi-plus-circle me-2"></i>Agregar Chip
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notificaciones -->
+            <div id="notification" class="notification d-none"></div>
+
+            <!-- Contenido Principal -->
+            <div class="app-content">
+                <!-- Dashboard Section -->
+                <div id="dashboardSection" class="fade-in">
+                    <!-- Estadísticas -->
+                    <div class="stats-grid">
+                        <div class="stat-card entel">
+                            <div class="stat-number" id="totalEntel">0</div>
+                            <div class="stat-label">Chips ENTEL</div>
+                        </div>
+                        <div class="stat-card tigo">
+                            <div class="stat-number" id="totalTigo">0</div>
+                            <div class="stat-label">Chips TIGO</div>
+                        </div>
+                        <div class="stat-card viva">
+                            <div class="stat-number" id="totalViva">0</div>
+                            <div class="stat-label">Chips VIVA</div>
+                        </div>
+                        <div class="stat-card en-uso">
+                            <div class="stat-number" id="totalEnUso">0</div>
+                            <div class="stat-label">Chips en Uso</div>
+                        </div>
+                        <div class="stat-card por-usar">
+                            <div class="stat-number" id="totalPorUsar">0</div>
+                            <div class="stat-label">Chips por Usar</div>
+                        </div>
+                        <div class="stat-card" style="border-left-color: #dc3545;">
+                            <div class="stat-number" id="totalVencidos">0</div>
+                            <div class="stat-label">Chips Vencidos</div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6">
+                            <!-- Chips por Vencer -->
+                            <div class="app-card">
+                                <div class="app-card-header">
+                                    <span>Chips por Vencer (Próximos 7 días)</span>
+                                </div>
+                                <div class="app-card-body">
+                                    <div id="chipsPorVencerList">
+                                        <!-- Los chips por vencer se cargarán aquí -->
+                                    </div>
+                                    <div id="noChipsPorVencer" class="text-center text-muted py-4 d-none">
+                                        <i class="bi bi-check-circle display-4"></i>
+                                        <p class="mt-2">No hay chips por vencer en los próximos 7 días</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6">
+                            <!-- Resumen por Operadora -->
+                            <div class="app-card">
+                                <div class="app-card-header">
+                                    <span>Resumen por Operadora</span>
+                                </div>
+                                <div class="app-card-body">
+                                    <div class="row text-center">
+                                        <div class="col-4">
+                                            <div class="text-entel">
+                                                <i class="bi bi-sim-fill display-6"></i>
+                                                <div class="fw-bold fs-5" id="resumenEntel">0</div>
+                                                <small>ENTEL Activos</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="text-tigo">
+                                                <i class="bi bi-sim-fill display-6"></i>
+                                                <div class="fw-bold fs-5" id="resumenTigo">0</div>
+                                                <small>TIGO Activos</small>
+                                            </div>
+                                        </div>
+                                        <div class="col-4">
+                                            <div class="text-viva">
+                                                <i class="bi bi-sim-fill display-6"></i>
+                                                <div class="fw-bold fs-5" id="resumenViva">0</div>
+                                                <small>VIVA Activos</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventario Section -->
+                <div id="inventarioSection" class="fade-in d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title">Inventario Completo</h2>
+                        <div>
+                            <button class="btn app-btn app-btn-primary me-2" id="addCategoryBtn">
+                                <i class="bi bi-folder-plus me-2"></i>Categoría
+                            </button>
+                            <button class="btn app-btn app-btn-success" id="addChipInventarioBtn">
+                                <i class="bi bi-plus-circle me-2"></i>Agregar Chip
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="filter-card">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <select class="form-select" id="filterOperadora">
+                                    <option value="">Todas las Operadoras</option>
+                                    <option value="ENTEL">ENTEL</option>
+                                    <option value="TIGO">TIGO</option>
+                                    <option value="VIVA">VIVA</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="filterEstado">
+                                    <option value="">Todos los Estados</option>
+                                    <option value="ACTIVO">Activo</option>
+                                    <option value="INACTIVO">Inactivo</option>
+                                    <option value="VENCIDO">Vencido</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <select class="form-select" id="filterCategoria">
+                                    <option value="">Todas las Categorías</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="app-card">
+                        <div class="app-card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0" id="inventarioTable">
+                                    <thead>
+                                        <tr>
+                                            <th># Secuencia</th>
+                                            <th>Número Chip</th>
+                                            <th>Operadora</th>
+                                            <th>Categoría</th>
+                                            <th>Activación</th>
+                                            <th>Uso</th>
+                                            <th>Vencimiento</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="inventarioTableBody">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="loadingInventario" class="loading-spinner d-none">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Categorías Section -->
+                <div id="categoriasSection" class="fade-in d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title">Gestión de Categorías</h2>
+                        <button class="btn app-btn app-btn-primary" id="addCategoryMainBtn">
+                            <i class="bi bi-folder-plus me-2"></i>Nueva Categoría
+                        </button>
+                    </div>
+
+                    <div class="app-card">
+                        <div class="app-card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-striped table-hover mb-0" id="categoriasTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Operadora</th>
+                                            <th>Nombre</th>
+                                            <th>Letra Categoría</th>
+                                            <th>Cantidad Chips</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="categoriasTableBody">
+                                        <!-- Los datos se cargarán aquí -->
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="loadingCategorias" class="loading-spinner d-none">
+                                <div class="spinner-border text-primary" role="status">
+                                    <span class="visually-hidden">Cargando...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reportes Section -->
+                <div id="reportesSection" class="fade-in d-none">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h2 class="section-title">Reportes y Estadísticas</h2>
+                        <button class="btn app-btn app-btn-primary" id="exportReportBtn">
+                            <i class="bi bi-download me-2"></i>Exportar Reporte
+                        </button>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-6 mb-4">
+                            <div class="app-card">
+                                <div class="app-card-header">
+                                    Distribución por Operadora
+                                </div>
+                                <div class="app-card-body">
+                                    <div class="chart-container" style="height: 300px;">
+                                        <canvas id="operadoraChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 mb-4">
+                            <div class="app-card">
+                                <div class="app-card-header">
+                                    Estados de Chips
+                                </div>
+                                <div class="app-card-body">
+                                    <div class="chart-container" style="height: 300px;">
+                                        <canvas id="estadoChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Categoría -->
+    <div class="modal fade" id="categoryModal" tabindex="-1" aria-labelledby="categoryModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="categoryModalLabel">Agregar Categoría</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="categoryForm">
+                        <input type="hidden" id="categoryId">
+                        <div class="mb-3">
+                            <label for="categoryOperadora" class="form-label">Operadora</label>
+                            <select class="form-select" id="categoryOperadora" required>
+                                <option value="">Seleccionar operadora</option>
+                                <option value="ENTEL">ENTEL</option>
+                                <option value="TIGO">TIGO</option>
+                                <option value="VIVA">VIVA</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryNombre" class="form-label">Nombre de la Categoría</label>
+                            <input type="text" class="form-control" id="categoryNombre" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryLetra" class="form-label">Letra de Categoría</label>
+                            <input type="text" class="form-control" id="categoryLetra" maxlength="5" required>
+                            <div class="form-text">Ejemplo: E, T, V, EMP, etc.</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveCategoryBtn">Guardar Categoría</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Chip -->
+    <div class="modal fade" id="chipModal" tabindex="-1" aria-labelledby="chipModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="chipModalLabel">Agregar Chip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="chipForm">
+                        <input type="hidden" id="chipId">
+                        <div class="mb-3">
+                            <label for="chipOperadora" class="form-label">Operadora</label>
+                            <select class="form-select" id="chipOperadora" required>
+                                <option value="">Seleccionar operadora</option>
+                                <option value="ENTEL">ENTEL</option>
+                                <option value="TIGO">TIGO</option>
+                                <option value="VIVA">VIVA</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="chipCategoria" class="form-label">Categoría</label>
+                            <select class="form-select" id="chipCategoria" required>
+                                <option value="">Seleccionar categoría</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="chipNumero" class="form-label">Número del Chip</label>
+                            <input type="text" class="form-control" id="chipNumero" required>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="chipActivacion" class="form-label">Fecha Activación</label>
+                                    <input type="date" class="form-control" id="chipActivacion" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="chipUso" class="form-label">Fecha de Uso</label>
+                                    <input type="date" class="form-control" id="chipUso" required>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="mb-3">
+                                    <label for="chipVencimiento" class="form-label">Fecha Vencimiento</label>
+                                    <input type="date" class="form-control" id="chipVencimiento" required>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="chipObservaciones" class="form-label">Observaciones</label>
+                            <textarea class="form-control" id="chipObservaciones" rows="3"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveChipBtn">Guardar Chip</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Flatpickr -->
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://zrbhhiayfaedatwlzqch.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYmhoaWF5ZmFlZGF0d2x6cWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExMTcwMjgsImV4cCI6MjA3NjY5MzAyOH0.b97mGNErXGRuIorOPTf6m1awGlIyrXaAI4VS65aR-5o';
+
+        let allChips = [];
+        let allCategories = [];
+        let filteredChips = [];
+        let operadoraChart, estadoChart;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeApp();
+        });
+
+        function initializeApp() {
+            // Configurar navegación
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Actualizar clase activa
+                    document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Actualizar título de sección
+                    updateSectionTitle(section);
+                });
+            });
+
+            // Configurar botones
+            document.getElementById('addCategoryBtn').addEventListener('click', showAddCategoryModal);
+            document.getElementById('addCategoryMainBtn').addEventListener('click', showAddCategoryModal);
+            document.getElementById('addChipBtn').addEventListener('click', showAddChipModal);
+            document.getElementById('addChipInventarioBtn').addEventListener('click', showAddChipModal);
+            document.getElementById('saveCategoryBtn').addEventListener('click', saveCategory);
+            document.getElementById('saveChipBtn').addEventListener('click', saveChip);
+            document.getElementById('refreshDataBtn').addEventListener('click', refreshData);
+            document.getElementById('exportReportBtn').addEventListener('click', exportReport);
+
+            // Configurar filtros
+            document.getElementById('filterOperadora').addEventListener('change', filterChips);
+            document.getElementById('filterEstado').addEventListener('change', filterChips);
+            document.getElementById('filterCategoria').addEventListener('change', filterChips);
+
+            // Configurar cambio de operadora en modal de chip
+            document.getElementById('chipOperadora').addEventListener('change', updateChipCategories);
+
+            // Configurar menú toggle para móviles
+            document.querySelector('.menu-toggle').addEventListener('click', toggleSidebar);
+
+            // Cargar datos iniciales
+            loadDashboardData();
+        }
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.app-sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            
+            sidebar.classList.toggle('show');
+            
+            if (sidebar.classList.contains('show')) {
+                // Crear overlay si no existe
+                if (!overlay) {
+                    const newOverlay = document.createElement('div');
+                    newOverlay.className = 'sidebar-overlay';
+                    document.body.appendChild(newOverlay);
+                    
+                    newOverlay.addEventListener('click', toggleSidebar);
+                } else {
+                    overlay.classList.add('show');
+                }
+            } else {
+                if (overlay) overlay.classList.remove('show');
+            }
+        }
+
+        function updateSectionTitle(section) {
+            const titles = {
+                'dashboard': 'Dashboard',
+                'inventario': 'Inventario Completo',
+                'categorias': 'Gestión de Categorías',
+                'reportes': 'Reportes y Estadísticas'
+            };
+            
+            document.getElementById('currentSectionTitle').textContent = titles[section] || 'Inventario de Chips';
+        }
+
+        function showSection(section) {
+            // Ocultar todas las secciones
+            document.getElementById('dashboardSection').classList.add('d-none');
+            document.getElementById('inventarioSection').classList.add('d-none');
+            document.getElementById('categoriasSection').classList.add('d-none');
+            document.getElementById('reportesSection').classList.add('d-none');
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(section + 'Section').classList.remove('d-none');
+            
+            // Cargar datos específicos de la sección si es necesario
+            if (section === 'inventario') {
+                loadInventarioData();
+            } else if (section === 'categorias') {
+                loadCategoriasData();
+            } else if (section === 'reportes') {
+                loadReportsData();
+            }
+            
+            // En móviles, cerrar el sidebar después de seleccionar una sección
+            if (window.innerWidth < 768) {
+                toggleSidebar();
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                // Cargar categorías
+                const categoriesResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chip_categories`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!categoriesResponse.ok) throw new Error('Error al cargar categorías');
+                allCategories = await categoriesResponse.json();
+
+                // Cargar chips
+                const chipsResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chip_inventory?select=*`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+
+                if (!chipsResponse.ok) throw new Error('Error al cargar chips');
+                allChips = await chipsResponse.json();
+                filteredChips = [...allChips];
+
+                // Actualizar estadísticas
+                updateDashboardStats();
+                updateChipsPorVencer();
+
+            } catch (error) {
+                console.error('Error al cargar datos del dashboard:', error);
+                showNotification('Error al cargar datos. Verifique su conexión.', 'error');
+            }
+        }
+
+        function updateDashboardStats() {
+            // Contar chips por operadora
+            const entelCount = allChips.filter(chip => chip.operadora === 'ENTEL').length;
+            const tigoCount = allChips.filter(chip => chip.operadora === 'TIGO').length;
+            const vivaCount = allChips.filter(chip => chip.operadora === 'VIVA').length;
+            
+            document.getElementById('totalEntel').textContent = entelCount;
+            document.getElementById('totalTigo').textContent = tigoCount;
+            document.getElementById('totalViva').textContent = vivaCount;
+
+            // Contar chips activos por operadora
+            const entelActivos = allChips.filter(chip => chip.operadora === 'ENTEL' && chip.estado === 'ACTIVO').length;
+            const tigoActivos = allChips.filter(chip => chip.operadora === 'TIGO' && chip.estado === 'ACTIVO').length;
+            const vivaActivos = allChips.filter(chip => chip.operadora === 'VIVA' && chip.estado === 'ACTIVO').length;
+            
+            document.getElementById('resumenEntel').textContent = entelActivos;
+            document.getElementById('resumenTigo').textContent = tigoActivos;
+            document.getElementById('resumenViva').textContent = vivaActivos;
+
+            // Nuevas estadísticas: Chips en Uso y Chips por Usar
+            const hoy = new Date().toISOString().split('T')[0];
+            
+            // Chips en Uso: fecha_uso <= hoy y estado ACTIVO
+            const chipsEnUso = allChips.filter(chip => 
+                chip.fecha_uso <= hoy && chip.estado === 'ACTIVO'
+            ).length;
+            
+            // Chips por Usar: fecha_uso > hoy y estado ACTIVO
+            const chipsPorUsar = allChips.filter(chip => 
+                chip.fecha_uso > hoy && chip.estado === 'ACTIVO'
+            ).length;
+            
+            // Chips Vencidos
+            const chipsVencidos = allChips.filter(chip => chip.estado === 'VENCIDO').length;
+            
+            document.getElementById('totalEnUso').textContent = chipsEnUso;
+            document.getElementById('totalPorUsar').textContent = chipsPorUsar;
+            document.getElementById('totalVencidos').textContent = chipsVencidos;
+        }
+
+        function updateChipsPorVencer() {
+            const hoy = new Date();
+            const unaSemana = new Date();
+            unaSemana.setDate(hoy.getDate() + 7);
+            
+            const chipsPorVencer = allChips.filter(chip => {
+                const fechaVencimiento = new Date(chip.fecha_vencimiento);
+                return fechaVencimiento <= unaSemana && fechaVencimiento >= hoy && chip.estado === 'ACTIVO';
+            }).sort((a, b) => new Date(a.fecha_vencimiento) - new Date(b.fecha_vencimiento));
+
+            const container = document.getElementById('chipsPorVencerList');
+            const noChips = document.getElementById('noChipsPorVencer');
+
+            if (chipsPorVencer.length === 0) {
+                container.innerHTML = '';
+                noChips.classList.remove('d-none');
+                return;
+            }
+
+            noChips.classList.add('d-none');
+            container.innerHTML = chipsPorVencer.map(chip => {
+                const fechaVencimiento = new Date(chip.fecha_vencimiento);
+                const diasRestantes = Math.ceil((fechaVencimiento - hoy) / (1000 * 60 * 60 * 24));
+                const esCritico = diasRestantes <= 3;
+                
+                const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaChip(chip.id, categoria.id)}` : 'N/A';
+
+                return `
+                <div class="chip-vencimiento ${chip.operadora.toLowerCase()} ${esCritico ? 'critico' : ''}">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <strong>${numeroSecuencia}</strong> - ${chip.numero_chip}
+                            <br>
+                            <small class="text-muted">${categoria?.nombre || 'Sin categoría'} - Vence en ${diasRestantes} días</small>
+                        </div>
+                        <div class="text-end">
+                            <small class="text-muted">${formatDate(chip.fecha_vencimiento)}</small>
+                        </div>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function getSecuenciaChip(chipId, categoriaId) {
+            const chipsCategoria = allChips.filter(chip => chip.categoria_id === categoriaId)
+                                          .sort((a, b) => a.id - b.id);
+            const index = chipsCategoria.findIndex(chip => chip.id === chipId);
+            return index + 1;
+        }
+
+        async function loadInventarioData() {
+            showLoading('loadingInventario');
+            try {
+                // Actualizar opciones de categorías en filtro
+                updateFilterCategories();
+                
+                displayInventarioTable();
+
+            } catch (error) {
+                console.error('Error al cargar inventario:', error);
+                showNotification('Error al cargar inventario', 'error');
+            } finally {
+                hideLoading('loadingInventario');
+            }
+        }
+
+        function displayInventarioTable() {
+            const tbody = document.getElementById('inventarioTableBody');
+            
+            tbody.innerHTML = filteredChips.map(chip => {
+                const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaChip(chip.id, categoria.id)}` : 'N/A';
+                
+                let estadoBadge = '';
+                switch(chip.estado) {
+                    case 'ACTIVO':
+                        estadoBadge = '<span class="badge-estado badge-activo">Activo</span>';
+                        break;
+                    case 'INACTIVO':
+                        estadoBadge = '<span class="badge-estado badge-inactivo">Inactivo</span>';
+                        break;
+                    case 'VENCIDO':
+                        estadoBadge = '<span class="badge-estado badge-vencido">Vencido</span>';
+                        break;
+                }
+
+                return `
+                <tr>
+                    <td><strong>${numeroSecuencia}</strong></td>
+                    <td>${chip.numero_chip}</td>
+                    <td>
+                        <span class="badge ${getOperadoraBadgeClass(chip.operadora)}">${chip.operadora}</span>
+                    </td>
+                    <td>${categoria?.nombre || 'N/A'}</td>
+                    <td>${formatDate(chip.fecha_activacion)}</td>
+                    <td>${formatDate(chip.fecha_uso)}</td>
+                    <td>${formatDate(chip.fecha_vencimiento)}</td>
+                    <td>${estadoBadge}</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editChip(${chip.id})" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteChip(${chip.id})" title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function getOperadoraBadgeClass(operadora) {
+            switch(operadora) {
+                case 'ENTEL': return 'bg-entel';
+                case 'TIGO': return 'bg-tigo';
+                case 'VIVA': return 'bg-viva';
+                default: return 'bg-secondary';
+            }
+        }
+
+        function filterChips() {
+            const operadora = document.getElementById('filterOperadora').value;
+            const estado = document.getElementById('filterEstado').value;
+            const categoria = document.getElementById('filterCategoria').value;
+
+            filteredChips = allChips.filter(chip => {
+                return (!operadora || chip.operadora === operadora) &&
+                       (!estado || chip.estado === estado) &&
+                       (!categoria || chip.categoria_id == categoria);
+            });
+
+            displayInventarioTable();
+        }
+
+        function updateFilterCategories() {
+            const select = document.getElementById('filterCategoria');
+            select.innerHTML = '<option value="">Todas las Categorías</option>' +
+                allCategories.map(cat => 
+                    `<option value="${cat.id}">${cat.operadora} - ${cat.nombre} (${cat.letra_categoria})</option>`
+                ).join('');
+        }
+
+        async function loadCategoriasData() {
+            showLoading('loadingCategorias');
+            try {
+                displayCategoriasTable();
+            } catch (error) {
+                console.error('Error al cargar categorías:', error);
+                showNotification('Error al cargar categorías', 'error');
+            } finally {
+                hideLoading('loadingCategorias');
+            }
+        }
+
+        function displayCategoriasTable() {
+            const tbody = document.getElementById('categoriasTableBody');
+            
+            tbody.innerHTML = allCategories.map(category => {
+                const chipsCount = allChips.filter(chip => chip.categoria_id === category.id).length;
+                
+                return `
+                <tr>
+                    <td>
+                        <span class="badge ${getOperadoraBadgeClass(category.operadora)}">${category.operadora}</span>
+                    </td>
+                    <td>${category.nombre}</td>
+                    <td><strong>${category.letra_categoria}</strong></td>
+                    <td>${chipsCount} chips</td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${category.id})" title="Editar">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteCategory(${category.id})" ${chipsCount > 0 ? 'disabled' : ''} title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    </td>
+                </tr>
+            `}).join('');
+        }
+
+        function showAddCategoryModal() {
+            document.getElementById('categoryModalLabel').textContent = 'Agregar Categoría';
+            document.getElementById('categoryForm').reset();
+            document.getElementById('categoryId').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            modal.show();
+        }
+
+        async function saveCategory() {
+            const categoryId = document.getElementById('categoryId').value;
+            const operadora = document.getElementById('categoryOperadora').value;
+            const nombre = document.getElementById('categoryNombre').value;
+            const letra = document.getElementById('categoryLetra').value;
+
+            if (!operadora || !nombre || !letra) {
+                showNotification('Por favor, complete todos los campos', 'error');
+                return;
+            }
+
+            try {
+                const categoryData = {
+                    operadora: operadora,
+                    nombre: nombre,
+                    letra_categoria: letra.toUpperCase()
+                };
+
+                let response;
+                if (categoryId) {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/chip_categories?id=eq.${categoryId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(categoryData)
+                        }
+                    );
+                } else {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/chip_categories`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(categoryData)
+                        }
+                    );
+                }
+
+                if (!response.ok) throw new Error('Error al guardar categoría');
+
+                bootstrap.Modal.getInstance(document.getElementById('categoryModal')).hide();
+                loadDashboardData();
+                if (document.getElementById('categoriasSection').classList.contains('d-none') === false) {
+                    loadCategoriasData();
+                }
+
+                showNotification('Categoría guardada exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al guardar categoría:', error);
+                showNotification('Error al guardar categoría', 'error');
+            }
+        }
+
+        function showAddChipModal() {
+            document.getElementById('chipModalLabel').textContent = 'Agregar Chip';
+            document.getElementById('chipForm').reset();
+            document.getElementById('chipId').value = '';
+            
+            // Actualizar categorías disponibles
+            updateChipCategories();
+            
+            const modal = new bootstrap.Modal(document.getElementById('chipModal'));
+            modal.show();
+        }
+
+        function updateChipCategories() {
+            const operadora = document.getElementById('chipOperadora').value;
+            const select = document.getElementById('chipCategoria');
+            
+            const categoriasFiltradas = operadora ? 
+                allCategories.filter(cat => cat.operadora === operadora) : 
+                allCategories;
+            
+            select.innerHTML = '<option value="">Seleccionar categoría</option>' +
+                categoriasFiltradas.map(cat => 
+                    `<option value="${cat.id}">${cat.nombre} (${cat.letra_categoria})</option>`
+                ).join('');
+        }
+
+        async function saveChip() {
+            const chipId = document.getElementById('chipId').value;
+            const operadora = document.getElementById('chipOperadora').value;
+            const categoriaId = document.getElementById('chipCategoria').value;
+            const numero = document.getElementById('chipNumero').value;
+            const activacion = document.getElementById('chipActivacion').value;
+            const uso = document.getElementById('chipUso').value;
+            const vencimiento = document.getElementById('chipVencimiento').value;
+            const observaciones = document.getElementById('chipObservaciones').value;
+
+            if (!operadora || !categoriaId || !numero || !activacion || !uso || !vencimiento) {
+                showNotification('Por favor, complete todos los campos obligatorios', 'error');
+                return;
+            }
+
+            // Determinar estado basado en fechas
+            const hoy = new Date().toISOString().split('T')[0];
+            let estado = 'ACTIVO';
+            if (vencimiento < hoy) {
+                estado = 'VENCIDO';
+            }
+
+            try {
+                const chipData = {
+                    operadora: operadora,
+                    categoria_id: parseInt(categoriaId),
+                    numero_chip: numero,
+                    numero_secuencia: 'AUTO', // Se calculará automáticamente
+                    fecha_activacion: activacion,
+                    fecha_uso: uso,
+                    fecha_vencimiento: vencimiento,
+                    estado: estado,
+                    observaciones: observaciones
+                };
+
+                let response;
+                if (chipId) {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/chip_inventory?id=eq.${chipId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(chipData)
+                        }
+                    );
+                } else {
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/chip_inventory`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(chipData)
+                        }
+                    );
+                }
+
+                if (!response.ok) throw new Error('Error al guardar chip');
+
+                bootstrap.Modal.getInstance(document.getElementById('chipModal')).hide();
+                loadDashboardData();
+                if (document.getElementById('inventarioSection').classList.contains('d-none') === false) {
+                    loadInventarioData();
+                }
+
+                showNotification('Chip guardado exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al guardar chip:', error);
+                showNotification('Error al guardar chip', 'error');
+            }
+        }
+
+        function editCategory(categoryId) {
+            const category = allCategories.find(cat => cat.id === categoryId);
+            if (!category) return;
+
+            document.getElementById('categoryModalLabel').textContent = 'Editar Categoría';
+            document.getElementById('categoryId').value = category.id;
+            document.getElementById('categoryOperadora').value = category.operadora;
+            document.getElementById('categoryNombre').value = category.nombre;
+            document.getElementById('categoryLetra').value = category.letra_categoria;
+
+            const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
+            modal.show();
+        }
+
+        function editChip(chipId) {
+            const chip = allChips.find(c => c.id === chipId);
+            if (!chip) return;
+
+            document.getElementById('chipModalLabel').textContent = 'Editar Chip';
+            document.getElementById('chipId').value = chip.id;
+            document.getElementById('chipOperadora').value = chip.operadora;
+            document.getElementById('chipNumero').value = chip.numero_chip;
+            document.getElementById('chipActivacion').value = chip.fecha_activacion;
+            document.getElementById('chipUso').value = chip.fecha_uso;
+            document.getElementById('chipVencimiento').value = chip.fecha_vencimiento;
+            document.getElementById('chipObservaciones').value = chip.observaciones || '';
+
+            // Actualizar categorías y seleccionar la correcta
+            updateChipCategories();
+            setTimeout(() => {
+                document.getElementById('chipCategoria').value = chip.categoria_id;
+            }, 100);
+
+            const modal = new bootstrap.Modal(document.getElementById('chipModal'));
+            modal.show();
+        }
+
+        async function deleteCategory(categoryId) {
+            if (!confirm('¿Está seguro de que desea eliminar esta categoría?')) return;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chip_categories?id=eq.${categoryId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al eliminar categoría');
+
+                loadDashboardData();
+                if (document.getElementById('categoriasSection').classList.contains('d-none') === false) {
+                    loadCategoriasData();
+                }
+
+                showNotification('Categoría eliminada exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al eliminar categoría:', error);
+                showNotification('Error al eliminar categoría', 'error');
+            }
+        }
+
+        async function deleteChip(chipId) {
+            if (!confirm('¿Está seguro de que desea eliminar este chip?')) return;
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chip_inventory?id=eq.${chipId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al eliminar chip');
+
+                loadDashboardData();
+                if (document.getElementById('inventarioSection').classList.contains('d-none') === false) {
+                    loadInventarioData();
+                }
+
+                showNotification('Chip eliminado exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al eliminar chip:', error);
+                showNotification('Error al eliminar chip', 'error');
+            }
+        }
+
+        function loadReportsData() {
+            if (operadoraChart) operadoraChart.destroy();
+            if (estadoChart) estadoChart.destroy();
+            
+            // Gráfico de distribución por operadora
+            const operadoraCtx = document.getElementById('operadoraChart').getContext('2d');
+            const operadoraCounts = {
+                'ENTEL': allChips.filter(chip => chip.operadora === 'ENTEL').length,
+                'TIGO': allChips.filter(chip => chip.operadora === 'TIGO').length,
+                'VIVA': allChips.filter(chip => chip.operadora === 'VIVA').length
+            };
+            
+            operadoraChart = new Chart(operadoraCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['ENTEL', 'TIGO', 'VIVA'],
+                    datasets: [{
+                        data: [operadoraCounts.ENTEL, operadoraCounts.TIGO, operadoraCounts.VIVA],
+                        backgroundColor: ['#0088CC', '#005EB8', '#78BE20'],
+                        borderWidth: 2,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            // Gráfico de estados - Ahora muestra En Uso, Por Usar y Vencidos
+            const estadoCtx = document.getElementById('estadoChart').getContext('2d');
+            const hoy = new Date().toISOString().split('T')[0];
+            
+            const chipsEnUso = allChips.filter(chip => 
+                chip.fecha_uso <= hoy && chip.estado === 'ACTIVO'
+            ).length;
+            
+            const chipsPorUsar = allChips.filter(chip => 
+                chip.fecha_uso > hoy && chip.estado === 'ACTIVO'
+            ).length;
+            
+            const chipsVencidos = allChips.filter(chip => chip.estado === 'VENCIDO').length;
+            
+            estadoChart = new Chart(estadoCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['En Uso', 'Por Usar', 'Vencidos'],
+                    datasets: [{
+                        label: 'Cantidad de Chips',
+                        data: [chipsEnUso, chipsPorUsar, chipsVencidos],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        function exportReport() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(18);
+            doc.setTextColor(102, 126, 234);
+            doc.text('Reporte de Inventario de Chips', 20, 20);
+            
+            // Información
+            doc.setFontSize(12);
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Generado: ${new Date().toLocaleString('es-ES')}`, 20, 30);
+            doc.text(`Total chips: ${allChips.length}`, 20, 37);
+            
+            // Tabla
+            const tableColumn = ["# Sec", "Número", "Operadora", "Categoría", "Activación", "Uso", "Vencimiento", "Estado"];
+            const tableRows = [];
+            
+            filteredChips.forEach(chip => {
+                const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaChip(chip.id, categoria.id)}` : 'N/A';
+                
+                const rowData = [
+                    numeroSecuencia,
+                    chip.numero_chip,
+                    chip.operadora,
+                    categoria?.nombre || 'N/A',
+                    formatDate(chip.fecha_activacion),
+                    formatDate(chip.fecha_uso),
+                    formatDate(chip.fecha_vencimiento),
+                    chip.estado
+                ];
+                tableRows.push(rowData);
+            });
+            
+            doc.autoTable({
+                head: [tableColumn],
+                body: tableRows,
+                startY: 45,
+                theme: 'grid',
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 2
+                },
+                headStyles: {
+                    fillColor: [102, 126, 234],
+                    textColor: 255
+                }
+            });
+            
+            doc.save(`Reporte_Inventario_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        // Funciones utilitarias
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('es-ES');
+        }
+
+        function showLoading(elementId) {
+            document.getElementById(elementId).classList.remove('d-none');
+        }
+
+        function hideLoading(elementId) {
+            document.getElementById(elementId).classList.add('d-none');
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        function refreshData() {
+            const refreshBtn = document.getElementById('refreshDataBtn');
+            refreshBtn.classList.add('loading');
+            
+            loadDashboardData().then(() => {
+                setTimeout(() => {
+                    refreshBtn.classList.remove('loading');
+                    showNotification('Datos actualizados correctamente', 'success');
+                }, 500);
+            });
+        }
+
+        // Hacer las funciones accesibles globalmente
+        window.editCategory = editCategory;
+        window.deleteCategory = deleteCategory;
+        window.editChip = editChip;
+        window.deleteChip = deleteChip;
+    </script>
+</body>
+</html>

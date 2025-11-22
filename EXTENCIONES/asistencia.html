@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>TOKTOK · Registro de Asistencias</title>
+
+  <!-- TailwindCSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            tok: {
+              primary: '#10b981',
+              dark: '#0b1220',
+              light: '#ecfdf5',
+              accent: '#22d3ee',
+              warning: '#f59e0b',
+              danger: '#ef4444'
+            }
+          },
+          boxShadow: { soft: '0 10px 30px rgba(0,0,0,.15)' },
+          borderRadius: { '2xl': '1.25rem' }
+        }
+      }
+    }
+  </script>
+
+  <!-- Supabase JS v2 -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- QR generator -->
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <!-- jsPDF (generar PDF de reportes) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- jsPDF AutoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+  <!-- html2canvas para convertir a imagen -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
+  <style>
+    html { scroll-behavior: smooth; }
+    
+    /* Diseño mejorado de la credencial con degradado azul */
+    .id-card { 
+      width: 85.6mm; 
+      height: 54mm; 
+      border-radius: 6mm; 
+      box-shadow: 0 0 0 1px rgba(0,0,0,.08) inset, 0 4px 12px rgba(0,0,0,0.1);
+      background: linear-gradient(135deg, #0c2d48 0%, #2b6ca3 50%, #6baed6 100%);
+      position: relative; 
+      overflow: hidden; 
+      color: white;
+    }
+    
+    .id-card-back {
+      background: linear-gradient(135deg, #0c2d48 0%, #2b6ca3 50%, #6baed6 100%);
+    }
+    
+    .id-grid { display: grid; grid-template-columns: 1fr 1.2fr; height: 100%; }
+    .id-photo { object-fit: cover; width: 100%; height: 100%; }
+    .id-brand { 
+      position: absolute; 
+      right: 6mm; 
+      top: 6mm; 
+      font-weight: 800; 
+      font-size: 10pt; 
+      color: white;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    .id-qrs { 
+      position: absolute; 
+      right: 4mm; 
+      bottom: 4mm; 
+      width: 20mm; 
+      height: 20mm; 
+      background: white; 
+      padding: 1mm; 
+      border-radius: 2mm; 
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
+    }
+    .id-field { 
+      font-size: 9pt; 
+      line-height: 1.1;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+    }
+    
+    .photo-container {
+      background: linear-gradient(to bottom, #f0f8ff, #e1f5fe);
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .id-data {
+      padding: 3mm;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      height: 100%;
+    }
+    
+    .logo-mark {
+      position: absolute;
+      left: 4mm;
+      top: 4mm;
+      width: 12mm;
+      height: 12mm;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+      color: white;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    @media print {
+      body * { visibility: hidden; }
+      #print-area, #print-area * { visibility: visible; }
+      #print-area { position: absolute; left: 0; top: 0; width: 100%; }
+      .print-page { 
+        page-break-after: always; 
+        width: 216mm; 
+        height: 279mm; 
+        padding: 10mm; 
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+      .print-cards-container {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 20mm;
+        margin-bottom: 20mm;
+      }
+      .print-card-pair {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin-bottom: 15mm;
+      }
+      .id-card { 
+        box-shadow: 0 0 5px rgba(0,0,0,0.2);
+        margin-bottom: 5mm;
+      }
+      @page { 
+        size: letter; 
+        margin: 0;
+      }
+    }
+
+    @media (max-width: 1024px) {
+      .header-content { flex-direction: column; align-items: flex-start; gap: 1rem; }
+      .connection-form { flex-direction: column; width: 100%; }
+      .connection-form input { width: 100%; }
+    }
+    @media (max-width: 768px) {
+      .tabs-container { flex-wrap: wrap; }
+      .tab-btn { flex: 1; min-width: 120px; font-size: 0.8rem; padding: 0.5rem 0.75rem; }
+      .filter-form { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 640px) {
+      .id-cards-container { flex-direction: column; align-items: center; }
+      .id-card { margin-bottom: 1.5rem; }
+      .worker-form-buttons { flex-direction: column; }
+      .worker-form-buttons button { width: 100%; }
+    }
+    
+    /* Estilos para celdas editables */
+    .editable-cell {
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s ease;
+    }
+    
+    .editable-cell:hover {
+      background-color: #f0f9ff;
+      box-shadow: inset 0 0 0 2px #3b82f6;
+    }
+    
+    .editable-cell:after {
+      content: '✏️';
+      position: absolute;
+      right: 5px;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 12px;
+      opacity: 0.6;
+    }
+    
+    .editable-empty {
+      background-color: #fef3c7 !important;
+      color: #92400e;
+      font-style: italic;
+    }
+    
+    .editable-empty:hover {
+      background-color: #fef3c7 !important;
+      box-shadow: inset 0 0 0 2px #f59e0b;
+    }
+    
+    .editable-empty:after {
+      content: '➕';
+      color: #f59e0b;
+    }
+    
+    .edit-time-input {
+      width: 100%;
+      border: 2px solid #3b82f6;
+      border-radius: 6px;
+      padding: 4px 8px;
+      font-size: 0.9em;
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .saving {
+      background: linear-gradient(90deg, #f0f9ff, #e0f2fe, #f0f9ff) !important;
+      background-size: 200% 100% !important;
+      animation: saving-pulse 1.5s ease-in-out infinite;
+    }
+    
+    @keyframes saving-pulse {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    .saved {
+      background-color: #dcfce7 !important;
+      border: 1px solid #22c55e;
+    }
+    
+    .edit-mode {
+      background-color: #fef3c7 !important;
+      border: 2px solid #f59e0b;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-tok-light text-slate-900">
+  <header class="bg-gradient-to-r from-tok-primary to-tok-accent text-white shadow-soft">
+    <div class="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between header-content">
+      <h1 class="text-2xl font-bold tracking-tight">TOKTOK · Sistema de Registro de Asistencias</h1>
+      <div class="text-sm opacity-90">RMGC X TOKTOK </div>
+    </div>
+  </header>
+
+  <main class="max-w-6xl mx-auto px-4 py-6">
+    <!-- Tabs -->
+    <div class="mb-6">
+      <div class="flex gap-2 bg-white rounded-2xl p-2 shadow-soft tabs-container">
+        <button data-tab="tab1" class="tab-btn px-4 py-2 rounded-xl bg-tok-primary text-white font-medium">1) Registro Trabajador</button>
+        <button data-tab="tab3" class="tab-btn px-4 py-2 rounded-xl hover:bg-slate-100">2) Reportes</button>
+        <div class="ml-auto flex items-center gap-2 connection-form">
+          <span id="conn-status" class="text-sm text-emerald-600 font-medium">Conectado a Supabase</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB 1 -->
+    <section id="tab1" class="tab-view">
+      <div class="grid md:grid-cols-2 gap-6">
+        <div class="bg-white rounded-2xl p-5 shadow-soft">
+          <h2 class="text-xl font-semibold mb-4">Datos del trabajador</h2>
+          <form id="worker-form" class="grid gap-3">
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="text-sm">Nombres</label>
+                <input required id="w-name" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
+              </div>
+              <div>
+                <label class="text-sm">Apellidos</label>
+                <input required id="w-last" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
+              </div>
+            </div>
+            <div class="grid md:grid-cols-2 gap-3">
+              <div>
+                <label class="text-sm">Cédula de identidad</label>
+                <input required id="w-ci" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
+              </div>
+              <div>
+                <label class="text-sm">Cargo</label>
+                <input required id="w-role" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
+              </div>
+            </div>
+            <div>
+              <label class="text-sm">Foto del trabajador</label>
+              <input type="file" accept="image/*" id="w-photo" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
+            </div>
+            <div class="flex gap-2 worker-form-buttons">
+              <button type="button" id="gen-qr" class="px-4 py-2 rounded-xl bg-tok-primary text-white font-medium">Generar Credencial + QR</button>
+              <button type="button" id="print-card" class="px-4 py-2 rounded-xl bg-slate-900 text-white">Imprimir credencial</button>
+              <button type="button" id="download-card" class="px-4 py-2 rounded-xl bg-tok-accent text-white">Descargar como imagen</button>
+              <button type="submit" class="px-4 py-2 rounded-xl bg-tok-warning text-white">Guardar en Supabase</button>
+            </div>
+            <p class="text-xs text-slate-500">Al guardar, se subirá la foto a <em>Storage</em> y se creará el trabajador con su <strong>qr_id</strong> único.</p>
+          </form>
+        </div>
+
+        <div class="bg-white rounded-2xl p-5 shadow-soft">
+          <h3 class="text-lg font-semibold mb-2">Vista previa de credencial (tamaño real)</h3>
+          <div class="flex gap-6 flex-wrap id-cards-container">
+            <div id="card-front" class="id-card mb-4">
+              <div class="id-brand"></div>
+              <div class="id-grid">
+                <div class="photo-container">
+                  <img id="card-photo" class="id-photo" alt="Foto" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%239ca3af'%3EFoto%3C/text%3E%3C/svg%3E" />
+                </div>
+                <div class="id-data">
+                  <div>
+                    <div class="id-field mt-6"><span class="font-semibold">Nombres: </span><span id="card-name">—</span></div>
+                    <div class="id-field"><span class="font-semibold">Apellidos: </span><span id="card-last">—</span></div>
+                    <div class="id-field"><span class="font-semibold">CI: </span><span id="card-ci">—</span></div>
+                    <div class="id-field"><span class="font-semibold">Cargo: </span><span id="card-role">—</span></div>
+                  </div>
+                  <div class="id-qrs" id="card-qr"></div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <div id="card-back" class="id-card id-card-back">
+                <div class="h-full p-4 flex flex-col">
+                  <div class="text-sm font-semibold mb-2 text-white">TOKTOK</div>
+                  <p class="text-xs mt-1 leading-tight text-white">
+                    Este código QR es único de la tienda <b>TOKTOK</b> y sirve exclusivamente para el registro de asistencia.
+                  </p>
+                  <div class="mt-2 text-xs text-white opacity-80">Contacto: RMGC TOKTOK</div>
+                  <div class="mt-auto">
+                    <div class="text-xs mb-1 text-white">QR de respaldo</div>
+                    <div class="id-qrs" id="card-qr-back"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      
+      <!-- Área de impresión (oculta hasta que se imprima) -->
+      <div id="print-area" class="hidden">
+        <div class="print-page">
+          <h2 class="text-xl font-bold mb-8">Credencial TOKTOK</h2>
+          <div class="print-cards-container">
+            <div class="print-card-pair">
+              <div class="id-card">
+                <div class="id-brand"></div>
+                <div class="id-grid">
+                  <div class="photo-container">
+                    <img id="print-card-photo" class="id-photo" alt="Foto" />
+                  </div>
+                  <div class="id-data">
+                    <div>
+                      <div class="id-field mt-6"><span class="font-semibold">Nombres: </span><span id="print-card-name">—</span></div>
+                      <div class="id-field"><span class="font-semibold">Apellidos: </span><span id="print-card-last">—</span></div>
+                      <div class="id-field"><span class="font-semibold">CI: </span><span id="print-card-ci">—</span></div>
+                      <div class="id-field"><span class="font-semibold">Cargo: </span><span id="print-card-role">—</span></div>
+                    </div>
+                    <div class="id-qrs" id="print-card-qr"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="id-card id-card-back mt-4">
+                <div class="h-full p-4 flex flex-col">
+
+                  <div class="text-sm font-semibold mb-2 text-white">TOKTOK</div>
+                  <p class="text-xs mt-1 leading-tight text-white">
+                    Este código QR es único de la tienda <b>TOKTOK</b> y sirve exclusivamente para el registro de asistencia.
+                  </p>
+                  <div class="mt-2 text-xs text-white opacity-80">Contacto: RMGC TOKTOK</div>
+                  <div class="mt-auto">
+                    <div class="text-xs mb-1 text-white">QR de respaldo</div>
+                    <div class="id-qrs" id="print-card-qr-back"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3 -->
+    <section id="tab3" class="tab-view hidden">
+      <div class="bg-white rounded-2xl p-5 shadow-soft">
+        <h2 class="text-xl font-semibold mb-4">Reporte de asistencias</h2>
+        <div class="grid md:grid-cols-6 gap-3 mb-3 filter-form">
+          <input id="filter-name" class="px-3 py-2 rounded-xl bg-slate-100" placeholder="Nombre" />
+          <input id="filter-last" class="px-3 py-2 rounded-xl bg-slate-100" placeholder="Apellido" />
+          <select id="filter-event" class="px-3 py-2 rounded-xl bg-slate-100">
+            <option value="">Todos los eventos</option>
+            <option value="entrada">Entrada</option>
+            <option value="salida">Salida</option>
+            <option value="extra">Extra</option>
+          </select>
+          <input id="filter-from" type="date" class="px-3 py-2 rounded-xl bg-slate-100" />
+          <input id="filter-to" type="date" class="px-3 py-2 rounded-xl bg-slate-100" />
+          <div class="flex gap-2">
+            <button id="apply-filters" class="px-4 py-2 rounded-xl bg-tok-primary text-white">Aplicar</button>
+            <button id="export-pdf" class="px-4 py-2 rounded-xl bg-slate-900 text-white">Descargar PDF</button>
+          </div>
+        </div>
+        <div class="overflow-auto rounded-xl border border-slate-200">
+          <table class="min-w-full text-sm" id="report-table">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-3 py-2 text-left">Fecha</th>
+                <th class="px-3 py-2 text-left">Trabajador</th>
+                <th class="px-3 py-2 text-left">CI</th>
+                <th class="px-3 py-2 text-left">Cargo</th>
+                <th class="px-3 py-2 text-left">Entrada</th>
+                <th class="px-3 py-2 text-left">Salida</th>
+                <th class="px-3 py-2 text-left">Horas trabajadas</th>
+                <th class="px-3 py-2 text-left">Notas</th>
+              </tr>
+            </thead>
+            <tbody id="report-body"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <div id="toast" class="fixed bottom-4 right-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl shadow-soft z-50"></div>
+  </main>
+
+  <script>
+    // ========== Utilidades UI ==========
+    const $$ = s => document.querySelector(s);
+    const $$$ = s => Array.from(document.querySelectorAll(s));
+    function toast(msg, type='info'){ 
+      const t=$$('#toast'); 
+      t.textContent=msg; 
+      t.classList.remove('hidden'); 
+      t.style.background = type==='error'? '#ef4444' : (type==='warn'? '#f59e0b' : '#0f172a'); 
+      setTimeout(()=>t.classList.add('hidden'), 3000);
+      console[type==='error'?'error':'log'](msg);
+    }
+
+    // ========== Supabase ==========
+    const SUPABASE_URL = 'https://jnpxaunuqttylwheadsa.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpucHhhdW51cXR0eWx3aGVhZHNhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTU5NTU2NjQsImV4cCI6MjA3MTUzMTY2NH0.ZHix4M6SKvLW5CO8f13ToYq45EyNlAA7RuJ55vuoh9E';
+    
+    let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    const state = { 
+      bucket:'fotos_trabajadores',
+      editingCell: null,
+      originalAttendanceData: [],
+      workerData: {},
+      attendanceCache: new Map()
+    };
+
+    // ========== Tabs ==========
+    $$$('.tab-btn').forEach(btn=>btn.addEventListener('click', async ()=>{
+      const id = btn.dataset.tab; 
+      $$$('.tab-view').forEach(v=>v.classList.add('hidden')); 
+      $$('#'+id).classList.remove('hidden');
+      $$$('.tab-btn').forEach(b=>b.classList.remove('bg-tok-primary','text-white'));
+      btn.classList.add('bg-tok-primary','text-white');
+
+      if (id === 'tab3') {
+        await loadWorkerData();
+        applyFilters();
+      }
+    }));
+
+    // ========== UUID ==========
+    function uuidv4(){ 
+      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>
+        (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)
+      ) 
+    }
+
+    // ========== Credencial + QR ==========
+    let currentQR = null;
+    let currentQRId = null;
+
+    $$('#gen-qr').addEventListener('click', () => {
+      const name = $$('#w-name').value.trim();
+      const last = $$('#w-last').value.trim();
+      const ci = $$('#w-ci').value.trim();
+      const role = $$('#w-role').value.trim();
+      if(!name || !last || !ci || !role){ toast('Completa todos los campos', 'warn'); return; }
+
+      $$('#card-name').textContent = name;
+      $$('#card-last').textContent = last;
+      $$('#card-ci').textContent = ci;
+      $$('#card-role').textContent = role;
+
+      $$('#print-card-name').textContent = name;
+      $$('#print-card-last').textContent = last;
+      $$('#print-card-ci').textContent = ci;
+      $$('#print-card-role').textContent = role;
+
+      const f = $$('#w-photo').files?.[0];
+      if (f){ 
+        const r = new FileReader(); 
+        r.onload = e => { 
+          $$('#card-photo').src = e.target.result; 
+          $$('#print-card-photo').src = e.target.result;
+        }; 
+        r.readAsDataURL(f); 
+      }
+
+      currentQRId = 'TOK-' + uuidv4();
+      if (currentQR) { 
+        $$('#card-qr').innerHTML=''; 
+        $$('#card-qr-back').innerHTML=''; 
+        $$('#print-card-qr').innerHTML='';
+        $$('#print-card-qr-back').innerHTML='';
+      }
+      currentQR = new QRCode(document.getElementById('card-qr'), { text: currentQRId, width: 160, height: 160 });
+      new QRCode(document.getElementById('card-qr-back'), { text: currentQRId, width: 160, height: 160 });
+      new QRCode(document.getElementById('print-card-qr'), { text: currentQRId, width: 160, height: 160 });
+      new QRCode(document.getElementById('print-card-qr-back'), { text: currentQRId, width: 160, height: 160 });
+
+      toast('Credencial generada con QR único');
+    });
+
+    $$('#print-card').addEventListener('click', ()=>{ 
+      if(!currentQRId){ toast('Genera la credencial primero','warn'); return; } 
+      
+      $$('#print-area').classList.remove('hidden');
+      
+      setTimeout(() => {
+        window.print();
+        setTimeout(() => {
+          $$('#print-area').classList.add('hidden');
+        }, 500);
+      }, 100);
+    });
+
+    // ========== Descargar como imagen ==========
+    $$('#download-card').addEventListener('click', async () => {
+      if(!currentQRId){ toast('Genera la credencial primero','warn'); return; }
+      
+      try {
+        const frontCanvas = await html2canvas($$('#card-front'), {
+          scale: 3,
+          backgroundColor: null
+        });
+        
+        const frontLink = document.createElement('a');
+        frontLink.href = frontCanvas.toDataURL('image/png');
+        frontLink.download = `credencial_anverso_${$$('#w-name').value.trim()}_${$$('#w-last').value.trim()}.png`;
+        document.body.appendChild(frontLink);
+        frontLink.click();
+        document.body.removeChild(frontLink);
+        
+        setTimeout(async () => {
+          const backCanvas = await html2canvas($$('#card-back'), {
+            scale: 3,
+            backgroundColor: null
+          });
+          
+          const backLink = document.createElement('a');
+          backLink.href = backCanvas.toDataURL('image/png');
+          backLink.download = `credencial_reverso_${$$('#w-name').value.trim()}_${$$('#w-last').value.trim()}.png`;
+          document.body.appendChild(backLink);
+          backLink.click();
+          document.body.removeChild(backLink);
+          
+          toast('Imágenes descargadas correctamente ✅');
+        }, 500);
+        
+      } catch (error) {
+        console.error('Error al descargar imágenes:', error);
+        toast('Error al descargar las imágenes', 'error');
+      }
+    });
+
+    // ========== Guardar en Supabase ==========
+    $$('#worker-form').addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      try{
+        const name = $$('#w-name').value.trim();
+        const last = $$('#w-last').value.trim();
+        const ci = $$('#w-ci').value.trim();
+        const role = $$('#w-role').value.trim();
+        if(!currentQRId){ toast('Genera el QR primero', 'warn'); return; }
+
+        let foto_url = null;
+        const file = $$('#w-photo').files?.[0];
+        if(file){
+          const path = `${Date.now()}_${file.name}`;
+          const { data: up, error: upErr } = await supabase.storage.from(state.bucket).upload(path, file, {upsert:false});
+          if(upErr) throw upErr; 
+          foto_url = supabase.storage.from(state.bucket).getPublicUrl(path).data.publicUrl;
+        }
+
+        const { error } = await supabase.from('workers').insert({ 
+          nombres: name, apellidos: last, ci, cargo: role, foto_url, qr_id: currentQRId 
+        });
+        if(error) throw error;
+        toast('Trabajador guardado en Supabase ✅');
+        
+        $$('#worker-form').reset();
+        $$('#card-name').textContent = '—';
+        $$('#card-last').textContent = '—';
+        $$('#card-ci').textContent = '—';
+        $$('#card-role').textContent = '—';
+        $$('#card-photo').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%239ca3af'%3EFoto%3C/text%3E%3C/svg%3E";
+        $$('#card-qr').innerHTML = '';
+        $$('#card-qr-back').innerHTML = '';
+        currentQRId = null;
+        
+      }catch(err){ console.error(err); toast('Error al guardar: '+(err.message||err), 'error'); }
+    });
+
+    // ========== Cargar datos de trabajadores ==========
+    async function loadWorkerData() {
+      try {
+        const { data, error } = await supabase
+          .from('workers')
+          .select('id, ci, nombres, apellidos, cargo');
+        
+        if (error) throw error;
+        
+        state.workerData = {};
+        data.forEach(worker => {
+          state.workerData[worker.ci] = worker;
+        });
+        
+      } catch (error) {
+        console.error('Error cargando datos de trabajadores:', error);
+        toast('Error cargando datos de trabajadores', 'error');
+      }
+    }
+
+    // ========== Reportes ==========
+    async function fetchReport(){
+      try {
+        state.attendanceCache.clear();
+        
+        const { data, error } = await supabase.from('attendance')
+          .select('id,event_type,notes,device_time,created_at,workers:worker_id(nombres,apellidos,ci,cargo)')
+          .order('created_at', { ascending: true });
+        
+        if(error) throw error;
+        
+        data.forEach(record => {
+          state.attendanceCache.set(record.id, record);
+        });
+        
+        return data;
+      } catch (error) {
+        toast('Error cargando reportes', 'error');
+        return [];
+      }
+    }
+
+    // ========== FUNCIÓN CORREGIDA - MANEJO CORRECTO DE FECHAS ==========
+    async function saveAttendanceChange(attendanceId, field, newValue) {
+      try {
+        if (!attendanceId) {
+          // CREAR NUEVO REGISTRO SI NO EXISTE
+          const rowData = state.editingRowData;
+          if (!rowData || !rowData.workerId) {
+            throw new Error('No se puede crear registro sin datos del trabajador');
+          }
+
+          const eventType = field === 'entrada' ? 'entrada' : 'salida';
+          
+          // Crear fecha correcta con la hora especificada
+          const currentDate = new Date(rowData.fecha);
+          const [hours, minutes] = newValue.split(':').map(Number);
+          currentDate.setHours(hours, minutes, 0, 0);
+          
+          const { data, error } = await supabase
+            .from('attendance')
+            .insert({
+              worker_id: rowData.workerId,
+              event_type: eventType,
+              device_time: currentDate.toISOString(),
+              notes: `Registro creado manualmente - ${eventType} a las ${newValue}`,
+              created_at: new Date().toISOString()
+            })
+            .select();
+
+          if (error) throw error;
+          
+          // Actualizar cache con el nuevo registro
+          if (data && data[0]) {
+            state.attendanceCache.set(data[0].id, data[0]);
+          }
+          
+          toast('Nuevo registro creado exitosamente ✅');
+          return true;
+        }
+
+        // ACTUALIZAR REGISTRO EXISTENTE
+        const currentRecord = state.attendanceCache.get(attendanceId);
+        if (!currentRecord) {
+          throw new Error('Registro no encontrado en cache');
+        }
+
+        const updateData = {};
+        
+        // Obtener la fecha actual y aplicar la nueva hora
+        const currentDate = new Date(currentRecord.device_time || currentRecord.created_at);
+        const [hours, minutes] = newValue.split(':').map(Number);
+        currentDate.setHours(hours, minutes, 0, 0);
+        
+        updateData.device_time = currentDate.toISOString();
+        updateData.notes = `Registro editado manualmente - ${field} ajustada a ${newValue}`;
+
+        console.log('Actualizando registro:', {
+          attendanceId,
+          currentDate: currentDate.toISOString(),
+          newValue
+        });
+
+        const { data, error } = await supabase
+          .from('attendance')
+          .update(updateData)
+          .eq('id', attendanceId)
+          .select();
+
+        if (error) {
+          console.error('Error de Supabase:', error);
+          throw error;
+        }
+
+        if (!data || data.length === 0) {
+          throw new Error('No se recibió confirmación de la actualización');
+        }
+
+        // Actualizar cache con los nuevos datos
+        const updatedRecord = { ...currentRecord, ...updateData };
+        state.attendanceCache.set(attendanceId, updatedRecord);
+
+        console.log('Registro actualizado exitosamente:', data[0]);
+        return true;
+
+      } catch (error) {
+        console.error('Error guardando cambio:', error);
+        throw error;
+      }
+    }
+
+    // ========== FUNCIÓN CORREGIDA PARA MOSTRAR HORAS ==========
+    function formatTime(date) {
+      if (!date || isNaN(date.getTime())) return '—';
+      
+      // Usar la hora local del registro
+      const hours = String(date.getHours()).padStart(2, '0');
+      const minutes = String(date.getMinutes()).padStart(2, '0');
+      
+      return `${hours}:${minutes}`;
+    }
+
+    // Función para obtener workerId desde CI
+    function getWorkerIdFromCI(ci) {
+      const worker = state.workerData[ci];
+      return worker ? worker.id : null;
+    }
+
+    // Función mejorada para parsear fechas
+    function parseDateFromNotes(notes){
+      if (!notes) return null;
+      
+      // Intentar diferentes formatos de fecha
+      try {
+        // Formato ISO
+        const isoDate = new Date(notes);
+        if (!isNaN(isoDate.getTime())) return isoDate;
+        
+        // Formato personalizado
+        const dateTimeMatch = notes.match(/(\d{4}-\d{2}-\d{2})[T\s](\d{2}:\d{2}:\d{2})/);
+        if (dateTimeMatch) {
+          const dateStr = `${dateTimeMatch[1]}T${dateTimeMatch[2]}`;
+          const parsedDate = new Date(dateStr);
+          if (!isNaN(parsedDate.getTime())) return parsedDate;
+        }
+      } catch (e) {
+        console.warn('Error parseando fecha:', e);
+      }
+      
+      return null;
+    }
+
+    function formatDate(date) {
+      if (!date || isNaN(date.getTime())) return '—';
+      return date.toLocaleDateString('es-ES', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit'
+      });
+    }
+
+    function timeToMinutes(timeStr) {
+      if (!timeStr || timeStr === '—') return 0;
+      const [hours, minutes] = timeStr.split(':').map(Number);
+      return hours * 60 + minutes;
+    }
+
+    function calculateWorkedHours(entradaStr, salidaStr) {
+      if (entradaStr === '—' || salidaStr === '—') return 0;
+      const entradaMins = timeToMinutes(entradaStr);
+      const salidaMins = timeToMinutes(salidaStr);
+      let diffMins = salidaMins - entradaMins;
+      if (diffMins < 0) diffMins += 24 * 60;
+      return diffMins / 60;
+    }
+
+    function formatHours(decimalHours) {
+      if (decimalHours <= 0) return '—';
+      const hours = Math.floor(decimalHours);
+      const minutes = Math.round((decimalHours - hours) * 60);
+      return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
+    }
+
+    // SISTEMA MEJORADO DE EDICIÓN
+    function setupCellEditing() {
+      $$$('.editable-cell').forEach(cell => {
+        cell.replaceWith(cell.cloneNode(true));
+      });
+      
+      $$$('.editable-cell').forEach(cell => {
+        cell.addEventListener('click', function() {
+          if (state.editingCell) return;
+          
+          const field = this.dataset.field;
+          const rowIndex = this.dataset.rowIndex;
+          const attendanceId = this.dataset.attendanceId;
+          const originalValue = this.textContent;
+          const isEmpty = originalValue === '—';
+          
+          // Guardar datos de la fila para crear nuevos registros
+          const row = $$(`tr[data-row-index="${rowIndex}"]`);
+          if (row) {
+            const ci = row.cells[2].textContent;
+            const fecha = row.cells[0].textContent;
+            const workerId = getWorkerIdFromCI(ci);
+            
+            state.editingRowData = {
+              workerId: workerId,
+              fecha: new Date(fecha.split('/').reverse().join('-')),
+              ci: ci
+            };
+          }
+
+          const input = document.createElement('input');
+          input.type = 'text';
+          input.value = isEmpty ? '' : originalValue;
+          input.className = 'edit-time-input';
+          input.placeholder = 'HH:MM';
+          
+          this.innerHTML = '';
+          this.appendChild(input);
+          input.focus();
+          input.select();
+          
+          this.classList.add('edit-mode');
+          state.editingCell = this;
+          state.editingAttendanceId = attendanceId;
+          state.editingField = field;
+          state.originalValue = originalValue;
+          
+          const saveEdit = async () => {
+            const newValue = input.value.trim();
+            
+            // Validación mejorada
+            const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
+            if (newValue && !timeRegex.test(newValue)) {
+              toast('Formato de hora inválido. Use HH:MM (24h)', 'error');
+              input.focus();
+              return;
+            }
+            
+            const displayValue = newValue || '—';
+            
+            // Actualizar UI inmediatamente
+            this.textContent = displayValue;
+            this.classList.remove('edit-mode');
+            this.classList.add('saving');
+            
+            // Actualizar clases según si está vacío o no
+            if (displayValue === '—') {
+              this.classList.add('editable-empty');
+            } else {
+              this.classList.remove('editable-empty');
+              this.classList.add('editable-cell');
+            }
+            
+            this.dataset.field = field;
+            this.dataset.rowIndex = rowIndex;
+            this.dataset.attendanceId = attendanceId;
+            
+            state.editingCell = null;
+            
+            if (newValue !== state.originalValue.replace('—', '')) {
+              try {
+                await saveAttendanceChange(attendanceId, field, newValue);
+                this.classList.remove('saving');
+                this.classList.add('saved');
+                updateWorkedHours(rowIndex);
+                toast('Cambio guardado exitosamente ✅');
+                
+                setTimeout(() => {
+                  this.classList.remove('saved');
+                }, 2000);
+                
+              } catch (error) {
+                this.classList.remove('saving');
+                this.textContent = state.originalValue;
+                if (state.originalValue === '—') {
+                  this.classList.add('editable-empty');
+                }
+                toast('Error al guardar el cambio: ' + error.message, 'error');
+              }
+            }
+            
+            setupCellEditing();
+          };
+          
+          input.addEventListener('blur', saveEdit);
+          input.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+              saveEdit();
+            } else if (e.key === 'Escape') {
+              this.textContent = state.originalValue;
+              this.classList.remove('edit-mode');
+              if (state.originalValue === '—') {
+                this.classList.add('editable-empty');
+              } else {
+                this.classList.add('editable-cell');
+              }
+              this.dataset.field = field;
+              this.dataset.rowIndex = rowIndex;
+              this.dataset.attendanceId = attendanceId;
+              state.editingCell = null;
+              setupCellEditing();
+            }
+          });
+        });
+      });
+    }
+
+    function updateWorkedHours(rowIndex) {
+      const row = $$(`tr[data-row-index="${rowIndex}"]`);
+      if (!row) return;
+      
+      const entradaCell = row.querySelector('[data-field="entrada"]');
+      const salidaCell = row.querySelector('[data-field="salida"]');
+      const horasCell = row.querySelector('[data-field="horas"]');
+      
+      const entradaStr = entradaCell.textContent;
+      const salidaStr = salidaCell.textContent;
+      
+      const horasTrabajadas = calculateWorkedHours(entradaStr, salidaStr);
+      
+      horasCell.textContent = formatHours(horasTrabajadas);
+      horasCell.className = `px-3 py-2 font-semibold ${horasTrabajadas > 0 ? 'text-green-700' : ''}`;
+    }
+
+    function renderReport(rows){
+      const tbody = $$('#report-body');
+      tbody.innerHTML = '';
+      
+      state.originalAttendanceData = rows;
+      
+      const groupedByWorkerDay = {};
+      
+      rows.forEach(r => {
+        const w = r.workers || {}; 
+        const ci = w.ci || 'NA';
+        
+        let recordDate = parseDateFromNotes(r.notes) || 
+                       (r.device_time ? new Date(r.device_time) : null) || 
+                       new Date(r.created_at);
+        
+        if (!recordDate || isNaN(recordDate.getTime())) return;
+        
+        const localDateStr = recordDate.toLocaleDateString('es-ES');
+        const key = ci + '|' + localDateStr;
+        
+        if (!groupedByWorkerDay[key]) {
+          groupedByWorkerDay[key] = {
+            nombres: w.nombres || '',
+            apellidos: w.apellidos || '',
+            ci: ci,
+            cargo: w.cargo || '',
+            fecha: recordDate,
+            entradas: [],
+            salidas: [],
+            notas: r.notes || '',
+            horasTrabajadas: 0,
+            entradaIds: [],
+            salidaIds: [],
+            entradaDates: [],
+            salidaDates: []
+          };
+        }
+        
+        if (r.event_type === 'entrada') {
+          groupedByWorkerDay[key].entradas.push(recordDate);
+          groupedByWorkerDay[key].entradaIds.push(r.id);
+          groupedByWorkerDay[key].entradaDates.push(recordDate);
+        } else if (r.event_type === 'salida') {
+          groupedByWorkerDay[key].salidas.push(recordDate);
+          groupedByWorkerDay[key].salidaIds.push(r.id);
+          groupedByWorkerDay[key].salidaDates.push(recordDate);
+        }
+      });
+      
+      Object.values(groupedByWorkerDay).forEach(group => {
+        group.entradas.sort((a, b) => a - b);
+        group.salidas.sort((a, b) => a - b);
+        
+        let totalHoras = 0;
+        const minLength = Math.min(group.entradas.length, group.salidas.length);
+        
+        for (let i = 0; i < minLength; i++) {
+          const entrada = group.entradas[i];
+          const salida = group.salidas[i];
+          
+          if (salida > entrada) {
+            const diffMs = salida - entrada;
+            totalHoras += diffMs / (1000 * 60 * 60);
+          }
+        }
+        
+        group.horasTrabajadas = totalHoras;
+      });
+      
+      let rowIndex = 0;
+      Object.values(groupedByWorkerDay).forEach(group => {
+        const tr = document.createElement('tr');
+        tr.classList.add('hover:bg-slate-50');
+        tr.dataset.rowIndex = rowIndex;
+        
+        const entradaStr = group.entradas.length > 0 
+          ? formatTime(group.entradas[0])
+          : '—';
+          
+        const salidaStr = group.salidas.length > 0 
+          ? formatTime(group.salidas[group.salidas.length - 1])
+          : '—';
+        
+        const entradaId = group.entradaIds.length > 0 ? group.entradaIds[0] : '';
+        const salidaId = group.salidaIds.length > 0 ? group.salidaIds[group.salidaIds.length - 1] : '';
+        
+        const entradaClass = entradaStr === '—' ? 'editable-cell editable-empty' : 'editable-cell';
+        const salidaClass = salidaStr === '—' ? 'editable-cell editable-empty' : 'editable-cell';
+        
+        tr.innerHTML = `
+          <td class="px-3 py-2">${formatDate(group.fecha)}</td>
+          <td class="px-3 py-2">${group.nombres} ${group.apellidos}</td>
+          <td class="px-3 py-2">${group.ci}</td>
+          <td class="px-3 py-2">${group.cargo}</td>
+          <td class="px-3 py-2 ${entradaClass}" data-field="entrada" data-row-index="${rowIndex}" data-attendance-id="${entradaId}">${entradaStr}</td>
+          <td class="px-3 py-2 ${salidaClass}" data-field="salida" data-row-index="${rowIndex}" data-attendance-id="${salidaId}">${salidaStr}</td>
+          <td class="px-3 py-2 font-semibold ${group.horasTrabajadas > 0 ? 'text-green-700' : ''}" data-field="horas" data-row-index="${rowIndex}">
+            ${group.horasTrabajadas > 0 ? formatHours(group.horasTrabajadas) : '—'}
+          </td>
+          <td class="px-3 py-2 whitespace-pre-wrap max-w-xs truncate" title="${group.notas}">${group.notas}</td>
+        `;
+        
+        tbody.appendChild(tr);
+        rowIndex++;
+      });
+      
+      setupCellEditing();
+    }
+
+    async function applyFilters(){
+      let rows = await fetchReport();
+      const nameF = $$('#filter-name').value.trim().toLowerCase();
+      const lastF = $$('#filter-last').value.trim().toLowerCase();
+      const eventF = $$('#filter-event').value;
+      const from = $$('#filter-from').value ? new Date($$('#filter-from').value+'T00:00:00') : null;
+      const to = $$('#filter-to').value ? new Date($$('#filter-to').value+'T23:59:59') : null;
+
+      rows = rows.filter(r=>{
+        const w = r.workers || {}; 
+        const n = (w.nombres||'').toLowerCase(); 
+        const l = (w.apellidos||'').toLowerCase();
+        if(nameF && !n.includes(nameF)) return false;
+        if(lastF && !l.includes(lastF)) return false;
+        if(eventF && r.event_type !== eventF) return false;
+        
+        const recordDate = parseDateFromNotes(r.notes) || 
+                          (r.device_time ? new Date(r.device_time) : null) || 
+                          new Date(r.created_at);
+        
+        if(from && recordDate && recordDate < from) return false;
+        if(to && recordDate && recordDate > to) return false;
+        return true;
+      });
+      renderReport(rows);
+    }
+
+    $$('#apply-filters').addEventListener('click', applyFilters);
+
+    // Descargar PDF
+    $$('#export-pdf').addEventListener('click', async ()=>{
+      try {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        
+        doc.setFontSize(16);
+        doc.text('TOKTOK - Reporte de Asistencias', 14, 15);
+        
+        doc.setFontSize(10);
+        doc.text(`Generado el: ${new Date().toLocaleString('es-ES')}`, 14, 22);
+        
+        const tableRows = [];
+        const tableHeader = [
+          'Fecha', 
+          'Trabajador', 
+          'CI', 
+          'Cargo', 
+          'Entrada', 
+          'Salida', 
+          'Horas trabajadas', 
+          'Notas'
+        ];
+        
+        const rows = Array.from($$('#report-body').querySelectorAll('tr'));
+        rows.forEach(tr => {
+          const cols = Array.from(tr.querySelectorAll('td'));
+          const rowData = [
+            cols[0]?.textContent || '',
+            cols[1]?.textContent || '',
+            cols[2]?.textContent || '',
+            cols[3]?.textContent || '',
+            cols[4]?.textContent || '',
+            cols[5]?.textContent || '',
+            cols[6]?.textContent || '',
+            cols[7]?.textContent || ''
+          ];
+          tableRows.push(rowData);
+        });
+        
+        doc.autoTable({
+          head: [tableHeader],
+          body: tableRows,
+          startY: 30,
+          theme: 'grid',
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [16, 185, 129] }
+        });
+        
+        doc.save('reporte-asistencias-toktok.pdf');
+        toast('PDF generado correctamente ✅');
+      } catch (error) {
+        console.error('Error al generar PDF:', error);
+        toast('Error al generar PDF', 'error');
+      }
+    });
+
+    // Inicializar conexión a Supabase
+    toast('Conectado a Supabase ✅');
+  </script>
+</body>
+</html>
