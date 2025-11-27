@@ -21,6 +21,8 @@
             --viva-dark: #5A9E00;
             --viva-light: #8CC63F;
             --viva-accent: #FF6B00;
+            --falta-color: #FFA500;
+            --echo-color: #28a745;
         }
         
         * {
@@ -46,7 +48,6 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.08);
         }
         
-        /* Header estilo app móvil */
         .app-header {
             background: linear-gradient(135deg, var(--viva-color) 0%, var(--viva-dark) 100%);
             color: white;
@@ -81,7 +82,6 @@
             border: 2px solid rgba(255,255,255,0.5);
         }
         
-        /* Navegación tipo app móvil */
         .bottom-nav {
             position: fixed;
             bottom: 0;
@@ -120,13 +120,11 @@
             margin-bottom: 2px;
         }
         
-        /* Contenido principal */
         .app-content {
             padding: 15px 12px;
             padding-bottom: 70px;
         }
         
-        /* Tarjetas estilo app */
         .app-card {
             background: white;
             border-radius: 14px;
@@ -155,7 +153,6 @@
             padding: 16px;
         }
         
-        /* Estadísticas */
         .stats-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -190,7 +187,6 @@
             font-weight: 500;
         }
         
-        /* Botones */
         .app-btn {
             border-radius: 10px;
             padding: 10px 14px;
@@ -243,13 +239,11 @@
             color: white;
         }
         
-        /* Botón pequeño para borrar historial */
         .app-btn-small {
             padding: 8px 10px;
             font-size: 0.75rem;
         }
         
-        /* Estados */
         .status-badge {
             border-radius: 16px;
             padding: 4px 10px;
@@ -258,17 +252,16 @@
             display: inline-block;
         }
         
-        .status-nuevo {
-            background-color: #28a745;
+        .status-falta {
+            background-color: var(--falta-color);
             color: white;
         }
         
-        .status-corte {
-            background-color: #dc3545;
+        .status-echo {
+            background-color: var(--echo-color);
             color: white;
         }
         
-        /* Tablas responsivas */
         .table-responsive {
             border-radius: 10px;
             overflow: hidden;
@@ -296,7 +289,6 @@
             cursor: pointer;
         }
         
-        /* Loading */
         .loading-spinner {
             display: flex;
             justify-content: center;
@@ -304,7 +296,6 @@
             padding: 30px;
         }
         
-        /* Buscador */
         .search-container {
             position: relative;
             margin-bottom: 16px;
@@ -330,7 +321,6 @@
             font-size: 1rem;
         }
         
-        /* Notificaciones */
         .notification {
             position: fixed;
             top: 15px;
@@ -363,7 +353,6 @@
             background: linear-gradient(135deg, var(--viva-color) 0%, var(--viva-dark) 100%);
         }
         
-        /* Utilidades */
         .text-viva {
             color: var(--viva-color);
         }
@@ -388,7 +377,6 @@
             border-radius: 2px;
         }
         
-        /* Responsive adicional */
         @media (min-width: 768px) {
             .app-container {
                 max-width: 768px;
@@ -399,7 +387,6 @@
             }
         }
         
-        /* Animaciones */
         .fade-in {
             animation: fadeIn 0.4s ease-in;
         }
@@ -409,7 +396,6 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Botón de actualización */
         .refresh-btn {
             background: transparent;
             border: none;
@@ -432,7 +418,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Detalles de recarga */
         .recharge-detail-item {
             display: flex;
             justify-content: space-between;
@@ -454,7 +439,6 @@
             color: #333;
         }
         
-        /* Barra de progreso para borrado de historial */
         .progress-container {
             margin: 20px 0;
         }
@@ -527,12 +511,12 @@
                         <div class="stat-label">Total Usuarios</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="nuevoCount">0</div>
-                        <div class="stat-label">Estado: Nuevo</div>
+                        <div class="stat-number" id="faltaCount">0</div>
+                        <div class="stat-label">Estado: Falta</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="corteCount">0</div>
-                        <div class="stat-label">Estado: Corte</div>
+                        <div class="stat-number" id="echoCount">0</div>
+                        <div class="stat-label">Estado: Echo</div>
                     </div>
                 </div>
 
@@ -797,8 +781,8 @@
                         <div class="mb-3">
                             <label for="editStatus" class="form-label">Estado</label>
                             <select class="form-select app-form-control" id="editStatus" required>
-                                <option value="NUEVO">Nuevo</option>
-                                <option value="CORTE">Corte</option>
+                                <option value="FALTA">Falta</option>
+                                <option value="ECHO">Echo</option>
                             </select>
                         </div>
                     </form>
@@ -993,11 +977,11 @@
             document.getElementById('totalUsers').textContent = allUsers.length;
             
             // Contar por estado
-            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            const faltaCount = allRecharges.filter(r => r.estado === 'FALTA').length;
+            const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             
-            document.getElementById('nuevoCount').textContent = nuevoCount.toLocaleString();
-            document.getElementById('corteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('faltaCount').textContent = faltaCount.toLocaleString();
+            document.getElementById('echoCount').textContent = echoCount.toLocaleString();
         }
 
         function updateRecentActivity() {
@@ -1011,7 +995,7 @@
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : 'status-echo'}">
                             ${recharge.estado}
                         </span>
                     </td>
@@ -1077,7 +1061,7 @@
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : 'status-echo'}">
                             ${recharge.estado}
                         </span>
                     </td>
@@ -1123,7 +1107,7 @@
                 <div class="recharge-detail-item">
                     <span class="recharge-detail-label">Estado:</span>
                     <span class="recharge-detail-value">
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : 'status-echo'}">
                             ${recharge.estado}
                         </span>
                     </span>
@@ -1505,16 +1489,16 @@
             
             // Gráfico de distribución por estado
             const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
-            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            const faltaCount = allRecharges.filter(r => r.estado === 'FALTA').length;
+            const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             
             statusChart = new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Nuevo', 'Corte'],
+                    labels: ['Falta', 'Echo'],
                     datasets: [{
-                        data: [nuevoCount, corteCount],
-                        backgroundColor: ['#28a745', '#dc3545'],
+                        data: [faltaCount, echoCount],
+                        backgroundColor: ['#FFA500', '#28a745'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
