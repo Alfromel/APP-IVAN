@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOKTOK - Panel CEO</title>
+    <title>TOKTOK - CEO Dashboard</title>
     
     <!-- Meta tags PWA -->
     <meta name="theme-color" content="#7c3aed">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="TOKTOK">
-    <meta name="description" content="Panel de control para dueños y CEO de TOKTOK">
-    <meta name="keywords" content="toktok, panel, control, dueño, ceo, reportes">
+    <meta name="apple-mobile-web-app-title" content="TOKTOK CEO">
+    <meta name="description" content="Panel ejecutivo para CEO y dueños de TOKTOK">
+    <meta name="keywords" content="toktok, ceo, panel, ejecutivo, administración">
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-    <meta name="apple-mobile-web-app-title" content="CEO" />
+    <meta name="apple-mobile-web-app-title" content="CEO Panel" />
     <link rel="manifest" href="/site.webmanifest" />
     <!-- Manifest -->
     <link rel="manifest" href="manifest.json">
@@ -29,13 +29,6 @@
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-        
         :root {
             --primary: #8b5cf6;
             --primary-dark: #7c3aed;
@@ -58,12 +51,18 @@
             --inventario: #3b82f6;
         }
         
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
         body {
             background: linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
-            padding: 16px;
             position: relative;
         }
 
@@ -82,38 +81,84 @@
             z-index: -1;
         }
         
-        /* Header compacto */
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-            padding: 8px 0;
+        /* Header CEO */
+        .ceo-header {
+            padding: 20px 16px 16px;
+            background: linear-gradient(180deg, rgba(15, 15, 35, 0.9) 0%, transparent 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
         }
         
         .company-name {
-            font-size: 1.5rem;
+            font-size: 1.3rem;
             font-weight: 800;
             background: linear-gradient(135deg, var(--primary), var(--primary-light));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            margin-bottom: 4px;
             letter-spacing: -0.5px;
         }
         
-        .user-role {
-            font-size: 0.75rem;
-            color: var(--text-muted);
-            font-weight: 500;
-            background: rgba(139, 92, 246, 0.1);
-            padding: 4px 12px;
-            border-radius: 12px;
-            display: inline-block;
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            backdrop-filter: blur(10px);
+        .ceo-badge {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
         
-        /* Secciones compactas */
-        .section {
-            margin-bottom: 20px;
+        .header-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 12px;
+        }
+        
+        .stat-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 10px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin-bottom: 2px;
+        }
+        
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-muted);
+        }
+        
+        /* Contenido principal */
+        .main-content {
+            padding: 16px;
+            padding-bottom: 80px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        /* Sección rápida */
+        .quick-section {
+            margin-bottom: 24px;
         }
         
         .section-title {
@@ -124,311 +169,239 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            padding: 8px 0;
+            padding-left: 8px;
         }
         
         .section-title i {
-            font-size: 0.9rem;
             color: var(--primary-light);
-            width: 16px;
-            text-align: center;
+            font-size: 0.9rem;
         }
         
-        /* Grid móvil ultra compacto */
-        .mobile-section {
-            display: block;
-        }
-        
-        .quick-access-grid {
+        /* Grid CEO */
+        .ceo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             gap: 12px;
         }
         
-        .quick-access-item {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 16px 8px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-            min-height: 80px;
+        @media (min-width: 768px) {
+            .ceo-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
         }
         
-        .quick-access-item::before {
+        .ceo-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            backdrop-filter: blur(10px);
+            min-height: 100px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .ceo-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
-            right: 0;
+            width: 100%;
             height: 100%;
             background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(124, 58, 237, 0.03));
             opacity: 0;
-            transition: opacity 0.2s ease;
+            transition: opacity 0.3s ease;
         }
         
-        .quick-access-item:hover, .quick-access-item:active {
-            transform: translateY(-2px);
+        .ceo-card:hover::before,
+        .ceo-card:active::before {
+            opacity: 1;
+        }
+        
+        .ceo-card:hover {
+            transform: translateY(-3px);
             box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
-            background: var(--card-hover);
             border-color: rgba(139, 92, 246, 0.3);
         }
         
-        .icon-container {
+        .ceo-card:active {
+            transform: translateY(-1px);
+        }
+        
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+        
+        .card-icon {
             width: 36px;
             height: 36px;
-            border-radius: 10px;
+            border-radius: 8px;
             background: rgba(139, 92, 246, 0.1);
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 8px;
-            transition: all 0.2s ease;
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            font-size: 1rem;
+            color: var(--primary-light);
+            flex-shrink: 0;
         }
         
-        .quick-access-item:hover .icon-container {
-            transform: scale(1.05);
-            background: rgba(139, 92, 246, 0.15);
-        }
-        
-        .icon-container img {
+        .card-icon img {
             width: 20px;
             height: 20px;
             object-fit: contain;
             border-radius: 4px;
         }
         
-        .quick-access-item h3 {
-            font-size: 0.8rem;
-            color: var(--text-primary);
-            font-weight: 600;
-            position: relative;
-            z-index: 1;
-            margin-bottom: 2px;
-        }
-        
-        .quick-access-item p {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* Colores específicos para cada categoría */
-        .operadoras .quick-access-item:nth-child(1) .icon-container {
-            background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.2);
-        }
-        .operadoras .quick-access-item:nth-child(1):hover .icon-container {
-            background: rgba(239, 68, 68, 0.15);
-        }
-        
-        .operadoras .quick-access-item:nth-child(2) .icon-container {
-            background: rgba(6, 214, 160, 0.1);
-            border-color: rgba(6, 214, 160, 0.2);
-        }
-        .operadoras .quick-access-item:nth-child(2):hover .icon-container {
-            background: rgba(6, 214, 160, 0.15);
-        }
-        
-        .operadoras .quick-access-item:nth-child(3) .icon-container {
-            background: rgba(251, 191, 36, 0.1);
-            border-color: rgba(251, 191, 36, 0.2);
-        }
-        .operadoras .quick-access-item:nth-child(3):hover .icon-container {
-            background: rgba(251, 191, 36, 0.15);
-        }
-        
-        .banco .quick-access-item .icon-container {
-            background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.2);
-        }
-        .banco .quick-access-item:hover .icon-container {
-            background: rgba(16, 185, 129, 0.15);
-        }
-        
-        .tiendas .quick-access-item:nth-child(1) .icon-container {
-            background: rgba(249, 115, 22, 0.1);
-            border-color: rgba(249, 115, 22, 0.2);
-        }
-        .tiendas .quick-access-item:nth-child(1):hover .icon-container {
-            background: rgba(249, 115, 22, 0.15);
-        }
-        
-        .tiendas .quick-access-item:nth-child(2) .icon-container {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.2);
-        }
-        .tiendas .quick-access-item:nth-child(2):hover .icon-container {
-            background: rgba(139, 92, 246, 0.15);
-        }
-        
-        .inventario .quick-access-item .icon-container {
-            background: rgba(59, 130, 246, 0.1);
-            border-color: rgba(59, 130, 246, 0.2);
-        }
-        .inventario .quick-access-item:hover .icon-container {
-            background: rgba(59, 130, 246, 0.15);
-        }
-        
-        /* Sección escritorio ultra compacta */
-        .desktop-section {
-            margin-top: 0;
-        }
-        
-        .desktop-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-        }
-        
-        .desktop-item {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 20px 12px;
-            text-align: center;
-            box-shadow: var(--shadow);
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-decoration: none;
-            color: inherit;
-            border: 1px solid var(--border);
-            backdrop-filter: blur(20px);
-            position: relative;
-            overflow: hidden;
-            min-height: 100px;
-        }
-        
-        .desktop-item:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 16px 32px rgba(0, 0, 0, 0.4);
-            background: var(--card-hover);
-            border-color: rgba(139, 92, 246, 0.4);
-        }
-        
-        .desktop-icon-container {
-            width: 44px;
-            height: 44px;
+        .card-badge {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-secondary);
+            font-size: 0.6rem;
+            padding: 2px 8px;
             border-radius: 10px;
-            background: rgba(139, 92, 246, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 12px;
-            transition: all 0.2s ease;
-            position: relative;
-            z-index: 1;
-            border: 1px solid rgba(139, 92, 246, 0.2);
+            font-weight: 500;
         }
         
-        .desktop-item:hover .desktop-icon-container {
-            transform: scale(1.08);
-            background: rgba(139, 92, 246, 0.15);
-        }
-        
-        .desktop-icon-container img {
-            width: 24px;
-            height: 24px;
-            object-fit: contain;
-            border-radius: 5px;
-        }
-        
-        .desktop-item h3 {
-            font-size: 0.85rem;
-            color: var(--text-primary);
+        .card-title {
+            font-size: 0.9rem;
             font-weight: 600;
-            position: relative;
-            z-index: 1;
+            color: var(--text-primary);
             margin-bottom: 4px;
         }
         
-        .desktop-item p {
+        .card-desc {
             font-size: 0.75rem;
             color: var(--text-muted);
-            position: relative;
-            z-index: 1;
+            line-height: 1.3;
         }
         
-        /* Colores específicos para escritorio */
-        .operadoras-desk .desktop-item:nth-child(1) .desktop-icon-container {
+        /* Colores específicos por categoría */
+        .entel-card .card-icon {
             background: rgba(239, 68, 68, 0.1);
-            border-color: rgba(239, 68, 68, 0.2);
+            color: var(--entel);
         }
-        .operadoras-desk .desktop-item:nth-child(1):hover .desktop-icon-container {
-            background: rgba(239, 68, 68, 0.15);
+        .entel-card:hover {
+            border-color: rgba(239, 68, 68, 0.3);
         }
         
-        .operadoras-desk .desktop-item:nth-child(2) .desktop-icon-container {
+        .tigo-card .card-icon {
             background: rgba(6, 214, 160, 0.1);
-            border-color: rgba(6, 214, 160, 0.2);
+            color: var(--tigo);
         }
-        .operadoras-desk .desktop-item:nth-child(2):hover .desktop-icon-container {
-            background: rgba(6, 214, 160, 0.15);
+        .tigo-card:hover {
+            border-color: rgba(6, 214, 160, 0.3);
         }
         
-        .operadoras-desk .desktop-item:nth-child(3) .desktop-icon-container {
+        .viva-card .card-icon {
             background: rgba(251, 191, 36, 0.1);
-            border-color: rgba(251, 191, 36, 0.2);
+            color: var(--viva);
         }
-        .operadoras-desk .desktop-item:nth-child(3):hover .desktop-icon-container {
-            background: rgba(251, 191, 36, 0.15);
+        .viva-card:hover {
+            border-color: rgba(251, 191, 36, 0.3);
         }
         
-        .banco-desk .desktop-item .desktop-icon-container {
+        .bcp-card .card-icon {
             background: rgba(16, 185, 129, 0.1);
-            border-color: rgba(16, 185, 129, 0.2);
+            color: var(--bcp);
         }
-        .banco-desk .desktop-item:hover .desktop-icon-container {
-            background: rgba(16, 185, 129, 0.15);
+        .bcp-card:hover {
+            border-color: rgba(16, 185, 129, 0.3);
         }
         
-        .tiendas-desk .desktop-item:nth-child(1) .desktop-icon-container {
+        .tienda-card .card-icon {
             background: rgba(249, 115, 22, 0.1);
-            border-color: rgba(249, 115, 22, 0.2);
+            color: var(--tienda);
         }
-        .tiendas-desk .desktop-item:nth-child(1):hover .desktop-icon-container {
-            background: rgba(249, 115, 22, 0.15);
+        .tienda-card:hover {
+            border-color: rgba(249, 115, 22, 0.3);
         }
         
-        .tiendas-desk .desktop-item:nth-child(2) .desktop-icon-container {
+        .juegos-card .card-icon {
             background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.2);
-        }
-        .tiendas-desk .desktop-item:nth-child(2):hover .desktop-icon-container {
-            background: rgba(139, 92, 246, 0.15);
+            color: var(--juegos);
         }
         
-        .inventario-desk .desktop-item .desktop-icon-container {
+        .inventario-card .card-icon {
             background: rgba(59, 130, 246, 0.1);
-            border-color: rgba(59, 130, 246, 0.2);
+            color: var(--inventario);
         }
-        .inventario-desk .desktop-item:hover .desktop-icon-container {
-            background: rgba(59, 130, 246, 0.15);
+        .inventario-card:hover {
+            border-color: rgba(59, 130, 246, 0.3);
         }
         
-        /* Botón de instalación PWA compacto */
+        .admin-card .card-icon {
+            background: rgba(168, 85, 247, 0.1);
+            color: var(--primary);
+        }
+        
+        .asistencia-card .card-icon {
+            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent);
+        }
+        
+        /* Widgets CEO */
+        .widgets-section {
+            margin: 24px 0;
+        }
+        
+        .widget-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .widget-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .widget-title {
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .widget-title i {
+            color: var(--primary-light);
+        }
+        
+        .widget-data {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+        
+        .widget-change {
+            font-size: 0.7rem;
+            color: #10b981;
+            font-weight: 600;
+        }
+        
+        .widget-change.negative {
+            color: #ef4444;
+        }
+        
+        /* Botón de instalación PWA */
         #installButton {
             position: fixed;
-            bottom: 16px;
-            right: 16px;
+            bottom: 20px;
+            right: 20px;
             background: linear-gradient(135deg, var(--primary), var(--primary-dark));
             color: white;
             border: none;
@@ -440,7 +413,7 @@
             cursor: pointer;
             display: none;
             z-index: 1000;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -453,21 +426,56 @@
             box-shadow: 0 12px 25px rgba(139, 92, 246, 0.5);
         }
         
-        /* Estilos para modo standalone */
-        @media all and (display-mode: standalone) {
-            body {
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-                padding-left: env(safe-area-inset-left);
-                padding-right: env(safe-area-inset-right);
-            }
-            
-            #installButton {
-                display: none !important;
-            }
+        #installButton:active {
+            transform: translateY(0);
         }
         
-        /* Animaciones sutiles */
+        /* Barra de navegación CEO */
+        .ceo-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(15, 15, 35, 0.9);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-around;
+            padding: 12px 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-decoration: none;
+            color: var(--text-muted);
+            transition: all 0.3s ease;
+            padding: 6px 12px;
+            border-radius: 10px;
+        }
+        
+        .nav-item.active {
+            color: var(--primary-light);
+            background: rgba(139, 92, 246, 0.1);
+        }
+        
+        .nav-item:active {
+            transform: scale(0.95);
+        }
+        
+        .nav-icon {
+            font-size: 1.2rem;
+            margin-bottom: 4px;
+        }
+        
+        .nav-label {
+            font-size: 0.65rem;
+            font-weight: 500;
+        }
+        
+        /* Animaciones */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
@@ -479,311 +487,332 @@
             }
         }
         
-        .quick-access-item {
-            animation: fadeInUp 0.3s ease forwards;
-            opacity: 0;
-        }
-        
-        .quick-access-item:nth-child(1) { animation-delay: 0.1s; }
-        .quick-access-item:nth-child(2) { animation-delay: 0.15s; }
-        .quick-access-item:nth-child(3) { animation-delay: 0.2s; }
-        
-        .desktop-item {
+        .ceo-card {
             animation: fadeInUp 0.4s ease forwards;
             opacity: 0;
         }
         
-        .desktop-item:nth-child(1) { animation-delay: 0.2s; }
-        .desktop-item:nth-child(2) { animation-delay: 0.25s; }
-        .desktop-item:nth-child(3) { animation-delay: 0.3s; }
+        .ceo-card:nth-child(1) { animation-delay: 0.1s; }
+        .ceo-card:nth-child(2) { animation-delay: 0.15s; }
+        .ceo-card:nth-child(3) { animation-delay: 0.2s; }
+        .ceo-card:nth-child(4) { animation-delay: 0.25s; }
+        .ceo-card:nth-child(5) { animation-delay: 0.3s; }
+        .ceo-card:nth-child(6) { animation-delay: 0.35s; }
+        .ceo-card:nth-child(7) { animation-delay: 0.4s; }
+        .ceo-card:nth-child(8) { animation-delay: 0.45s; }
         
-        /* Media queries - Separación total móvil/escritorio */
-        @media (max-width: 768px) {
-            .desktop-section {
-                display: none;
-            }
-            .mobile-section {
-                display: block;
-            }
+        /* Scrollbar personalizado */
+        .main-content::-webkit-scrollbar {
+            width: 4px;
         }
         
-        @media (min-width: 769px) {
-            .mobile-section {
-                display: none;
+        .main-content::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        
+        .main-content::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+        
+        /* Modo standalone */
+        @media all and (display-mode: standalone) {
+            body {
+                padding-top: env(safe-area-inset-top);
+                padding-bottom: env(safe-area-inset-bottom);
             }
-            .desktop-section {
-                display: block;
+            
+            .ceo-nav {
+                padding-bottom: max(12px, env(safe-area-inset-bottom));
+            }
+            
+            #installButton {
+                display: none !important;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Encabezado ultra compacto -->
-    <div class="header">
-        <h1 class="company-name">TOKTOK</h1>
-        <p class="user-role">Dueño / CEO</p>
-    </div>
+    <!-- Header CEO -->
+    <header class="ceo-header">
+        <div class="header-top">
+            <h1 class="company-name">TOKTOK</h1>
+            <div class="ceo-badge">
+                <i class="fas fa-crown"></i>
+                CEO
+            </div>
+        </div>
+        
+    </header>
     
-    <!-- Sección Móvil - SOLO VISIBLE EN MÓVIL -->
-    <div class="mobile-section">
-        <!-- Sección Operadoras -->
-        <div class="section operadoras">
-            <h2 class="section-title"><i class="fas fa-sim-card"></i> TOKTOK</h2>
-            <div class="quick-access-grid">
-                <a href="EXTENCIONES/admin-entel.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de Entel -->
-                        <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
-                    </div>
-                    <h3>Entel</h3>
-                    <p>Admin</p>
-                </a>
-                
-                <a href="EXTENCIONES/admin-tigo.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de Tigo -->
-                        <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
-                    </div>
-                    <h3>Tigo</h3>
-                    <p>Admin</p>
-                </a>
-                
-                <a href="EXTENCIONES/admin-viva.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de Viva -->
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
-                    </div>
-                    <h3>Viva</h3>
-                    <p>Admin</p>
-                </a>
-
-                <a href="EXTENCIONES/admin-bcp.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de BCP -->
-                        <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
-                    </div>
-                    <h3>BCP</h3>
-                    <p>Admin</p>
-                </a>
-            </div>
-        </div>
-        
+    <!-- Contenido principal -->
+    <main class="main-content">
 
         
-        <!-- Sección Tiendas -->
-        <div class="section tiendas">
-            <h2 class="section-title"><i class="fas fa-store"></i> Tiendas</h2>
-            <div class="quick-access-grid">
-                <a href="EXTENCIONES/admin-tienda.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de Tienda -->
-                        <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
+        <!-- Panel de Control Principal -->
+        <div class="quick-section">
+            <h2 class="section-title">
+                <i class="fas fa-tachometer-alt"></i>
+                Panel de Control
+            </h2>
+            <div class="ceo-grid">
+
+                             <!-- Panel Admin TokTok -->
+                <a href="admin-toktok/index.html" class="ceo-card admin-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Admin">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
                     </div>
-                    <h3>Tienda</h3>
-                    <p>Reportes</p>
+                    <div class="card-title">TokTok Admin</div>
+                    <div class="card-desc">Panel administrativo principal</div>
+                </a>
+
+
+                <!-- Operadoras -->
+                <a href="EXTENCIONES/admin-entel.html" class="ceo-card entel-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Entel</div>
+                 
                 </a>
                 
-                <a href="EXTENCIONES/juegos.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de Juegos -->
-                        <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
+                <a href="EXTENCIONES/admin-tigo.html" class="ceo-card tigo-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
                     </div>
-                    <h3>Juegos</h3>
-                    <p>Ambiente</p>
-                </a>
-            </div>
-        </div>
+                    <div class="card-title">Tigo</div>
         
-        <!-- Sección Inventario -->
-        <div class="section inventario">
-            <h2 class="section-title"><i class="fas fa-boxes"></i> Inventario</h2>
-            <div class="quick-access-grid">
-                <a href="EXTENCIONES/inventario-cel.html" class="quick-access-item">
-                    <div class="icon-container">
-                        <!-- Cambia esta URL por el logo de Inventario -->
-                        <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
-                    </div>
-                    <h3>Inventario</h3>
-                    <p>Gestión</p>
                 </a>
+                
+                <a href="EXTENCIONES/admin-viva.html" class="ceo-card viva-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Viva</div>
+           
+                </a>
+                
+                <!-- Banco -->
+                <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Banco BCP</div>
+     
+                </a>
+                
+                <!-- Tienda -->
+                <a href="EXTENCIONES/admin-tienda.html" class="ceo-card tienda-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Tienda</div>
+              
+                </a>
+                
+                <!-- Juegos -->
+                <a href="EXTENCIONES/juegos.html" class="ceo-card juegos-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Juegos</div>
+          
+                </a>
+                
+                <!-- Inventario -->
+                <a href="EXTENCIONES/inventario-cel.html" class="ceo-card inventario-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Inventario</div>
+        
+                </a>
+                
+                <!-- Asistencia -->
+                <a href="EXTENCIONES/asistencia.html" class="ceo-card asistencia-card">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <img src="https://cdn-icons-png.flaticon.com/512/4854/4854344.png" alt="Asistencia">
+                        </div>
+                        <div class="card-badge">ADMIN</div>
+                    </div>
+                    <div class="card-title">Asistencia</div>
+             
+                </a>
+                
             </div>
         </div>
-    </div>
+
+    </main>
     
-    <!-- Sección Escritorio - SOLO VISIBLE EN ESCRITORIO -->
-    <div class="desktop-section">
-        <!-- Operadoras Escritorio -->
-        <div class="section operadoras-desk">
-            <h2 class="section-title"><i class="fas fa-sim-card"></i> TokTok</h2>
-            <div class="desktop-grid">
-                <a href="EXTENCIONES/admin-entel-esc.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Entel -->
-                        <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
-                    </div>
-                    <h3>Entel</h3>
-                    <p>Admin</p>
-                </a>
-                
-                <a href="EXTENCIONES/admin-tigo.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Tigo -->
-                        <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
-                    </div>
-                    <h3>Tigo</h3>
-                    <p>Admin</p>
-                </a>
-                
-                <a href="EXTENCIONES/admin-viva.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Viva -->
-                        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
-                    </div>
-                    <h3>Viva</h3>
-                    <p>Admin</p>
-                </a>
 
-                    <a href="EXTENCIONES/admin-bcp.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de BCP -->
-                        <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
-                    </div>
-                    <h3>BCP</h3>
-                    <p>Admin</p>
-                </a>
-
-                    <a href="EXTENCIONES/admin-tienda.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Tienda -->
-                        <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
-                    </div>
-                    <h3>Tienda</h3>
-                    <p>Gestión completa</p>
-                </a>
-
-                 <a href="EXTENCIONES/juegos.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Juegos -->
-                        <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
-                    </div>
-                    <h3>Juegos</h3>
-                    <p>Ambiente de juego</p>
-                </a>
-
-            </div>
-        </div>
-        
-
-        
-        <!-- Inventario Escritorio -->
-        <div class="section inventario-desk">
-            <h2 class="section-title"><i class="fas fa-boxes"></i> Inventario</h2>
-            <div class="desktop-grid">
-                <a href="EXTENCIONES/inventario-esc.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Inventario -->
-                        <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
-                    </div>
-                    <h3>Inventario</h3>
-                    <p>Gestión Chips</p>
-                </a>
-                
-                <a href="EXTENCIONES/asistencia.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Asistencia -->
-                        <img src="https://cdn-icons-png.flaticon.com/512/4854/4854344.png" alt="Asistencia">
-                    </div>
-                    <h3>Asistencia</h3>
-                    <p>Control personal</p>
-                </a>
-                
-                <a href="admin-toktok/index.html" class="desktop-item">
-                    <div class="desktop-icon-container">
-                        <!-- Cambia esta URL por el logo de Admin -->
-                        <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Admin">
-                    </div>
-                    <h3>TokTok Admin</h3>
-                    <p>Panel principal</p>
-                </a>
-            </div>
-        </div>
-    </div>
     
     <!-- Botón de instalación PWA -->
     <button id="installButton" aria-label="Instalar aplicación">
-        <i class="fas fa-download"></i> Instalar
+        <i class="fas fa-download"></i> Instalar App
     </button>
 
     <script>
-        // Efecto táctil mejorado para móviles
-        document.querySelectorAll('.quick-access-item, .desktop-item').forEach(item => {
-            item.addEventListener('touchstart', function() {
-                this.style.transform = 'translateY(-1px) scale(0.98)';
+        // Precargar imágenes
+        const logoImages = [
+            'https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg',
+            'https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru',
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s',
+            'https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg',
+            'https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg',
+            'https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg',
+            'https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM',
+            'https://cdn-icons-png.flaticon.com/512/4854/4854344.png',
+            'https://thumbs.dreamstime.com/b/print-173512941.jpg'
+        ];
+        
+        logoImages.forEach(src => {
+            const img = new Image();
+            img.src = src;
+        });
+        
+        // Efecto táctil para tarjetas
+        document.querySelectorAll('.ceo-card').forEach(card => {
+            card.addEventListener('touchstart', function() {
+                this.style.transform = 'translateY(-2px) scale(0.98)';
             });
             
-            item.addEventListener('touchend', function() {
-                this.style.transform = '';
+            card.addEventListener('touchend', function() {
+                this.style.transform = 'translateY(-3px)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 150);
             });
         });
         
-        // Código para PWA
-        // Registrar Service Worker
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/sw.js')
-                    .then(function(registration) {
-                        console.log('ServiceWorker registrado con éxito: ', registration.scope);
-                    })
-                    .catch(function(error) {
-                        console.log('Error al registrar ServiceWorker: ', error);
-                    });
-            });
+        // Actualizar estadísticas en tiempo real
+        function updateRealTimeStats() {
+            const stats = document.querySelectorAll('.stat-value');
+            if (stats.length >= 3) {
+                // Actualizar ingresos (simulación)
+                const currentIncome = parseInt(stats[0].textContent.replace(/[^\d]/g, ''));
+                const randomIncome = Math.floor(Math.random() * 200) - 100;
+                const newIncome = Math.max(24000, currentIncome + randomIncome);
+                stats[0].textContent = `Bs ${(newIncome / 1000).toFixed(1)}K`;
+                
+                // Actualizar crecimiento
+                const growth = (Math.random() * 3 - 0.5).toFixed(1);
+                const sign = growth >= 0 ? '+' : '';
+                stats[1].textContent = `${sign}${growth}%`;
+                
+                // Actualizar operatividad
+                const uptime = 95 + Math.random() * 5;
+                stats[2].textContent = `${uptime.toFixed(0)}%`;
+            }
+            
+            // Actualizar widgets
+            const widgetData = document.querySelectorAll('.widget-data');
+            if (widgetData.length >= 2) {
+                // Ingresos del día
+                const baseIncome = 24850;
+                const incomeVar = Math.floor(Math.random() * 300) - 150;
+                widgetData[0].textContent = `Bs ${(baseIncome + incomeVar).toLocaleString('es-ES')}`;
+                
+                // Transacciones
+                const baseTrans = 892;
+                const transVar = Math.floor(Math.random() * 50) - 25;
+                widgetData[1].textContent = (baseTrans + transVar).toLocaleString('es-ES');
+            }
         }
         
-        // Instalación de PWA
+        // Actualizar cada 30 segundos
+        setInterval(updateRealTimeStats, 30000);
+        
+        // Simular datos al cargar
+        setTimeout(updateRealTimeStats, 1000);
+        
+        // Navegación activa
+        document.querySelectorAll('.nav-item').forEach(item => {
+            item.addEventListener('click', function(e) {
+                if (!this.classList.contains('active')) {
+                    document.querySelectorAll('.nav-item').forEach(i => {
+                        i.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    // Aquí podrías agregar lógica para cambiar contenido
+                    e.preventDefault();
+                    
+                    // Feedback táctil
+                    this.style.transform = 'scale(0.95)';
+                    setTimeout(() => {
+                        this.style.transform = '';
+                    }, 150);
+                }
+            });
+        });
+        
+        // PWA Installation
         let deferredPrompt;
         const installButton = document.getElementById('installButton');
         
         window.addEventListener('beforeinstallprompt', (e) => {
-            // Previene que el mini-infobar aparezca en mobile
             e.preventDefault();
-            // Guarda el evento para que pueda ser activado después
             deferredPrompt = e;
-            // Muestra el botón de instalación
             installButton.style.display = 'flex';
             
-            installButton.addEventListener('click', () => {
-                // Oculta el botón de instalación
+            installButton.addEventListener('click', async () => {
                 installButton.style.display = 'none';
-                // Muestra el prompt de instalación
                 deferredPrompt.prompt();
-                // Espera a que el usuario responda al prompt
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('Usuario aceptó la instalación');
-                    } else {
-                        console.log('Usuario rechazó la instalación');
-                    }
-                    deferredPrompt = null;
-                });
+                
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`User response to the install prompt: ${outcome}`);
+                deferredPrompt = null;
             });
         });
         
-        // Evento cuando la PWA es instalada exitosamente
-        window.addEventListener('appinstalled', (evt) => {
-            console.log('TOKTOK PWA fue instalada exitosamente');
+        window.addEventListener('appinstalled', () => {
+            console.log('TOKTOK CEO PWA installed successfully');
             installButton.style.display = 'none';
         });
         
-        // Detectar si la aplicación ya está instalada
-        window.addEventListener('load', () => {
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                console.log('La aplicación se está ejecutando en modo standalone');
-                installButton.style.display = 'none';
-            }
-        });
+        // Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('ServiceWorker registered:', registration.scope);
+                    })
+                    .catch(error => {
+                        console.log('ServiceWorker registration failed:', error);
+                    });
+            });
+        }
+        
+        // Detectar modo standalone
+        if (window.matchMedia('(display-mode: standalone)').matches) {
+            console.log('Running in standalone mode');
+            installButton.style.display = 'none';
+        }
     </script>
 </body>
 </html>
-
-
