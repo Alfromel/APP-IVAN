@@ -374,6 +374,137 @@
             color: #6c757d;
             font-size: 0.875rem;
         }
+        
+        /* Barra de progreso para borrar historial */
+        .deletion-progress {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            width: 400px;
+            max-width: 90%;
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .deletion-progress.show {
+            display: block;
+        }
+        
+        .deletion-progress-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+            display: none;
+        }
+        
+        .deletion-progress-backdrop.show {
+            display: block;
+        }
+        
+        .progress-steps {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .progress-steps li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .progress-steps .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 12px;
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .progress-steps .step-icon.completed {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .progress-steps .step-icon.current {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .progress-steps .step-text {
+            flex: 1;
+            color: #495057;
+        }
+        
+        .progress-steps .step-text.completed {
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .progress-steps .step-text.current {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .progress-bar-container {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-percentage {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+        }
+        
+        .danger-zone {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .danger-zone h6 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
@@ -745,6 +876,51 @@
         </section>
     </div>
 
+    <!-- Modal de Borrar Historial -->
+    <div class="deletion-progress-backdrop" id="deletion-progress-backdrop"></div>
+    <div class="deletion-progress" id="deletion-progress">
+        <h5>Borrando Historial de Usuario</h5>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-percentage" id="progress-percentage">0%</div>
+        
+        <ul class="progress-steps" id="progress-steps">
+            <li>
+                <div class="step-icon" id="step-1-icon">1</div>
+                <div class="step-text" id="step-1-text">Buscando usuario...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-2-icon">2</div>
+                <div class="step-text" id="step-2-text">Eliminando recargas...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-3-icon">3</div>
+                <div class="step-text" id="step-3-text">Eliminando recargas de juegos...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-4-icon">4</div>
+                <div class="step-text" id="step-4-text">Eliminando transacciones...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-5-icon">5</div>
+                <div class="step-text" id="step-5-text">Actualizando balance...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-6-icon">6</div>
+                <div class="step-text" id="step-6-text">Finalizando...</div>
+            </li>
+        </ul>
+        
+        <div class="mt-3" id="deletion-status">
+            Preparando para borrar historial...
+        </div>
+        
+        <div class="mt-4">
+            <button class="btn btn-secondary" id="cancel-deletion">Cancelar</button>
+        </div>
+    </div>
+
     <!-- Modal de Detalles -->
     <div class="modal-backdrop" id="detail-modal-backdrop"></div>
     <div class="detail-modal" id="detail-modal">
@@ -830,6 +1006,8 @@
                                     <option value="">Seleccionar tipo</option>
                                     <option value="deposit">Depósito</option>
                                     <option value="withdrawal">Retiro</option>
+                                    <option value="transfer_send">Transferencia (Envío)</option>
+                                    <option value="transfer_receive">Transferencia (Recepción)</option>
                                 </select>
                             </div>
                         </div>
@@ -846,6 +1024,12 @@
                                     <option value="failed">Fallido</option>
                                 </select>
                             </div>
+                        </div>
+                        <div class="mb-3" id="transfer-to-section" style="display: none;">
+                            <label for="transfer-to-user" class="form-label">Transferir a Usuario</label>
+                            <select class="form-select" id="transfer-to-user">
+                                <option value="">Seleccionar usuario destino</option>
+                            </select>
                         </div>
                         <div class="mb-3">
                             <label for="transaction-description" class="form-label">Descripción</label>
@@ -984,6 +1168,8 @@
         let rechargesData = [];
         let gameRechargesData = [];
         let userBalances = {}; // Para almacenar balances de usuarios
+        let deletionInProgress = false;
+        let currentDeletionUserId = null;
         
         // Funciones de utilidad
         const formatCurrency = (amount) => {
@@ -1033,7 +1219,7 @@
             });
         };
         
-        // Función para calcular balances de usuarios de forma precisa
+        // Función para calcular balances de usuarios de forma CORRECTA
         const calculateUserBalances = async () => {
             try {
                 userBalances = {};
@@ -1045,7 +1231,10 @@
                 
                 if (transactionsError) throw transactionsError;
                 
-                // Calcular balance basado únicamente en transacciones
+                // IMPORTANTE: Solo calcular balance basado en transacciones
+                // Las recargas y recargas de juegos NO afectan el balance
+                // El balance es solo lo que el usuario tiene disponible para transferir/retirar
+                
                 transactions.forEach(transaction => {
                     if (!userBalances[transaction.user_id]) {
                         userBalances[transaction.user_id] = 0;
@@ -1054,16 +1243,23 @@
                     // Solo considerar transacciones completadas
                     if (transaction.status === 'completed') {
                         if (transaction.type === 'deposit') {
-                            // Depósito: suma al balance (verde)
+                            // Depósito: suma al balance (el usuario agrega dinero)
                             userBalances[transaction.user_id] += parseFloat(transaction.amount);
                         } else if (transaction.type === 'withdrawal') {
-                            // Retiro: resta del balance (rojo)
+                            // Retiro: resta del balance (el usuario saca dinero)
                             userBalances[transaction.user_id] -= parseFloat(transaction.amount);
+                        } else if (transaction.type === 'transfer_send') {
+                            // Transferencia enviada: resta del balance
+                            userBalances[transaction.user_id] -= parseFloat(transaction.amount);
+                        } else if (transaction.type === 'transfer_receive') {
+                            // Transferencia recibida: suma al balance
+                            userBalances[transaction.user_id] += parseFloat(transaction.amount);
                         }
                     }
                 });
                 
-                // NO restar recargas ni recargas de juegos porque ya están incluidas en las transacciones
+                // NO restar recargas ni recargas de juegos
+                // Estas son gastos/pagos por servicios, no afectan el balance disponible
                 
                 return userBalances;
             } catch (error) {
@@ -1093,6 +1289,197 @@
             
             modal.classList.remove('show');
             backdrop.classList.remove('show');
+        };
+        
+        // Funciones para mostrar/ocultar barra de progreso de borrado
+        const showDeletionProgress = () => {
+            document.getElementById('deletion-progress').classList.add('show');
+            document.getElementById('deletion-progress-backdrop').classList.add('show');
+            deletionInProgress = true;
+        };
+        
+        const hideDeletionProgress = () => {
+            document.getElementById('deletion-progress').classList.remove('show');
+            document.getElementById('deletion-progress-backdrop').classList.remove('show');
+            deletionInProgress = false;
+            currentDeletionUserId = null;
+        };
+        
+        const updateDeletionProgress = (step, percentage, status) => {
+            // Actualizar barra de progreso
+            document.getElementById('progress-bar').style.width = `${percentage}%`;
+            document.getElementById('progress-percentage').textContent = `${percentage}%`;
+            
+            // Actualizar estado
+            document.getElementById('deletion-status').textContent = status;
+            
+            // Actualizar pasos
+            for (let i = 1; i <= 6; i++) {
+                const stepIcon = document.getElementById(`step-${i}-icon`);
+                const stepText = document.getElementById(`step-${i}-text`);
+                
+                if (i < step) {
+                    stepIcon.className = 'step-icon completed';
+                    stepIcon.innerHTML = '<i class="fas fa-check"></i>';
+                    stepText.className = 'step-text completed';
+                } else if (i === step) {
+                    stepIcon.className = 'step-icon current';
+                    stepText.className = 'step-text current';
+                } else {
+                    stepIcon.className = 'step-icon';
+                    stepIcon.textContent = i;
+                    stepText.className = 'step-text';
+                }
+            }
+        };
+        
+        // Función para borrar historial de usuario
+        const deleteUserHistory = async (userId) => {
+            if (!userId || deletionInProgress) return;
+            
+            try {
+                currentDeletionUserId = userId;
+                showDeletionProgress();
+                updateDeletionProgress(1, 0, 'Buscando usuario...');
+                
+                // Paso 1: Obtener balance actual del usuario
+                await calculateUserBalances();
+                const currentBalance = userBalances[userId] || 0;
+                
+                updateDeletionProgress(2, 20, 'Eliminando recargas...');
+                
+                // Paso 2: Borrar recargas del usuario (paginado)
+                let hasMoreRecharges = true;
+                let rechargePage = 0;
+                let totalRechargesDeleted = 0;
+                
+                while (hasMoreRecharges) {
+                    const { data: recharges, error } = await supabase
+                        .from('recharges')
+                        .select('id')
+                        .eq('user_id', userId)
+                        .range(rechargePage * 100, (rechargePage * 100) + 99);
+                    
+                    if (error) throw error;
+                    
+                    if (recharges.length === 0) {
+                        hasMoreRecharges = false;
+                    } else {
+                        const rechargeIds = recharges.map(r => r.id);
+                        const { error: deleteError } = await supabase
+                            .from('recharges')
+                            .delete()
+                            .in('id', rechargeIds);
+                        
+                        if (deleteError) throw deleteError;
+                        
+                        totalRechargesDeleted += recharges.length;
+                        rechargePage++;
+                    }
+                }
+                
+                updateDeletionProgress(3, 40, `Eliminadas ${totalRechargesDeleted} recargas. Eliminando recargas de juegos...`);
+                
+                // Paso 3: Borrar recargas de juegos del usuario (paginado)
+                let hasMoreGameRecharges = true;
+                let gameRechargePage = 0;
+                let totalGameRechargesDeleted = 0;
+                
+                while (hasMoreGameRecharges) {
+                    const { data: gameRecharges, error } = await supabase
+                        .from('game_recharges')
+                        .select('id')
+                        .eq('user_id', userId)
+                        .range(gameRechargePage * 100, (gameRechargePage * 100) + 99);
+                    
+                    if (error) throw error;
+                    
+                    if (gameRecharges.length === 0) {
+                        hasMoreGameRecharges = false;
+                    } else {
+                        const gameRechargeIds = gameRecharges.map(gr => gr.id);
+                        const { error: deleteError } = await supabase
+                            .from('game_recharges')
+                            .delete()
+                            .in('id', gameRechargeIds);
+                        
+                        if (deleteError) throw deleteError;
+                        
+                        totalGameRechargesDeleted += gameRecharges.length;
+                        gameRechargePage++;
+                    }
+                }
+                
+                updateDeletionProgress(4, 60, `Eliminadas ${totalGameRechargesDeleted} recargas de juegos. Eliminando transacciones...`);
+                
+                // Paso 4: Borrar transacciones del usuario (paginado)
+                let hasMoreTransactions = true;
+                let transactionPage = 0;
+                let totalTransactionsDeleted = 0;
+                
+                while (hasMoreTransactions) {
+                    const { data: transactions, error } = await supabase
+                        .from('transactions')
+                        .select('id')
+                        .eq('user_id', userId)
+                        .range(transactionPage * 100, (transactionPage * 100) + 99);
+                    
+                    if (error) throw error;
+                    
+                    if (transactions.length === 0) {
+                        hasMoreTransactions = false;
+                    } else {
+                        const transactionIds = transactions.map(t => t.id);
+                        const { error: deleteError } = await supabase
+                            .from('transactions')
+                            .delete()
+                            .in('id', transactionIds);
+                        
+                        if (deleteError) throw deleteError;
+                        
+                        totalTransactionsDeleted += transactions.length;
+                        transactionPage++;
+                    }
+                }
+                
+                updateDeletionProgress(5, 80, `Eliminadas ${totalTransactionsDeleted} transacciones. Actualizando balance...`);
+                
+                // Paso 5: Crear una transacción de ajuste para mantener el balance actual
+                if (currentBalance !== 0) {
+                    const adjustmentTransaction = {
+                        user_id: userId,
+                        type: currentBalance > 0 ? 'deposit' : 'withdrawal',
+                        amount: Math.abs(currentBalance),
+                        status: 'completed',
+                        description: `Ajuste de balance después de borrar historial - Balance actual: ${formatCurrency(currentBalance)}`
+                    };
+                    
+                    const { error: transactionError } = await supabase
+                        .from('transactions')
+                        .insert([adjustmentTransaction]);
+                    
+                    if (transactionError) throw transactionError;
+                }
+                
+                updateDeletionProgress(6, 100, 'Historial borrado exitosamente. Actualizando datos...');
+                
+                // Esperar un momento para que el usuario vea el 100%
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                hideDeletionProgress();
+                
+                // Actualizar datos
+                await calculateUserBalances();
+                loadUsers();
+                loadDashboardData();
+                
+                showToast(`Historial borrado exitosamente para el usuario ${userId}. Se eliminaron: ${totalRechargesDeleted} recargas, ${totalGameRechargesDeleted} recargas de juegos, ${totalTransactionsDeleted} transacciones. Balance preservado: ${formatCurrency(currentBalance)}`);
+                
+            } catch (error) {
+                console.error('Error deleting user history:', error);
+                hideDeletionProgress();
+                showToast('Error al borrar el historial del usuario', 'error');
+            }
         };
         
         // Funciones para cargar datos
@@ -1256,7 +1643,7 @@
                 }
                 
                 const { data, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
+                    .range((page - 1) * 10, (page * 10) - 1)
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -1288,12 +1675,14 @@
             
             const html = transactions.map(transaction => {
                 const user = users.find(u => u.id === transaction.user_id);
-                const isPositive = transaction.type === 'deposit';
+                const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
                 const textColor = isPositive ? 'text-success' : 'text-danger';
                 const sign = isPositive ? '+' : '-';
                 const typeNames = {
                     'deposit': 'Ingreso',
-                    'withdrawal': 'Retiro'
+                    'withdrawal': 'Retiro',
+                    'transfer_send': 'Transferencia Enviada',
+                    'transfer_receive': 'Transferencia Recibida'
                 };
                 
                 return `
@@ -1361,6 +1750,9 @@
                                 <button class="btn btn-sm btn-outline-success edit-user" data-id="${user.id}">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                <button class="btn btn-sm btn-outline-danger delete-user-history" data-id="${user.id}" data-name="${user.full_name}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -1385,12 +1777,14 @@
             }
             
             const html = transactions.map(transaction => {
-                const isPositive = transaction.type === 'deposit';
+                const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
                 const textColor = isPositive ? 'text-success' : 'text-danger';
                 const sign = isPositive ? '+' : '-';
                 const typeNames = {
                     'deposit': 'Ingreso',
-                    'withdrawal': 'Retiro'
+                    'withdrawal': 'Retiro',
+                    'transfer_send': 'Transferencia Enviada',
+                    'transfer_receive': 'Transferencia Recibida'
                 };
                 
                 return `
@@ -1576,6 +1970,14 @@
                         <div class="detail-label">Fecha de registro:</div>
                         <div class="detail-value">${formatDate(user.created_at)}</div>
                     </div>
+                    
+                    <div class="danger-zone">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro</h6>
+                        <p class="small mb-3">Esta acción borrará todo el historial del usuario pero mantendrá su balance actual.</p>
+                        <button class="btn btn-sm btn-danger" id="delete-history-from-detail" data-id="${user.id}">
+                            <i class="fas fa-trash me-1"></i> Borrar Historial Completo
+                        </button>
+                    </div>
                 `;
                 
                 // Mostrar últimas transacciones
@@ -1588,11 +1990,13 @@
                     `;
                     
                     userTransactions.slice(0, 5).forEach(transaction => {
-                        const isPositive = transaction.type === 'deposit';
+                        const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
                         const sign = isPositive ? '+' : '-';
                         const typeNames = {
                             'deposit': 'Ingreso',
-                            'withdrawal': 'Retiro'
+                            'withdrawal': 'Retiro',
+                            'transfer_send': 'Transferencia Envío',
+                            'transfer_receive': 'Transferencia Recepción'
                         };
                         
                         detailsHTML += `
@@ -1635,6 +2039,15 @@
                 
                 showDetailModal(`Detalles del Usuario: ${user.full_name}`, detailsHTML);
                 
+                // Agregar evento al botón de borrar historial
+                document.getElementById('delete-history-from-detail').addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    if (confirm(`¿Está seguro de borrar todo el historial del usuario ${user.full_name}? Esta acción es irreversible pero mantendrá su balance actual.`)) {
+                        deleteUserHistory(userId);
+                        closeDetailModal();
+                    }
+                });
+                
             } catch (error) {
                 console.error('Error loading user details:', error);
                 showToast('Error al cargar los detalles del usuario', 'error');
@@ -1658,12 +2071,14 @@
                 
                 if (userError) throw userError;
                 
-                const isPositive = transaction.type === 'deposit';
+                const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
                 const textColor = isPositive ? 'text-success' : 'text-danger';
                 const sign = isPositive ? '+' : '-';
                 const typeNames = {
                     'deposit': 'Ingreso',
-                    'withdrawal': 'Retiro'
+                    'withdrawal': 'Retiro',
+                    'transfer_send': 'Transferencia Enviada',
+                    'transfer_receive': 'Transferencia Recibida'
                 };
                 
                 const detailsHTML = `
@@ -1685,7 +2100,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Monto:</div>
-                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</div>
+                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Estado:</div>
@@ -2134,11 +2549,17 @@
                 document.getElementById('transaction-amount').value = transaction.amount;
                 document.getElementById('transaction-status').value = 'completed'; // Siempre completado
                 document.getElementById('transaction-description').value = transaction.description || '';
+                
+                // Mostrar/ocultar sección de transferencia
+                if (transaction.type === 'transfer_send' || transaction.type === 'transfer_receive') {
+                    document.getElementById('transfer-to-section').style.display = 'block';
+                }
             } else {
                 modalTitle.textContent = 'Nueva Transacción';
                 form.reset();
                 document.getElementById('transaction-id').value = '';
                 document.getElementById('transaction-status').value = 'completed'; // Siempre completado
+                document.getElementById('transfer-to-section').style.display = 'none';
             }
             
             const transactionModal = new bootstrap.Modal(document.getElementById('transactionModal'));
@@ -2190,11 +2611,12 @@
         };
         
         // Llenar select de usuarios para recargas y transacciones
-        const populateUserSelect = async (selectId) => {
+        const populateUserSelect = async (selectId, excludeUserId = null) => {
             try {
                 const { data: users, error } = await supabase
                     .from('user_profiles')
-                    .select('id, full_name');
+                    .select('id, full_name')
+                    .order('full_name');
                 
                 if (error) throw error;
                 
@@ -2202,6 +2624,8 @@
                 select.innerHTML = '<option value="">Seleccionar usuario</option>';
                 
                 users.forEach(user => {
+                    if (excludeUserId && user.id === excludeUserId) return;
+                    
                     const option = document.createElement('option');
                     option.value = user.id;
                     option.textContent = user.full_name;
@@ -2255,6 +2679,9 @@
             document.getElementById('close-detail-modal-btn').addEventListener('click', closeDetailModal);
             document.getElementById('detail-modal-backdrop').addEventListener('click', closeDetailModal);
             
+            // Cancelar borrado
+            document.getElementById('cancel-deletion').addEventListener('click', hideDeletionProgress);
+            
             // Búsqueda en tablas
             document.getElementById('user-search').addEventListener('input', (e) => {
                 loadUsers(1, e.target.value);
@@ -2304,7 +2731,18 @@
             // Botón agregar transacción
             document.getElementById('add-transaction-btn').addEventListener('click', () => {
                 populateUserSelect('transaction-user');
+                populateUserSelect('transfer-to-user');
                 openTransactionModal();
+            });
+            
+            // Mostrar/ocultar campo de transferencia
+            document.getElementById('transaction-type').addEventListener('change', function() {
+                const transferSection = document.getElementById('transfer-to-section');
+                if (this.value === 'transfer_send') {
+                    transferSection.style.display = 'block';
+                } else {
+                    transferSection.style.display = 'none';
+                }
             });
             
             // Botón agregar recarga
@@ -2347,26 +2785,76 @@
             // Guardar transacción
             document.getElementById('save-transaction').addEventListener('click', async () => {
                 const transactionId = document.getElementById('transaction-id').value;
-                const transactionData = {
-                    user_id: document.getElementById('transaction-user').value,
-                    type: document.getElementById('transaction-type').value,
-                    amount: parseFloat(document.getElementById('transaction-amount').value),
-                    status: 'completed', // Siempre completado
-                    description: document.getElementById('transaction-description').value
-                };
+                const transactionType = document.getElementById('transaction-type').value;
                 
-                let result;
-                if (transactionId) {
-                    result = await updateTransaction(transactionId, transactionData);
+                // Si es transferencia, crear dos transacciones: una de envío y una de recepción
+                if (transactionType === 'transfer_send') {
+                    const transferToUserId = document.getElementById('transfer-to-user').value;
+                    if (!transferToUserId) {
+                        showToast('Debe seleccionar un usuario destino para la transferencia', 'error');
+                        return;
+                    }
+                    
+                    const amount = parseFloat(document.getElementById('transaction-amount').value);
+                    const description = document.getElementById('transaction-description').value;
+                    
+                    // Crear transacción de envío
+                    const sendTransaction = {
+                        user_id: document.getElementById('transaction-user').value,
+                        type: 'transfer_send',
+                        amount: amount,
+                        status: 'completed',
+                        description: `Transferencia enviada a usuario ${transferToUserId}: ${description}`
+                    };
+                    
+                    // Crear transacción de recepción
+                    const receiveTransaction = {
+                        user_id: transferToUserId,
+                        type: 'transfer_receive',
+                        amount: amount,
+                        status: 'completed',
+                        description: `Transferencia recibida de usuario ${document.getElementById('transaction-user').value}: ${description}`
+                    };
+                    
+                    try {
+                        const { error } = await supabase
+                            .from('transactions')
+                            .insert([sendTransaction, receiveTransaction]);
+                        
+                        if (error) throw error;
+                        
+                        showToast('Transferencia realizada exitosamente');
+                        const transactionModal = bootstrap.Modal.getInstance(document.getElementById('transactionModal'));
+                        transactionModal.hide();
+                        loadTransactions();
+                        loadDashboardData();
+                    } catch (error) {
+                        console.error('Error creating transfer:', error);
+                        showToast('Error al realizar la transferencia', 'error');
+                    }
                 } else {
-                    result = await createTransaction(transactionData);
-                }
-                
-                if (result) {
-                    const transactionModal = bootstrap.Modal.getInstance(document.getElementById('transactionModal'));
-                    transactionModal.hide();
-                    loadTransactions();
-                    loadDashboardData(); // Actualizar dashboard
+                    // Transacción normal
+                    const transactionData = {
+                        user_id: document.getElementById('transaction-user').value,
+                        type: transactionType,
+                        amount: parseFloat(document.getElementById('transaction-amount').value),
+                        status: 'completed', // Siempre completado
+                        description: document.getElementById('transaction-description').value
+                    };
+                    
+                    let result;
+                    if (transactionId) {
+                        result = await updateTransaction(transactionId, transactionData);
+                    } else {
+                        result = await createTransaction(transactionData);
+                    }
+                    
+                    if (result) {
+                        const transactionModal = bootstrap.Modal.getInstance(document.getElementById('transactionModal'));
+                        transactionModal.hide();
+                        loadTransactions();
+                        loadDashboardData(); // Actualizar dashboard
+                    }
                 }
             });
             
@@ -2437,6 +2925,16 @@
                         openUserModal(user);
                     }
                 }
+                
+                if (e.target.closest('.delete-user-history')) {
+                    const button = e.target.closest('.delete-user-history');
+                    const userId = button.dataset.id;
+                    const userName = button.dataset.name;
+                    
+                    if (confirm(`¿Está seguro de borrar todo el historial del usuario ${userName}? Esta acción es irreversible pero mantendrá su balance actual.`)) {
+                        deleteUserHistory(userId);
+                    }
+                }
             });
             
             // Manejar acciones de transacciones
@@ -2452,6 +2950,9 @@
                     
                     if (transaction) {
                         await populateUserSelect('transaction-user');
+                        if (transaction.type === 'transfer_send' || transaction.type === 'transfer_receive') {
+                            await populateUserSelect('transfer-to-user', transaction.user_id);
+                        }
                         openTransactionModal(transaction);
                     }
                 }
