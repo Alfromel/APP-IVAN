@@ -258,6 +258,11 @@
             display: inline-block;
         }
         
+        .status-echo {
+            background-color: #17a2b8;
+            color: white;
+        }
+        
         .status-nuevo {
             background-color: #28a745;
             color: white;
@@ -265,6 +270,11 @@
         
         .status-corte {
             background-color: #dc3545;
+            color: white;
+        }
+        
+        .status-error {
+            background-color: #ff6b00;
             color: white;
         }
         
@@ -698,12 +708,20 @@
                         <div class="stat-label">Total Usuarios</div>
                     </div>
                     <div class="stat-card">
+                        <div class="stat-number" id="echoCount">0</div>
+                        <div class="stat-label">Estado: Echo</div>
+                    </div>
+                    <div class="stat-card">
                         <div class="stat-number" id="nuevoCount">0</div>
                         <div class="stat-label">Estado: Nuevo</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="corteCount">0</div>
                         <div class="stat-label">Estado: Corte</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="errorCount">0</div>
+                        <div class="stat-label">Estado: Error</div>
                     </div>
                 </div>
 
@@ -968,8 +986,10 @@
                         <div class="mb-3">
                             <label for="editStatus" class="form-label">Estado</label>
                             <select class="form-select app-form-control" id="editStatus" required>
+                                <option value="ECHO">Echo</option>
                                 <option value="NUEVO">Nuevo</option>
                                 <option value="CORTE">Corte</option>
+                                <option value="ERROR">Error</option>
                             </select>
                         </div>
                     </form>
@@ -1200,11 +1220,15 @@
             document.getElementById('totalUsers').textContent = allUsers.length;
             
             // Contar por estado
+            const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
             const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
             
+            document.getElementById('echoCount').textContent = echoCount.toLocaleString();
             document.getElementById('nuevoCount').textContent = nuevoCount.toLocaleString();
             document.getElementById('corteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('errorCount').textContent = errorCount.toLocaleString();
         }
 
         function updateRecentActivity() {
@@ -1213,12 +1237,18 @@
             
             tbody.innerHTML = recentRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
+                let statusClass = '';
+                if (recharge.estado === 'ECHO') statusClass = 'status-echo';
+                else if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
+                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+                else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+                
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                        <span class="status-badge ${statusClass}">
                             ${recharge.estado}
                         </span>
                     </td>
@@ -1281,12 +1311,18 @@
             
             tbody.innerHTML = filteredRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
+                let statusClass = '';
+                if (recharge.estado === 'ECHO') statusClass = 'status-echo';
+                else if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
+                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+                else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+                
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                        <span class="status-badge ${statusClass}">
                             ${recharge.estado}
                         </span>
                     </td>
@@ -1319,6 +1355,12 @@
             currentRechargeId = rechargeId;
             const dateTime = parseDateTime(recharge.timestamp);
             
+            let statusClass = '';
+            if (recharge.estado === 'ECHO') statusClass = 'status-echo';
+            else if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
+            else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+            else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+            
             document.getElementById('rechargeDetailModalLabel').textContent = `Recarga #${recharge.id}`;
             
             const detailContent = document.getElementById('rechargeDetailContent');
@@ -1334,7 +1376,7 @@
                 <div class="recharge-detail-item">
                     <span class="recharge-detail-label">Estado:</span>
                     <span class="recharge-detail-value">
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : 'status-corte'}">
+                        <span class="status-badge ${statusClass}">
                             ${recharge.estado}
                         </span>
                     </span>
@@ -1603,10 +1645,20 @@
             }
 
             try {
+                // Generar comando según el estado
+                let command;
+                if (status === "CORTE") {
+                    command = `*222*2*${phoneNumber}*19*1#`;
+                } else if (status === "ERROR") {
+                    command = `*222*2*${phoneNumber}*21*1#`;
+                } else {
+                    command = `*222*2*${phoneNumber}*20*1#`;
+                }
+
                 const rechargeData = {
                     phone_number: phoneNumber,
                     estado: status,
-                    command: `*222*2*${phoneNumber}*20*1#`
+                    command: command
                 };
 
                 const response = await fetch(
@@ -1630,14 +1682,14 @@
                 if (rechargeIndex !== -1) {
                     allRecharges[rechargeIndex].phone_number = phoneNumber;
                     allRecharges[rechargeIndex].estado = status;
-                    allRecharges[rechargeIndex].command = `*222*2*${phoneNumber}*20*1#`;
+                    allRecharges[rechargeIndex].command = command;
                 }
 
                 const filteredIndex = filteredRecharges.findIndex(r => r.id === parseInt(rechargeId));
                 if (filteredIndex !== -1) {
                     filteredRecharges[filteredIndex].phone_number = phoneNumber;
                     filteredRecharges[filteredIndex].estado = status;
-                    filteredRecharges[filteredIndex].command = `*222*2*${phoneNumber}*20*1#`;
+                    filteredRecharges[filteredIndex].command = command;
                 }
 
                 // Cerrar modal y actualizar vistas
@@ -1772,16 +1824,18 @@
             
             // Gráfico de distribución por estado
             const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
+            const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
             const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
             
             statusChart = new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Nuevo', 'Corte'],
+                    labels: ['Echo', 'Nuevo', 'Corte', 'Error'],
                     datasets: [{
-                        data: [nuevoCount, corteCount],
-                        backgroundColor: ['#28a745', '#dc3545'],
+                        data: [echoCount, nuevoCount, corteCount, errorCount],
+                        backgroundColor: ['#17a2b8', '#28a745', '#dc3545', '#ff6b00'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
