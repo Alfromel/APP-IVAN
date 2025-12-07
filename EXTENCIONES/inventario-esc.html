@@ -10,8 +10,11 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
     <!-- DataTables -->
     <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap5.min.css">
     <!-- Flatpickr para fechas -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!-- SheetJS para exportar a Excel -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         :root {
             --entel-color: #0088CC;
@@ -251,12 +254,16 @@
             border-left-color: var(--viva-color);
         }
         
-        .stat-card.en-uso {
+        .stat-card.activos {
             border-left-color: var(--success-color);
         }
         
-        .stat-card.por-usar {
-            border-left-color: var(--warning-color);
+        .stat-card.vencidos {
+            border-left-color: var(--danger-color);
+        }
+        
+        .stat-card.designados {
+            border-left-color: #6f42c1;
         }
         
         .stat-number {
@@ -268,8 +275,9 @@
         .stat-card.entel .stat-number { color: var(--entel-color); }
         .stat-card.tigo .stat-number { color: var(--tigo-color); }
         .stat-card.viva .stat-number { color: var(--viva-color); }
-        .stat-card.en-uso .stat-number { color: var(--success-color); }
-        .stat-card.por-usar .stat-number { color: var(--warning-color); }
+        .stat-card.activos .stat-number { color: var(--success-color); }
+        .stat-card.vencidos .stat-number { color: var(--danger-color); }
+        .stat-card.designados .stat-number { color: #6f42c1; }
         
         .stat-label {
             color: #6c757d;
@@ -331,6 +339,11 @@
             color: white;
         }
         
+        .app-btn-purple {
+            background: #6f42c1;
+            color: white;
+        }
+        
         /* Badges de estado */
         .badge-estado {
             padding: 6px 10px;
@@ -352,6 +365,11 @@
         .badge-vencido {
             background-color: #f8d7da;
             color: #721c24;
+        }
+        
+        .badge-designado {
+            background-color: #e0d4f9;
+            color: #3c2a6d;
         }
         
         /* Tablas */
@@ -494,6 +512,15 @@
         
         .chip-vencimiento.critico { border-left-color: var(--danger-color); background: rgba(220, 53, 69, 0.05); }
         
+        /* Colores de operadoras */
+        .text-entel { color: var(--entel-color); }
+        .text-tigo { color: var(--tigo-color); }
+        .text-viva { color: var(--viva-color); }
+        
+        .bg-entel { background-color: var(--entel-color); }
+        .bg-tigo { background-color: var(--tigo-color); }
+        .bg-viva { background-color: var(--viva-color); }
+        
         /* Responsive para escritorio */
         @media (max-width: 1200px) {
             .stats-grid {
@@ -576,14 +603,14 @@
             margin-right: 15px;
         }
         
-        /* Colores de operadoras */
-        .text-entel { color: var(--entel-color); }
-        .text-tigo { color: var(--tigo-color); }
-        .text-viva { color: var(--viva-color); }
+        /* Estilos para chips designados */
+        .chip-designado-row {
+            background-color: rgba(111, 66, 193, 0.05);
+        }
         
-        .bg-entel { background-color: var(--entel-color); }
-        .bg-tigo { background-color: var(--tigo-color); }
-        .bg-viva { background-color: var(--viva-color); }
+        .chip-designado-row:hover {
+            background-color: rgba(111, 66, 193, 0.1);
+        }
     </style>
 </head>
 <body>
@@ -665,17 +692,17 @@
                             <div class="stat-number" id="totalViva">0</div>
                             <div class="stat-label">Chips VIVA</div>
                         </div>
-                        <div class="stat-card en-uso">
-                            <div class="stat-number" id="totalEnUso">0</div>
-                            <div class="stat-label">Chips en Uso</div>
+                        <div class="stat-card activos">
+                            <div class="stat-number" id="totalActivos">0</div>
+                            <div class="stat-label">Chips Activos</div>
                         </div>
-                        <div class="stat-card por-usar">
-                            <div class="stat-number" id="totalPorUsar">0</div>
-                            <div class="stat-label">Chips por Usar</div>
-                        </div>
-                        <div class="stat-card" style="border-left-color: #dc3545;">
+                        <div class="stat-card vencidos">
                             <div class="stat-number" id="totalVencidos">0</div>
                             <div class="stat-label">Chips Vencidos</div>
+                        </div>
+                        <div class="stat-card designados">
+                            <div class="stat-number" id="totalDesignados">0</div>
+                            <div class="stat-label">Chips Designados</div>
                         </div>
                     </div>
 
@@ -709,21 +736,21 @@
                                             <div class="text-entel">
                                                 <i class="bi bi-sim-fill display-6"></i>
                                                 <div class="fw-bold fs-5" id="resumenEntel">0</div>
-                                                <small>ENTEL Activos</small>
+                                                <small>ENTEL</small>
                                             </div>
                                         </div>
                                         <div class="col-4">
                                             <div class="text-tigo">
                                                 <i class="bi bi-sim-fill display-6"></i>
                                                 <div class="fw-bold fs-5" id="resumenTigo">0</div>
-                                                <small>TIGO Activos</small>
+                                                <small>TIGO</small>
                                             </div>
                                         </div>
                                         <div class="col-4">
                                             <div class="text-viva">
                                                 <i class="bi bi-sim-fill display-6"></i>
                                                 <div class="fw-bold fs-5" id="resumenViva">0</div>
-                                                <small>VIVA Activos</small>
+                                                <small>VIVA</small>
                                             </div>
                                         </div>
                                     </div>
@@ -747,29 +774,59 @@
                         </div>
                     </div>
 
-                    <!-- Filtros -->
+                    <!-- Filtros Mejorados -->
                     <div class="filter-card">
                         <div class="row g-3">
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <select class="form-select" id="filterOperadora">
-                                    <option value="">Todas las Operadoras</option>
+                                    <option value="">Todas Operadoras</option>
                                     <option value="ENTEL">ENTEL</option>
                                     <option value="TIGO">TIGO</option>
                                     <option value="VIVA">VIVA</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <select class="form-select" id="filterEstado">
-                                    <option value="">Todos los Estados</option>
+                                    <option value="">Todos Estados</option>
                                     <option value="ACTIVO">Activo</option>
                                     <option value="INACTIVO">Inactivo</option>
                                     <option value="VENCIDO">Vencido</option>
+                                    <option value="DESIGNADO">Designado</option>
                                 </select>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-2">
                                 <select class="form-select" id="filterCategoria">
-                                    <option value="">Todas las Categorías</option>
+                                    <option value="">Todas Categorías</option>
                                 </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="filterLetraCategoria">
+                                    <option value="">Todas Letras</option>
+                                    <!-- Se llenará dinámicamente -->
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <select class="form-select" id="filterDesignacion">
+                                    <option value="">Todos</option>
+                                    <option value="SI">Con Designación</option>
+                                    <option value="NO">Sin Designación</option>
+                                </select>
+                            </div>
+                            <div class="col-md-2">
+                                <input type="text" class="form-control" id="filterNumero" placeholder="Número chip...">
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-6">
+                                <input type="text" class="form-control" id="filterDesignadoA" placeholder="Filtrar por designado a...">
+                            </div>
+                            <div class="col-md-6 d-flex justify-content-end">
+                                <button class="btn btn-outline-secondary me-2" id="clearFiltersBtn">
+                                    <i class="bi bi-x-circle me-1"></i>Limpiar Filtros
+                                </button>
+                                <button class="btn btn-primary" id="applyFiltersBtn">
+                                    <i class="bi bi-funnel me-1"></i>Aplicar Filtros
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -788,6 +845,7 @@
                                             <th>Uso</th>
                                             <th>Vencimiento</th>
                                             <th>Estado</th>
+                                            <th>Designado a</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -809,9 +867,14 @@
                 <div id="categoriasSection" class="fade-in d-none">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="section-title">Gestión de Categorías</h2>
-                        <button class="btn app-btn app-btn-primary" id="addCategoryMainBtn">
-                            <i class="bi bi-folder-plus me-2"></i>Nueva Categoría
-                        </button>
+                        <div>
+                            <button class="btn app-btn app-btn-purple me-2" id="exportCategoriesBtn">
+                                <i class="bi bi-file-earmark-excel me-2"></i>Exportar Excel
+                            </button>
+                            <button class="btn app-btn app-btn-primary" id="addCategoryMainBtn">
+                                <i class="bi bi-folder-plus me-2"></i>Nueva Categoría
+                            </button>
+                        </div>
                     </div>
 
                     <div class="app-card">
@@ -820,9 +883,12 @@
                                 <table class="table table-striped table-hover mb-0" id="categoriasTable">
                                     <thead>
                                         <tr>
+                                            <th>ID</th>
                                             <th>Operadora</th>
                                             <th>Nombre</th>
                                             <th>Letra Categoría</th>
+                                            <th>Fecha Activación</th>
+                                            <th>Fecha Vencimiento</th>
                                             <th>Cantidad Chips</th>
                                             <th>Acciones</th>
                                         </tr>
@@ -893,7 +959,12 @@
                     <form id="categoryForm">
                         <input type="hidden" id="categoryId">
                         <div class="mb-3">
-                            <label for="categoryOperadora" class="form-label">Operadora</label>
+                            <label for="categoryIdInput" class="form-label">ID de Categoría *</label>
+                            <input type="text" class="form-control" id="categoryIdInput" required placeholder="Ej: CAT001, EMP01, etc.">
+                            <div class="form-text">Identificador único para esta categoría</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryOperadora" class="form-label">Operadora *</label>
                             <select class="form-select" id="categoryOperadora" required>
                                 <option value="">Seleccionar operadora</option>
                                 <option value="ENTEL">ENTEL</option>
@@ -902,13 +973,22 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="categoryNombre" class="form-label">Nombre de la Categoría</label>
+                            <label for="categoryNombre" class="form-label">Nombre de la Categoría *</label>
                             <input type="text" class="form-control" id="categoryNombre" required>
                         </div>
                         <div class="mb-3">
-                            <label for="categoryLetra" class="form-label">Letra de Categoría</label>
+                            <label for="categoryLetra" class="form-label">Letra de Categoría *</label>
                             <input type="text" class="form-control" id="categoryLetra" maxlength="5" required>
                             <div class="form-text">Ejemplo: E, T, V, EMP, etc.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryFechaActivacion" class="form-label">Fecha de Activación *</label>
+                            <input type="date" class="form-control" id="categoryFechaActivacion" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="categoryDiasVencimiento" class="form-label">Días para Vencimiento *</label>
+                            <input type="number" class="form-control" id="categoryDiasVencimiento" value="60" min="1" required>
+                            <div class="form-text">Todos los chips de esta categoría vencerán automáticamente después de estos días desde su activación.</div>
                         </div>
                     </form>
                 </div>
@@ -932,7 +1012,7 @@
                     <form id="chipForm">
                         <input type="hidden" id="chipId">
                         <div class="mb-3">
-                            <label for="chipOperadora" class="form-label">Operadora</label>
+                            <label for="chipOperadora" class="form-label">Operadora *</label>
                             <select class="form-select" id="chipOperadora" required>
                                 <option value="">Seleccionar operadora</option>
                                 <option value="ENTEL">ENTEL</option>
@@ -941,44 +1021,75 @@
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="chipCategoria" class="form-label">Categoría</label>
+                            <label for="chipCategoria" class="form-label">Categoría *</label>
                             <select class="form-select" id="chipCategoria" required>
                                 <option value="">Seleccionar categoría</option>
                             </select>
                         </div>
                         <div class="mb-3">
-                            <label for="chipNumero" class="form-label">Número del Chip</label>
+                            <label for="chipNumero" class="form-label">Número del Chip *</label>
                             <input type="text" class="form-control" id="chipNumero" required>
                         </div>
                         <div class="row">
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="chipActivacion" class="form-label">Fecha Activación</label>
+                                    <label for="chipActivacion" class="form-label">Fecha Activación *</label>
                                     <input type="date" class="form-control" id="chipActivacion" required>
                                 </div>
                             </div>
-                            <div class="col-md-4">
+                            <div class="col-md-6">
                                 <div class="mb-3">
-                                    <label for="chipUso" class="form-label">Fecha de Uso</label>
+                                    <label for="chipUso" class="form-label">Fecha de Uso *</label>
                                     <input type="date" class="form-control" id="chipUso" required>
-                                </div>
-                            </div>
-                            <div class="col-md-4">
-                                <div class="mb-3">
-                                    <label for="chipVencimiento" class="form-label">Fecha Vencimiento</label>
-                                    <input type="date" class="form-control" id="chipVencimiento" required>
                                 </div>
                             </div>
                         </div>
                         <div class="mb-3">
                             <label for="chipObservaciones" class="form-label">Observaciones</label>
-                            <textarea class="form-control" id="chipObservaciones" rows="3"></textarea>
+                            <textarea class="form-control" id="chipObservaciones" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="chipDesignadoCheck">
+                            <label class="form-check-label" for="chipDesignadoCheck">Designar este chip a:</label>
+                        </div>
+                        <div class="mb-3" id="chipDesignadoContainer" style="display: none;">
+                            <input type="text" class="form-control" id="chipDesignadoA" placeholder="Ej: Vendido.">
                         </div>
                     </form>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                     <button type="button" class="btn btn-primary" id="saveChipBtn">Guardar Chip</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Designar Chip -->
+    <div class="modal fade" id="designarModal" tabindex="-1" aria-labelledby="designarModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="designarModalLabel">Designar Chip</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="designarForm">
+                        <input type="hidden" id="designarChipId">
+                        <div class="mb-3">
+                            <label for="designarA" class="form-label">Designar a *</label>
+                            <input type="text" class="form-control" id="designarA" placeholder="Ej: Vendido." required>
+                            <div class="form-text">Especifique a quién o a qué departamento se designa este chip.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="designarObservaciones" class="form-label">Observaciones de la Designación</label>
+                            <textarea class="form-control" id="designarObservaciones" rows="3" placeholder="Motivo de la designación, proyecto, etc."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="saveDesignacionBtn">Guardar Designación</button>
                 </div>
             </div>
         </div>
@@ -1039,17 +1150,49 @@
             document.getElementById('saveChipBtn').addEventListener('click', saveChip);
             document.getElementById('refreshDataBtn').addEventListener('click', refreshData);
             document.getElementById('exportReportBtn').addEventListener('click', exportReport);
-
-            // Configurar filtros
-            document.getElementById('filterOperadora').addEventListener('change', filterChips);
-            document.getElementById('filterEstado').addEventListener('change', filterChips);
-            document.getElementById('filterCategoria').addEventListener('change', filterChips);
+            document.getElementById('exportCategoriesBtn').addEventListener('click', exportCategoriesExcel);
+            document.getElementById('saveDesignacionBtn').addEventListener('click', saveDesignacion);
+            document.getElementById('clearFiltersBtn').addEventListener('click', clearFilters);
+            document.getElementById('applyFiltersBtn').addEventListener('click', applyFilters);
 
             // Configurar cambio de operadora en modal de chip
             document.getElementById('chipOperadora').addEventListener('change', updateChipCategories);
 
+            // Configurar checkbox de designación
+            document.getElementById('chipDesignadoCheck').addEventListener('change', function() {
+                document.getElementById('chipDesignadoContainer').style.display = 
+                    this.checked ? 'block' : 'none';
+            });
+
             // Configurar menú toggle para móviles
             document.querySelector('.menu-toggle').addEventListener('click', toggleSidebar);
+
+            // Configurar filtros con eventos
+            document.getElementById('filterOperadora').addEventListener('change', function() {
+                if (this.value) applyFilters();
+            });
+            
+            document.getElementById('filterEstado').addEventListener('change', function() {
+                if (this.value) applyFilters();
+            });
+            
+            document.getElementById('filterLetraCategoria').addEventListener('change', function() {
+                if (this.value) applyFilters();
+            });
+            
+            document.getElementById('filterDesignacion').addEventListener('change', function() {
+                if (this.value) applyFilters();
+            });
+            
+            document.getElementById('filterNumero').addEventListener('input', function() {
+                if (this.value.length >= 3) applyFilters();
+                if (this.value === '') applyFilters();
+            });
+            
+            document.getElementById('filterDesignadoA').addEventListener('input', function() {
+                if (this.value.length >= 3) applyFilters();
+                if (this.value === '') applyFilters();
+            });
 
             // Cargar datos iniciales
             loadDashboardData();
@@ -1173,25 +1316,14 @@
             document.getElementById('resumenTigo').textContent = tigoActivos;
             document.getElementById('resumenViva').textContent = vivaActivos;
 
-            // Nuevas estadísticas: Chips en Uso y Chips por Usar
-            const hoy = new Date().toISOString().split('T')[0];
-            
-            // Chips en Uso: fecha_uso <= hoy y estado ACTIVO
-            const chipsEnUso = allChips.filter(chip => 
-                chip.fecha_uso <= hoy && chip.estado === 'ACTIVO'
-            ).length;
-            
-            // Chips por Usar: fecha_uso > hoy y estado ACTIVO
-            const chipsPorUsar = allChips.filter(chip => 
-                chip.fecha_uso > hoy && chip.estado === 'ACTIVO'
-            ).length;
-            
-            // Chips Vencidos
+            // Nuevas estadísticas: Chips Activos, Vencidos y Designados
+            const chipsActivos = allChips.filter(chip => chip.estado === 'ACTIVO').length;
             const chipsVencidos = allChips.filter(chip => chip.estado === 'VENCIDO').length;
+            const chipsDesignados = allChips.filter(chip => chip.designado_a && chip.designado_a.trim() !== '').length;
             
-            document.getElementById('totalEnUso').textContent = chipsEnUso;
-            document.getElementById('totalPorUsar').textContent = chipsPorUsar;
+            document.getElementById('totalActivos').textContent = chipsActivos;
             document.getElementById('totalVencidos').textContent = chipsVencidos;
+            document.getElementById('totalDesignados').textContent = chipsDesignados;
         }
 
         function updateChipsPorVencer() {
@@ -1220,7 +1352,7 @@
                 const esCritico = diasRestantes <= 3;
                 
                 const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaChip(chip.id, categoria.id)}` : 'N/A';
+                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaCategoria(chip.categoria_id, chip.id)}` : 'N/A';
 
                 return `
                 <div class="chip-vencimiento ${chip.operadora.toLowerCase()} ${esCritico ? 'critico' : ''}">
@@ -1239,11 +1371,11 @@
             }).join('');
         }
 
-        function getSecuenciaChip(chipId, categoriaId) {
+        function getSecuenciaCategoria(categoriaId, chipId) {
             const chipsCategoria = allChips.filter(chip => chip.categoria_id === categoriaId)
                                           .sort((a, b) => a.id - b.id);
             const index = chipsCategoria.findIndex(chip => chip.id === chipId);
-            return index + 1;
+            return index + 1; // Siempre empieza desde 1
         }
 
         async function loadInventarioData() {
@@ -1251,6 +1383,7 @@
             try {
                 // Actualizar opciones de categorías en filtro
                 updateFilterCategories();
+                updateFilterLetrasCategoria();
                 
                 displayInventarioTable();
 
@@ -1267,23 +1400,30 @@
             
             tbody.innerHTML = filteredChips.map(chip => {
                 const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaChip(chip.id, categoria.id)}` : 'N/A';
+                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaCategoria(chip.categoria_id, chip.id)}` : 'N/A';
                 
                 let estadoBadge = '';
-                switch(chip.estado) {
-                    case 'ACTIVO':
-                        estadoBadge = '<span class="badge-estado badge-activo">Activo</span>';
-                        break;
-                    case 'INACTIVO':
-                        estadoBadge = '<span class="badge-estado badge-inactivo">Inactivo</span>';
-                        break;
-                    case 'VENCIDO':
-                        estadoBadge = '<span class="badge-estado badge-vencido">Vencido</span>';
-                        break;
+                let rowClass = '';
+                
+                if (chip.designado_a && chip.designado_a.trim() !== '') {
+                    estadoBadge = '<span class="badge-estado badge-designado">Designado</span>';
+                    rowClass = 'chip-designado-row';
+                } else {
+                    switch(chip.estado) {
+                        case 'ACTIVO':
+                            estadoBadge = '<span class="badge-estado badge-activo">Activo</span>';
+                            break;
+                        case 'INACTIVO':
+                            estadoBadge = '<span class="badge-estado badge-inactivo">Inactivo</span>';
+                            break;
+                        case 'VENCIDO':
+                            estadoBadge = '<span class="badge-estado badge-vencido">Vencido</span>';
+                            break;
+                    }
                 }
 
                 return `
-                <tr>
+                <tr class="${rowClass}">
                     <td><strong>${numeroSecuencia}</strong></td>
                     <td>${chip.numero_chip}</td>
                     <td>
@@ -1294,10 +1434,19 @@
                     <td>${formatDate(chip.fecha_uso)}</td>
                     <td>${formatDate(chip.fecha_vencimiento)}</td>
                     <td>${estadoBadge}</td>
+                    <td>${chip.designado_a || ''}</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary" onclick="editChip(${chip.id})" title="Editar">
                             <i class="bi bi-pencil"></i>
                         </button>
+                        ${chip.designado_a ? 
+                            `<button class="btn btn-sm btn-outline-warning" onclick="removerDesignacion(${chip.id})" title="Remover Designación">
+                                <i class="bi bi-person-dash"></i>
+                            </button>` : 
+                            `<button class="btn btn-sm btn-outline-success" onclick="designarChip(${chip.id})" title="Designar">
+                                <i class="bi bi-person-plus"></i>
+                            </button>`
+                        }
                         <button class="btn btn-sm btn-outline-danger" onclick="deleteChip(${chip.id})" title="Eliminar">
                             <i class="bi bi-trash"></i>
                         </button>
@@ -1315,26 +1464,97 @@
             }
         }
 
-        function filterChips() {
+        function updateFilterCategories() {
+            const select = document.getElementById('filterCategoria');
+            select.innerHTML = '<option value="">Todas Categorías</option>' +
+                allCategories.map(cat => 
+                    `<option value="${cat.id}">${cat.categoria_id || cat.id} - ${cat.operadora} - ${cat.nombre}</option>`
+                ).join('');
+        }
+
+        function updateFilterLetrasCategoria() {
+            const select = document.getElementById('filterLetraCategoria');
+            const letrasUnicas = [...new Set(allCategories.map(cat => cat.letra_categoria))].sort();
+            
+            select.innerHTML = '<option value="">Todas Letras</option>' +
+                letrasUnicas.map(letra => 
+                    `<option value="${letra}">${letra}</option>`
+                ).join('');
+        }
+
+        function applyFilters() {
             const operadora = document.getElementById('filterOperadora').value;
             const estado = document.getElementById('filterEstado').value;
             const categoria = document.getElementById('filterCategoria').value;
+            const letraCategoria = document.getElementById('filterLetraCategoria').value;
+            const designacion = document.getElementById('filterDesignacion').value;
+            const numero = document.getElementById('filterNumero').value.toLowerCase();
+            const designadoA = document.getElementById('filterDesignadoA').value.toLowerCase();
 
             filteredChips = allChips.filter(chip => {
-                return (!operadora || chip.operadora === operadora) &&
-                       (!estado || chip.estado === estado) &&
-                       (!categoria || chip.categoria_id == categoria);
+                const categoriaChip = allCategories.find(cat => cat.id === chip.categoria_id);
+                
+                // Filtro por operadora
+                const matchOperadora = !operadora || chip.operadora === operadora;
+                
+                // Filtro por estado (manejar especial "DESIGNADO")
+                let matchEstado = true;
+                if (estado === 'DESIGNADO') {
+                    matchEstado = chip.designado_a && chip.designado_a.trim() !== '';
+                } else if (estado) {
+                    matchEstado = chip.estado === estado;
+                }
+                
+                // Filtro por categoría
+                const matchCategoria = !categoria || chip.categoria_id == categoria;
+                
+                // Filtro por letra de categoría
+                const matchLetraCategoria = !letraCategoria || 
+                    (categoriaChip && categoriaChip.letra_categoria === letraCategoria);
+                
+                // Filtro por designación (SI/NO)
+                let matchDesignacion = true;
+                if (designacion === 'SI') {
+                    matchDesignacion = chip.designado_a && chip.designado_a.trim() !== '';
+                } else if (designacion === 'NO') {
+                    matchDesignacion = !chip.designado_a || chip.designado_a.trim() === '';
+                }
+                
+                // Filtro por número de chip
+                const matchNumero = !numero || 
+                    chip.numero_chip.toLowerCase().includes(numero);
+                
+                // Filtro por designado a (texto)
+                const matchDesignadoA = !designadoA || 
+                    (chip.designado_a && chip.designado_a.toLowerCase().includes(designadoA));
+                
+                return matchOperadora && matchEstado && matchCategoria && 
+                       matchLetraCategoria && matchDesignacion && 
+                       matchNumero && matchDesignadoA;
             });
 
             displayInventarioTable();
+            
+            // Mostrar contador de resultados
+            const totalChips = allChips.length;
+            const filtradosChips = filteredChips.length;
+            if (filtradosChips !== totalChips) {
+                showNotification(`Mostrando ${filtradosChips} de ${totalChips} chips`, 'info');
+            }
         }
 
-        function updateFilterCategories() {
-            const select = document.getElementById('filterCategoria');
-            select.innerHTML = '<option value="">Todas las Categorías</option>' +
-                allCategories.map(cat => 
-                    `<option value="${cat.id}">${cat.operadora} - ${cat.nombre} (${cat.letra_categoria})</option>`
-                ).join('');
+        function clearFilters() {
+            document.getElementById('filterOperadora').value = '';
+            document.getElementById('filterEstado').value = '';
+            document.getElementById('filterCategoria').value = '';
+            document.getElementById('filterLetraCategoria').value = '';
+            document.getElementById('filterDesignacion').value = '';
+            document.getElementById('filterNumero').value = '';
+            document.getElementById('filterDesignadoA').value = '';
+            
+            filteredChips = [...allChips];
+            displayInventarioTable();
+            showNotification('Filtros limpiados', 'info');
         }
 
         async function loadCategoriasData() {
@@ -1357,11 +1577,14 @@
                 
                 return `
                 <tr>
+                    <td><strong>${category.categoria_id || category.id}</strong></td>
                     <td>
                         <span class="badge ${getOperadoraBadgeClass(category.operadora)}">${category.operadora}</span>
                     </td>
                     <td>${category.nombre}</td>
                     <td><strong>${category.letra_categoria}</strong></td>
+                    <td>${formatDate(category.fecha_activacion)}</td>
+                    <td>${formatDate(category.fecha_vencimiento)} (${category.dias_vencimiento} días)</td>
                     <td>${chipsCount} chips</td>
                     <td>
                         <button class="btn btn-sm btn-outline-primary" onclick="editCategory(${category.id})" title="Editar">
@@ -1379,6 +1602,11 @@
             document.getElementById('categoryModalLabel').textContent = 'Agregar Categoría';
             document.getElementById('categoryForm').reset();
             document.getElementById('categoryId').value = '';
+            document.getElementById('categoryDiasVencimiento').value = '60';
+            
+            // Establecer fecha actual por defecto
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('categoryFechaActivacion').value = hoy;
             
             const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
             modal.show();
@@ -1386,20 +1614,32 @@
 
         async function saveCategory() {
             const categoryId = document.getElementById('categoryId').value;
+            const categoriaIdInput = document.getElementById('categoryIdInput').value;
             const operadora = document.getElementById('categoryOperadora').value;
             const nombre = document.getElementById('categoryNombre').value;
             const letra = document.getElementById('categoryLetra').value;
+            const fechaActivacion = document.getElementById('categoryFechaActivacion').value;
+            const diasVencimiento = parseInt(document.getElementById('categoryDiasVencimiento').value);
 
-            if (!operadora || !nombre || !letra) {
-                showNotification('Por favor, complete todos los campos', 'error');
+            if (!categoriaIdInput || !operadora || !nombre || !letra || !fechaActivacion || !diasVencimiento) {
+                showNotification('Por favor, complete todos los campos obligatorios', 'error');
                 return;
             }
 
+            // Calcular fecha de vencimiento
+            const fechaActivacionObj = new Date(fechaActivacion);
+            const fechaVencimiento = new Date(fechaActivacionObj);
+            fechaVencimiento.setDate(fechaActivacionObj.getDate() + diasVencimiento);
+
             try {
                 const categoryData = {
+                    categoria_id: categoriaIdInput,
                     operadora: operadora,
                     nombre: nombre,
-                    letra_categoria: letra.toUpperCase()
+                    letra_categoria: letra.toUpperCase(),
+                    fecha_activacion: fechaActivacion,
+                    fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                    dias_vencimiento: diasVencimiento
                 };
 
                 let response;
@@ -1453,6 +1693,13 @@
             document.getElementById('chipModalLabel').textContent = 'Agregar Chip';
             document.getElementById('chipForm').reset();
             document.getElementById('chipId').value = '';
+            document.getElementById('chipDesignadoCheck').checked = false;
+            document.getElementById('chipDesignadoContainer').style.display = 'none';
+            
+            // Establecer fechas por defecto
+            const hoy = new Date().toISOString().split('T')[0];
+            document.getElementById('chipActivacion').value = hoy;
+            document.getElementById('chipUso').value = hoy;
             
             // Actualizar categorías disponibles
             updateChipCategories();
@@ -1471,7 +1718,7 @@
             
             select.innerHTML = '<option value="">Seleccionar categoría</option>' +
                 categoriasFiltradas.map(cat => 
-                    `<option value="${cat.id}">${cat.nombre} (${cat.letra_categoria})</option>`
+                    `<option value="${cat.id}">${cat.categoria_id || cat.id} - ${cat.nombre} (${cat.letra_categoria}) - Vence: ${formatDate(cat.fecha_vencimiento)}</option>`
                 ).join('');
         }
 
@@ -1482,33 +1729,55 @@
             const numero = document.getElementById('chipNumero').value;
             const activacion = document.getElementById('chipActivacion').value;
             const uso = document.getElementById('chipUso').value;
-            const vencimiento = document.getElementById('chipVencimiento').value;
             const observaciones = document.getElementById('chipObservaciones').value;
+            const designadoCheck = document.getElementById('chipDesignadoCheck').checked;
+            const designadoA = designadoCheck ? document.getElementById('chipDesignadoA').value : '';
 
-            if (!operadora || !categoriaId || !numero || !activacion || !uso || !vencimiento) {
+            if (!operadora || !categoriaId || !numero || !activacion || !uso) {
                 showNotification('Por favor, complete todos los campos obligatorios', 'error');
                 return;
             }
 
-            // Determinar estado basado en fechas
+            // Obtener categoría para calcular fecha de vencimiento
+            const categoria = allCategories.find(cat => cat.id == categoriaId);
+            if (!categoria) {
+                showNotification('Categoría no encontrada', 'error');
+                return;
+            }
+
+            // Calcular fecha de vencimiento basada en la categoría
+            const fechaActivacionObj = new Date(activacion);
+            const fechaVencimiento = new Date(categoria.fecha_activacion);
+            fechaVencimiento.setDate(new Date(categoria.fecha_activacion).getDate() + categoria.dias_vencimiento);
+
+            // Determinar estado
             const hoy = new Date().toISOString().split('T')[0];
             let estado = 'ACTIVO';
-            if (vencimiento < hoy) {
+            if (fechaVencimiento.toISOString().split('T')[0] < hoy) {
                 estado = 'VENCIDO';
             }
+
+            // Calcular secuencia dentro de la categoría
+            const chipsCategoria = allChips.filter(chip => chip.categoria_id == categoriaId);
+            const numeroSecuencia = chipsCategoria.length + 1;
 
             try {
                 const chipData = {
                     operadora: operadora,
                     categoria_id: parseInt(categoriaId),
                     numero_chip: numero,
-                    numero_secuencia: 'AUTO', // Se calculará automáticamente
+                    numero_secuencia: numeroSecuencia.toString(),
                     fecha_activacion: activacion,
                     fecha_uso: uso,
-                    fecha_vencimiento: vencimiento,
+                    fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
                     estado: estado,
                     observaciones: observaciones
                 };
+
+                // Agregar designación si está marcado
+                if (designadoCheck && designadoA.trim() !== '') {
+                    chipData.designado_a = designadoA.trim();
+                }
 
                 let response;
                 if (chipId) {
@@ -1557,15 +1826,115 @@
             }
         }
 
+        function designarChip(chipId) {
+            const chip = allChips.find(c => c.id === chipId);
+            if (!chip) return;
+
+            document.getElementById('designarModalLabel').textContent = 'Designar Chip';
+            document.getElementById('designarChipId').value = chipId;
+            document.getElementById('designarA').value = chip.designado_a || '';
+            document.getElementById('designarObservaciones').value = chip.designado_observaciones || '';
+
+            const modal = new bootstrap.Modal(document.getElementById('designarModal'));
+            modal.show();
+        }
+
+        async function saveDesignacion() {
+            const chipId = document.getElementById('designarChipId').value;
+            const designadoA = document.getElementById('designarA').value;
+            const observaciones = document.getElementById('designarObservaciones').value;
+
+            if (!designadoA.trim()) {
+                showNotification('Por favor, especifique a quién se designa el chip', 'error');
+                return;
+            }
+
+            try {
+                const chipData = {
+                    designado_a: designadoA.trim(),
+                    designado_observaciones: observaciones.trim()
+                };
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chip_inventory?id=eq.${chipId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(chipData)
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al guardar designación');
+
+                bootstrap.Modal.getInstance(document.getElementById('designarModal')).hide();
+                loadDashboardData();
+                if (document.getElementById('inventarioSection').classList.contains('d-none') === false) {
+                    loadInventarioData();
+                }
+
+                showNotification('Chip designado exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al guardar designación:', error);
+                showNotification('Error al guardar designación', 'error');
+            }
+        }
+
+        async function removerDesignacion(chipId) {
+            if (!confirm('¿Está seguro de que desea remover la designación de este chip?')) return;
+
+            try {
+                const chipData = {
+                    designado_a: null,
+                    designado_observaciones: null
+                };
+
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chip_inventory?id=eq.${chipId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(chipData)
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al remover designación');
+
+                loadDashboardData();
+                if (document.getElementById('inventarioSection').classList.contains('d-none') === false) {
+                    loadInventarioData();
+                }
+
+                showNotification('Designación removida exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al remover designación:', error);
+                showNotification('Error al remover designación', 'error');
+            }
+        }
+
         function editCategory(categoryId) {
             const category = allCategories.find(cat => cat.id === categoryId);
             if (!category) return;
 
             document.getElementById('categoryModalLabel').textContent = 'Editar Categoría';
             document.getElementById('categoryId').value = category.id;
+            document.getElementById('categoryIdInput').value = category.categoria_id || '';
             document.getElementById('categoryOperadora').value = category.operadora;
             document.getElementById('categoryNombre').value = category.nombre;
             document.getElementById('categoryLetra').value = category.letra_categoria;
+            document.getElementById('categoryFechaActivacion').value = category.fecha_activacion;
+            document.getElementById('categoryDiasVencimiento').value = category.dias_vencimiento;
 
             const modal = new bootstrap.Modal(document.getElementById('categoryModal'));
             modal.show();
@@ -1581,8 +1950,15 @@
             document.getElementById('chipNumero').value = chip.numero_chip;
             document.getElementById('chipActivacion').value = chip.fecha_activacion;
             document.getElementById('chipUso').value = chip.fecha_uso;
-            document.getElementById('chipVencimiento').value = chip.fecha_vencimiento;
             document.getElementById('chipObservaciones').value = chip.observaciones || '';
+
+            // Configurar designación
+            const designadoCheck = chip.designado_a && chip.designado_a.trim() !== '';
+            document.getElementById('chipDesignadoCheck').checked = designadoCheck;
+            document.getElementById('chipDesignadoContainer').style.display = designadoCheck ? 'block' : 'none';
+            if (designadoCheck) {
+                document.getElementById('chipDesignadoA').value = chip.designado_a;
+            }
 
             // Actualizar categorías y seleccionar la correcta
             updateChipCategories();
@@ -1690,16 +2066,15 @@
                 }
             });
 
-            // Gráfico de estados - Ahora muestra En Uso, Por Usar y Vencidos
+            // Gráfico de estados - Ahora muestra Activos, Designados y Vencidos
             const estadoCtx = document.getElementById('estadoChart').getContext('2d');
-            const hoy = new Date().toISOString().split('T')[0];
             
-            const chipsEnUso = allChips.filter(chip => 
-                chip.fecha_uso <= hoy && chip.estado === 'ACTIVO'
+            const chipsActivos = allChips.filter(chip => 
+                chip.estado === 'ACTIVO' && (!chip.designado_a || chip.designado_a.trim() === '')
             ).length;
             
-            const chipsPorUsar = allChips.filter(chip => 
-                chip.fecha_uso > hoy && chip.estado === 'ACTIVO'
+            const chipsDesignados = allChips.filter(chip => 
+                chip.designado_a && chip.designado_a.trim() !== ''
             ).length;
             
             const chipsVencidos = allChips.filter(chip => chip.estado === 'VENCIDO').length;
@@ -1707,11 +2082,11 @@
             estadoChart = new Chart(estadoCtx, {
                 type: 'bar',
                 data: {
-                    labels: ['En Uso', 'Por Usar', 'Vencidos'],
+                    labels: ['Activos', 'Designados', 'Vencidos'],
                     datasets: [{
                         label: 'Cantidad de Chips',
-                        data: [chipsEnUso, chipsPorUsar, chipsVencidos],
-                        backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                        data: [chipsActivos, chipsDesignados, chipsVencidos],
+                        backgroundColor: ['#28a745', '#6f42c1', '#dc3545'],
                         borderWidth: 0
                     }]
                 },
@@ -1748,12 +2123,17 @@
             doc.text(`Total chips: ${allChips.length}`, 20, 37);
             
             // Tabla
-            const tableColumn = ["# Sec", "Número", "Operadora", "Categoría", "Activación", "Uso", "Vencimiento", "Estado"];
+            const tableColumn = ["# Sec", "Número", "Operadora", "Categoría", "Activación", "Uso", "Vencimiento", "Estado", "Designado a"];
             const tableRows = [];
             
             filteredChips.forEach(chip => {
                 const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaChip(chip.id, categoria.id)}` : 'N/A';
+                const numeroSecuencia = categoria ? `${categoria.letra_categoria}${getSecuenciaCategoria(chip.categoria_id, chip.id)}` : 'N/A';
+                
+                let estado = chip.estado;
+                if (chip.designado_a && chip.designado_a.trim() !== '') {
+                    estado = 'DESIGNADO';
+                }
                 
                 const rowData = [
                     numeroSecuencia,
@@ -1763,7 +2143,8 @@
                     formatDate(chip.fecha_activacion),
                     formatDate(chip.fecha_uso),
                     formatDate(chip.fecha_vencimiento),
-                    chip.estado
+                    estado,
+                    chip.designado_a || ''
                 ];
                 tableRows.push(rowData);
             });
@@ -1784,6 +2165,52 @@
             });
             
             doc.save(`Reporte_Inventario_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+
+        function exportCategoriesExcel() {
+            // Crear un nuevo libro de trabajo
+            const wb = XLSX.utils.book_new();
+            
+            // Preparar datos para la hoja de cálculo
+            const excelData = allCategories.map(category => {
+                const chipsCount = allChips.filter(chip => chip.categoria_id === category.id).length;
+                
+                return {
+                    'ID Categoría': category.categoria_id || category.id,
+                    'Operadora': category.operadora,
+                    'Nombre Categoría': category.nombre,
+                    'Letra Categoría': category.letra_categoria,
+                    'Fecha Activación': formatDate(category.fecha_activacion),
+                    'Fecha Vencimiento': formatDate(category.fecha_vencimiento),
+                    'Días Vencimiento': category.dias_vencimiento,
+                    'Cantidad Chips': chipsCount
+                };
+            });
+
+            // Crear hoja de cálculo
+            const ws = XLSX.utils.json_to_sheet(excelData);
+            
+            // Aplicar estilos (ancho de columnas)
+            const wscols = [
+                {wch: 15}, // ID Categoría
+                {wch: 15}, // Operadora
+                {wch: 25}, // Nombre Categoría
+                {wch: 15}, // Letra Categoría
+                {wch: 20}, // Fecha Activación
+                {wch: 20}, // Fecha Vencimiento
+                {wch: 15}, // Días Vencimiento
+                {wch: 15}  // Cantidad Chips
+            ];
+            ws['!cols'] = wscols;
+
+            // Añadir hoja al libro
+            XLSX.utils.book_append_sheet(wb, ws, "Categorías");
+
+            // Generar archivo Excel
+            const fecha = new Date().toISOString().slice(0,10);
+            XLSX.writeFile(wb, `Categorías_Chips_${fecha}.xlsx`);
+            
+            showNotification('Exportación a Excel completada', 'success');
         }
 
         // Funciones utilitarias
@@ -1828,6 +2255,8 @@
         window.deleteCategory = deleteCategory;
         window.editChip = editChip;
         window.deleteChip = deleteChip;
+        window.designarChip = designarChip;
+        window.removerDesignacion = removerDesignacion;
     </script>
 </body>
 </html>
