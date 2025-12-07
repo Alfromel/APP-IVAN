@@ -10,585 +10,203 @@
         :root {
             --primary: #6d28d9;
             --primary-dark: #5b21b6;
-            --primary-light: #ede9fe;
             --secondary: #059669;
             --secondary-dark: #047857;
-            --secondary-light: #d1fae5;
             --accent: #f59e0b;
             --accent-dark: #d97706;
-            --accent-light: #fef3c7;
-            --danger: #dc2626;
-            --danger-light: #fee2e2;
-            --info: #3b82f6;
-            --info-light: #dbeafe;
-            --gray-100: #f8f9fa;
-            --gray-200: #e9ecef;
-            --gray-300: #dee2e6;
-            --gray-800: #343a40;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
         }
         
         body {
-            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f8fafc;
-            color: #334155;
-            line-height: 1.6;
-            overflow-x: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
         }
         
-        /* Sidebar mejorada */
         .sidebar {
-            background: linear-gradient(180deg, #1e1b4b 0%, #312e81 100%);
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
             height: 100vh;
             position: fixed;
-            width: 260px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            width: 250px;
+            transition: all 0.3s;
             z-index: 1000;
-            box-shadow: 0 0 40px rgba(0, 0, 0, 0.1);
-            border-right: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .sidebar-header {
-            padding: 1.5rem 1.5rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.05);
-        }
-        
-        .sidebar-header h4 {
-            font-weight: 700;
-            font-size: 1.25rem;
-            margin-bottom: 0.25rem;
-            background: linear-gradient(135deg, #ffffff 0%, #c7d2fe 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        
-        .sidebar-header small {
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-        }
-        
-        .nav-item {
-            position: relative;
         }
         
         .sidebar .nav-link {
             color: rgba(255, 255, 255, 0.8);
-            padding: 0.85rem 1.5rem;
-            margin: 0.25rem 0.75rem;
-            border-radius: 10px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            display: flex;
-            align-items: center;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
+            padding: 12px 20px;
+            margin: 4px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
         }
         
-        .sidebar .nav-link:hover {
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
             color: white;
-            background: rgba(255, 255, 255, 0.15);
-            transform: translateX(5px);
-        }
-        
-        .sidebar .nav-link.active {
-            color: white;
-            background: linear-gradient(90deg, rgba(109, 40, 217, 0.3) 0%, rgba(109, 40, 217, 0.1) 100%);
-            border-left: 4px solid var(--primary);
-            box-shadow: 0 4px 12px rgba(109, 40, 217, 0.2);
-        }
-        
-        .sidebar .nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            height: 100%;
-            width: 3px;
-            background: var(--primary);
-            border-radius: 0 3px 3px 0;
+            background-color: rgba(255, 255, 255, 0.1);
         }
         
         .sidebar .nav-link i {
-            margin-right: 12px;
+            margin-right: 10px;
             width: 20px;
             text-align: center;
-            font-size: 1.1rem;
         }
         
-        .nav-label {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: rgba(255, 255, 255, 0.5);
-            padding: 1rem 1.5rem 0.5rem;
-            margin-top: 1rem;
-        }
-        
-        /* Main content mejorado */
         .main-content {
-            margin-left: 260px;
-            padding: 1.5rem;
+            margin-left: 250px;
+            padding: 20px;
             transition: all 0.3s;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
         }
         
-        /* Navbar mejorada */
         .navbar {
-            background: white;
-            border-radius: 12px;
-            padding: 0.75rem 1.5rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-            margin-bottom: 1.5rem;
-            border: 1px solid var(--gray-200);
-            backdrop-filter: blur(10px);
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
         
-        .navbar-brand {
-            font-weight: 600;
-            color: var(--primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .navbar-brand i {
-            font-size: 1.25rem;
-        }
-        
-        .search-box {
-            position: relative;
-            min-width: 300px;
-        }
-        
-        .search-box input {
-            padding-left: 3rem;
-            padding-right: 2.5rem;
-            border-radius: 10px;
-            border: 1px solid var(--gray-300);
-            background: var(--gray-100);
-            transition: all 0.3s;
-        }
-        
-        .search-box input:focus {
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
-            background: white;
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--gray-800);
-            z-index: 10;
-        }
-        
-        .clear-search {
-            position: absolute;
-            right: 1rem;
-            top: 50%;
-            transform: translateY(-50%);
-            background: none;
+        .card {
             border: none;
-            color: var(--gray-800);
-            cursor: pointer;
-            display: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
         }
         
-        /* Cards de estadísticas mejoradas */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
+        .card:hover {
+            transform: translateY(-5px);
         }
         
         .stat-card {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--gray-200);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
+            border-left: 4px solid var(--primary);
         }
         
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
+        .stat-card.income {
+            border-left-color: var(--secondary);
         }
         
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+        .stat-card.users {
+            border-left-color: var(--accent);
         }
         
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
+        .stat-card.recharges {
+            border-left-color: #3b82f6;
         }
         
-        .stat-icon.users { background: var(--primary-light); color: var(--primary); }
-        .stat-icon.transactions { background: var(--secondary-light); color: var(--secondary); }
-        .stat-icon.recharges { background: var(--accent-light); color: var(--accent); }
-        .stat-icon.balance { background: var(--info-light); color: var(--info); }
-        
-        .stat-value {
-            font-size: 1.75rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-            color: var(--gray-800);
-        }
-        
-        .stat-label {
-            font-size: 0.875rem;
-            color: var(--gray-800);
-            font-weight: 500;
-        }
-        
-        .stat-change {
-            font-size: 0.75rem;
-            margin-top: 0.5rem;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-        }
-        
-        .stat-change.positive { color: var(--secondary); }
-        .stat-change.negative { color: var(--danger); }
-        
-        /* Filtros mejorados */
-        .filters-container {
-            background: white;
-            border-radius: 16px;
-            padding: 1.25rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--gray-200);
-        }
-        
-        .filter-row {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1rem;
-        }
-        
-        .filter-group {
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        
-        .filter-group label {
-            font-size: 0.875rem;
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-        
-        .filter-control {
-            padding: 0.625rem 1rem;
-            border-radius: 10px;
-            border: 1px solid var(--gray-300);
-            background: white;
-            font-size: 0.875rem;
-            transition: all 0.2s;
-        }
-        
-        .filter-control:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
-        }
-        
-        .filter-actions {
-            display: flex;
-            gap: 0.75rem;
-            margin-top: 0.5rem;
-        }
-        
-        /* Tablas mejoradas */
         .table-container {
-            background: white;
-            border-radius: 16px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--gray-200);
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
-            margin-bottom: 1.5rem;
-        }
-        
-        .table-header {
-            padding: 1.25rem 1.5rem;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(90deg, #f8fafc 0%, #f1f5f9 100%);
-        }
-        
-        .table-header h5 {
-            margin: 0;
-            font-weight: 600;
-            color: var(--gray-800);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-        }
-        
-        .table-header h5 i {
-            color: var(--primary);
-        }
-        
-        .table-responsive {
-            overflow-x: auto;
-        }
-        
-        .table {
-            margin: 0;
-            border-collapse: separate;
-            border-spacing: 0;
         }
         
         .table th {
-            background: var(--gray-100);
-            padding: 1rem 1.25rem;
+            background-color: #f8f9fa;
+            border-top: none;
             font-weight: 600;
-            color: var(--gray-800);
-            text-transform: uppercase;
-            font-size: 0.75rem;
-            letter-spacing: 0.5px;
-            border: none;
-            white-space: nowrap;
-        }
-        
-        .table td {
-            padding: 1rem 1.25rem;
-            vertical-align: middle;
-            border-top: 1px solid var(--gray-200);
-            font-size: 0.875rem;
-        }
-        
-        .table tbody tr {
-            transition: all 0.2s;
-        }
-        
-        .table tbody tr:hover {
-            background: var(--primary-light);
-        }
-        
-        /* Badges mejorados */
-        .badge {
-            padding: 0.35rem 0.75rem;
-            border-radius: 20px;
-            font-weight: 500;
-            font-size: 0.75rem;
-            letter-spacing: 0.3px;
+            color: #495057;
         }
         
         .badge-success {
-            background: var(--secondary-light);
-            color: var(--secondary-dark);
+            background-color: var(--secondary);
         }
         
         .badge-warning {
-            background: var(--accent-light);
-            color: var(--accent-dark);
+            background-color: var(--accent);
         }
         
         .badge-danger {
-            background: var(--danger-light);
-            color: var(--danger);
+            background-color: #dc2626;
         }
         
         .badge-info {
-            background: var(--info-light);
-            color: var(--info);
-        }
-        
-        .badge-primary {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-        }
-        
-        /* Botones mejorados */
-        .btn {
-            border-radius: 10px;
-            padding: 0.625rem 1.25rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            border: none;
+            background-color: #3b82f6;
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
+            background-color: var(--primary);
+            border-color: var(--primary);
         }
         
         .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(109, 40, 217, 0.3);
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
         }
         
         .btn-success {
-            background: linear-gradient(135deg, var(--secondary) 0%, var(--secondary-dark) 100%);
-            color: white;
+            background-color: var(--secondary);
+            border-color: var(--secondary);
         }
         
         .btn-success:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(5, 150, 105, 0.3);
+            background-color: var(--secondary-dark);
+            border-color: var(--secondary-dark);
         }
         
-        .btn-outline-primary {
-            border: 1px solid var(--primary);
-            color: var(--primary);
-            background: transparent;
+        .chart-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: 100%;
         }
         
-        .btn-outline-primary:hover {
-            background: var(--primary);
-            color: white;
-        }
-        
-        .btn-sm {
-            padding: 0.375rem 0.75rem;
-            font-size: 0.875rem;
-        }
-        
-        /* User avatar mejorado */
         .user-avatar {
             width: 40px;
             height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 50%;
+            background-color: #e9ecef;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 600;
-            color: white;
-            font-size: 0.875rem;
+            font-weight: bold;
+            color: var(--primary);
         }
         
         .user-avatar img {
             width: 100%;
             height: 100%;
-            border-radius: 12px;
+            border-radius: 50%;
             object-fit: cover;
         }
         
-        /* Action buttons mejorados */
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
         .action-buttons .btn {
-            padding: 0.375rem;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        /* Modal mejorado */
-        .modal-content {
-            border-radius: 16px;
-            border: none;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+            padding: 4px 8px;
+            margin: 0 2px;
         }
         
         .modal-header {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            background-color: var(--primary);
             color: white;
-            border-radius: 16px 16px 0 0;
-            padding: 1.5rem;
-            border: none;
         }
         
-        .modal-header .btn-close {
-            filter: brightness(0) invert(1);
-            opacity: 0.8;
+        .search-box {
+            position: relative;
         }
         
-        .modal-header .btn-close:hover {
-            opacity: 1;
+        .search-box input {
+            padding-left: 40px;
         }
         
-        .modal-body {
-            padding: 1.5rem;
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
         }
         
-        .modal-footer {
-            padding: 1.25rem 1.5rem;
-            border-top: 1px solid var(--gray-200);
-        }
-        
-        /* Paginación mejorada */
-        .pagination-container {
-            padding: 1.25rem 1.5rem;
-            border-top: 1px solid var(--gray-200);
-            background: var(--gray-100);
-        }
-        
-        .pagination {
-            margin: 0;
-        }
-        
-        .page-link {
-            border: none;
+        .pagination .page-link {
             color: var(--primary);
-            margin: 0 2px;
-            border-radius: 8px;
-            padding: 0.5rem 0.75rem;
-            transition: all 0.2s;
         }
         
-        .page-link:hover {
-            background: var(--primary-light);
-            color: var(--primary-dark);
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
         }
         
-        .page-item.active .page-link {
-            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
-            color: white;
-            box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
-        }
-        
-        /* Loading spinner mejorado */
         .loading-spinner {
             display: inline-block;
             width: 20px;
             height: 20px;
-            border: 3px solid rgba(109, 40, 217, 0.1);
+            border: 3px solid rgba(255, 255, 255, 0.3);
             border-radius: 50%;
-            border-top-color: var(--primary);
+            border-top-color: white;
             animation: spin 1s ease-in-out infinite;
         }
         
@@ -596,152 +214,182 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Status indicator */
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
         }
         
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            display: inline-block;
+        .operator-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            margin-right: 8px;
+            object-fit: contain;
         }
         
-        .status-dot.active {
-            background: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+        .recharge-actions {
+            display: flex;
+            gap: 5px;
         }
         
-        .status-dot.inactive {
-            background: var(--danger);
-            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+        .recharge-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
         }
         
-        /* Chart container mejorado */
-        .chart-container {
+        .transaction-highlight {
+            background-color: rgba(109, 40, 217, 0.05);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .transaction-row:hover {
+            background-color: rgba(109, 40, 217, 0.08);
+        }
+        
+        /* Estilos para el modal de detalles */
+        .detail-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--gray-200);
-            height: 100%;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
         }
         
-        .chart-header {
+        .detail-modal.show {
+            display: block;
+        }
+        
+        .detail-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 12px 12px 0 0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 1.5rem;
         }
         
-        /* User ID badge mejorado */
-        .user-id-badge {
-            font-family: 'JetBrains Mono', 'Courier New', monospace;
-            background: var(--gray-100);
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            color: var(--gray-800);
-            border: 1px solid var(--gray-200);
+        .detail-modal-body {
+            padding: 1.5rem;
         }
         
-        /* Balance colors */
+        .detail-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .modal-backdrop.show {
+            display: block;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            min-width: 150px;
+            color: #495057;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #212529;
+        }
+        
         .balance-positive {
             color: var(--secondary);
-            font-weight: 600;
+            font-weight: bold;
         }
         
         .balance-negative {
-            color: var(--danger);
-            font-weight: 600;
+            color: #dc2626;
+            font-weight: bold;
         }
         
         .balance-zero {
-            color: var(--gray-800);
-            font-weight: 600;
+            color: #6c757d;
+            font-weight: bold;
         }
         
-        /* Animaciones */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .user-id-badge {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-out;
+        .search-type-selector {
+            margin-right: 10px;
         }
         
-        /* Responsive */
-        @media (max-width: 992px) {
-            .sidebar {
-                width: 80px;
-            }
-            
-            .sidebar-header h4,
-            .sidebar-header small,
-            .sidebar .nav-link span,
-            .nav-label {
-                display: none;
-            }
-            
-            .sidebar .nav-link {
-                justify-content: center;
-                padding: 1rem;
-                margin: 0.25rem 0.5rem;
-            }
-            
-            .sidebar .nav-link i {
-                margin-right: 0;
-                font-size: 1.25rem;
-            }
-            
-            .main-content {
-                margin-left: 80px;
-            }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
         }
         
-        @media (max-width: 768px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .filter-row {
-                grid-template-columns: 1fr;
-            }
-            
-            .table-header {
-                flex-direction: column;
-                gap: 1rem;
-                align-items: flex-start;
-            }
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
         }
         
-        /* Toast notifications mejoradas */
-        .toast {
-            border-radius: 12px;
-            border: none;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
         }
         
-        /* Progress bar para borrado */
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
+        /* Barra de progreso para borrar historial */
         .deletion-progress {
             position: fixed;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             z-index: 2000;
             width: 400px;
             max-width: 90%;
             display: none;
-            padding: 2rem;
+            padding: 30px;
             text-align: center;
-            animation: fadeIn 0.3s ease-out;
         }
         
         .deletion-progress.show {
@@ -755,7 +403,6 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(4px);
             z-index: 1999;
             display: none;
         }
@@ -767,47 +414,42 @@
         .progress-steps {
             list-style: none;
             padding: 0;
-            margin: 1.5rem 0;
+            margin: 20px 0;
             text-align: left;
         }
         
         .progress-steps li {
-            margin: 0.75rem 0;
+            margin: 10px 0;
             display: flex;
             align-items: center;
         }
         
         .progress-steps .step-icon {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 12px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            background-color: var(--gray-200);
-            color: var(--gray-800);
-            transition: all 0.3s;
+            margin-right: 10px;
+            font-size: 12px;
+            background-color: #e9ecef;
+            color: #6c757d;
         }
         
         .progress-steps .step-icon.completed {
-            background: var(--secondary);
+            background-color: var(--secondary);
             color: white;
         }
         
         .progress-steps .step-icon.current {
-            background: var(--primary);
+            background-color: var(--primary);
             color: white;
-            box-shadow: 0 0 0 4px rgba(109, 40, 217, 0.2);
         }
         
         .progress-steps .step-text {
             flex: 1;
-            color: var(--gray-800);
-            font-size: 0.875rem;
-            transition: all 0.3s;
+            color: #495057;
         }
         
         .progress-steps .step-text.completed {
@@ -821,415 +463,87 @@
         }
         
         .progress-bar-container {
-            height: 8px;
-            background-color: var(--gray-200);
-            border-radius: 4px;
-            margin: 1.5rem 0;
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin: 20px 0;
             overflow: hidden;
         }
         
         .progress-bar {
             height: 100%;
-            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            background-color: var(--primary);
             width: 0%;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            border-radius: 4px;
+            transition: width 0.3s ease;
         }
         
         .progress-percentage {
-            font-size: 0.875rem;
-            color: var(--gray-800);
-            margin-top: 0.5rem;
-            font-weight: 500;
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
         }
         
-        /* Danger zone */
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+        }
+        
         .danger-zone {
-            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
-            border: 2px dashed var(--danger);
-            border-radius: 12px;
-            padding: 1.25rem;
-            margin-top: 1.5rem;
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
         }
         
         .danger-zone h6 {
-            color: var(--danger);
-            margin-bottom: 0.75rem;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        /* Empty state */
-        .empty-state {
-            text-align: center;
-            padding: 3rem 1.5rem;
-        }
-        
-        .empty-state i {
-            font-size: 3rem;
-            color: var(--gray-300);
-            margin-bottom: 1rem;
-        }
-        
-        .empty-state h5 {
-            color: var(--gray-800);
-            margin-bottom: 0.5rem;
-        }
-        
-        .empty-state p {
-            color: var(--gray-800);
-            margin-bottom: 1.5rem;
-        }
-        
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-            height: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-            background: var(--gray-100);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-            background: var(--primary);
-            border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--primary-dark);
-        }
-        
-        /* Date filter */
-        .date-filter {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-        
-        .date-input {
-            padding: 0.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--gray-300);
-            background: white;
-        }
-        
-        /* Quick stats */
-        .quick-stats {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-            flex-wrap: wrap;
-        }
-        
-        .quick-stat {
-            background: white;
-            padding: 1rem 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            border: 1px solid var(--gray-200);
-            display: flex;
-            align-items: center;
-            gap: 0.75rem;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-        
-        .quick-stat:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .quick-stat.active {
-            background: var(--primary-light);
-            border-color: var(--primary);
-        }
-        
-        .quick-stat i {
-            color: var(--primary);
-            font-size: 1.25rem;
-        }
-        
-        .quick-stat-content {
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .quick-stat-value {
-            font-weight: 600;
-            color: var(--gray-800);
-        }
-        
-        .quick-stat-label {
-            font-size: 0.75rem;
-            color: var(--gray-800);
-        }
-        
-        /* Operator logos */
-        .operator-logo {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            object-fit: contain;
-            background: white;
-            padding: 4px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        /* Status filter buttons */
-        .status-filters {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .status-filter-btn {
-            padding: 0.375rem 0.75rem;
-            border-radius: 20px;
-            border: 1px solid var(--gray-300);
-            background: white;
-            font-size: 0.75rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .status-filter-btn:hover {
-            background: var(--gray-100);
-        }
-        
-        .status-filter-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        /* Export buttons */
-        .export-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-        
-        .export-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--gray-300);
-            background: white;
-            color: var(--gray-800);
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-        
-        .export-btn:hover {
-            background: var(--gray-100);
-        }
-        
-        /* Stats summary */
-        .stats-summary {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin: 1.5rem 0;
-            padding: 1rem;
-            background: var(--gray-100);
-            border-radius: 12px;
-        }
-        
-        .stat-summary-item {
-            text-align: center;
-            padding: 1rem;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        
-        .stat-summary-label {
-            font-size: 0.75rem;
-            color: var(--gray-800);
-            margin-bottom: 0.25rem;
-        }
-        
-        .stat-summary-value {
-            font-size: 1.25rem;
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        /* Time period selector */
-        .time-period-selector {
-            display: flex;
-            gap: 0.5rem;
-            margin-bottom: 1rem;
-        }
-        
-        .time-period-btn {
-            padding: 0.5rem 1rem;
-            border-radius: 8px;
-            border: 1px solid var(--gray-300);
-            background: white;
-            color: var(--gray-800);
-            font-size: 0.875rem;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .time-period-btn:hover {
-            background: var(--gray-100);
-        }
-        
-        .time-period-btn.active {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-        }
-        
-        /* Dashboard cards grid */
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-        
-        @media (max-width: 992px) {
-            .dashboard-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Recent activity */
-        .recent-activity {
-            background: white;
-            border-radius: 16px;
-            padding: 1.5rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--gray-200);
-        }
-        
-        .activity-list {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .activity-item {
-            padding: 1rem 0;
-            border-bottom: 1px solid var(--gray-200);
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-        }
-        
-        .activity-item:last-child {
-            border-bottom: none;
-        }
-        
-        .activity-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1rem;
-        }
-        
-        .activity-content {
-            flex: 1;
-        }
-        
-        .activity-title {
-            font-weight: 500;
-            color: var(--gray-800);
-            margin-bottom: 0.25rem;
-        }
-        
-        .activity-time {
-            font-size: 0.75rem;
-            color: var(--gray-800);
-        }
-        
-        .activity-amount {
-            font-weight: 600;
-            color: var(--primary);
-        }
-        
-        /* User role badges */
-        .role-badge {
-            padding: 0.25rem 0.5rem;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .role-badge.admin {
-            background: var(--primary-light);
-            color: var(--primary-dark);
-        }
-        
-        .role-badge.user {
-            background: var(--gray-200);
-            color: var(--gray-800);
+            color: #dc2626;
+            margin-bottom: 10px;
         }
     </style>
 </head>
 <body>
-    <!-- Sidebar mejorada -->
+    <!-- Sidebar -->
     <div class="sidebar">
-        <div class="sidebar-header">
-            <h4>TokTok Admin</h4>
-            <small>Panel de Administración</small>
+        <div class="p-4">
+            <h4 class="text-white mb-0">TokTok Admin</h4>
+            <small class="text-white-50">Panel de Administración</small>
         </div>
         
-        <div class="nav-label">PRINCIPAL</div>
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link active" href="#" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i>
-                    <span>Dashboard</span>
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
                 </a>
             </li>
-        </ul>
-        
-        <div class="nav-label">GESTIÓN</div>
-        <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="users">
-                    <i class="fas fa-users"></i>
-                    <span>Usuarios</span>
+                    <i class="fas fa-users"></i> Usuarios
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="transactions">
-                    <i class="fas fa-exchange-alt"></i>
-                    <span>Transacciones</span>
+                    <i class="fas fa-exchange-alt"></i> Transacciones
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="recharges">
-                    <i class="fas fa-mobile-alt"></i>
-                    <span>Recargas</span>
+                    <i class="fas fa-mobile-alt"></i> Recargas
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="game-recharges">
-                    <i class="fas fa-gamepad"></i>
-                    <span>Recargas Juegos</span>
+                    <i class="fas fa-gamepad"></i> Recargas Juegos
                 </a>
             </li>
-        </ul>
-        
-        <div class="nav-label">SISTEMA</div>
-        <ul class="nav flex-column">
             <li class="nav-item mt-4">
                 <a class="nav-link" href="#" id="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i>
-                    <span>Cerrar Sesión</span>
+                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
                 </a>
             </li>
         </ul>
@@ -1237,266 +551,124 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Navbar mejorada -->
-        <nav class="navbar">
-            <div class="container-fluid p-0">
-                <div class="d-flex align-items-center w-100">
-                    <div class="navbar-brand">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Dashboard Admin</span>
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="d-flex align-items-center">
+                    <div class="search-box me-3">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Buscar...">
                     </div>
                     
-                    <div class="ms-auto d-flex align-items-center gap-3">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" class="form-control" id="global-search" placeholder="Buscar en todo el sistema...">
-                            <button class="clear-search" id="clear-global-search">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                        
-                        <div class="dropdown">
-                            <button class="btn btn-outline-primary dropdown-toggle d-flex align-items-center" type="button" data-bs-toggle="dropdown">
-                                <div class="user-avatar me-2">
-                                    <span>A</span>
-                                </div>
-                                <span>Administrador</span>
-                            </button>
-                            <ul class="dropdown-menu dropdown-menu-end">
-                                <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Configuración</a></li>
-                                <li><hr class="dropdown-divider"></li>
-                                <li><a class="dropdown-item" href="#" id="navbar-logout-btn"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
-                            </ul>
-                        </div>
+                    <div class="dropdown">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i> Administrador
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="navbar-logout-btn"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                        </ul>
                     </div>
                 </div>
             </div>
         </nav>
 
-        <!-- Dashboard Section mejorada -->
+        <!-- Dashboard Section -->
         <section id="dashboard-section">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Dashboard</h2>
                 <div>
-                    <h2 class="mb-2">Dashboard</h2>
-                    <p class="text-muted mb-0">Resumen general del sistema</p>
-                </div>
-                <div class="d-flex gap-2">
-                    <div class="date-filter">
-                        <input type="date" class="form-control form-control-sm" id="date-from">
-                        <span>a</span>
-                        <input type="date" class="form-control form-control-sm" id="date-to">
-                    </div>
                     <button class="btn btn-primary" id="refresh-data">
-                        <i class="fas fa-sync-alt"></i>
-                        <span>Actualizar</span>
+                        <i class="fas fa-sync-alt me-2"></i> Actualizar Datos
                     </button>
                 </div>
             </div>
             
-            <!-- Stats Grid mejorado -->
+            <!-- Statistics Cards -->
             <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon users">
-                        <i class="fas fa-users"></i>
-                    </div>
-                    <div class="stat-value" id="total-users-count">0</div>
+                <div class="stat-item">
                     <div class="stat-label">Usuarios Totales</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>+12 hoy</span>
-                    </div>
+                    <div class="stat-value text-primary" id="total-users-count">0</div>
+                    <small class="text-muted">Usuarios registrados</small>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon transactions">
-                        <i class="fas fa-exchange-alt"></i>
-                    </div>
-                    <div class="stat-value" id="today-transactions">0</div>
+                <div class="stat-item">
                     <div class="stat-label">Transacciones Hoy</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>+5%</span>
-                    </div>
+                    <div class="stat-value text-success" id="today-transactions">0</div>
+                    <small class="text-muted">Transacciones del día</small>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon recharges">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <div class="stat-value" id="today-recharges">0</div>
+                <div class="stat-item">
                     <div class="stat-label">Recargas Hoy</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>+8%</span>
-                    </div>
+                    <div class="stat-value text-info" id="today-recharges">0</div>
+                    <small class="text-muted">Recargas del día</small>
                 </div>
-                
-                <div class="stat-card">
-                    <div class="stat-icon balance">
-                        <i class="fas fa-wallet"></i>
-                    </div>
-                    <div class="stat-value" id="total-balance">Bs 0.00</div>
+                <div class="stat-item">
                     <div class="stat-label">Balance Total</div>
-                    <div class="stat-change positive">
-                        <i class="fas fa-arrow-up"></i>
-                        <span>+3.5%</span>
-                    </div>
+                    <div class="stat-value" id="total-balance">Bs 0.00</div>
+                    <small class="text-muted">Saldo total del sistema</small>
                 </div>
             </div>
             
-            <!-- Filtros rápidos -->
-            <div class="quick-stats" id="quick-stats">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
-            <!-- Dashboard Grid -->
-            <div class="dashboard-grid">
-                <!-- Tabla de transacciones recientes -->
-                <div class="table-container fade-in">
-                    <div class="table-header">
-                        <h5><i class="fas fa-history"></i>Transacciones Recientes</h5>
-                        <div class="export-buttons">
-                            <button class="btn btn-sm btn-outline-primary" id="export-transactions">
-                                <i class="fas fa-download"></i> Exportar
-                            </button>
-                            <a href="#" class="btn btn-sm btn-primary" data-section="transactions">
-                                <i class="fas fa-external-link-alt"></i> Ver Todas
-                            </a>
+            <!-- Recent Transactions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="table-container">
+                        <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0">Transacciones Recientes</h5>
+                            <a href="#" class="btn btn-sm btn-outline-primary" data-section="transactions">Ver Todas</a>
                         </div>
-                    </div>
-                    <div class="table-responsive">
-                        <table class="table table-hover mb-0">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Usuario</th>
-                                    <th>Tipo</th>
-                                    <th>Monto</th>
-                                    <th>Fecha</th>
-                                    <th>Estado</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="recent-transactions">
-                                <tr>
-                                    <td colspan="7" class="text-center py-5">
-                                        <div class="loading-spinner"></div>
-                                        <p class="mt-2 text-muted">Cargando transacciones...</p>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-                
-                <!-- Actividad reciente -->
-                <div class="recent-activity">
-                    <h5 class="mb-4"><i class="fas fa-bell"></i> Actividad Reciente</h5>
-                    <div class="activity-list" id="recent-activity">
-                        <div class="activity-item">
-                            <div class="activity-icon bg-primary-light text-primary">
-                                <i class="fas fa-user-plus"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Nuevo usuario registrado</div>
-                                <div class="activity-time">Hace 5 minutos</div>
-                            </div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-success-light text-success">
-                                <i class="fas fa-money-bill-wave"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Recarga completada</div>
-                                <div class="activity-time">Hace 15 minutos</div>
-                            </div>
-                            <div class="activity-amount">+Bs 50</div>
-                        </div>
-                        <div class="activity-item">
-                            <div class="activity-icon bg-info-light text-info">
-                                <i class="fas fa-exchange-alt"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">Transferencia exitosa</div>
-                                <div class="activity-time">Hace 30 minutos</div>
-                            </div>
-                            <div class="activity-amount">-Bs 100</div>
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>ID Usuario</th>
+                                        <th>Tipo</th>
+                                        <th>Descripción</th>
+                                        <th>Monto</th>
+                                        <th>Fecha</th>
+                                        <th>Estado</th>
+                                        <th>Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="recent-transactions">
+                                    <tr>
+                                        <td colspan="7" class="text-center py-4">
+                                            <div class="spinner-border text-primary" role="status">
+                                                <span class="visually-hidden">Cargando...</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- Users Section mejorada -->
+        <!-- Users Section -->
         <section id="users-section" class="d-none">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Usuarios</h2>
                 <div>
-                    <h2 class="mb-2">Gestión de Usuarios</h2>
-                    <p class="text-muted mb-0">Administra todos los usuarios del sistema</p>
-                </div>
-                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-user-btn">
-                        <i class="fas fa-plus"></i>
-                        <span>Agregar Usuario</span>
+                        <i class="fas fa-plus me-2"></i> Agregar Usuario
                     </button>
                 </div>
             </div>
             
-            <!-- Filtros mejorados -->
-            <div class="filters-container fade-in">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-search me-1"></i>Búsqueda</label>
-                        <div class="search-box">
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todos los Usuarios</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control filter-control" id="user-search" placeholder="Buscar por ID, nombre o email...">
-                            <button class="clear-search" id="clear-user-search">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, nombre o email..." id="user-search">
                         </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Estado</label>
-                        <select class="form-select filter-control" id="user-status-filter">
-                            <option value="">Todos los estados</option>
-                            <option value="active">Activo</option>
-                            <option value="inactive">Inactivo</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar me-1"></i>Fecha de Registro</label>
-                        <div class="date-filter">
-                            <input type="date" class="form-control form-control-sm" id="user-date-from">
-                            <input type="date" class="form-control form-control-sm" id="user-date-to">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn btn-primary btn-sm" id="apply-user-filters">
-                        <i class="fas fa-filter"></i> Aplicar Filtros
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" id="reset-user-filters">
-                        <i class="fas fa-redo"></i> Restablecer
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Stats summary -->
-            <div class="stats-summary" id="users-summary">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
-            <!-- Tabla de usuarios -->
-            <div class="table-container fade-in">
-                <div class="table-header">
-                    <h5><i class="fas fa-users"></i>Todos los Usuarios</h5>
-                    <div class="export-buttons">
-                        <button class="btn btn-sm btn-outline-primary" id="export-users">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1515,15 +687,16 @@
                         </thead>
                         <tbody id="users-table-body">
                             <tr>
-                                <td colspan="8" class="text-center py-5">
-                                    <div class="loading-spinner"></div>
-                                    <p class="mt-2 text-muted">Cargando usuarios...</p>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-container">
+                <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="users-pagination">
                             <!-- Pagination will be generated here -->
@@ -1533,98 +706,25 @@
             </div>
         </section>
 
-        <!-- Transactions Section mejorada -->
+        <!-- Transactions Section -->
         <section id="transactions-section" class="d-none">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Transacciones</h2>
                 <div>
-                    <h2 class="mb-2">Gestión de Transacciones</h2>
-                    <p class="text-muted mb-0">Administra todas las transacciones del sistema</p>
-                </div>
-                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-transaction-btn">
-                        <i class="fas fa-plus"></i>
-                        <span>Nueva Transacción</span>
+                        <i class="fas fa-plus me-2"></i> Nueva Transacción
                     </button>
                 </div>
             </div>
             
-            <!-- Filtros mejorados -->
-            <div class="filters-container fade-in">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-search me-1"></i>Búsqueda</label>
-                        <div class="search-box">
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Transacciones</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control filter-control" id="transaction-search" placeholder="Buscar por ID transacción o ID usuario...">
-                            <button class="clear-search" id="clear-transaction-search">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID transacción o ID usuario..." id="transaction-search">
                         </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Tipo</label>
-                        <select class="form-select filter-control" id="transaction-type-filter">
-                            <option value="">Todos los tipos</option>
-                            <option value="deposit">Depósito</option>
-                            <option value="withdrawal">Retiro</option>
-                            <option value="transfer_send">Transferencia Enviada</option>
-                            <option value="transfer_receive">Transferencia Recibida</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Estado</label>
-                        <select class="form-select filter-control" id="transaction-status-filter">
-                            <option value="">Todos los estados</option>
-                            <option value="completed">Completado</option>
-                            <option value="pending">Pendiente</option>
-                            <option value="failed">Fallido</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar me-1"></i>Rango de Fechas</label>
-                        <div class="date-filter">
-                            <input type="date" class="form-control form-control-sm" id="transaction-date-from">
-                            <input type="date" class="form-control form-control-sm" id="transaction-date-to">
-                        </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-money-bill-wave me-1"></i>Monto</label>
-                        <div class="d-flex gap-2">
-                            <input type="number" class="form-control form-control-sm" id="transaction-amount-min" placeholder="Mínimo">
-                            <input type="number" class="form-control form-control-sm" id="transaction-amount-max" placeholder="Máximo">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn btn-primary btn-sm" id="apply-transaction-filters">
-                        <i class="fas fa-filter"></i> Aplicar Filtros
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" id="reset-transaction-filters">
-                        <i class="fas fa-redo"></i> Restablecer
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Stats summary -->
-            <div class="stats-summary" id="transactions-summary">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
-            <!-- Tabla de transacciones -->
-            <div class="table-container fade-in">
-                <div class="table-header">
-                    <h5><i class="fas fa-exchange-alt"></i>Todas las Transacciones</h5>
-                    <div class="export-buttons">
-                        <button class="btn btn-sm btn-outline-primary" id="export-transactions-all">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1643,15 +743,16 @@
                         </thead>
                         <tbody id="transactions-table-body">
                             <tr>
-                                <td colspan="8" class="text-center py-5">
-                                    <div class="loading-spinner"></div>
-                                    <p class="mt-2 text-muted">Cargando transacciones...</p>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-container">
+                <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="transactions-pagination">
                             <!-- Pagination will be generated here -->
@@ -1661,97 +762,25 @@
             </div>
         </section>
 
-        <!-- Recharges Section mejorada -->
+        <!-- Recharges Section -->
         <section id="recharges-section" class="d-none">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Recargas</h2>
                 <div>
-                    <h2 class="mb-2">Gestión de Recargas</h2>
-                    <p class="text-muted mb-0">Administra todas las recargas del sistema</p>
-                </div>
-                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-recharge-btn">
-                        <i class="fas fa-plus"></i>
-                        <span>Nueva Recarga</span>
+                        <i class="fas fa-plus me-2"></i> Nueva Recarga
                     </button>
                 </div>
             </div>
             
-            <!-- Filtros mejorados -->
-            <div class="filters-container fade-in">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-search me-1"></i>Búsqueda</label>
-                        <div class="search-box">
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Recargas</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control filter-control" id="recharge-search" placeholder="Buscar por ID, teléfono o ID usuario...">
-                            <button class="clear-search" id="clear-recharge-search">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, teléfono o ID usuario..." id="recharge-search">
                         </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Operadora</label>
-                        <select class="form-select filter-control" id="recharge-operator-filter">
-                            <option value="">Todas las operadoras</option>
-                            <option value="entel">Entel</option>
-                            <option value="tigo">Tigo</option>
-                            <option value="viva">Viva</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Estado</label>
-                        <select class="form-select filter-control" id="recharge-status-filter">
-                            <option value="">Todos los estados</option>
-                            <option value="completed">Completado</option>
-                            <option value="pending">Pendiente</option>
-                            <option value="failed">Fallido</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar me-1"></i>Rango de Fechas</label>
-                        <div class="date-filter">
-                            <input type="date" class="form-control form-control-sm" id="recharge-date-from">
-                            <input type="date" class="form-control form-control-sm" id="recharge-date-to">
-                        </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-money-bill-wave me-1"></i>Monto</label>
-                        <div class="d-flex gap-2">
-                            <input type="number" class="form-control form-control-sm" id="recharge-amount-min" placeholder="Mínimo">
-                            <input type="number" class="form-control form-control-sm" id="recharge-amount-max" placeholder="Máximo">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn btn-primary btn-sm" id="apply-recharge-filters">
-                        <i class="fas fa-filter"></i> Aplicar Filtros
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" id="reset-recharge-filters">
-                        <i class="fas fa-redo"></i> Restablecer
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Stats summary -->
-            <div class="stats-summary" id="recharges-summary">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
-            <!-- Tabla de recargas -->
-            <div class="table-container fade-in">
-                <div class="table-header">
-                    <h5><i class="fas fa-mobile-alt"></i>Todas las Recargas</h5>
-                    <div class="export-buttons">
-                        <button class="btn btn-sm btn-outline-primary" id="export-recharges">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1770,15 +799,16 @@
                         </thead>
                         <tbody id="recharges-table-body">
                             <tr>
-                                <td colspan="8" class="text-center py-5">
-                                    <div class="loading-spinner"></div>
-                                    <p class="mt-2 text-muted">Cargando recargas...</p>
+                                <td colspan="8" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-container">
+                <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="recharges-pagination">
                             <!-- Pagination will be generated here -->
@@ -1788,96 +818,25 @@
             </div>
         </section>
 
-        <!-- Game Recharges Section mejorada -->
+        <!-- Game Recharges Section -->
         <section id="game-recharges-section" class="d-none">
             <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2>Gestión de Recargas de Juegos</h2>
                 <div>
-                    <h2 class="mb-2">Gestión de Recargas de Juegos</h2>
-                    <p class="text-muted mb-0">Administra todas las recargas de juegos del sistema</p>
-                </div>
-                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-game-recharge-btn">
-                        <i class="fas fa-plus"></i>
-                        <span>Nueva Recarga</span>
+                        <i class="fas fa-plus me-2"></i> Nueva Recarga
                     </button>
                 </div>
             </div>
             
-            <!-- Filtros mejorados -->
-            <div class="filters-container fade-in">
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-search me-1"></i>Búsqueda</label>
-                        <div class="search-box">
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Recargas de Juegos</h5>
+                    <div class="d-flex">
+                        <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control filter-control" id="game-recharge-search" placeholder="Buscar por ID, jugador o ID usuario...">
-                            <button class="clear-search" id="clear-game-recharge-search">
-                                <i class="fas fa-times"></i>
-                            </button>
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, jugador o ID usuario..." id="game-recharge-search">
                         </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Juego</label>
-                        <select class="form-select filter-control" id="game-recharge-game-filter">
-                            <option value="">Todos los juegos</option>
-                            <option value="freefire">Free Fire</option>
-                            <option value="mobilelegends">Mobile Legends</option>
-                        </select>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-filter me-1"></i>Estado</label>
-                        <select class="form-select filter-control" id="game-recharge-status-filter">
-                            <option value="">Todos los estados</option>
-                            <option value="completed">Completado</option>
-                            <option value="pending">Pendiente</option>
-                            <option value="failed">Fallido</option>
-                        </select>
-                    </div>
-                </div>
-                
-                <div class="filter-row">
-                    <div class="filter-group">
-                        <label><i class="fas fa-calendar me-1"></i>Rango de Fechas</label>
-                        <div class="date-filter">
-                            <input type="date" class="form-control form-control-sm" id="game-recharge-date-from">
-                            <input type="date" class="form-control form-control-sm" id="game-recharge-date-to">
-                        </div>
-                    </div>
-                    
-                    <div class="filter-group">
-                        <label><i class="fas fa-gem me-1"></i>Diamantes</label>
-                        <div class="d-flex gap-2">
-                            <input type="number" class="form-control form-control-sm" id="game-recharge-diamonds-min" placeholder="Mínimo">
-                            <input type="number" class="form-control form-control-sm" id="game-recharge-diamonds-max" placeholder="Máximo">
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="filter-actions">
-                    <button class="btn btn-primary btn-sm" id="apply-game-recharge-filters">
-                        <i class="fas fa-filter"></i> Aplicar Filtros
-                    </button>
-                    <button class="btn btn-outline-secondary btn-sm" id="reset-game-recharge-filters">
-                        <i class="fas fa-redo"></i> Restablecer
-                    </button>
-                </div>
-            </div>
-            
-            <!-- Stats summary -->
-            <div class="stats-summary" id="game-recharges-summary">
-                <!-- Se llenará dinámicamente -->
-            </div>
-            
-            <!-- Tabla de recargas de juegos -->
-            <div class="table-container fade-in">
-                <div class="table-header">
-                    <h5><i class="fas fa-gamepad"></i>Todas las Recargas de Juegos</h5>
-                    <div class="export-buttons">
-                        <button class="btn btn-sm btn-outline-primary" id="export-game-recharges">
-                            <i class="fas fa-download"></i> Exportar
-                        </button>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -1897,15 +856,16 @@
                         </thead>
                         <tbody id="game-recharges-table-body">
                             <tr>
-                                <td colspan="9" class="text-center py-5">
-                                    <div class="loading-spinner"></div>
-                                    <p class="mt-2 text-muted">Cargando recargas de juegos...</p>
+                                <td colspan="9" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Cargando...</span>
+                                    </div>
                                 </td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
-                <div class="pagination-container">
+                <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="game-recharges-pagination">
                             <!-- Pagination will be generated here -->
@@ -1916,10 +876,10 @@
         </section>
     </div>
 
-    <!-- Modal de Borrar Historial (Mejorado) -->
+    <!-- Modal de Borrar Historial -->
     <div class="deletion-progress-backdrop" id="deletion-progress-backdrop"></div>
     <div class="deletion-progress" id="deletion-progress">
-        <h5 class="mb-4"><i class="fas fa-trash me-2"></i>Borrando Historial</h5>
+        <h5>Borrando Historial de Usuario</h5>
         <div class="progress-bar-container">
             <div class="progress-bar" id="progress-bar"></div>
         </div>
@@ -1953,17 +913,15 @@
         </ul>
         
         <div class="mt-3" id="deletion-status">
-            <small class="text-muted">Preparando para borrar historial...</small>
+            Preparando para borrar historial...
         </div>
         
-        <div class="mt-4 d-flex gap-2 justify-content-center">
-            <button class="btn btn-secondary" id="cancel-deletion">
-                <i class="fas fa-times me-1"></i> Cancelar
-            </button>
+        <div class="mt-4">
+            <button class="btn btn-secondary" id="cancel-deletion">Cancelar</button>
         </div>
     </div>
 
-    <!-- Modal de Detalles (Mejorado) -->
+    <!-- Modal de Detalles -->
     <div class="modal-backdrop" id="detail-modal-backdrop"></div>
     <div class="detail-modal" id="detail-modal">
         <div class="detail-modal-header">
@@ -1974,13 +932,12 @@
             <!-- Los detalles se cargarán aquí dinámicamente -->
         </div>
         <div class="detail-modal-footer">
-            <button type="button" class="btn btn-secondary" id="close-detail-modal-btn">
-                <i class="fas fa-times me-1"></i> Cerrar
-            </button>
+            <button type="button" class="btn btn-secondary" id="close-detail-modal-btn">Cerrar</button>
         </div>
     </div>
 
-    <!-- Modales existentes (manteniendo estructura pero con mejoras visuales) -->
+    <!-- Modals -->
+    
     <!-- User Modal -->
     <div class="modal fade" id="userModal" tabindex="-1">
         <div class="modal-dialog modal-lg">
@@ -2210,17 +1167,11 @@
         let transactionsData = [];
         let rechargesData = [];
         let gameRechargesData = [];
-        let userBalances = {};
+        let userBalances = {}; // Para almacenar balances de usuarios
         let deletionInProgress = false;
         let currentDeletionUserId = null;
         
-        // Variables para filtros
-        let currentUserFilters = {};
-        let currentTransactionFilters = {};
-        let currentRechargeFilters = {};
-        let currentGameRechargeFilters = {};
-        
-        // Funciones de utilidad mejoradas
+        // Funciones de utilidad
         const formatCurrency = (amount) => {
             return 'Bs ' + parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
         };
@@ -2241,37 +1192,34 @@
         };
         
         const showToast = (message, type = 'success') => {
-            // Crear elemento toast mejorado
+            // Crear elemento toast
             const toast = document.createElement('div');
-            toast.className = `toast align-items-center text-bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed bottom-0 end-0 m-3`;
+            toast.className = `toast align-items-center text-bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed top-0 end-0 m-3`;
             toast.setAttribute('role', 'alert');
             toast.setAttribute('aria-live', 'assertive');
             toast.setAttribute('aria-atomic', 'true');
-            toast.style.zIndex = '2000';
             
             toast.innerHTML = `
-                <div class="d-flex align-items-center">
-                    <div class="toast-body d-flex align-items-center">
-                        <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-triangle'} me-2"></i>
+                <div class="d-flex">
+                    <div class="toast-body">
                         ${message}
                     </div>
-                    <button type="button" class="btn-close btn-close-white me-2" data-bs-dismiss="toast"></button>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
                 </div>
             `;
             
             document.body.appendChild(toast);
             
-            const bsToast = new bootstrap.Toast(toast, {
-                delay: 3000
-            });
+            const bsToast = new bootstrap.Toast(toast);
             bsToast.show();
             
+            // Remover el toast después de que se oculta
             toast.addEventListener('hidden.bs.toast', () => {
                 document.body.removeChild(toast);
             });
         };
         
-        // Función para calcular balances de usuarios de forma CORRECTA
+        // Función para calcular balances de usuarios de forma precisa
         const calculateUserBalances = async () => {
             try {
                 userBalances = {};
@@ -2283,10 +1231,7 @@
                 
                 if (transactionsError) throw transactionsError;
                 
-                // IMPORTANTE: Solo calcular balance basado en transacciones
-                // Las recargas y recargas de juegos NO afectan el balance
-                // El balance es solo lo que el usuario tiene disponible para transferir/retirar
-                
+                // Calcular balance basado en transacciones
                 transactions.forEach(transaction => {
                     if (!userBalances[transaction.user_id]) {
                         userBalances[transaction.user_id] = 0;
@@ -2295,10 +1240,10 @@
                     // Solo considerar transacciones completadas
                     if (transaction.status === 'completed') {
                         if (transaction.type === 'deposit') {
-                            // Depósito: suma al balance (el usuario agrega dinero)
+                            // Depósito: suma al balance
                             userBalances[transaction.user_id] += parseFloat(transaction.amount);
                         } else if (transaction.type === 'withdrawal') {
-                            // Retiro: resta del balance (el usuario saca dinero)
+                            // Retiro: resta del balance
                             userBalances[transaction.user_id] -= parseFloat(transaction.amount);
                         } else if (transaction.type === 'transfer_send') {
                             // Transferencia enviada: resta del balance
@@ -2310,8 +1255,31 @@
                     }
                 });
                 
-                // NO restar recargas ni recargas de juegos
-                // Estas son gastos/pagos por servicios, no afectan el balance disponible
+                // Obtener recargas y restarlas del balance
+                const { data: recharges, error: rechargesError } = await supabase
+                    .from('recharges')
+                    .select('*');
+                
+                if (rechargesError) throw rechargesError;
+                
+                recharges.forEach(recharge => {
+                    if (userBalances[recharge.user_id] !== undefined) {
+                        userBalances[recharge.user_id] -= parseFloat(recharge.amount);
+                    }
+                });
+                
+                // Obtener recargas de juegos y restarlas del balance
+                const { data: gameRecharges, error: gameRechargesError } = await supabase
+                    .from('game_recharges')
+                    .select('*');
+                
+                if (gameRechargesError) throw gameRechargesError;
+                
+                gameRecharges.forEach(gameRecharge => {
+                    if (userBalances[gameRecharge.user_id] !== undefined) {
+                        userBalances[gameRecharge.user_id] -= parseFloat(gameRecharge.amount);
+                    }
+                });
                 
                 return userBalances;
             } catch (error) {
@@ -2578,14 +1546,11 @@
                     .from('transactions')
                     .select('*')
                     .order('created_at', { ascending: false })
-                    .limit(5);
+                    .limit(10);
                 
                 if (recentTransactionsError) throw recentTransactionsError;
                 
                 renderRecentTransactions(recentTransactions, users);
-                
-                // Actualizar actividad reciente
-                updateRecentActivity();
                 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
@@ -2621,10 +1586,6 @@
                 renderUsersTable(usersData);
                 renderUsersPagination(page, Math.ceil(count / 10));
                 
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(usersData, 'users');
-                renderSummaryStats(summary, 'users-summary', 'users');
-                
             } catch (error) {
                 console.error('Error loading users:', error);
                 showToast('Error al cargar los usuarios', 'error');
@@ -2659,10 +1620,6 @@
                 renderTransactionsTable(transactionsData);
                 renderTransactionsPagination(page, Math.ceil(count / 10));
                 
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(transactionsData, 'transactions');
-                renderSummaryStats(summary, 'transactions-summary', 'transactions');
-                
             } catch (error) {
                 console.error('Error loading transactions:', error);
                 showToast('Error al cargar las transacciones', 'error');
@@ -2689,10 +1646,6 @@
                 renderRechargesTable(rechargesData);
                 renderRechargesPagination(page, Math.ceil(count / 10));
                 
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(rechargesData, 'recharges');
-                renderSummaryStats(summary, 'recharges-summary', 'recharges');
-                
             } catch (error) {
                 console.error('Error loading recharges:', error);
                 showToast('Error al cargar las recargas', 'error');
@@ -2710,7 +1663,7 @@
                 }
                 
                 const { data, error, count } = await query
-                    .range((page - 1) * 10, (page * 10) - 1)
+                    .range((page - 1) * 10, page * 10 - 1)
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -2718,10 +1671,6 @@
                 gameRechargesData = data || [];
                 renderGameRechargesTable(gameRechargesData);
                 renderGameRechargesPagination(page, Math.ceil(count / 10));
-                
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(gameRechargesData, 'gameRecharges');
-                renderSummaryStats(summary, 'game-recharges-summary', 'gameRecharges');
                 
             } catch (error) {
                 console.error('Error loading game recharges:', error);
@@ -2758,28 +1707,16 @@
                 
                 return `
                     <tr class="transaction-row">
-                        <td><span class="user-id-badge">${transaction.id.substring(0, 8)}...</span></td>
-                        <td>
-                            <div class="d-flex align-items-center">
-                                <div class="user-avatar me-2">
-                                    ${user?.full_name ? getInitials(user.full_name) : '??'}
-                                </div>
-                                <div>
-                                    <div class="fw-medium">${user?.full_name || 'Usuario no encontrado'}</div>
-                                    <small class="text-muted">ID: ${transaction.user_id.substring(0, 8)}...</small>
-                                </div>
-                            </div>
-                        </td>
+                        <td><span class="user-id-badge">${transaction.user_id}</span></td>
                         <td class="text-capitalize">${typeNames[transaction.type] || transaction.type}</td>
+                        <td>${transaction.description || 'Sin descripción'}</td>
                         <td class="${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
                         <td>${formatDate(transaction.created_at)}</td>
-                        <td><span class="badge badge-success">Completado</span></td>
+                        <td><span class="badge bg-success status-badge">Completado</span></td>
                         <td>
-                            <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-primary view-transaction-detail" data-id="${transaction.id}">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
+                            <button class="btn btn-sm btn-outline-primary view-transaction-detail" data-id="${transaction.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
                         </td>
                     </tr>
                 `;
@@ -2794,24 +1731,11 @@
             if (!users || users.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <div class="empty-state">
-                                <i class="fas fa-users"></i>
-                                <h5>No se encontraron usuarios</h5>
-                                <p>Intenta con otros criterios de búsqueda</p>
-                                <button class="btn btn-primary" id="add-user-empty">
-                                    <i class="fas fa-plus me-2"></i> Agregar Usuario
-                                </button>
-                            </div>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No se encontraron usuarios
                         </td>
                     </tr>
                 `;
-                
-                // Agregar event listener al botón de agregar desde empty state
-                document.getElementById('add-user-empty')?.addEventListener('click', () => {
-                    openUserModal();
-                });
-                
                 return;
             }
             
@@ -2821,37 +1745,32 @@
                 
                 return `
                     <tr>
-                        <td><span class="user-id-badge">${user.id.substring(0, 8)}...</span></td>
+                        <td><span class="user-id-badge">${user.id}</span></td>
                         <td>
                             <div class="d-flex align-items-center">
-                                <div class="user-avatar me-3">
-                                    ${getInitials(user.full_name)}
+                                <div class="user-avatar me-2">
+                                    ${user.avatar_url ? 
+                                        `<img src="${user.avatar_url}" alt="${user.full_name}">` : 
+                                        getInitials(user.full_name)
+                                    }
                                 </div>
-                                <div>
-                                    <div class="fw-medium">${user.full_name}</div>
-                                    <small class="text-muted">ID: ${user.id.substring(0, 8)}...</small>
-                                </div>
+                                <div class="fw-medium">${user.full_name}</div>
                             </div>
                         </td>
                         <td>${user.email}</td>
-                        <td>${user.phone || '<span class="text-muted">No especificado</span>'}</td>
+                        <td>${user.phone || 'No especificado'}</td>
                         <td class="${balanceClass}">${formatCurrency(balance)}</td>
-                        <td>
-                            <span class="badge badge-success">
-                                <span class="status-dot active me-1"></span>
-                                Activo
-                            </span>
-                        </td>
+                        <td><span class="badge bg-success">Activo</span></td>
                         <td>${formatDate(user.created_at)}</td>
                         <td>
                             <div class="action-buttons">
-                                <button class="btn btn-sm btn-outline-primary view-user-detail" data-id="${user.id}" title="Ver detalles">
+                                <button class="btn btn-sm btn-outline-primary view-user-detail" data-id="${user.id}">
                                     <i class="fas fa-eye"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-success edit-user" data-id="${user.id}" title="Editar">
+                                <button class="btn btn-sm btn-outline-success edit-user" data-id="${user.id}">
                                     <i class="fas fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm btn-outline-danger delete-user-history" data-id="${user.id}" data-name="${user.full_name}" title="Borrar historial">
+                                <button class="btn btn-sm btn-outline-danger delete-user-history" data-id="${user.id}" data-name="${user.full_name}">
                                     <i class="fas fa-trash"></i>
                                 </button>
                             </div>
@@ -2869,12 +1788,8 @@
             if (!transactions || transactions.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <div class="empty-state">
-                                <i class="fas fa-exchange-alt"></i>
-                                <h5>No se encontraron transacciones</h5>
-                                <p>Intenta con otros criterios de búsqueda</p>
-                            </div>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No se encontraron transacciones
                         </td>
                     </tr>
                 `;
@@ -2894,13 +1809,13 @@
                 
                 return `
                     <tr class="transaction-highlight transaction-row">
-                        <td><span class="user-id-badge">${transaction.id.substring(0, 8)}...</span></td>
-                        <td><span class="user-id-badge">${transaction.user_id.substring(0, 8)}...</span></td>
+                        <td><span class="user-id-badge">${transaction.id}</span></td>
+                        <td><span class="user-id-badge">${transaction.user_id}</span></td>
                         <td class="text-capitalize">${typeNames[transaction.type] || transaction.type}</td>
                         <td>${transaction.description || 'Sin descripción'}</td>
                         <td class="${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
                         <td>${formatDate(transaction.created_at)}</td>
-                        <td><span class="badge badge-success">Completado</span></td>
+                        <td><span class="badge bg-success status-badge">Completado</span></td>
                         <td>
                             <div class="action-buttons">
                                 <button class="btn btn-sm btn-outline-primary view-transaction-detail" data-id="${transaction.id}">
@@ -2924,12 +1839,8 @@
             if (!recharges || recharges.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="8" class="text-center py-5">
-                            <div class="empty-state">
-                                <i class="fas fa-mobile-alt"></i>
-                                <h5>No se encontraron recargas</h5>
-                                <p>Intenta con otros criterios de búsqueda</p>
-                            </div>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            No se encontraron recargas
                         </td>
                     </tr>
                 `;
@@ -2943,13 +1854,13 @@
                 
                 return `
                     <tr>
-                        <td><span class="user-id-badge">${recharge.id.substring(0, 8)}...</span></td>
-                        <td><span class="user-id-badge">${recharge.user_id.substring(0, 8)}...</span></td>
+                        <td><span class="user-id-badge">${recharge.id}</span></td>
+                        <td><span class="user-id-badge">${recharge.user_id}</span></td>
                         <td>${operatorName}</td>
                         <td>${recharge.phone_number}</td>
                         <td class="fw-medium">${formatCurrency(recharge.amount)}</td>
                         <td>${formatDate(recharge.created_at)}</td>
-                        <td><span class="badge badge-success">Completado</span></td>
+                        <td><span class="badge bg-success status-badge">Completado</span></td>
                         <td>
                             <div class="recharge-actions">
                                 <button class="btn btn-sm btn-outline-primary view-recharge-detail" data-id="${recharge.id}">
@@ -2973,12 +1884,8 @@
             if (!gameRecharges || gameRecharges.length === 0) {
                 container.innerHTML = `
                     <tr>
-                        <td colspan="9" class="text-center py-5">
-                            <div class="empty-state">
-                                <i class="fas fa-gamepad"></i>
-                                <h5>No se encontraron recargas de juegos</h5>
-                                <p>Intenta con otros criterios de búsqueda</p>
-                            </div>
+                        <td colspan="9" class="text-center py-4 text-muted">
+                            No se encontraron recargas de juegos
                         </td>
                     </tr>
                 `;
@@ -2990,8 +1897,8 @@
                 
                 return `
                     <tr>
-                        <td><span class="user-id-badge">${recharge.id.substring(0, 8)}...</span></td>
-                        <td><span class="user-id-badge">${recharge.user_id.substring(0, 8)}...</span></td>
+                        <td><span class="user-id-badge">${recharge.id}</span></td>
+                        <td><span class="user-id-badge">${recharge.user_id}</span></td>
                         <td>${gameName}</td>
                         <td>${recharge.game_id}</td>
                         <td>${recharge.player_name}</td>
@@ -3073,7 +1980,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Estado:</div>
-                        <div class="detail-value"><span class="badge badge-success">Activo</span></div>
+                        <div class="detail-value"><span class="badge bg-success">Activo</span></div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Balance:</div>
@@ -3213,11 +2120,11 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Monto:</div>
-                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
+                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Estado:</div>
-                        <div class="detail-value"><span class="badge badge-success">Completado</span></div>
+                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Descripción:</div>
@@ -3285,7 +2192,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Estado:</div>
-                        <div class="detail-value"><span class="badge badge-success">Completado</span></div>
+                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Fecha:</div>
@@ -3749,651 +2656,6 @@
             }
         };
         
-        // Función para inicializar filtros por fecha
-        const initializeDateFilters = () => {
-            const today = new Date();
-            const oneWeekAgo = new Date();
-            oneWeekAgo.setDate(today.getDate() - 7);
-            
-            // Formatear fechas para inputs
-            const formatForInput = (date) => date.toISOString().split('T')[0];
-            
-            // Dashboard date filters
-            document.getElementById('date-from').value = formatForInput(oneWeekAgo);
-            document.getElementById('date-to').value = formatForInput(today);
-            
-            // User filters
-            document.getElementById('user-date-from').value = '';
-            document.getElementById('user-date-to').value = '';
-            
-            // Transaction filters
-            document.getElementById('transaction-date-from').value = formatForInput(oneWeekAgo);
-            document.getElementById('transaction-date-to').value = formatForInput(today);
-            
-            // Recharge filters
-            document.getElementById('recharge-date-from').value = formatForInput(oneWeekAgo);
-            document.getElementById('recharge-date-to').value = formatForInput(today);
-            
-            // Game recharge filters
-            document.getElementById('game-recharge-date-from').value = formatForInput(oneWeekAgo);
-            document.getElementById('game-recharge-date-to').value = formatForInput(today);
-        };
-        
-        // Función para crear estadísticas resumen
-        const createSummaryStats = (data, type) => {
-            let summary = {
-                total: data.length,
-                amount: 0,
-                average: 0
-            };
-            
-            if (type === 'transactions') {
-                summary.amount = data.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-                summary.average = summary.total > 0 ? summary.amount / summary.total : 0;
-                
-                // Agrupar por tipo
-                const types = {
-                    deposit: data.filter(t => t.type === 'deposit').length,
-                    withdrawal: data.filter(t => t.type === 'withdrawal').length,
-                    transfer_send: data.filter(t => t.type === 'transfer_send').length,
-                    transfer_receive: data.filter(t => t.type === 'transfer_receive').length
-                };
-                summary.types = types;
-            }
-            
-            if (type === 'recharges') {
-                summary.amount = data.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-                summary.average = summary.total > 0 ? summary.amount / summary.total : 0;
-                
-                // Agrupar por operadora
-                const operators = {};
-                data.forEach(r => {
-                    operators[r.operator] = (operators[r.operator] || 0) + 1;
-                });
-                summary.operators = operators;
-            }
-            
-            if (type === 'gameRecharges') {
-                summary.amount = data.reduce((sum, item) => sum + parseFloat(item.amount || 0), 0);
-                summary.average = summary.total > 0 ? summary.amount / summary.total : 0;
-                summary.diamonds = data.reduce((sum, item) => sum + parseInt(item.diamonds || 0), 0);
-            }
-            
-            if (type === 'users') {
-                summary.active = data.filter(u => u.status === 'active').length;
-                summary.inactive = data.filter(u => u.status === 'inactive').length;
-                summary.totalBalance = Object.values(userBalances).reduce((sum, balance) => sum + balance, 0);
-            }
-            
-            return summary;
-        };
-        
-        // Función para renderizar estadísticas resumen
-        const renderSummaryStats = (summary, elementId, type) => {
-            const container = document.getElementById(elementId);
-            if (!container) return;
-            
-            if (type === 'users') {
-                container.innerHTML = `
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Total Usuarios</div>
-                        <div class="stat-summary-value">${summary.total}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Activos</div>
-                        <div class="stat-summary-value text-success">${summary.active}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Inactivos</div>
-                        <div class="stat-summary-value text-danger">${summary.inactive}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Balance Total</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.totalBalance)}</div>
-                    </div>
-                `;
-            }
-            
-            if (type === 'transactions') {
-                container.innerHTML = `
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Total Transacciones</div>
-                        <div class="stat-summary-value">${summary.total}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Monto Total</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.amount)}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Promedio</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.average)}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Depósitos</div>
-                        <div class="stat-summary-value">${summary.types?.deposit || 0}</div>
-                    </div>
-                `;
-            }
-            
-            if (type === 'recharges') {
-                container.innerHTML = `
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Total Recargas</div>
-                        <div class="stat-summary-value">${summary.total}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Monto Total</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.amount)}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Promedio</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.average)}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Entel</div>
-                        <div class="stat-summary-value">${summary.operators?.entel || 0}</div>
-                    </div>
-                `;
-            }
-            
-            if (type === 'gameRecharges') {
-                container.innerHTML = `
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Total Recargas</div>
-                        <div class="stat-summary-value">${summary.total}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Monto Total</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.amount)}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Diamantes Total</div>
-                        <div class="stat-summary-value">${summary.diamonds}</div>
-                    </div>
-                    <div class="stat-summary-item">
-                        <div class="stat-summary-label">Promedio</div>
-                        <div class="stat-summary-value">${formatCurrency(summary.average)}</div>
-                    </div>
-                `;
-            }
-        };
-        
-        // Función para crear filtros de búsqueda
-        const setupSearchFilters = () => {
-            // Configurar todos los campos de búsqueda
-            const searchInputs = [
-                'global-search',
-                'user-search',
-                'transaction-search',
-                'recharge-search',
-                'game-recharge-search'
-            ];
-            
-            searchInputs.forEach(id => {
-                const input = document.getElementById(id);
-                const clearBtn = document.getElementById(`clear-${id}`);
-                
-                if (input && clearBtn) {
-                    // Mostrar/ocultar botón de limpiar
-                    input.addEventListener('input', function() {
-                        clearBtn.style.display = this.value ? 'block' : 'none';
-                    });
-                    
-                    // Limpiar búsqueda
-                    clearBtn.addEventListener('click', function() {
-                        input.value = '';
-                        this.style.display = 'none';
-                        
-                        // Disparar evento de búsqueda
-                        input.dispatchEvent(new Event('input'));
-                    });
-                    
-                    // Buscar al presionar Enter
-                    input.addEventListener('keypress', function(e) {
-                        if (e.key === 'Enter') {
-                            this.dispatchEvent(new Event('input'));
-                        }
-                    });
-                }
-            });
-        };
-        
-        // Función para crear filtros rápidos
-        const setupQuickStats = async () => {
-            try {
-                // Obtener datos para filtros rápidos
-                const today = new Date().toISOString().split('T')[0];
-                const yesterday = new Date();
-                yesterday.setDate(yesterday.getDate() - 1);
-                const yesterdayStr = yesterday.toISOString().split('T')[0];
-                
-                // Contar transacciones de hoy
-                const { data: todayTransactions, error: todayError } = await supabase
-                    .from('transactions')
-                    .select('id')
-                    .gte('created_at', today);
-                
-                // Contar recargas de hoy
-                const { data: todayRecharges, error: rechargesError } = await supabase
-                    .from('recharges')
-                    .select('id')
-                    .gte('created_at', today);
-                
-                // Contar transacciones de ayer
-                const { data: yesterdayTransactions, error: yesterdayError } = await supabase
-                    .from('transactions')
-                    .select('id')
-                    .gte('created_at', yesterdayStr)
-                    .lt('created_at', today);
-                
-                if (!todayError && !rechargesError && !yesterdayError) {
-                    const container = document.getElementById('quick-stats');
-                    container.innerHTML = `
-                        <div class="quick-stat active" data-filter="today">
-                            <i class="fas fa-calendar-day"></i>
-                            <div class="quick-stat-content">
-                                <div class="quick-stat-value">Hoy</div>
-                                <div class="quick-stat-label">${todayTransactions.length} transacciones</div>
-                            </div>
-                        </div>
-                        <div class="quick-stat" data-filter="yesterday">
-                            <i class="fas fa-calendar-alt"></i>
-                            <div class="quick-stat-content">
-                                <div class="quick-stat-value">Ayer</div>
-                                <div class="quick-stat-label">${yesterdayTransactions.length} transacciones</div>
-                            </div>
-                        </div>
-                        <div class="quick-stat" data-filter="week">
-                            <i class="fas fa-calendar-week"></i>
-                            <div class="quick-stat-content">
-                                <div class="quick-stat-value">Última semana</div>
-                                <div class="quick-stat-label">Ver todos</div>
-                            </div>
-                        </div>
-                        <div class="quick-stat" data-filter="month">
-                            <i class="fas fa-calendar"></i>
-                            <div class="quick-stat-content">
-                                <div class="quick-stat-value">Este mes</div>
-                                <div class="quick-stat-label">Ver todos</div>
-                            </div>
-                        </div>
-                    `;
-                    
-                    // Agregar event listeners a los filtros rápidos
-                    container.querySelectorAll('.quick-stat').forEach(stat => {
-                        stat.addEventListener('click', function() {
-                            // Remover clase active de todos
-                            container.querySelectorAll('.quick-stat').forEach(s => {
-                                s.classList.remove('active');
-                            });
-                            // Agregar clase active al seleccionado
-                            this.classList.add('active');
-                            
-                            // Aplicar filtro basado en la selección
-                            const filter = this.dataset.filter;
-                            applyQuickFilter(filter);
-                        });
-                    });
-                }
-            } catch (error) {
-                console.error('Error setting up quick stats:', error);
-            }
-        };
-        
-        // Función para aplicar filtros rápidos
-        const applyQuickFilter = (filter) => {
-            const today = new Date();
-            let startDate = new Date();
-            let endDate = new Date();
-            
-            switch(filter) {
-                case 'today':
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate.setHours(23, 59, 59, 999);
-                    break;
-                case 'yesterday':
-                    startDate.setDate(today.getDate() - 1);
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate.setDate(today.getDate() - 1);
-                    endDate.setHours(23, 59, 59, 999);
-                    break;
-                case 'week':
-                    startDate.setDate(today.getDate() - 7);
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate.setHours(23, 59, 59, 999);
-                    break;
-                case 'month':
-                    startDate.setMonth(today.getMonth(), 1);
-                    startDate.setHours(0, 0, 0, 0);
-                    endDate.setHours(23, 59, 59, 999);
-                    break;
-            }
-            
-            // Actualizar filtros de fecha
-            document.getElementById('date-from').value = startDate.toISOString().split('T')[0];
-            document.getElementById('date-to').value = endDate.toISOString().split('T')[0];
-            
-            // Recargar datos del dashboard
-            loadDashboardData();
-        };
-        
-        // Función para actualizar actividad reciente
-        const updateRecentActivity = async () => {
-            try {
-                // Obtener actividad reciente (transacciones de hoy)
-                const today = new Date().toISOString().split('T')[0];
-                const { data: recentTransactions, error } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .gte('created_at', today)
-                    .order('created_at', { ascending: false })
-                    .limit(5);
-                
-                if (error) throw error;
-                
-                const activityContainer = document.getElementById('recent-activity');
-                if (recentTransactions.length === 0) {
-                    activityContainer.innerHTML = `
-                        <div class="text-center py-3">
-                            <p class="text-muted">No hay actividad hoy</p>
-                        </div>
-                    `;
-                    return;
-                }
-                
-                let activityHTML = '';
-                
-                recentTransactions.forEach(transaction => {
-                    const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
-                    const iconClass = isPositive ? 'bg-success-light text-success' : 'bg-info-light text-info';
-                    const icon = isPositive ? 'fa-money-bill-wave' : 'fa-exchange-alt';
-                    const amountClass = isPositive ? 'balance-positive' : 'balance-negative';
-                    const sign = isPositive ? '+' : '-';
-                    
-                    activityHTML += `
-                        <div class="activity-item">
-                            <div class="activity-icon ${iconClass}">
-                                <i class="fas ${icon}"></i>
-                            </div>
-                            <div class="activity-content">
-                                <div class="activity-title">${transaction.type === 'deposit' ? 'Depósito' : transaction.type === 'withdrawal' ? 'Retiro' : 'Transferencia'}</div>
-                                <div class="activity-time">${formatDate(transaction.created_at)}</div>
-                            </div>
-                            <div class="activity-amount ${amountClass}">${sign}${formatCurrency(transaction.amount)}</div>
-                        </div>
-                    `;
-                });
-                
-                activityContainer.innerHTML = activityHTML;
-            } catch (error) {
-                console.error('Error updating recent activity:', error);
-            }
-        };
-        
-        // Función para aplicar filtros a usuarios
-        const applyUserFilters = async () => {
-            try {
-                const status = document.getElementById('user-status-filter').value;
-                const dateFrom = document.getElementById('user-date-from').value;
-                const dateTo = document.getElementById('user-date-to').value;
-                const search = document.getElementById('user-search').value;
-                
-                let query = supabase
-                    .from('user_profiles')
-                    .select('*', { count: 'exact' });
-                
-                // Aplicar filtro de estado
-                if (status) {
-                    query = query.eq('status', status);
-                }
-                
-                // Aplicar filtro de fecha
-                if (dateFrom) {
-                    query = query.gte('created_at', dateFrom);
-                }
-                if (dateTo) {
-                    const endDate = new Date(dateTo);
-                    endDate.setHours(23, 59, 59, 999);
-                    query = query.lte('created_at', endDate.toISOString());
-                }
-                
-                // Aplicar búsqueda
-                if (search) {
-                    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,id.ilike.%${search}%,phone.ilike.%${search}%`);
-                }
-                
-                const { data, error, count } = await query
-                    .range(0, 49)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                usersData = data || [];
-                renderUsersTable(usersData);
-                
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(usersData, 'users');
-                renderSummaryStats(summary, 'users-summary', 'users');
-                
-                showToast(`Filtros aplicados: ${usersData.length} usuarios encontrados`);
-                
-            } catch (error) {
-                console.error('Error applying user filters:', error);
-                showToast('Error al aplicar filtros', 'error');
-            }
-        };
-        
-        // Función para aplicar filtros a transacciones
-        const applyTransactionFilters = async () => {
-            try {
-                const type = document.getElementById('transaction-type-filter').value;
-                const status = document.getElementById('transaction-status-filter').value;
-                const dateFrom = document.getElementById('transaction-date-from').value;
-                const dateTo = document.getElementById('transaction-date-to').value;
-                const amountMin = document.getElementById('transaction-amount-min').value;
-                const amountMax = document.getElementById('transaction-amount-max').value;
-                const search = document.getElementById('transaction-search').value;
-                
-                let query = supabase
-                    .from('transactions')
-                    .select('*', { count: 'exact' });
-                
-                // Aplicar filtros
-                if (type) query = query.eq('type', type);
-                if (status) query = query.eq('status', status);
-                
-                if (dateFrom) query = query.gte('created_at', dateFrom);
-                if (dateTo) {
-                    const endDate = new Date(dateTo);
-                    endDate.setHours(23, 59, 59, 999);
-                    query = query.lte('created_at', endDate.toISOString());
-                }
-                
-                if (amountMin) query = query.gte('amount', parseFloat(amountMin));
-                if (amountMax) query = query.lte('amount', parseFloat(amountMax));
-                
-                if (search) {
-                    query = query.or(`id.ilike.%${search}%,user_id.ilike.%${search}%,description.ilike.%${search}%`);
-                }
-                
-                const { data, error, count } = await query
-                    .range(0, 49)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                transactionsData = data || [];
-                renderTransactionsTable(transactionsData);
-                
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(transactionsData, 'transactions');
-                renderSummaryStats(summary, 'transactions-summary', 'transactions');
-                
-                showToast(`Filtros aplicados: ${transactionsData.length} transacciones encontradas`);
-                
-            } catch (error) {
-                console.error('Error applying transaction filters:', error);
-                showToast('Error al aplicar filtros', 'error');
-            }
-        };
-        
-        // Función para aplicar filtros a recargas
-        const applyRechargeFilters = async () => {
-            try {
-                const operator = document.getElementById('recharge-operator-filter').value;
-                const status = document.getElementById('recharge-status-filter').value;
-                const dateFrom = document.getElementById('recharge-date-from').value;
-                const dateTo = document.getElementById('recharge-date-to').value;
-                const amountMin = document.getElementById('recharge-amount-min').value;
-                const amountMax = document.getElementById('recharge-amount-max').value;
-                const search = document.getElementById('recharge-search').value;
-                
-                let query = supabase
-                    .from('recharges')
-                    .select('*', { count: 'exact' });
-                
-                // Aplicar filtros
-                if (operator) query = query.eq('operator', operator);
-                if (status) query = query.eq('status', status);
-                
-                if (dateFrom) query = query.gte('created_at', dateFrom);
-                if (dateTo) {
-                    const endDate = new Date(dateTo);
-                    endDate.setHours(23, 59, 59, 999);
-                    query = query.lte('created_at', endDate.toISOString());
-                }
-                
-                if (amountMin) query = query.gte('amount', parseFloat(amountMin));
-                if (amountMax) query = query.lte('amount', parseFloat(amountMax));
-                
-                if (search) {
-                    query = query.or(`id.ilike.%${search}%,user_id.ilike.%${search}%,phone_number.ilike.%${search}%`);
-                }
-                
-                const { data, error, count } = await query
-                    .range(0, 49)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                rechargesData = data || [];
-                renderRechargesTable(rechargesData);
-                
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(rechargesData, 'recharges');
-                renderSummaryStats(summary, 'recharges-summary', 'recharges');
-                
-                showToast(`Filtros aplicados: ${rechargesData.length} recargas encontradas`);
-                
-            } catch (error) {
-                console.error('Error applying recharge filters:', error);
-                showToast('Error al aplicar filtros', 'error');
-            }
-        };
-        
-        // Función para aplicar filtros a recargas de juegos
-        const applyGameRechargeFilters = async () => {
-            try {
-                const game = document.getElementById('game-recharge-game-filter').value;
-                const status = document.getElementById('game-recharge-status-filter').value;
-                const dateFrom = document.getElementById('game-recharge-date-from').value;
-                const dateTo = document.getElementById('game-recharge-date-to').value;
-                const diamondsMin = document.getElementById('game-recharge-diamonds-min').value;
-                const diamondsMax = document.getElementById('game-recharge-diamonds-max').value;
-                const search = document.getElementById('game-recharge-search').value;
-                
-                let query = supabase
-                    .from('game_recharges')
-                    .select('*', { count: 'exact' });
-                
-                // Aplicar filtros
-                if (game) query = query.eq('game', game);
-                if (status) query = query.eq('status', status);
-                
-                if (dateFrom) query = query.gte('created_at', dateFrom);
-                if (dateTo) {
-                    const endDate = new Date(dateTo);
-                    endDate.setHours(23, 59, 59, 999);
-                    query = query.lte('created_at', endDate.toISOString());
-                }
-                
-                if (diamondsMin) query = query.gte('diamonds', parseInt(diamondsMin));
-                if (diamondsMax) query = query.lte('diamonds', parseInt(diamondsMax));
-                
-                if (search) {
-                    query = query.or(`id.ilike.%${search}%,user_id.ilike.%${search}%,game_id.ilike.%${search}%,player_name.ilike.%${search}%`);
-                }
-                
-                const { data, error, count } = await query
-                    .range(0, 49)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                gameRechargesData = data || [];
-                renderGameRechargesTable(gameRechargesData);
-                
-                // Actualizar resumen de estadísticas
-                const summary = createSummaryStats(gameRechargesData, 'gameRecharges');
-                renderSummaryStats(summary, 'game-recharges-summary', 'gameRecharges');
-                
-                showToast(`Filtros aplicados: ${gameRechargesData.length} recargas encontradas`);
-                
-            } catch (error) {
-                console.error('Error applying game recharge filters:', error);
-                showToast('Error al aplicar filtros', 'error');
-            }
-        };
-        
-        // Función para resetear filtros
-        const resetFilters = (type) => {
-            switch(type) {
-                case 'users':
-                    document.getElementById('user-status-filter').value = '';
-                    document.getElementById('user-date-from').value = '';
-                    document.getElementById('user-date-to').value = '';
-                    document.getElementById('user-search').value = '';
-                    document.getElementById('clear-user-search').style.display = 'none';
-                    loadUsers();
-                    break;
-                case 'transactions':
-                    document.getElementById('transaction-type-filter').value = '';
-                    document.getElementById('transaction-status-filter').value = '';
-                    document.getElementById('transaction-date-from').value = '';
-                    document.getElementById('transaction-date-to').value = '';
-                    document.getElementById('transaction-amount-min').value = '';
-                    document.getElementById('transaction-amount-max').value = '';
-                    document.getElementById('transaction-search').value = '';
-                    document.getElementById('clear-transaction-search').style.display = 'none';
-                    loadTransactions();
-                    break;
-                case 'recharges':
-                    document.getElementById('recharge-operator-filter').value = '';
-                    document.getElementById('recharge-status-filter').value = '';
-                    document.getElementById('recharge-date-from').value = '';
-                    document.getElementById('recharge-date-to').value = '';
-                    document.getElementById('recharge-amount-min').value = '';
-                    document.getElementById('recharge-amount-max').value = '';
-                    document.getElementById('recharge-search').value = '';
-                    document.getElementById('clear-recharge-search').style.display = 'none';
-                    loadRecharges();
-                    break;
-                case 'game-recharges':
-                    document.getElementById('game-recharge-game-filter').value = '';
-                    document.getElementById('game-recharge-status-filter').value = '';
-                    document.getElementById('game-recharge-date-from').value = '';
-                    document.getElementById('game-recharge-date-to').value = '';
-                    document.getElementById('game-recharge-diamonds-min').value = '';
-                    document.getElementById('game-recharge-diamonds-max').value = '';
-                    document.getElementById('game-recharge-search').value = '';
-                    document.getElementById('clear-game-recharge-search').style.display = 'none';
-                    loadGameRecharges();
-                    break;
-            }
-            
-            showToast('Filtros restablecidos');
-        };
-        
         // Event Listeners
         document.addEventListener('DOMContentLoaded', async () => {
             // Verificar sesión de administrador
@@ -4405,11 +2667,6 @@
             }
             
             currentAdmin = session.user;
-            
-            // Inicializar componentes
-            initializeDateFilters();
-            setupSearchFilters();
-            setupQuickStats();
             
             // Configurar navegación
             document.querySelectorAll('.sidebar .nav-link[data-section]').forEach(link => {
@@ -4445,50 +2702,45 @@
             // Cancelar borrado
             document.getElementById('cancel-deletion').addEventListener('click', hideDeletionProgress);
             
-            // Búsqueda global
-            document.getElementById('global-search').addEventListener('input', (e) => {
-                const searchTerm = e.target.value;
-                if (searchTerm) {
-                    // Realizar búsqueda en todas las secciones
-                    switch(currentSection) {
+            // Búsqueda en tablas
+            document.getElementById('user-search').addEventListener('input', (e) => {
+                loadUsers(1, e.target.value);
+            });
+            
+            document.getElementById('transaction-search').addEventListener('input', (e) => {
+                loadTransactions(1, e.target.value);
+            });
+            
+            document.getElementById('recharge-search').addEventListener('input', (e) => {
+                loadRecharges(1, e.target.value);
+            });
+            
+            document.getElementById('game-recharge-search').addEventListener('input', (e) => {
+                loadGameRecharges(1, e.target.value);
+            });
+            
+            // Paginación
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('page-link') && e.target.dataset.page) {
+                    e.preventDefault();
+                    const page = parseInt(e.target.dataset.page);
+                    const type = e.target.dataset.type;
+                    
+                    switch(type) {
                         case 'users':
-                            document.getElementById('user-search').value = searchTerm;
-                            applyUserFilters();
+                            loadUsers(page, document.getElementById('user-search').value);
                             break;
                         case 'transactions':
-                            document.getElementById('transaction-search').value = searchTerm;
-                            applyTransactionFilters();
+                            loadTransactions(page, document.getElementById('transaction-search').value);
                             break;
                         case 'recharges':
-                            document.getElementById('recharge-search').value = searchTerm;
-                            applyRechargeFilters();
+                            loadRecharges(page, document.getElementById('recharge-search').value);
                             break;
                         case 'game-recharges':
-                            document.getElementById('game-recharge-search').value = searchTerm;
-                            applyGameRechargeFilters();
+                            loadGameRecharges(page, document.getElementById('game-recharge-search').value);
                             break;
                     }
                 }
-            });
-            
-            // Aplicar filtros
-            document.getElementById('apply-user-filters').addEventListener('click', applyUserFilters);
-            document.getElementById('apply-transaction-filters').addEventListener('click', applyTransactionFilters);
-            document.getElementById('apply-recharge-filters').addEventListener('click', applyRechargeFilters);
-            document.getElementById('apply-game-recharge-filters').addEventListener('click', applyGameRechargeFilters);
-            
-            // Resetear filtros
-            document.getElementById('reset-user-filters').addEventListener('click', () => resetFilters('users'));
-            document.getElementById('reset-transaction-filters').addEventListener('click', () => resetFilters('transactions'));
-            document.getElementById('reset-recharge-filters').addEventListener('click', () => resetFilters('recharges'));
-            document.getElementById('reset-game-recharge-filters').addEventListener('click', () => resetFilters('game-recharges'));
-            
-            // Exportar datos (funcionalidad básica)
-            document.querySelectorAll('[id^="export-"]').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const type = this.id.replace('export-', '');
-                    showToast(`Función de exportación ${type} en desarrollo`, 'info');
-                });
             });
             
             // Botón agregar usuario
@@ -4572,7 +2824,7 @@
                         type: 'transfer_send',
                         amount: amount,
                         status: 'completed',
-                        description: `Transferencia enviada a usuario ${transferToUserId}: ${description}`
+                        description: `Transferencia enviada: ${description}`
                     };
                     
                     // Crear transacción de recepción
@@ -4581,7 +2833,7 @@
                         type: 'transfer_receive',
                         amount: amount,
                         status: 'completed',
-                        description: `Transferencia recibida de usuario ${document.getElementById('transaction-user').value}: ${description}`
+                        description: `Transferencia recibida: ${description}`
                     };
                     
                     try {
@@ -4760,47 +3012,6 @@
                         openGameRechargeModal(gameRecharge);
                     }
                 }
-            });
-            
-            // Paginación
-            document.addEventListener('click', (e) => {
-                if (e.target.classList.contains('page-link') && e.target.dataset.page) {
-                    e.preventDefault();
-                    const page = parseInt(e.target.dataset.page);
-                    const type = e.target.dataset.type;
-                    
-                    switch(type) {
-                        case 'users':
-                            loadUsers(page, document.getElementById('user-search').value);
-                            break;
-                        case 'transactions':
-                            loadTransactions(page, document.getElementById('transaction-search').value);
-                            break;
-                        case 'recharges':
-                            loadRecharges(page, document.getElementById('recharge-search').value);
-                            break;
-                        case 'game-recharges':
-                            loadGameRecharges(page, document.getElementById('game-recharge-search').value);
-                            break;
-                    }
-                }
-            });
-            
-            // Búsqueda en tablas
-            document.getElementById('user-search').addEventListener('input', (e) => {
-                applyUserFilters();
-            });
-            
-            document.getElementById('transaction-search').addEventListener('input', (e) => {
-                applyTransactionFilters();
-            });
-            
-            document.getElementById('recharge-search').addEventListener('input', (e) => {
-                applyRechargeFilters();
-            });
-            
-            document.getElementById('game-recharge-search').addEventListener('input', (e) => {
-                applyGameRechargeFilters();
             });
             
             // Cargar datos iniciales
