@@ -1219,7 +1219,7 @@
             });
         };
         
-        // Función para calcular balances de usuarios de forma precisa
+        // Función para calcular balances de usuarios de forma CORRECTA
         const calculateUserBalances = async () => {
             try {
                 userBalances = {};
@@ -1231,7 +1231,10 @@
                 
                 if (transactionsError) throw transactionsError;
                 
-                // Calcular balance basado en transacciones
+                // IMPORTANTE: Solo calcular balance basado en transacciones
+                // Las recargas y recargas de juegos NO afectan el balance
+                // El balance es solo lo que el usuario tiene disponible para transferir/retirar
+                
                 transactions.forEach(transaction => {
                     if (!userBalances[transaction.user_id]) {
                         userBalances[transaction.user_id] = 0;
@@ -1240,10 +1243,10 @@
                     // Solo considerar transacciones completadas
                     if (transaction.status === 'completed') {
                         if (transaction.type === 'deposit') {
-                            // Depósito: suma al balance
+                            // Depósito: suma al balance (el usuario agrega dinero)
                             userBalances[transaction.user_id] += parseFloat(transaction.amount);
                         } else if (transaction.type === 'withdrawal') {
-                            // Retiro: resta del balance
+                            // Retiro: resta del balance (el usuario saca dinero)
                             userBalances[transaction.user_id] -= parseFloat(transaction.amount);
                         } else if (transaction.type === 'transfer_send') {
                             // Transferencia enviada: resta del balance
@@ -1255,31 +1258,8 @@
                     }
                 });
                 
-                // Obtener recargas y restarlas del balance
-                const { data: recharges, error: rechargesError } = await supabase
-                    .from('recharges')
-                    .select('*');
-                
-                if (rechargesError) throw rechargesError;
-                
-                recharges.forEach(recharge => {
-                    if (userBalances[recharge.user_id] !== undefined) {
-                        userBalances[recharge.user_id] -= parseFloat(recharge.amount);
-                    }
-                });
-                
-                // Obtener recargas de juegos y restarlas del balance
-                const { data: gameRecharges, error: gameRechargesError } = await supabase
-                    .from('game_recharges')
-                    .select('*');
-                
-                if (gameRechargesError) throw gameRechargesError;
-                
-                gameRecharges.forEach(gameRecharge => {
-                    if (userBalances[gameRecharge.user_id] !== undefined) {
-                        userBalances[gameRecharge.user_id] -= parseFloat(gameRecharge.amount);
-                    }
-                });
+                // NO restar recargas ni recargas de juegos
+                // Estas son gastos/pagos por servicios, no afectan el balance disponible
                 
                 return userBalances;
             } catch (error) {
@@ -1663,7 +1643,7 @@
                 }
                 
                 const { data, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
+                    .range((page - 1) * 10, (page * 10) - 1)
                     .order('created_at', { ascending: false });
                 
                 if (error) throw error;
@@ -2120,7 +2100,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Monto:</div>
-                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</div>
+                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Estado:</div>
@@ -2824,7 +2804,7 @@
                         type: 'transfer_send',
                         amount: amount,
                         status: 'completed',
-                        description: `Transferencia enviada: ${description}`
+                        description: `Transferencia enviada a usuario ${transferToUserId}: ${description}`
                     };
                     
                     // Crear transacción de recepción
@@ -2833,7 +2813,7 @@
                         type: 'transfer_receive',
                         amount: amount,
                         status: 'completed',
-                        description: `Transferencia recibida: ${description}`
+                        description: `Transferencia recibida de usuario ${document.getElementById('transaction-user').value}: ${description}`
                     };
                     
                     try {
