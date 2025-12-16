@@ -23,6 +23,7 @@
             --viva-accent: #FF6B00;
             --falta-color: #FFA500;
             --echo-color: #28a745;
+            --error-color: #dc3545;
         }
         
         * {
@@ -259,6 +260,11 @@
         
         .status-echo {
             background-color: var(--echo-color);
+            color: white;
+        }
+        
+        .status-error {
+            background-color: var(--error-color);
             color: white;
         }
         
@@ -517,6 +523,10 @@
                     <div class="stat-card">
                         <div class="stat-number" id="echoCount">0</div>
                         <div class="stat-label">Estado: Echo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="errorCount">0</div>
+                        <div class="stat-label">Estado: Error</div>
                     </div>
                 </div>
 
@@ -783,6 +793,7 @@
                             <select class="form-select app-form-control" id="editStatus" required>
                                 <option value="FALTA">Falta</option>
                                 <option value="ECHO">Echo</option>
+                                <option value="ERROR">Error</option>
                             </select>
                         </div>
                     </form>
@@ -979,9 +990,11 @@
             // Contar por estado
             const faltaCount = allRecharges.filter(r => r.estado === 'FALTA').length;
             const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
+            const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
             
             document.getElementById('faltaCount').textContent = faltaCount.toLocaleString();
             document.getElementById('echoCount').textContent = echoCount.toLocaleString();
+            document.getElementById('errorCount').textContent = errorCount.toLocaleString();
         }
 
         function updateRecentActivity() {
@@ -995,7 +1008,7 @@
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : 'status-echo'}">
+                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : recharge.estado === 'ECHO' ? 'status-echo' : 'status-error'}">
                             ${recharge.estado}
                         </span>
                     </td>
@@ -1056,12 +1069,15 @@
             
             tbody.innerHTML = filteredRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
+                const statusClass = recharge.estado === 'FALTA' ? 'status-falta' : 
+                                   recharge.estado === 'ECHO' ? 'status-echo' : 'status-error';
+                
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
                     <td>${recharge.user_name}</td>
                     <td>${recharge.phone_number}</td>
                     <td>
-                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : 'status-echo'}">
+                        <span class="status-badge ${statusClass}">
                             ${recharge.estado}
                         </span>
                     </td>
@@ -1095,6 +1111,9 @@
             document.getElementById('rechargeDetailModalLabel').textContent = `Recarga VIVA #${recharge.id}`;
             
             const detailContent = document.getElementById('rechargeDetailContent');
+            const statusClass = recharge.estado === 'FALTA' ? 'status-falta' : 
+                               recharge.estado === 'ECHO' ? 'status-echo' : 'status-error';
+            
             detailContent.innerHTML = `
                 <div class="recharge-detail-item">
                     <span class="recharge-detail-label">Usuario:</span>
@@ -1107,7 +1126,7 @@
                 <div class="recharge-detail-item">
                     <span class="recharge-detail-label">Estado:</span>
                     <span class="recharge-detail-value">
-                        <span class="status-badge ${recharge.estado === 'FALTA' ? 'status-falta' : 'status-echo'}">
+                        <span class="status-badge ${statusClass}">
                             ${recharge.estado}
                         </span>
                     </span>
@@ -1491,14 +1510,15 @@
             const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
             const faltaCount = allRecharges.filter(r => r.estado === 'FALTA').length;
             const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
+            const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
             
             statusChart = new Chart(statusCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['Falta', 'Echo'],
+                    labels: ['Falta', 'Echo', 'Error'],
                     datasets: [{
-                        data: [faltaCount, echoCount],
-                        backgroundColor: ['#FFA500', '#28a745'],
+                        data: [faltaCount, echoCount, errorCount],
+                        backgroundColor: ['#FFA500', '#28a745', '#dc3545'],
                         borderWidth: 2,
                         borderColor: '#fff'
                     }]
