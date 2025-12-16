@@ -659,6 +659,106 @@
             color: #6c757d;
             margin-top: 5px;
         }
+        
+        /* Estilos específicos para la sección de reportes */
+        .day-filter-container {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        .day-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .day-stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border-left: 3px solid var(--entel-color);
+        }
+        
+        .day-stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--entel-color);
+            margin-bottom: 4px;
+        }
+        
+        .day-stat-label {
+            color: #6c757d;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .chart-container-large {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .no-data-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+        
+        .no-data-message i {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #ddd;
+        }
+        
+        .hourly-stats {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .hourly-stats h5 {
+            margin-bottom: 15px;
+            color: var(--entel-color);
+            font-weight: 600;
+        }
+        
+        .hour-list {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+        
+        .hour-item {
+            background: white;
+            padding: 8px 10px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-left: 3px solid var(--entel-light);
+        }
+        
+        .hour-time {
+            font-weight: 600;
+            color: #555;
+        }
+        
+        .hour-count {
+            background: var(--entel-color);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
     </style>
 </head>
 <body>
@@ -850,42 +950,55 @@
                     </button>
                 </div>
 
-                <div class="row">
-                    <div class="col-12 mb-4">
-                        <div class="app-card">
-                            <div class="app-card-header">
-                                Distribución por Estado
-                            </div>
-                            <div class="app-card-body">
-                                <div class="chart-container">
-                                    <canvas id="statusDistributionChart"></canvas>
+                <!-- Filtro por día -->
+                <div class="day-filter-container">
+                    <div class="row align-items-center">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <label for="dayFilter" class="form-label">Seleccionar Día</label>
+                            <select class="form-select app-form-control" id="dayFilter">
+                                <option value="">Cargando días...</option>
+                            </select>
+                        </div>
+                        <div class="col-md-8">
+                            <div class="day-stats-grid" id="dayStats">
+                                <div class="day-stat-card">
+                                    <div class="day-stat-number" id="totalDayRecharges">0</div>
+                                    <div class="day-stat-label">Total Recargas</div>
+                                </div>
+                                <div class="day-stat-card">
+                                    <div class="day-stat-number" id="uniqueUsersDay">0</div>
+                                    <div class="day-stat-label">Usuarios Activos</div>
+                                </div>
+                                <div class="day-stat-card">
+                                    <div class="day-stat-number" id="hourPeakDay">--:--</div>
+                                    <div class="day-stat-label">Hora Pico</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-                    <div class="col-12 mb-4">
-                        <div class="app-card">
-                            <div class="app-card-header">
-                                Recargas por Usuario
-                            </div>
-                            <div class="app-card-body">
-                                <div class="chart-container">
-                                    <canvas id="userRechargesChart"></canvas>
-                                </div>
-                            </div>
+                </div>
+
+                <!-- Gráfico principal -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        Recargas por Hora
+                    </div>
+                    <div class="app-card-body">
+                        <div class="chart-container-large">
+                            <canvas id="hourlyChart"></canvas>
+                        </div>
+                        <div id="noDataMessage" class="no-data-message d-none">
+                            <i class="bi bi-bar-chart"></i>
+                            <p>No hay datos para mostrar. Seleccione un día del filtro.</p>
                         </div>
                     </div>
-                    <div class="col-12 mb-4">
-                        <div class="app-card">
-                            <div class="app-card-header">
-                                Recargas por Día (Última Semana)
-                            </div>
-                            <div class="app-card-body">
-                                <div class="chart-container">
-                                    <canvas id="dailyRechargesChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
+                </div>
+
+                <!-- Estadísticas por hora -->
+                <div class="hourly-stats" id="hourlyStats" style="display: none;">
+                    <h5>Detalle por Hora</h5>
+                    <div class="hour-list" id="hourList">
+                        <!-- Las horas se cargarán aquí -->
                     </div>
                 </div>
             </div>
@@ -1054,8 +1167,9 @@
         let allUsers = [];
         let filteredRecharges = [];
         let autoRefreshInterval;
-        let statusChart, userChart, dailyChart;
-        let currentRechargeId = null;
+        let hourlyChart;
+        let availableDays = [];
+        let selectedDay = '';
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminPanel();
@@ -1103,6 +1217,12 @@
             document.getElementById('confirmClearBtn').addEventListener('click', clearAllHistory);
             document.getElementById('cancelClearBtn').addEventListener('click', function() {
                 bootstrap.Modal.getInstance(document.getElementById('clearHistoryModal')).hide();
+            });
+
+            // Configurar filtro de día
+            document.getElementById('dayFilter').addEventListener('change', function() {
+                selectedDay = this.value;
+                updateDayStatistics();
             });
 
             // Cargar datos iniciales
@@ -1817,59 +1937,185 @@
         }
 
         function loadReportsData() {
-            // Destruir gráficos existentes si existen
-            if (statusChart) statusChart.destroy();
-            if (userChart) userChart.destroy();
-            if (dailyChart) dailyChart.destroy();
+            // Extraer días únicos de las recargas
+            extractAvailableDays();
             
-            // Gráfico de distribución por estado
-            const statusCtx = document.getElementById('statusDistributionChart').getContext('2d');
-            const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
-            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
-            const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
+            // Si hay días disponibles, seleccionar el más reciente
+            if (availableDays.length > 0) {
+                selectedDay = availableDays[0].value;
+                document.getElementById('dayFilter').value = selectedDay;
+                updateDayStatistics();
+            } else {
+                // Mostrar mensaje de no datos
+                document.getElementById('noDataMessage').classList.remove('d-none');
+                document.getElementById('hourlyStats').style.display = 'none';
+            }
+        }
+
+        function extractAvailableDays() {
+            // Crear un set para almacenar días únicos
+            const uniqueDays = new Set();
             
-            statusChart = new Chart(statusCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['Echo', 'Nuevo', 'Corte', 'Error'],
-                    datasets: [{
-                        data: [echoCount, nuevoCount, corteCount, errorCount],
-                        backgroundColor: ['#17a2b8', '#28a745', '#dc3545', '#ff6b00'],
-                        borderWidth: 2,
-                        borderColor: '#fff'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
-                        }
+            allRecharges.forEach(recharge => {
+                const datePart = recharge.timestamp.split(' ')[0]; // Obtener solo la fecha
+                uniqueDays.add(datePart);
+            });
+            
+            // Convertir set a array y ordenar de más reciente a más antiguo
+            availableDays = Array.from(uniqueDays)
+                .sort((a, b) => {
+                    const dateA = parseDateString(a);
+                    const dateB = parseDateString(b);
+                    return dateB - dateA;
+                })
+                .map(date => ({
+                    value: date,
+                    label: formatDateForDisplay(date)
+                }));
+            
+            // Actualizar el select de días
+            const dayFilter = document.getElementById('dayFilter');
+            dayFilter.innerHTML = '';
+            
+            if (availableDays.length === 0) {
+                dayFilter.innerHTML = '<option value="">No hay datos disponibles</option>';
+                return;
+            }
+            
+            availableDays.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day.value;
+                option.textContent = day.label;
+                dayFilter.appendChild(option);
+            });
+        }
+
+        function parseDateString(dateStr) {
+            // Formato: DD/MM/YYYY
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                return new Date(parts[2], parts[1] - 1, parts[0]);
+            }
+            return new Date();
+        }
+
+        function formatDateForDisplay(dateStr) {
+            // Formato: DD/MM/YYYY -> DD de Mes, YYYY
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                const months = [
+                    'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                    'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+                ];
+                const day = parseInt(parts[0]);
+                const month = parseInt(parts[1]) - 1;
+                const year = parts[2];
+                
+                return `${day} de ${months[month]}, ${year}`;
+            }
+            return dateStr;
+        }
+
+        function updateDayStatistics() {
+            if (!selectedDay) return;
+            
+            // Filtrar recargas del día seleccionado
+            const dayRecharges = allRecharges.filter(recharge => {
+                const datePart = recharge.timestamp.split(' ')[0];
+                return datePart === selectedDay;
+            });
+            
+            if (dayRecharges.length === 0) {
+                // No hay datos para este día
+                document.getElementById('noDataMessage').classList.remove('d-none');
+                if (hourlyChart) hourlyChart.destroy();
+                document.getElementById('hourlyStats').style.display = 'none';
+                document.getElementById('totalDayRecharges').textContent = '0';
+                document.getElementById('uniqueUsersDay').textContent = '0';
+                document.getElementById('hourPeakDay').textContent = '--:--';
+                return;
+            }
+            
+            // Ocultar mensaje de no datos
+            document.getElementById('noDataMessage').classList.add('d-none');
+            
+            // Calcular estadísticas del día
+            const totalRecargas = dayRecharges.length;
+            
+            // Usuarios únicos
+            const uniqueUsers = new Set();
+            dayRecharges.forEach(recharge => uniqueUsers.add(recharge.user_id));
+            const uniqueUsersCount = uniqueUsers.size;
+            
+            // Hora pico
+            const hourCounts = {};
+            let peakHour = '';
+            let maxCount = 0;
+            
+            // Preparar datos por hora (00-23)
+            const hourlyData = {};
+            for (let i = 0; i < 24; i++) {
+                hourlyData[i.toString().padStart(2, '0')] = 0;
+            }
+            
+            dayRecharges.forEach(recharge => {
+                const timePart = recharge.timestamp.split(' ')[1];
+                if (timePart) {
+                    const hour = timePart.split(':')[0];
+                    hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+                    
+                    // Actualizar conteo por hora para estadísticas
+                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                    
+                    if (hourCounts[hour] > maxCount) {
+                        maxCount = hourCounts[hour];
+                        peakHour = hour + ':00';
                     }
                 }
             });
+            
+            // Actualizar estadísticas
+            document.getElementById('totalDayRecharges').textContent = totalRecargas.toLocaleString();
+            document.getElementById('uniqueUsersDay').textContent = uniqueUsersCount.toLocaleString();
+            document.getElementById('hourPeakDay').textContent = peakHour;
+            
+            // Crear o actualizar gráfico
+            createHourlyChart(hourlyData);
+            
+            // Mostrar estadísticas por hora
+            updateHourlyStats(hourlyData);
+        }
 
-            // Gráfico de recargas por usuario
-            const userCtx = document.getElementById('userRechargesChart').getContext('2d');
-            const userRechargeCounts = {};
-            allRecharges.forEach(recharge => {
-                userRechargeCounts[recharge.user_name] = (userRechargeCounts[recharge.user_name] || 0) + 1;
-            });
+        function createHourlyChart(hourlyData) {
+            const ctx = document.getElementById('hourlyChart').getContext('2d');
             
-            const userLabels = Object.keys(userRechargeCounts);
-            const userData = Object.values(userRechargeCounts);
+            // Destruir gráfico existente si hay uno
+            if (hourlyChart) {
+                hourlyChart.destroy();
+            }
             
-            userChart = new Chart(userCtx, {
+            // Preparar etiquetas y datos
+            const labels = [];
+            const data = [];
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = i.toString().padStart(2, '0');
+                labels.push(hour + ':00');
+                data.push(hourlyData[hour] || 0);
+            }
+            
+            // Crear nuevo gráfico
+            hourlyChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: userLabels,
+                    labels: labels,
                     datasets: [{
-                        label: 'Recargas',
-                        data: userData,
+                        label: 'Recargas por Hora',
+                        data: data,
                         backgroundColor: '#0096D6',
-                        borderWidth: 0
+                        borderColor: '#0077B3',
+                        borderWidth: 1,
+                        borderRadius: 4
                     }]
                 },
                 options: {
@@ -1878,76 +2124,69 @@
                     plugins: {
                         legend: {
                             display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Recargas: ${context.raw}`;
+                                }
+                            }
                         }
                     },
                     scales: {
                         y: {
-                            beginAtZero: true
-                        }
-                    }
-                }
-            });
-
-            // Gráfico de recargas por día (última semana)
-            const dailyCtx = document.getElementById('dailyRechargesChart').getContext('2d');
-            const dailyData = getDailyRechargeData();
-            
-            dailyChart = new Chart(dailyCtx, {
-                type: 'line',
-                data: {
-                    labels: dailyData.labels,
-                    datasets: [{
-                        label: 'Recargas por Día',
-                        data: dailyData.counts,
-                        backgroundColor: 'rgba(0, 150, 214, 0.1)',
-                        borderColor: '#0096D6',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Número de Recargas'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hora del Día'
+                            }
                         }
                     }
                 }
             });
         }
 
-        function getDailyRechargeData() {
-            // Obtener datos de los últimos 7 días
-            const last7Days = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                last7Days.push(date.toISOString().split('T')[0]);
+        function updateHourlyStats(hourlyData) {
+            const hourList = document.getElementById('hourList');
+            hourList.innerHTML = '';
+            
+            let hasData = false;
+            
+            // Ordenar horas por cantidad de recargas (de mayor a menor)
+            const sortedHours = Object.entries(hourlyData)
+                .filter(([hour, count]) => count > 0)
+                .sort((a, b) => b[1] - a[1]);
+            
+            if (sortedHours.length === 0) {
+                hourList.innerHTML = '<div class="col-12 text-center text-muted">No hay recargas en este día</div>';
+                document.getElementById('hourlyStats').style.display = 'block';
+                return;
             }
             
-            // Formatear fechas para mostrar
-            const labels = last7Days.map(date => {
-                const d = new Date(date);
-                return `${d.getDate()}/${d.getMonth() + 1}`;
+            hasData = true;
+            
+            sortedHours.forEach(([hour, count]) => {
+                const hourItem = document.createElement('div');
+                hourItem.className = 'hour-item';
+                hourItem.innerHTML = `
+                    <span class="hour-time">${hour}:00</span>
+                    <span class="hour-count">${count}</span>
+                `;
+                hourList.appendChild(hourItem);
             });
             
-            // Contar recargas por día
-            const counts = last7Days.map(date => {
-                return allRecharges.filter(recharge => {
-                    const rechargeDate = recharge.timestamp.split(' ')[0];
-                    const formattedRechargeDate = rechargeDate.split('/').reverse().join('-');
-                    return formattedRechargeDate === date;
-                }).length;
-            });
-            
-            return { labels, counts };
+            if (hasData) {
+                document.getElementById('hourlyStats').style.display = 'block';
+            }
         }
 
         function exportDashboard() {
@@ -1963,7 +2202,23 @@
         }
 
         function exportReports() {
-            exportToPDF('Reportes', allRecharges);
+            // Exportar reporte del día seleccionado
+            if (!selectedDay) {
+                showNotification('Seleccione un día para exportar', 'warning');
+                return;
+            }
+            
+            const dayRecharges = allRecharges.filter(recharge => {
+                const datePart = recharge.timestamp.split(' ')[0];
+                return datePart === selectedDay;
+            });
+            
+            if (dayRecharges.length === 0) {
+                showNotification('No hay datos para exportar', 'warning');
+                return;
+            }
+            
+            exportToPDF(`Reporte_${selectedDay}`, dayRecharges);
         }
 
         function exportToPDF(title, data) {
@@ -2060,6 +2315,11 @@
                 setTimeout(() => {
                     refreshBtn.classList.remove('loading');
                     showNotification('Datos actualizados correctamente', 'success');
+                    
+                    // Si estamos en la sección de reportes, actualizar los datos
+                    if (!document.getElementById('reportsSection').classList.contains('d-none')) {
+                        loadReportsData();
+                    }
                 }, 500);
             });
         }
