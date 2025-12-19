@@ -759,6 +759,96 @@
             font-weight: 600;
             font-size: 0.75rem;
         }
+        
+        /* NUEVO: Estilos para estadísticas por usuario */
+        .user-stats-container {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        .user-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .user-stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .user-stat-card {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+            border-left: 3px solid var(--entel-accent);
+        }
+        
+        .user-stat-number {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--entel-accent);
+            margin-bottom: 4px;
+        }
+        
+        .user-stat-label {
+            color: #6c757d;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .user-stats-details {
+            margin-top: 15px;
+        }
+        
+        .user-stats-details h6 {
+            color: var(--entel-color);
+            font-weight: 600;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .user-hour-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .user-hour-item:last-child {
+            border-bottom: none;
+        }
+        
+        .user-hour-time {
+            font-size: 0.8rem;
+            color: #555;
+        }
+        
+        .user-hour-count {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--entel-color);
+        }
+        
+        .user-filter-row {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        @media (min-width: 768px) {
+            .user-filter-row {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -950,7 +1040,8 @@
                     </button>
                 </div>
 
-                <!-- Filtro por día -->
+
+                <!-- Filtro por día (existente) -->
                 <div class="day-filter-container">
                     <div class="row align-items-center">
                         <div class="col-md-4 mb-3 mb-md-0">
@@ -999,6 +1090,67 @@
                     <h5>Detalle por Hora</h5>
                     <div class="hour-list" id="hourList">
                         <!-- Las horas se cargarán aquí -->
+                    </div>
+                </div>
+                
+                <!-- Nueva sección: Estadísticas por Usuario -->
+                <div class="user-stats-container">
+                    <h5 class="mb-3 text-entel">
+                        <i class="bi bi-person-circle me-2"></i>Estadísticas por Usuario
+                    </h5>
+                    
+                    <!-- Filtros para usuario -->
+                    <div class="user-filter-row">
+                        <div>
+                            <label for="userFilter" class="form-label">Seleccionar Usuario</label>
+                            <select class="form-select app-form-control" id="userFilter">
+                                <option value="">Todos los usuarios</option>
+                                <!-- Los usuarios se cargarán aquí -->
+                            </select>
+                        </div>
+                        <div>
+                            <label for="userDayFilter" class="form-label">Seleccionar Día</label>
+                            <select class="form-select app-form-control" id="userDayFilter">
+                                <option value="">Todos los días</option>
+                                <!-- Los días se cargarán aquí -->
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Estadísticas del usuario seleccionado -->
+                    <div class="user-stats-grid" id="userStatsGrid">
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userTotalRecharges">0</div>
+                            <div class="user-stat-label">Total Recargas</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userEchoCount">0</div>
+                            <div class="user-stat-label">Estado: Echo</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userNuevoCount">0</div>
+                            <div class="user-stat-label">Estado: Nuevo</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userCorteCount">0</div>
+                            <div class="user-stat-label">Estado: Corte</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userErrorCount">0</div>
+                            <div class="user-stat-label">Estado: Error</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userHourPeak">--:--</div>
+                            <div class="user-stat-label">Hora Pico</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Detalle por hora del usuario -->
+                    <div class="user-stats-details" id="userHourlyDetails" style="display: none;">
+                        <h6>Actividad por Hora</h6>
+                        <div id="userHourList">
+                            <!-- Las horas se cargarán aquí -->
+                        </div>
                     </div>
                 </div>
             </div>
@@ -1170,6 +1322,8 @@
         let hourlyChart;
         let availableDays = [];
         let selectedDay = '';
+        let selectedUserId = '';
+        let selectedUserDay = '';
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminPanel();
@@ -1223,6 +1377,17 @@
             document.getElementById('dayFilter').addEventListener('change', function() {
                 selectedDay = this.value;
                 updateDayStatistics();
+            });
+
+            // Configurar filtros para estadísticas por usuario
+            document.getElementById('userFilter').addEventListener('change', function() {
+                selectedUserId = this.value;
+                updateUserStatistics();
+            });
+            
+            document.getElementById('userDayFilter').addEventListener('change', function() {
+                selectedUserDay = this.value;
+                updateUserStatistics();
             });
 
             // Cargar datos iniciales
@@ -1940,6 +2105,12 @@
             // Extraer días únicos de las recargas
             extractAvailableDays();
             
+            // Cargar usuarios en el filtro
+            populateUserFilter();
+            
+            // Cargar días en el filtro de usuario
+            populateUserDayFilter();
+            
             // Si hay días disponibles, seleccionar el más reciente
             if (availableDays.length > 0) {
                 selectedDay = availableDays[0].value;
@@ -1950,6 +2121,30 @@
                 document.getElementById('noDataMessage').classList.remove('d-none');
                 document.getElementById('hourlyStats').style.display = 'none';
             }
+        }
+
+        function populateUserFilter() {
+            const userFilter = document.getElementById('userFilter');
+            userFilter.innerHTML = '<option value="">Todos los usuarios</option>';
+            
+            allUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.nombre} (${user.username})`;
+                userFilter.appendChild(option);
+            });
+        }
+
+        function populateUserDayFilter() {
+            const userDayFilter = document.getElementById('userDayFilter');
+            userDayFilter.innerHTML = '<option value="">Todos los días</option>';
+            
+            availableDays.forEach(day => {
+                const option = document.createElement('option');
+                option.value = day.value;
+                option.textContent = day.label;
+                userDayFilter.appendChild(option);
+            });
         }
 
         function extractAvailableDays() {
@@ -2014,6 +2209,86 @@
                 return `${day} de ${months[month]}, ${year}`;
             }
             return dateStr;
+        }
+
+        function updateUserStatistics() {
+            // Filtrar recargas según los criterios seleccionados
+            let filteredByUser = allRecharges;
+            
+            // Filtrar por usuario si se seleccionó uno
+            if (selectedUserId) {
+                filteredByUser = filteredByUser.filter(recharge => recharge.user_id == selectedUserId);
+            }
+            
+            // Filtrar por día si se seleccionó uno
+            if (selectedUserDay) {
+                filteredByUser = filteredByUser.filter(recharge => {
+                    const datePart = recharge.timestamp.split(' ')[0];
+                    return datePart === selectedUserDay;
+                });
+            }
+            
+            // Calcular estadísticas
+            const totalRecargas = filteredByUser.length;
+            
+            // Contar por estado
+            const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
+            const nuevoCount = filteredByUser.filter(r => r.estado === 'NUEVO').length;
+            const corteCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
+            const errorCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
+            
+            // Calcular hora pico
+            const hourCounts = {};
+            let peakHour = '';
+            let maxCount = 0;
+            
+            filteredByUser.forEach(recharge => {
+                const timePart = recharge.timestamp.split(' ')[1];
+                if (timePart) {
+                    const hour = timePart.split(':')[0];
+                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                    
+                    if (hourCounts[hour] > maxCount) {
+                        maxCount = hourCounts[hour];
+                        peakHour = hour + ':00';
+                    }
+                }
+            });
+            
+            // Actualizar estadísticas en la interfaz
+            document.getElementById('userTotalRecharges').textContent = totalRecargas.toLocaleString();
+            document.getElementById('userEchoCount').textContent = echoCount.toLocaleString();
+            document.getElementById('userNuevoCount').textContent = nuevoCount.toLocaleString();
+            document.getElementById('userCorteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('userErrorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('userHourPeak').textContent = peakHour || '--:--';
+            
+            // Actualizar detalle por hora
+            updateUserHourlyDetails(hourCounts);
+        }
+
+        function updateUserHourlyDetails(hourCounts) {
+            const userHourList = document.getElementById('userHourList');
+            const userHourlyDetails = document.getElementById('userHourlyDetails');
+            
+            if (Object.keys(hourCounts).length === 0) {
+                userHourList.innerHTML = '<div class="text-center text-muted py-3">No hay actividad por hora</div>';
+                userHourlyDetails.style.display = 'block';
+                return;
+            }
+            
+            // Ordenar horas por cantidad (de mayor a menor)
+            const sortedHours = Object.entries(hourCounts)
+                .sort((a, b) => b[1] - a[1]);
+            
+            userHourList.innerHTML = sortedHours.map(([hour, count]) => `
+                <div class="user-hour-item">
+                    <span class="user-hour-time">${hour}:00</span>
+                    <span class="user-hour-count">${count} recarga${count !== 1 ? 's' : ''}</span>
+                </div>
+            `).join('');
+            
+            userHourlyDetails.style.display = 'block';
         }
 
         function updateDayStatistics() {
