@@ -850,6 +850,87 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+        
+        /* NUEVO: Estilos para el gráfico de usuarios por recargas */
+        .users-chart-container {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        .users-chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .users-chart-header h5 {
+            color: var(--entel-color);
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .users-chart-body {
+            position: relative;
+            height: 400px;
+            width: 100%;
+        }
+        
+        .users-chart-footer {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #f0f0f0;
+        }
+        
+        .top-users-list {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 8px;
+        }
+        
+        @media (min-width: 768px) {
+            .top-users-list {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+        
+        .top-user-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 12px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--entel-color);
+        }
+        
+        .top-user-rank {
+            font-weight: 700;
+            color: var(--entel-color);
+            font-size: 1rem;
+            min-width: 30px;
+        }
+        
+        .top-user-name {
+            flex-grow: 1;
+            font-weight: 600;
+            color: #333;
+            padding: 0 10px;
+        }
+        
+        .top-user-count {
+            background: var(--entel-color);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            min-width: 60px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -1069,7 +1150,7 @@
                     </div>
                 </div>
 
-                <!-- Gráfico principal -->
+                <!-- Gráfico principal de recargas por hora -->
                 <div class="app-card">
                     <div class="app-card-header">
                         Recargas por Hora
@@ -1090,6 +1171,27 @@
                     <h5>Detalle por Hora</h5>
                     <div class="hour-list" id="hourList">
                         <!-- Las horas se cargarán aquí -->
+                    </div>
+                </div>
+                
+                <!-- NUEVO: Gráfico de usuarios por recargas -->
+                <div class="users-chart-container">
+                    <div class="users-chart-header">
+                        <h5><i class="bi bi-people-fill me-2"></i>Recargas por Usuario</h5>
+                        <small class="text-muted" id="usersChartDate">Total general</small>
+                    </div>
+                    <div class="users-chart-body">
+                        <canvas id="usersChart"></canvas>
+                    </div>
+                    <div class="users-chart-footer">
+                        <h6>Top 10 Usuarios</h6>
+                        <div class="top-users-list" id="topUsersList">
+                            <!-- Top usuarios se cargarán aquí -->
+                        </div>
+                    </div>
+                    <div id="noUsersDataMessage" class="no-data-message d-none">
+                        <i class="bi bi-person"></i>
+                        <p>No hay datos de usuarios para mostrar.</p>
                     </div>
                 </div>
                 
@@ -1337,6 +1439,7 @@
         let autoRefreshInterval;
         let hourlyChart;
         let userHourlyChart;
+        let usersChart; // NUEVA: Gráfico de usuarios por recargas
         let availableDays = [];
         let selectedDay = '';
         let selectedUserId = '';
@@ -1394,6 +1497,7 @@
             document.getElementById('dayFilter').addEventListener('change', function() {
                 selectedDay = this.value;
                 updateDayStatistics();
+                updateUsersChart(); // NUEVO: Actualizar gráfico de usuarios cuando cambia el día
             });
 
             // Configurar filtros para estadísticas por usuario
@@ -2133,6 +2237,7 @@
                 selectedDay = availableDays[0].value;
                 document.getElementById('dayFilter').value = selectedDay;
                 updateDayStatistics();
+                updateUsersChart(); // NUEVO: Actualizar gráfico de usuarios
             } else {
                 // Mostrar mensaje de no datos
                 document.getElementById('noDataMessage').classList.remove('d-none');
@@ -2226,6 +2331,145 @@
                 return `${day} de ${months[month]}, ${year}`;
             }
             return dateStr;
+        }
+
+        // NUEVA FUNCIÓN: Actualizar gráfico de usuarios por recargas
+        function updateUsersChart() {
+            // Filtrar recargas según el día seleccionado
+            let filteredData = allRecharges;
+            
+            if (selectedDay) {
+                filteredData = filteredData.filter(recharge => {
+                    const datePart = recharge.timestamp.split(' ')[0];
+                    return datePart === selectedDay;
+                });
+            }
+            
+            // Contar recargas por usuario
+            const userRechargeCounts = {};
+            filteredData.forEach(recharge => {
+                if (recharge.user_id && recharge.user_name) {
+                    userRechargeCounts[recharge.user_id] = {
+                        name: recharge.user_name,
+                        count: (userRechargeCounts[recharge.user_id]?.count || 0) + 1
+                    };
+                }
+            });
+            
+            // Ordenar usuarios por cantidad de recargas (de mayor a menor)
+            const sortedUsers = Object.values(userRechargeCounts)
+                .sort((a, b) => b.count - a.count);
+            
+            // Verificar si hay datos
+            if (sortedUsers.length === 0) {
+                document.getElementById('noUsersDataMessage').classList.remove('d-none');
+                document.getElementById('usersChartDate').textContent = selectedDay ? `Día: ${formatDateForDisplay(selectedDay)}` : 'Total general';
+                document.getElementById('topUsersList').innerHTML = '<div class="col-12 text-center text-muted">No hay datos de usuarios para mostrar</div>';
+                
+                // Destruir gráfico existente si hay uno
+                if (usersChart) {
+                    usersChart.destroy();
+                    usersChart = null;
+                }
+                return;
+            }
+            
+            document.getElementById('noUsersDataMessage').classList.add('d-none');
+            
+            // Actualizar la fecha en el encabezado
+            document.getElementById('usersChartDate').textContent = selectedDay ? 
+                `Día: ${formatDateForDisplay(selectedDay)}` : 'Total general';
+            
+            // Preparar datos para el gráfico
+            const labels = sortedUsers.map(user => user.name);
+            const data = sortedUsers.map(user => user.count);
+            
+            // Crear colores para las barras (degradado de azul)
+            const backgroundColors = data.map((_, index) => {
+                const intensity = 255 - Math.floor((index / data.length) * 100);
+                return `rgba(0, 150, 214, ${0.7 + (index * 0.1)})`;
+            });
+            
+            // Obtener el contexto del canvas
+            const ctx = document.getElementById('usersChart').getContext('2d');
+            
+            // Destruir gráfico existente si hay uno
+            if (usersChart) {
+                usersChart.destroy();
+            }
+            
+            // Crear nuevo gráfico de barras
+            usersChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Recargas',
+                        data: data,
+                        backgroundColor: backgroundColors,
+                        borderColor: '#0077B3',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Número de Recargas'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Usuarios'
+                            },
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 0
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Actualizar lista de top usuarios
+            updateTopUsersList(sortedUsers);
+        }
+
+        // NUEVA FUNCIÓN: Actualizar lista de top usuarios
+        function updateTopUsersList(sortedUsers) {
+            const topUsersList = document.getElementById('topUsersList');
+            
+            // Tomar los primeros 10 usuarios o todos si hay menos
+            const topUsers = sortedUsers.slice(0, 10);
+            
+            topUsersList.innerHTML = topUsers.map((user, index) => `
+                <div class="top-user-item">
+                    <div class="top-user-rank">#${index + 1}</div>
+                    <div class="top-user-name">${user.name}</div>
+                    <div class="top-user-count">${user.count} recarga${user.count !== 1 ? 's' : ''}</div>
+                </div>
+            `).join('');
         }
 
         function updateUserStatistics() {
