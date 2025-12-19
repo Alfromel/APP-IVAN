@@ -778,7 +778,7 @@
         
         @media (min-width: 768px) {
             .user-stats-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
             }
         }
         
@@ -786,6 +786,7 @@
             background: white;
             border-radius: 14px;
             padding: 16px;
+            text-align: center;
             box-shadow: 0 2px 10px rgba(0,0,0,0.06);
             border-left: 3px solid var(--entel-accent);
         }
@@ -1040,7 +1041,6 @@
                     </button>
                 </div>
 
-
                 <!-- Filtro por día (existente) -->
                 <div class="day-filter-container">
                     <div class="row align-items-center">
@@ -1145,9 +1145,25 @@
                         </div>
                     </div>
                     
+                    <!-- Gráfico del usuario -->
+                    <div class="app-card mt-3">
+                        <div class="app-card-header">
+                            Actividad por Hora del Usuario
+                        </div>
+                        <div class="app-card-body">
+                            <div class="chart-container-large">
+                                <canvas id="userHourlyChart"></canvas>
+                            </div>
+                            <div id="userNoDataMessage" class="no-data-message d-none">
+                                <i class="bi bi-bar-chart"></i>
+                                <p>No hay datos para mostrar. Seleccione un usuario y/o día.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <!-- Detalle por hora del usuario -->
-                    <div class="user-stats-details" id="userHourlyDetails" style="display: none;">
-                        <h6>Actividad por Hora</h6>
+                    <div class="user-stats-details mt-3" id="userHourlyDetails" style="display: none;">
+                        <h6>Detalle por Hora</h6>
                         <div id="userHourList">
                             <!-- Las horas se cargarán aquí -->
                         </div>
@@ -1320,6 +1336,7 @@
         let filteredRecharges = [];
         let autoRefreshInterval;
         let hourlyChart;
+        let userHourlyChart;
         let availableDays = [];
         let selectedDay = '';
         let selectedUserId = '';
@@ -2242,10 +2259,19 @@
             let peakHour = '';
             let maxCount = 0;
             
+            // Preparar datos por hora (00-23)
+            const hourlyData = {};
+            for (let i = 0; i < 24; i++) {
+                hourlyData[i.toString().padStart(2, '0')] = 0;
+            }
+            
             filteredByUser.forEach(recharge => {
                 const timePart = recharge.timestamp.split(' ')[1];
                 if (timePart) {
                     const hour = timePart.split(':')[0];
+                    hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+                    
+                    // Actualizar conteo por hora para estadísticas
                     hourCounts[hour] = (hourCounts[hour] || 0) + 1;
                     
                     if (hourCounts[hour] > maxCount) {
@@ -2263,8 +2289,90 @@
             document.getElementById('userErrorCount').textContent = errorCount.toLocaleString();
             document.getElementById('userHourPeak').textContent = peakHour || '--:--';
             
+            // Actualizar gráfico del usuario
+            createUserHourlyChart(hourlyData);
+            
             // Actualizar detalle por hora
             updateUserHourlyDetails(hourCounts);
+        }
+
+        function createUserHourlyChart(hourlyData) {
+            const ctx = document.getElementById('userHourlyChart').getContext('2d');
+            
+            // Destruir gráfico existente si hay uno
+            if (userHourlyChart) {
+                userHourlyChart.destroy();
+            }
+            
+            // Verificar si hay datos
+            const hasData = Object.values(hourlyData).some(count => count > 0);
+            
+            if (!hasData) {
+                document.getElementById('userNoDataMessage').classList.remove('d-none');
+                return;
+            }
+            
+            document.getElementById('userNoDataMessage').classList.add('d-none');
+            
+            // Preparar etiquetas y datos
+            const labels = [];
+            const data = [];
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = i.toString().padStart(2, '0');
+                labels.push(hour + ':00');
+                data.push(hourlyData[hour] || 0);
+            }
+            
+            // Crear nuevo gráfico
+            userHourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Recargas por Hora',
+                        data: data,
+                        backgroundColor: '#FF6B00',
+                        borderColor: '#E55A00',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Recargas: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Número de Recargas'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hora del Día'
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function updateUserHourlyDetails(hourCounts) {
@@ -2358,7 +2466,7 @@
             createHourlyChart(hourlyData);
             
             // Mostrar estadísticas por hora
-            updateHourlyStats(hourlyData);
+            updateHourlyStats(hourCounts);
         }
 
         function createHourlyChart(hourlyData) {
