@@ -405,6 +405,93 @@
         .fade-in {
             animation: fadeIn 0.5s ease-out;
         }
+        
+        /* Estilos para chips preview */
+        .chip-preview-item {
+            display: inline-flex;
+            align-items: center;
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 4px 12px;
+            margin: 2px;
+            font-size: 0.85rem;
+        }
+        
+        .chip-preview-item .btn-close-sm {
+            font-size: 0.7rem;
+            margin-left: 5px;
+            padding: 4px;
+        }
+        
+        /* Mejoras para reportes */
+        .report-card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+            border-left: 4px solid;
+        }
+        
+        .report-card .card-title {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .stats-detail {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #e9ecef;
+        }
+        
+        .stats-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px 0;
+            border-bottom: 1px solid #f8f9fa;
+        }
+        
+        .stats-detail-item:last-child {
+            border-bottom: none;
+        }
+        
+        /* Validación de números */
+        .chip-number-input {
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+        
+        .invalid-chip {
+            background-color: #fff5f5;
+            border-color: #dc3545;
+        }
+        
+        .valid-chip {
+            background-color: #f0fff4;
+            border-color: #28a745;
+        }
+        
+        /* Mejoras para filtros */
+        .filter-section {
+            margin-bottom: 15px;
+        }
+        
+        .filter-section-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #495057;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
     </style>
 </head>
 <body>
@@ -589,7 +676,7 @@
                     </div>
                 </section>
 
-                <!-- Inventario -->
+                <!-- Inventario MEJORADO -->
                 <section id="inventarioSection" class="fade-in d-none">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="section-title">Inventario Completo de Chips</h2>
@@ -602,39 +689,75 @@
                                 <i class="bi bi-plus-circle"></i>
                                 <span>Agregar Chips</span>
                             </button>
+                            <button class="btn btn-warning-custom btn-custom" id="exportFilteredInventarioBtn">
+                                <i class="bi bi-file-earmark-excel"></i>
+                                <span>Exportar Filtrado</span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Filtros -->
+                    <!-- Filtros MEJORADOS - SIN SECCIÓN "MOSTRAR" -->
                     <div class="filter-card mb-4">
                         <div class="row g-3">
                             <div class="col-md-3">
-                                <select class="form-select" id="filterOperadora">
-                                    <option value="">Todas Operadoras</option>
-                                    <option value="ENTEL">ENTEL</option>
-                                    <option value="TIGO">TIGO</option>
-                                    <option value="VIVA">VIVA</option>
-                                </select>
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Operadora</div>
+                                    <select class="form-select filter-change" id="filterOperadora">
+                                        <option value="">Todas Operadoras</option>
+                                        <option value="ENTEL">ENTEL</option>
+                                        <option value="TIGO">TIGO</option>
+                                        <option value="VIVA">VIVA</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select" id="filterEstado">
-                                    <option value="">Todos Estados</option>
-                                    <option value="ACTIVO">Activos</option>
-                                    <option value="VENCIDO">Vencidos</option>
-                                    <option value="INACTIVO">Inactivos</option>
-                                </select>
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Estado</div>
+                                    <select class="form-select filter-change" id="filterEstado">
+                                        <option value="">Todos Estados</option>
+                                        <option value="ACTIVO">Activos</option>
+                                        <option value="VENCIDO">Vencidos</option>
+                                        <option value="INACTIVO">Inactivos</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-3">
-                                <select class="form-select" id="filterCategoria">
-                                    <option value="">Todas Categorías</option>
-                                </select>
+                                <div class="filter-section">
+                                    <div class="filter-section-title">ID Categoría</div>
+                                    <select class="form-select filter-change" id="filterCategoriaId">
+                                        <option value="">Todos IDs</option>
+                                    </select>
+                                </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="input-group">
-                                    <input type="text" class="form-control" id="filterBusqueda" placeholder="Buscar...">
-                                    <button class="btn btn-outline-secondary" type="button" id="clearFiltersBtn">
-                                        <i class="bi bi-x-circle"></i>
-                                    </button>
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Letra Categoría</div>
+                                    <select class="form-select filter-change" id="filterLetraCategoria">
+                                        <option value="">Todas Letras</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row g-3 mt-2">
+                            <div class="col-md-12">
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Búsqueda Avanzada</div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control filter-change" id="filterBusqueda" placeholder="Buscar por número, secuencia o designado...">
+                                        <button class="btn btn-outline-secondary" type="button" id="clearFiltersBtn">
+                                            <i class="bi bi-x-circle"></i> Limpiar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted" id="filterCount">Mostrando 0 chips</small>
+                                    <small class="text-primary">
+                                        <i class="bi bi-info-circle"></i> Los filtros se aplican automáticamente
+                                    </small>
                                 </div>
                             </div>
                         </div>
@@ -647,10 +770,11 @@
                                 <table class="table table-custom mb-0" id="inventarioTable">
                                     <thead>
                                         <tr>
-                                            <th># Secuencia</th>
+                                            <th>#</th>
                                             <th>Número</th>
                                             <th>Operadora</th>
-                                            <th>Categoría</th>
+                                            <th>ID Categoría</th>
+                                            <th>Letra Categoría</th>
                                             <th>Fecha Nac.</th>
                                             <th>Fecha Venc.</th>
                                             <th>Días Rest.</th>
@@ -668,14 +792,18 @@
                     </div>
                 </section>
 
-                <!-- Categorías -->
+                <!-- Categorías MEJORADO -->
                 <section id="categoriasSection" class="fade-in d-none">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="section-title">Gestión de Categorías</h2>
                         <div class="d-flex gap-2">
                             <button class="btn btn-success-custom btn-custom" id="exportCategoriesBtn">
                                 <i class="bi bi-file-earmark-excel"></i>
-                                <span>Exportar</span>
+                                <span>Exportar Todo</span>
+                            </button>
+                            <button class="btn btn-warning-custom btn-custom" id="exportFilteredCategoriesBtn">
+                                <i class="bi bi-download"></i>
+                                <span>Exportar Filtrado</span>
                             </button>
                             <button class="btn btn-primary-custom btn-custom" id="addCategoryMainBtn">
                                 <i class="bi bi-folder-plus"></i>
@@ -684,20 +812,73 @@
                         </div>
                     </div>
 
+                    <!-- Filtros para Categorías - CON FILTRADO EN TIEMPO REAL -->
+                    <div class="filter-card mb-4">
+                        <div class="row g-3">
+                            <div class="col-md-3">
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Operadora</div>
+                                    <select class="form-select filter-change-categoria" id="filterCategoriasOperadora">
+                                        <option value="">Todas Operadoras</option>
+                                        <option value="ENTEL">ENTEL</option>
+                                        <option value="TIGO">TIGO</option>
+                                        <option value="VIVA">VIVA</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="filter-section">
+                                    <div class="filter-section-title">ID Categoría</div>
+                                    <input type="text" class="form-control filter-change-categoria" id="filterCategoriasId" placeholder="Buscar ID...">
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Letra Categoría</div>
+                                    <select class="form-select filter-change-categoria" id="filterCategoriasLetra">
+                                        <option value="">Todas Letras</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-md-3">
+                                <div class="filter-section">
+                                    <div class="filter-section-title">Búsqueda</div>
+                                    <div class="input-group">
+                                        <input type="text" class="form-control filter-change-categoria" id="filterCategoriasBusqueda" placeholder="Buscar por nombre...">
+                                        <button class="btn btn-outline-secondary" type="button" id="clearFiltersCategoriasBtn">
+                                            <i class="bi bi-x-circle"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <small class="text-muted" id="categoriasFilterCount">Mostrando 0 categorías</small>
+                                    <small class="text-primary">
+                                        <i class="bi bi-info-circle"></i> Los filtros se aplican automáticamente
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tabla de Categorías -->
                     <div class="app-card">
                         <div class="app-card-body p-0">
                             <div class="table-responsive">
                                 <table class="table table-custom mb-0" id="categoriasTable">
                                     <thead>
                                         <tr>
-                                            <th>ID</th>
+                                            <th>ID Categoría</th>
                                             <th>Letra</th>
                                             <th>Operadora</th>
                                             <th>Nombre</th>
                                             <th>Fecha Nac.</th>
                                             <th>Fecha Venc.</th>
                                             <th>Días</th>
-                                            <th>Chips</th>
+                                            <th>Chips Asignados</th>
                                             <th>Acciones</th>
                                         </tr>
                                     </thead>
@@ -710,22 +891,84 @@
                     </div>
                 </section>
 
-                <!-- Reportes -->
+                <!-- Reportes SIMPLIFICADO -->
                 <section id="reportesSection" class="fade-in d-none">
                     <div class="d-flex justify-content-between align-items-center mb-4">
                         <h2 class="section-title">Reportes y Estadísticas</h2>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-primary-custom btn-custom" id="generateReportBtn">
-                                <i class="bi bi-graph-up"></i>
-                                <span>Generar Reporte</span>
+                            <button class="btn btn-primary-custom btn-custom" id="refreshReportBtn">
+                                <i class="bi bi-arrow-clockwise"></i>
+                                <span>Actualizar</span>
                             </button>
                             <button class="btn btn-success-custom btn-custom" id="exportReportBtn">
                                 <i class="bi bi-download"></i>
-                                <span>Exportar</span>
+                                <span>Exportar Reporte</span>
                             </button>
                         </div>
                     </div>
 
+                    <!-- Resumen estadístico -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="report-card" style="border-left-color: #0088CC;">
+                                <div class="card-title">ENTEL</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fs-4 fw-bold" id="reportEntelTotal">0</div>
+                                        <div class="text-muted small">Total chips</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fs-5 text-success" id="reportEntelActivos">0</div>
+                                        <div class="text-muted small">Activos</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fs-5 text-warning" id="reportEntelPorVencer">0</div>
+                                        <div class="text-muted small">Por vencer</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="report-card" style="border-left-color: #005EB8;">
+                                <div class="card-title">TIGO</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fs-4 fw-bold" id="reportTigoTotal">0</div>
+                                        <div class="text-muted small">Total chips</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fs-5 text-success" id="reportTigoActivos">0</div>
+                                        <div class="text-muted small">Activos</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fs-5 text-warning" id="reportTigoPorVencer">0</div>
+                                        <div class="text-muted small">Por vencer</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="report-card" style="border-left-color: #78BE20;">
+                                <div class="card-title">VIVA</div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <div class="fs-4 fw-bold" id="reportVivaTotal">0</div>
+                                        <div class="text-muted small">Total chips</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fs-5 text-success" id="reportVivaActivos">0</div>
+                                        <div class="text-muted small">Activos</div>
+                                    </div>
+                                    <div class="text-end">
+                                        <div class="fs-5 text-warning" id="reportVivaPorVencer">0</div>
+                                        <div class="text-muted small">Por vencer</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos principales SOLO 2 -->
                     <div class="row">
                         <div class="col-lg-6 mb-4">
                             <div class="app-card h-100">
@@ -733,7 +976,12 @@
                                     Distribución por Operadora
                                 </div>
                                 <div class="app-card-body">
-                                    <canvas id="operadoraChart" height="300"></canvas>
+                                    <div class="chart-container">
+                                        <canvas id="operadoraChart"></canvas>
+                                    </div>
+                                    <div class="stats-detail" id="operadoraStats">
+                                        <!-- Se llena con JavaScript -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -743,7 +991,12 @@
                                     Estados de Chips
                                 </div>
                                 <div class="app-card-body">
-                                    <canvas id="estadoChart" height="300"></canvas>
+                                    <div class="chart-container">
+                                        <canvas id="estadoChart"></canvas>
+                                    </div>
+                                    <div class="stats-detail" id="estadoStats">
+                                        <!-- Se llena con JavaScript -->
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -867,14 +1120,22 @@
                             </div>
                         </div>
 
-                        <div class="mb-3">
+                        <div class="mb-4">
                             <label class="form-label">Números de Chips *</label>
-                            <textarea class="form-control" id="chipsNumeros" rows="6" 
-                                placeholder="Ingrese números separados por comas, espacios o líneas nuevas. Ejemplo:
+                            <div class="alert alert-info mb-2">
+                                <i class="bi bi-info-circle me-2"></i>
+                                <strong>IMPORTANTE:</strong> Cada número de chip debe tener <strong>exactamente 8 dígitos</strong> (ni más, ni menos). Ejemplo correcto: 78901234
+                            </div>
+                            <textarea class="form-control chip-number-input" id="chipsNumeros" rows="6" 
+                                placeholder="Ingrese números de 8 dígitos separados por comas, espacios o líneas nuevas. Ejemplo:
 78901234
 78901235, 78901236
 78901237 78901238"></textarea>
-                            <div class="form-text">Puede ingresar múltiples números a la vez</div>
+                            <div class="form-text mt-2">
+                                <i class="bi bi-check-circle text-success me-1"></i>
+                                Formato correcto: 8 dígitos (ej: 78901234)
+                            </div>
+                            <div id="chipValidationInfo" class="mt-2"></div>
                         </div>
 
                         <div class="mb-3">
@@ -891,6 +1152,35 @@
                                         <input type="text" class="form-control" id="chipDesignadoObservaciones" placeholder="Observaciones">
                                     </div>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Vista previa con validación MEJORADA -->
+                        <div id="chipsPreview" class="d-none">
+                            <label class="form-label">Validación y Vista Previa</label>
+                            <div class="alert alert-warning mb-2" id="validationWarning" style="display: none;">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <span id="warningText"></span>
+                            </div>
+                            <div class="alert alert-danger mb-2 d-none" id="duplicateWarning">
+                                <i class="bi bi-exclamation-triangle me-2"></i>
+                                <span id="duplicateWarningText"></span>
+                            </div>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>Número</th>
+                                            <th>Validación</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="chipsPreviewTable"></tbody>
+                                </table>
+                            </div>
+                            <div class="text-center mt-2">
+                                <small class="text-muted" id="chipsCount">0 chips listos para agregar</small>
                             </div>
                         </div>
                     </form>
@@ -948,6 +1238,11 @@
         let allChips = [];
         let allCategories = [];
         let chipsPorVencer = [];
+        let charts = {};
+        let filteredChips = []; // Para almacenar chips filtrados
+        let filteredCategories = []; // Para almacenar categorías filtradas
+        let existingChipNumbers = new Set(); // Para validar duplicados
+        let filterTimeout; // Para el debounce en tiempo real
 
         class SistemaInventarioChips {
             constructor() {
@@ -981,11 +1276,7 @@
                 document.getElementById('addCategoryBtn').addEventListener('click', () => this.showCategoryModal());
                 document.getElementById('addCategoryMainBtn').addEventListener('click', () => this.showCategoryModal());
                 document.getElementById('sendAlertsBtn').addEventListener('click', () => this.sendAlertsPorVencer());
-
-                // Guardar
-                document.getElementById('saveCategoryBtn').addEventListener('click', () => this.saveCategory());
-                document.getElementById('saveChipBtn').addEventListener('click', () => this.saveChips());
-                document.getElementById('saveDesignacionBtn').addEventListener('click', () => this.saveDesignacion());
+                document.getElementById('refreshReportBtn').addEventListener('click', () => this.loadReportsData());
 
                 // Exportar
                 document.getElementById('exportExcelBtn').addEventListener('click', () => this.exportToExcel());
@@ -994,27 +1285,65 @@
                 document.getElementById('exportCategoriesBtn').addEventListener('click', () => this.exportCategories());
                 document.getElementById('exportReportBtn').addEventListener('click', () => this.exportReport());
                 document.getElementById('exportPorVencerBtn').addEventListener('click', () => this.exportPorVencer());
+                document.getElementById('exportFilteredInventarioBtn').addEventListener('click', () => this.exportFilteredInventario());
+                document.getElementById('exportFilteredCategoriesBtn').addEventListener('click', () => this.exportFilteredCategories());
 
-                // Filtros
-                document.getElementById('clearFiltersBtn').addEventListener('click', () => this.clearFilters());
-                document.getElementById('filterBusqueda').addEventListener('input', () => this.displayInventarioTable());
-                document.getElementById('filterOperadora').addEventListener('change', () => this.displayInventarioTable());
-                document.getElementById('filterEstado').addEventListener('change', () => this.displayInventarioTable());
-                document.getElementById('filterCategoria').addEventListener('change', () => this.displayInventarioTable());
+                // Guardar
+                document.getElementById('saveCategoryBtn').addEventListener('click', () => this.saveCategory());
+                document.getElementById('saveChipBtn').addEventListener('click', () => this.saveChips());
+                document.getElementById('saveDesignacionBtn').addEventListener('click', () => this.saveDesignacion());
+
+                // Filtros Inventario - FILTRADO EN TIEMPO REAL
+                document.getElementById('clearFiltersBtn').addEventListener('click', () => this.clearFiltersInventario());
+                
+                // Event listeners para filtros en tiempo real (Inventario)
+                document.querySelectorAll('.filter-change').forEach(element => {
+                    element.addEventListener('input', () => this.applyFiltersRealTime('inventario'));
+                    element.addEventListener('change', () => this.applyFiltersRealTime('inventario'));
+                });
+                
+                // Event listeners para filtros en tiempo real (Categorías)
+                document.querySelectorAll('.filter-change-categoria').forEach(element => {
+                    element.addEventListener('input', () => this.applyFiltersRealTime('categorias'));
+                    element.addEventListener('change', () => this.applyFiltersRealTime('categorias'));
+                });
+
+                // Filtros Categorías
+                document.getElementById('clearFiltersCategoriasBtn').addEventListener('click', () => this.clearFiltersCategorias());
+
+                // Validación de chips en tiempo real
+                document.getElementById('chipsNumeros').addEventListener('input', () => this.validateAndPreviewChips());
+
+                // Actualizar categorías cuando cambia la operadora
+                document.getElementById('chipOperadora').addEventListener('change', () => this.updateChipCategories());
 
                 // Designación
                 document.getElementById('chipDesignadoCheck').addEventListener('change', (e) => {
                     document.getElementById('chipDesignadoContainer').classList.toggle('d-none', !e.target.checked);
                 });
 
-                // Preview chips
-                document.getElementById('chipOperadora').addEventListener('change', () => this.updateChipCategories());
-
                 // Menu toggle
                 document.querySelector('.menu-toggle').addEventListener('click', () => this.toggleSidebar());
 
                 // Logout
                 document.getElementById('logoutBtn').addEventListener('click', () => this.logout());
+            }
+
+            // Método para aplicar filtros en tiempo real con debounce
+            applyFiltersRealTime(type) {
+                // Limpiar timeout anterior
+                if (filterTimeout) {
+                    clearTimeout(filterTimeout);
+                }
+                
+                // Establecer nuevo timeout para evitar demasiadas actualizaciones
+                filterTimeout = setTimeout(() => {
+                    if (type === 'inventario') {
+                        this.displayInventarioTable();
+                    } else if (type === 'categorias') {
+                        this.displayCategoriasTable();
+                    }
+                }, 300); // 300ms de debounce
             }
 
             async loadAllData() {
@@ -1027,6 +1356,9 @@
                     
                     this.updateDashboard();
                     this.updateSidebarCounts();
+                    
+                    // Actualizar números existentes para validación
+                    this.updateExistingChipNumbers();
                     
                     // Cargar datos de la sección actual
                     const currentSection = this.getCurrentSection();
@@ -1048,6 +1380,13 @@
                 }
             }
 
+            updateExistingChipNumbers() {
+                existingChipNumbers = new Set();
+                allChips.forEach(chip => {
+                    existingChipNumbers.add(chip.numero_chip);
+                });
+            }
+
             async loadCategories() {
                 try {
                     const response = await fetch(
@@ -1063,7 +1402,7 @@
                     if (!response.ok) throw new Error('Error cargando categorías');
                     
                     allCategories = await response.json();
-                    this.populateCategoryFilters();
+                    this.populateFilterDropdowns();
                     return allCategories;
                 } catch (error) {
                     throw error;
@@ -1105,6 +1444,175 @@
                 }
             }
 
+            // Poblar dropdowns de filtros
+            populateFilterDropdowns() {
+                // Filtro por ID de categoría (inventario)
+                const filterCategoriaId = document.getElementById('filterCategoriaId');
+                const uniqueCategoryIds = [...new Set(allCategories.map(cat => cat.categoria_id))];
+                
+                filterCategoriaId.innerHTML = '<option value="">Todos IDs</option>' +
+                    uniqueCategoryIds.sort().map(id => `
+                        <option value="${id}">${id}</option>
+                    `).join('');
+                
+                // Filtro por letra de categoría (inventario)
+                const filterLetraCategoria = document.getElementById('filterLetraCategoria');
+                const uniqueLetters = [...new Set(allCategories.map(cat => cat.letra_categoria))];
+                
+                filterLetraCategoria.innerHTML = '<option value="">Todas Letras</option>' +
+                    uniqueLetters.sort().map(letra => `
+                        <option value="${letra}">${letra}</option>
+                    `).join('');
+                
+                // Filtro por letra de categoría (categorías)
+                const filterCategoriasLetra = document.getElementById('filterCategoriasLetra');
+                filterCategoriasLetra.innerHTML = '<option value="">Todas Letras</option>' +
+                    uniqueLetters.sort().map(letra => `
+                        <option value="${letra}">${letra}</option>
+                    `).join('');
+            }
+
+            // VALIDACIÓN MEJORADA: 8 dígitos exactos y no duplicados
+            validateChipNumber(chipNumber) {
+                if (!chipNumber) return { valid: false, error: 'Número vacío' };
+                
+                const cleaned = chipNumber.toString().trim().replace(/\D/g, '');
+                
+                // Validación de 8 dígitos exactos
+                if (cleaned.length !== 8) {
+                    return { 
+                        valid: false, 
+                        error: `Debe tener 8 dígitos exactos (tiene ${cleaned.length})`,
+                        number: cleaned
+                    };
+                }
+                
+                // Validación de solo números
+                if (!/^\d+$/.test(cleaned)) {
+                    return { 
+                        valid: false, 
+                        error: 'Solo debe contener números',
+                        number: cleaned
+                    };
+                }
+                
+                // Validación de duplicados
+                if (existingChipNumbers.has(cleaned)) {
+                    return { 
+                        valid: false, 
+                        error: 'Ya existe en la base de datos',
+                        number: cleaned,
+                        duplicate: true
+                    };
+                }
+                
+                return { 
+                    valid: true, 
+                    error: null,
+                    number: cleaned,
+                    duplicate: false
+                };
+            }
+
+            // VALIDACIÓN MEJORADA con detección de duplicados
+            validateAndPreviewChips() {
+                const text = document.getElementById('chipsNumeros').value;
+                const previewContainer = document.getElementById('chipsPreview');
+                const previewTable = document.getElementById('chipsPreviewTable');
+                const chipsCount = document.getElementById('chipsCount');
+                const warningDiv = document.getElementById('validationWarning');
+                const duplicateWarningDiv = document.getElementById('duplicateWarning');
+                const warningText = document.getElementById('warningText');
+                const duplicateWarningText = document.getElementById('duplicateWarningText');
+                
+                const chipNumbers = this.parseChipNumbers(text);
+                const validationResults = chipNumbers.map(num => this.validateChipNumber(num));
+                
+                const validChips = validationResults.filter(r => r.valid);
+                const invalidChips = validationResults.filter(r => !r.valid);
+                const duplicateChips = validationResults.filter(r => r.duplicate);
+                
+                if (chipNumbers.length === 0) {
+                    previewContainer.classList.add('d-none');
+                    warningDiv.style.display = 'none';
+                    duplicateWarningDiv.classList.add('d-none');
+                    return;
+                }
+                
+                previewContainer.classList.remove('d-none');
+                
+                // Mostrar hasta 10 resultados
+                previewTable.innerHTML = validationResults.slice(0, 10).map((result, index) => {
+                    if (result.valid) {
+                        return `
+                            <tr class="valid-chip">
+                                <td>${index + 1}</td>
+                                <td><code>${result.number}</code></td>
+                                <td><span class="badge bg-success"><i class="bi bi-check-circle"></i> Válido</span></td>
+                                <td>8 dígitos ✓</td>
+                            </tr>
+                        `;
+                    } else if (result.duplicate) {
+                        return `
+                            <tr class="invalid-chip">
+                                <td>${index + 1}</td>
+                                <td><code>${result.number}</code></td>
+                                <td><span class="badge bg-danger"><i class="bi bi-x-circle"></i> Duplicado</span></td>
+                                <td>Ya existe en el sistema</td>
+                            </tr>
+                        `;
+                    } else {
+                        return `
+                            <tr class="invalid-chip">
+                                <td>${index + 1}</td>
+                                <td><code>${result.number || 'N/A'}</code></td>
+                                <td><span class="badge bg-danger"><i class="bi bi-x-circle"></i> Inválido</span></td>
+                                <td>${result.error}</td>
+                            </tr>
+                        `;
+                    }
+                }).join('');
+                
+                if (chipNumbers.length > 10) {
+                    previewTable.innerHTML += `
+                        <tr>
+                            <td colspan="4" class="text-center text-muted">
+                                ... y ${chipNumbers.length - 10} chips más
+                            </td>
+                        </tr>
+                    `;
+                }
+                
+                chipsCount.textContent = `${validChips.length} chips válidos de ${chipNumbers.length} totales`;
+                
+                // Mostrar advertencias
+                if (invalidChips.length > 0 && duplicateChips.length === 0) {
+                    warningDiv.style.display = 'block';
+                    duplicateWarningDiv.classList.add('d-none');
+                    warningText.textContent = `${invalidChips.length} chips tienen formato incorrecto (deben ser 8 dígitos exactos).`;
+                } else if (duplicateChips.length > 0) {
+                    warningDiv.style.display = 'none';
+                    duplicateWarningDiv.classList.remove('d-none');
+                    duplicateWarningText.textContent = `${duplicateChips.length} chips ya existen en la base de datos. No se pueden agregar duplicados.`;
+                } else {
+                    warningDiv.style.display = 'none';
+                    duplicateWarningDiv.classList.add('d-none');
+                }
+            }
+
+            parseChipNumbers(text) {
+                if (!text.trim()) return [];
+                
+                // Eliminar duplicados en la misma entrada
+                const numbers = text.split(/[\n, ]+/)
+                    .map(num => num.trim())
+                    .filter(num => num.length > 0)
+                    .map(num => num.replace(/\D/g, '')); // Solo números
+                
+                // Eliminar duplicados manteniendo el orden
+                return [...new Set(numbers)];
+            }
+
             calcularDiasRestantes(fechaVencimiento) {
                 if (!fechaVencimiento) return 0;
                 const hoy = new Date();
@@ -1124,7 +1632,6 @@
             }
 
             updateDashboard() {
-                // Totales por operadora
                 const entelCount = allChips.filter(chip => chip.operadora === 'ENTEL').length;
                 const tigoCount = allChips.filter(chip => chip.operadora === 'TIGO').length;
                 const vivaCount = allChips.filter(chip => chip.operadora === 'VIVA').length;
@@ -1134,7 +1641,6 @@
                 document.getElementById('totalViva').textContent = vivaCount;
                 document.getElementById('totalChips').textContent = allChips.length;
                 
-                // Estados
                 const activosCount = allChips.filter(chip => chip.estado === 'ACTIVO').length;
                 const vencidosCount = allChips.filter(chip => chip.estado === 'VENCIDO').length;
                 const designadosCount = allChips.filter(chip => chip.designado_a).length;
@@ -1144,7 +1650,6 @@
                 document.getElementById('chipsVencidos').textContent = vencidosCount;
                 document.getElementById('chipsDesignados').textContent = designadosCount;
                 
-                // Actualizar listas
                 this.updateChipsPorVencerList();
                 this.updateChipsRecientesList();
             }
@@ -1175,7 +1680,7 @@
                                     <span class="badge badge-custom badge-${chip.operadora.toLowerCase()} me-2">
                                         ${chip.operadora}
                                     </span>
-                                    <strong class="me-2">${chip.numero_secuencia}</strong>
+                                    <strong class="me-2">${chip.numero_secuencia || chip.numero_chip}</strong>
                                     <span>${chip.numero_chip}</span>
                                 </div>
                                 <div class="text-muted small">
@@ -1212,7 +1717,7 @@
                                     <span class="badge badge-custom badge-${chip.operadora.toLowerCase()} me-2">
                                         ${chip.operadora}
                                     </span>
-                                    <strong class="me-2">${chip.numero_secuencia}</strong>
+                                    <strong class="me-2">${chip.numero_secuencia || chip.numero_chip}</strong>
                                     <span>${chip.numero_chip}</span>
                                 </div>
                                 <div class="text-muted small">
@@ -1237,15 +1742,12 @@
             }
 
             showSection(section) {
-                // Ocultar todas las secciones
                 document.querySelectorAll('[id$="Section"]').forEach(sec => {
                     sec.classList.add('d-none');
                 });
                 
-                // Mostrar sección seleccionada
                 document.getElementById(`${section}Section`).classList.remove('d-none');
                 
-                // Actualizar título
                 const titles = {
                     'dashboard': 'Dashboard',
                     'inventario': 'Inventario',
@@ -1256,7 +1758,6 @@
                 
                 document.getElementById('currentSectionTitle').textContent = titles[section];
                 
-                // Actualizar navegación activa
                 document.querySelectorAll('.nav-item').forEach(item => {
                     item.classList.remove('active');
                     if (item.dataset.section === section) {
@@ -1264,7 +1765,6 @@
                     }
                 });
                 
-                // Cargar datos de la sección
                 if (section === 'inventario') {
                     this.displayInventarioTable();
                 } else if (section === 'categorias') {
@@ -1275,17 +1775,59 @@
                     this.displayChipsPorVencer();
                 }
                 
-                // Cerrar sidebar en móviles
                 if (window.innerWidth < 768) {
                     this.toggleSidebar();
                 }
             }
 
+            // MÉTODO MEJORADO: Mostrar tabla de inventario con ENUMERACIÓN por categoría/filtro
             displayInventarioTable() {
                 const tbody = document.getElementById('inventarioTableBody');
-                const chips = this.applyFiltersToChips();
+                filteredChips = this.applyFiltersInventario();
                 
-                tbody.innerHTML = chips.map(chip => {
+                // Agrupar por categoría para enumeración
+                const groupedByCategory = {};
+                filteredChips.forEach(chip => {
+                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                    const categoryKey = categoria ? `${categoria.operadora}-${categoria.categoria_id}` : 'sin-categoria';
+                    
+                    if (!groupedByCategory[categoryKey]) {
+                        groupedByCategory[categoryKey] = [];
+                    }
+                    groupedByCategory[categoryKey].push(chip);
+                });
+                
+                // Generar secuencias por categoría
+                let allRows = [];
+                Object.values(groupedByCategory).forEach(chipsInCategory => {
+                    // Ordenar por ID o fecha
+                    chipsInCategory.sort((a, b) => a.id - b.id);
+                    
+                    // Asignar números de secuencia (1, 2, 3...)
+                    chipsInCategory.forEach((chip, index) => {
+                        chip.numero_secuencia = index + 1;
+                        allRows.push(chip);
+                    });
+                });
+                
+                // Ordenar todos los chips para mostrar
+                allRows.sort((a, b) => {
+                    // Primero por operadora, luego por categoría
+                    const catA = allCategories.find(cat => cat.id === a.categoria_id);
+                    const catB = allCategories.find(cat => cat.id === b.categoria_id);
+                    
+                    if (catA && catB) {
+                        if (catA.operadora !== catB.operadora) {
+                            return catA.operadora.localeCompare(catB.operadora);
+                        }
+                        if (catA.categoria_id !== catB.categoria_id) {
+                            return catA.categoria_id.localeCompare(catB.categoria_id);
+                        }
+                    }
+                    return a.numero_secuencia - b.numero_secuencia;
+                });
+                
+                tbody.innerHTML = allRows.map(chip => {
                     const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                     const estado = this.determinarEstado(chip);
                     const diasColor = chip.dias_restantes <= 0 ? 'text-danger' : 
@@ -1294,14 +1836,15 @@
                     
                     return `
                     <tr>
-                        <td><strong>${chip.numero_secuencia}</strong></td>
+                        <td><strong>${chip.numero_secuencia || 'N/A'}</strong></td>
                         <td>${chip.numero_chip}</td>
                         <td>
                             <span class="badge badge-custom badge-${chip.operadora.toLowerCase()}">
                                 ${chip.operadora}
                             </span>
                         </td>
-                        <td>${categoria?.nombre || 'N/A'}</td>
+                        <td>${categoria?.categoria_id || 'N/A'}</td>
+                        <td>${categoria?.letra_categoria || 'N/A'}</td>
                         <td>${this.formatDate(chip.fecha_activacion)}</td>
                         <td>${this.formatDate(chip.fecha_vencimiento)}</td>
                         <td class="fw-bold ${diasColor}">
@@ -1334,12 +1877,70 @@
                     </tr>
                     `;
                 }).join('');
+                
+                // Actualizar contador de filtros
+                document.getElementById('filterCount').textContent = `Mostrando ${filteredChips.length} chips de ${allChips.length} totales`;
             }
 
+            // MÉTODO MEJORADO: Aplicar filtros de inventario (SIMPLIFICADO - SIN SECCIÓN MOSTRAR)
+            applyFiltersInventario() {
+                const operadora = document.getElementById('filterOperadora').value;
+                const estado = document.getElementById('filterEstado').value;
+                const categoriaId = document.getElementById('filterCategoriaId').value;
+                const letraCategoria = document.getElementById('filterLetraCategoria').value;
+                const busqueda = document.getElementById('filterBusqueda').value.toLowerCase();
+                
+                return allChips.filter(chip => {
+                    // Filtro por operadora
+                    if (operadora && chip.operadora !== operadora) return false;
+                    
+                    // Filtro por estado
+                    if (estado) {
+                        if (estado === 'VENCIDO' && this.determinarEstado(chip) !== 'VENCIDO') return false;
+                        if (estado === 'ACTIVO' && chip.estado !== 'ACTIVO') return false;
+                        if (estado === 'INACTIVO' && chip.estado !== 'INACTIVO') return false;
+                    }
+                    
+                    // Filtro por ID de categoría
+                    if (categoriaId) {
+                        const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                        if (!categoria || categoria.categoria_id !== categoriaId) return false;
+                    }
+                    
+                    // Filtro por letra de categoría
+                    if (letraCategoria) {
+                        const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                        if (!categoria || categoria.letra_categoria !== letraCategoria) return false;
+                    }
+                    
+                    // Filtro por búsqueda
+                    if (busqueda) {
+                        const chipNumber = chip.numero_chip.toLowerCase();
+                        const sequenceNumber = chip.numero_secuencia ? chip.numero_secuencia.toString() : '';
+                        const designado = chip.designado_a ? chip.designado_a.toLowerCase() : '';
+                        const categoriaInfo = allCategories.find(cat => cat.id === chip.categoria_id);
+                        const categoriaNombre = categoriaInfo ? categoriaInfo.nombre.toLowerCase() : '';
+                        const categoriaIdSearch = categoriaInfo ? categoriaInfo.categoria_id.toLowerCase() : '';
+                        
+                        if (!chipNumber.includes(busqueda) && 
+                            !sequenceNumber.includes(busqueda) && 
+                            !designado.includes(busqueda) &&
+                            !categoriaNombre.includes(busqueda) &&
+                            !categoriaIdSearch.includes(busqueda)) {
+                            return false;
+                        }
+                    }
+                    
+                    return true;
+                });
+            }
+
+            // MÉTODO MEJORADO: Mostrar tabla de categorías con filtros
             displayCategoriasTable() {
                 const tbody = document.getElementById('categoriasTableBody');
+                filteredCategories = this.applyFiltersCategorias();
                 
-                tbody.innerHTML = allCategories.map(categoria => {
+                tbody.innerHTML = filteredCategories.map(categoria => {
                     const chipsCount = allChips.filter(chip => chip.categoria_id === categoria.id).length;
                     
                     return `
@@ -1373,6 +1974,60 @@
                     </tr>
                     `;
                 }).join('');
+                
+                // Actualizar contador de filtros
+                document.getElementById('categoriasFilterCount').textContent = `Mostrando ${filteredCategories.length} categorías de ${allCategories.length} totales`;
+            }
+
+            // MÉTODO MEJORADO: Aplicar filtros de categorías
+            applyFiltersCategorias() {
+                const operadora = document.getElementById('filterCategoriasOperadora').value;
+                const categoriaId = document.getElementById('filterCategoriasId').value.trim().toLowerCase();
+                const letraCategoria = document.getElementById('filterCategoriasLetra').value;
+                const busqueda = document.getElementById('filterCategoriasBusqueda').value.trim().toLowerCase();
+                
+                return allCategories.filter(categoria => {
+                    // Filtro por operadora
+                    if (operadora && categoria.operadora !== operadora) return false;
+                    
+                    // Filtro por ID de categoría
+                    if (categoriaId && !categoria.categoria_id.toLowerCase().includes(categoriaId)) return false;
+                    
+                    // Filtro por letra de categoría
+                    if (letraCategoria && categoria.letra_categoria !== letraCategoria) return false;
+                    
+                    // Filtro por búsqueda general
+                    if (busqueda) {
+                        const nombre = categoria.nombre.toLowerCase();
+                        const categoriaIdSearch = categoria.categoria_id.toLowerCase();
+                        const observaciones = categoria.observaciones ? categoria.observaciones.toLowerCase() : '';
+                        
+                        if (!nombre.includes(busqueda) && 
+                            !categoriaIdSearch.includes(busqueda) &&
+                            !observaciones.includes(busqueda)) {
+                            return false;
+                        }
+                    }
+                    
+                    return true;
+                });
+            }
+
+            clearFiltersInventario() {
+                document.getElementById('filterOperadora').value = '';
+                document.getElementById('filterEstado').value = '';
+                document.getElementById('filterCategoriaId').value = '';
+                document.getElementById('filterLetraCategoria').value = '';
+                document.getElementById('filterBusqueda').value = '';
+                this.displayInventarioTable();
+            }
+
+            clearFiltersCategorias() {
+                document.getElementById('filterCategoriasOperadora').value = '';
+                document.getElementById('filterCategoriasId').value = '';
+                document.getElementById('filterCategoriasLetra').value = '';
+                document.getElementById('filterCategoriasBusqueda').value = '';
+                this.displayCategoriasTable();
             }
 
             displayChipsPorVencer() {
@@ -1402,7 +2057,7 @@
                                 </div>
                             </div>
                             <div class="col-md-3">
-                                <div class="fw-bold">${chip.numero_secuencia}</div>
+                                <div class="fw-bold">${chip.numero_secuencia || chip.numero_chip}</div>
                                 <div class="text-muted small">${chip.numero_chip}</div>
                             </div>
                             <div class="col-md-2">
@@ -1435,7 +2090,6 @@
                 form.reset();
                 
                 if (categoryId) {
-                    // Modo edición
                     const category = allCategories.find(cat => cat.id === categoryId);
                     if (category) {
                         document.getElementById('categoryModalLabel').textContent = 'Editar Categoría';
@@ -1449,7 +2103,6 @@
                         document.getElementById('observaciones').value = category.observaciones || '';
                     }
                 } else {
-                    // Modo creación
                     document.getElementById('categoryModalLabel').textContent = 'Nueva Categoría';
                     document.getElementById('categoryId').value = '';
                     document.getElementById('fecha_activacion').value = new Date().toISOString().split('T')[0];
@@ -1474,7 +2127,6 @@
                 const dias_vencimiento = parseInt(document.getElementById('dias_vencimiento').value);
                 const observaciones = document.getElementById('observaciones').value.trim();
                 
-                // Calcular fecha de vencimiento
                 const fechaActivacion = new Date(fecha_activacion);
                 const fechaVencimiento = new Date(fechaActivacion);
                 fechaVencimiento.setDate(fechaActivacion.getDate() + dias_vencimiento);
@@ -1494,7 +2146,6 @@
                     let response;
                     
                     if (categoryId) {
-                        // Actualizar categoría existente
                         response = await fetch(
                             `${SUPABASE_URL}/rest/v1/chip_categories?id=eq.${categoryId}`,
                             {
@@ -1509,7 +2160,6 @@
                             }
                         );
                     } else {
-                        // Crear nueva categoría
                         response = await fetch(
                             `${SUPABASE_URL}/rest/v1/chip_categories`,
                             {
@@ -1548,6 +2198,9 @@
                 document.getElementById('chipModalLabel').textContent = 'Agregar Chips';
                 document.getElementById('chipDesignadoContainer').classList.add('d-none');
                 document.getElementById('chipDesignadoCheck').checked = false;
+                document.getElementById('chipsPreview').classList.add('d-none');
+                document.getElementById('validationWarning').style.display = 'none';
+                document.getElementById('duplicateWarning').classList.add('d-none');
                 
                 this.updateChipCategories();
                 
@@ -1583,7 +2236,6 @@
                 const designadoA = designadoCheck ? document.getElementById('chipDesignadoA').value.trim() : null;
                 const designadoObservaciones = designadoCheck ? document.getElementById('chipDesignadoObservaciones').value.trim() : null;
                 
-                // Obtener números de chips
                 const numerosText = document.getElementById('chipsNumeros').value;
                 const chipNumbers = this.parseChipNumbers(numerosText);
                 
@@ -1592,7 +2244,31 @@
                     return;
                 }
                 
-                // Obtener información de la categoría
+                const validationResults = chipNumbers.map(num => this.validateChipNumber(num));
+                const invalidChips = validationResults.filter(r => !r.valid);
+                const validChips = validationResults.filter(r => r.valid).map(r => r.number);
+                
+                if (invalidChips.length > 0) {
+                    const duplicateChips = invalidChips.filter(r => r.duplicate);
+                    const formatErrorChips = invalidChips.filter(r => !r.duplicate);
+                    
+                    let errorMessage = '';
+                    if (duplicateChips.length > 0) {
+                        errorMessage += `${duplicateChips.length} chips ya existen en la base de datos.\n`;
+                    }
+                    if (formatErrorChips.length > 0) {
+                        errorMessage += `${formatErrorChips.length} chips tienen formato incorrecto (deben ser 8 dígitos exactos).`;
+                    }
+                    
+                    this.showAlert('Error de validación', errorMessage, 'error');
+                    return;
+                }
+                
+                if (validChips.length === 0) {
+                    this.showAlert('Error', 'No hay chips válidos para agregar', 'error');
+                    return;
+                }
+                
                 const categoria = allCategories.find(cat => cat.id == categoriaId);
                 if (!categoria) {
                     this.showAlert('Error', 'Categoría no encontrada', 'error');
@@ -1604,8 +2280,7 @@
                 const fechaVencimiento = new Date(fechaActivacionObj);
                 fechaVencimiento.setDate(fechaActivacionObj.getDate() + categoria.dias_vencimiento);
                 
-                // Preparar chips para insertar
-                const chipsToInsert = chipNumbers.map(numero_chip => ({
+                const chipsToInsert = validChips.map(numero_chip => ({
                     categoria_id: parseInt(categoriaId),
                     operadora: operadora,
                     numero_chip: numero_chip,
@@ -1618,7 +2293,6 @@
                 }));
                 
                 try {
-                    // Insertar en lotes
                     const batchSize = 50;
                     let successfulInserts = 0;
                     
@@ -1659,26 +2333,6 @@
                     console.error('Error guardando chips:', error);
                     this.showAlert('Error', 'No se pudieron guardar los chips', 'error');
                 }
-            }
-
-            parseChipNumbers(text) {
-                if (!text.trim()) return [];
-                
-                // Separar por líneas, comas o espacios
-                return text.split(/[\n, ]+/)
-                    .map(num => num.trim())
-                    .filter(num => num.length > 0)
-                    .filter((num, index, self) => self.indexOf(num) === index); // Únicos
-            }
-
-            populateCategoryFilters() {
-                const filterSelect = document.getElementById('filterCategoria');
-                filterSelect.innerHTML = '<option value="">Todas Categorías</option>' +
-                    allCategories.map(cat => `
-                        <option value="${cat.id}">
-                            ${cat.categoria_id} - ${cat.operadora} - ${cat.nombre}
-                        </option>
-                    `).join('');
             }
 
             designarChip(chipId) {
@@ -1789,11 +2443,12 @@
                     title: 'Editar Chip',
                     html: `
                         <div class="mb-3">
-                            <label class="form-label">Número de Chip</label>
-                            <input type="text" class="form-control" id="editChipNumber" value="${chip.numero_chip}">
+                            <label class="form-label">Número de Chip * (8 dígitos exactos)</label>
+                            <input type="text" class="form-control chip-number-input" id="editChipNumber" value="${chip.numero_chip}" maxlength="8">
+                            <div class="form-text">Debe contener exactamente 8 dígitos</div>
                         </div>
                         <div class="mb-3">
-                            <label class="form-label">Fecha de Nacimiento</label>
+                            <label class="form-label">Fecha de Nacimiento *</label>
                             <input type="date" class="form-control" id="editFechaNacimiento" value="${chip.fecha_activacion}">
                         </div>
                     `,
@@ -1804,8 +2459,10 @@
                         const numero = document.getElementById('editChipNumber').value.trim();
                         const fecha = document.getElementById('editFechaNacimiento').value;
                         
-                        if (!numero) {
-                            Swal.showValidationMessage('El número de chip es requerido');
+                        const validation = this.validateChipNumber(numero);
+                        // Permitir edición del mismo número
+                        if (numero !== chip.numero_chip && !validation.valid) {
+                            Swal.showValidationMessage(`Número inválido: ${validation.error}`);
                             return false;
                         }
                         
@@ -1814,7 +2471,7 @@
                             return false;
                         }
                         
-                        return { numero_chip: numero, fecha_activacion: fecha };
+                        return { numero_chip: validation.number, fecha_activacion: fecha };
                     }
                 });
                 
@@ -1822,7 +2479,6 @@
                     try {
                         const { numero_chip, fecha_activacion } = result.value;
                         
-                        // Recalcular fecha de vencimiento
                         const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                         const fechaNacimiento = new Date(fecha_activacion);
                         const fechaVencimiento = new Date(fechaNacimiento);
@@ -1902,7 +2558,6 @@
             }
 
             async deleteCategory(categoryId) {
-                // Verificar si la categoría tiene chips
                 const chipsInCategory = allChips.filter(chip => chip.categoria_id === categoryId);
                 if (chipsInCategory.length > 0) {
                     this.showAlert('Error', 'No se puede eliminar una categoría que tiene chips asignados', 'error');
@@ -1947,73 +2602,169 @@
                 }
             }
 
-            applyFiltersToChips() {
-                const operadora = document.getElementById('filterOperadora').value;
-                const estado = document.getElementById('filterEstado').value;
-                const categoria = document.getElementById('filterCategoria').value;
-                const busqueda = document.getElementById('filterBusqueda').value.toLowerCase();
+            // MÉTODO MEJORADO: Exportar inventario filtrado con todas las columnas
+            exportFilteredInventario() {
+                if (filteredChips.length === 0) {
+                    this.showAlert('Información', 'No hay datos filtrados para exportar', 'info');
+                    return;
+                }
                 
-                return allChips.filter(chip => {
-                    // Filtro por operadora
-                    if (operadora && chip.operadora !== operadora) return false;
+                // Aplicar numeración para exportación
+                const chipsToExport = [...filteredChips];
+                const groupedByCategory = {};
+                
+                chipsToExport.forEach(chip => {
+                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                    const categoryKey = categoria ? `${categoria.operadora}-${categoria.categoria_id}` : 'sin-categoria';
                     
-                    // Filtro por estado
-                    if (estado) {
-                        if (estado === 'VENCIDO' && this.determinarEstado(chip) !== 'VENCIDO') return false;
-                        if (estado === 'ACTIVO' && chip.estado !== 'ACTIVO') return false;
-                        if (estado === 'INACTIVO' && chip.estado !== 'INACTIVO') return false;
+                    if (!groupedByCategory[categoryKey]) {
+                        groupedByCategory[categoryKey] = [];
                     }
-                    
-                    // Filtro por categoría
-                    if (categoria && chip.categoria_id != categoria) return false;
-                    
-                    // Filtro por búsqueda
-                    if (busqueda) {
-                        const chipNumber = chip.numero_chip.toLowerCase();
-                        const sequenceNumber = chip.numero_secuencia ? chip.numero_secuencia.toLowerCase() : '';
-                        const designado = chip.designado_a ? chip.designado_a.toLowerCase() : '';
-                        
-                        if (!chipNumber.includes(busqueda) && 
-                            !sequenceNumber.includes(busqueda) && 
-                            !designado.includes(busqueda)) {
-                            return false;
-                        }
-                    }
-                    
-                    return true;
+                    groupedByCategory[categoryKey].push(chip);
                 });
+                
+                // Renumerar para exportación
+                Object.values(groupedByCategory).forEach(chipsInCategory => {
+                    chipsInCategory.sort((a, b) => a.id - b.id);
+                    chipsInCategory.forEach((chip, index) => {
+                        chip.numero_secuencia_export = index + 1;
+                    });
+                });
+                
+                const data = chipsToExport.map(chip => {
+                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                    const estado = this.determinarEstado(chip);
+                    
+                    return {
+                        '#': chip.numero_secuencia_export || '',
+                        'Número Chip': chip.numero_chip,
+                        'Operadora': chip.operadora,
+                        'ID Categoría': categoria?.categoria_id || 'N/A',
+                        'Letra Categoría': categoria?.letra_categoria || 'N/A',
+                        'Categoría': categoria?.nombre || 'N/A',
+                        'Fecha Nacimiento': chip.fecha_activacion,
+                        'Fecha Vencimiento': chip.fecha_vencimiento,
+                        'Días Restantes': chip.dias_restantes,
+                        'Estado': estado,
+                        'Designado a': chip.designado_a || '',
+                        'Observaciones Designación': chip.designado_observaciones || ''
+                    };
+                });
+
+                const worksheet = XLSX.utils.json_to_sheet(data);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario Filtrado");
+                
+                // Ajustar anchos de columna
+                const wscols = [
+                    {wch: 5},  // #
+                    {wch: 15}, // Número Chip
+                    {wch: 10}, // Operadora
+                    {wch: 15}, // ID Categoría
+                    {wch: 15}, // Letra Categoría
+                    {wch: 20}, // Categoría
+                    {wch: 15}, // Fecha Nacimiento
+                    {wch: 15}, // Fecha Vencimiento
+                    {wch: 15}, // Días Restantes
+                    {wch: 15}, // Estado
+                    {wch: 25}, // Designado a
+                    {wch: 30}  // Observaciones
+                ];
+                worksheet['!cols'] = wscols;
+
+                const fecha = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(workbook, `inventario_filtrado_${fecha}.xlsx`);
+                this.showAlert('Éxito', `Inventario filtrado exportado a Excel (${filteredChips.length} registros)`, 'success');
             }
 
-            clearFilters() {
-                document.getElementById('filterOperadora').value = '';
-                document.getElementById('filterEstado').value = '';
-                document.getElementById('filterCategoria').value = '';
-                document.getElementById('filterBusqueda').value = '';
-                this.displayInventarioTable();
+            // MÉTODO MEJORADO: Exportar categorías filtradas
+            exportFilteredCategories() {
+                if (filteredCategories.length === 0) {
+                    this.showAlert('Información', 'No hay categorías filtradas para exportar', 'info');
+                    return;
+                }
+                
+                const data = filteredCategories.map(cat => {
+                    const chipsCount = allChips.filter(chip => chip.categoria_id === cat.id).length;
+                    
+                    return {
+                        'ID Categoría': cat.categoria_id,
+                        'Letra': cat.letra_categoria,
+                        'Operadora': cat.operadora,
+                        'Nombre Categoría': cat.nombre,
+                        'Fecha Nacimiento': cat.fecha_activacion,
+                        'Fecha Vencimiento': cat.fecha_vencimiento,
+                        'Días Vencimiento': cat.dias_vencimiento,
+                        'Chips Asignados': chipsCount,
+                        'Observaciones': cat.observaciones || ''
+                    };
+                });
+
+                const worksheet = XLSX.utils.json_to_sheet(data);
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Categorías Filtradas");
+                
+                // Ajustar anchos de columna
+                const wscols = [
+                    {wch: 15}, {wch: 10}, {wch: 10}, {wch: 25},
+                    {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
+                    {wch: 30}
+                ];
+                worksheet['!cols'] = wscols;
+                
+                const fecha = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(workbook, `categorias_filtradas_${fecha}.xlsx`);
+                
+                this.showAlert('Éxito', `Categorías filtradas exportadas a Excel (${filteredCategories.length} registros)`, 'success');
             }
 
             loadReportsData() {
-                // Destruir gráficos anteriores si existen
-                if (window.operadoraChart) window.operadoraChart.destroy();
-                if (window.estadoChart) window.estadoChart.destroy();
+                this.updateReportStatistics();
                 
-                // Gráfico de distribución por operadora
-                const operadoraCtx = document.getElementById('operadoraChart').getContext('2d');
+                Object.values(charts).forEach(chart => {
+                    if (chart) chart.destroy();
+                });
+                
+                this.createOperadoraChart();
+                this.createEstadoChart();
+            }
+
+            updateReportStatistics() {
+                const entelChips = allChips.filter(chip => chip.operadora === 'ENTEL');
+                const tigoChips = allChips.filter(chip => chip.operadora === 'TIGO');
+                const vivaChips = allChips.filter(chip => chip.operadora === 'VIVA');
+                
+                document.getElementById('reportEntelTotal').textContent = entelChips.length;
+                document.getElementById('reportEntelActivos').textContent = entelChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
+                document.getElementById('reportEntelPorVencer').textContent = entelChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length;
+                
+                document.getElementById('reportTigoTotal').textContent = tigoChips.length;
+                document.getElementById('reportTigoActivos').textContent = tigoChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
+                document.getElementById('reportTigoPorVencer').textContent = tigoChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length;
+                
+                document.getElementById('reportVivaTotal').textContent = vivaChips.length;
+                document.getElementById('reportVivaActivos').textContent = vivaChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
+                document.getElementById('reportVivaPorVencer').textContent = vivaChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length;
+            }
+
+            createOperadoraChart() {
+                const ctx = document.getElementById('operadoraChart').getContext('2d');
                 const operadoraData = {
                     'ENTEL': allChips.filter(chip => chip.operadora === 'ENTEL').length,
                     'TIGO': allChips.filter(chip => chip.operadora === 'TIGO').length,
                     'VIVA': allChips.filter(chip => chip.operadora === 'VIVA').length
                 };
                 
-                window.operadoraChart = new Chart(operadoraCtx, {
-                    type: 'pie',
+                charts.operadora = new Chart(ctx, {
+                    type: 'doughnut',
                     data: {
                         labels: ['ENTEL', 'TIGO', 'VIVA'],
                         datasets: [{
                             data: [operadoraData.ENTEL, operadoraData.TIGO, operadoraData.VIVA],
                             backgroundColor: ['#0088CC', '#005EB8', '#78BE20'],
                             borderWidth: 2,
-                            borderColor: '#fff'
+                            borderColor: '#fff',
+                            hoverOffset: 15
                         }]
                     },
                     options: {
@@ -2023,32 +2774,76 @@
                             legend: {
                                 position: 'right',
                                 labels: {
-                                    padding: 20
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    pointStyle: 'circle'
+                                }
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} (${percentage}%)`;
+                                    }
                                 }
                             }
                         }
                     }
                 });
+                
+                const total = operadoraData.ENTEL + operadoraData.TIGO + operadoraData.VIVA;
+                document.getElementById('operadoraStats').innerHTML = `
+                    <div class="stats-detail-item">
+                        <span>ENTEL:</span>
+                        <span>${operadoraData.ENTEL} (${Math.round((operadoraData.ENTEL/total)*100)}%)</span>
+                    </div>
+                    <div class="stats-detail-item">
+                        <span>TIGO:</span>
+                        <span>${operadoraData.TIGO} (${Math.round((operadoraData.TIGO/total)*100)}%)</span>
+                    </div>
+                    <div class="stats-detail-item">
+                        <span>VIVA:</span>
+                        <span>${operadoraData.VIVA} (${Math.round((operadoraData.VIVA/total)*100)}%)</span>
+                    </div>
+                `;
+            }
 
-                // Gráfico de estados
-                const estadoCtx = document.getElementById('estadoChart').getContext('2d');
+            createEstadoChart() {
+                const ctx = document.getElementById('estadoChart').getContext('2d');
                 const estadoData = {
-                    'Activos': allChips.filter(chip => chip.estado === 'ACTIVO' && this.determinarEstado(chip) !== 'VENCIDO').length,
-                    'Por Vencer': chipsPorVencer.length,
+                    'Activos': allChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length,
+                    'Por Vencer': allChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER').length,
+                    'Críticos': allChips.filter(chip => this.determinarEstado(chip) === 'CRITICO').length,
                     'Vencidos': allChips.filter(chip => this.determinarEstado(chip) === 'VENCIDO').length,
-                    'Designados': allChips.filter(chip => chip.designado_a).length
+                    'Designados': allChips.filter(chip => this.determinarEstado(chip) === 'DESIGNADO').length
                 };
                 
-                window.estadoChart = new Chart(estadoCtx, {
+                charts.estado = new Chart(ctx, {
                     type: 'bar',
                     data: {
-                        labels: ['Activos', 'Por Vencer', 'Vencidos', 'Designados'],
+                        labels: ['Activos', 'Por Vencer', 'Críticos', 'Vencidos', 'Designados'],
                         datasets: [{
                             label: 'Cantidad de Chips',
-                            data: [estadoData.Activos, estadoData['Por Vencer'], estadoData.Vencidos, estadoData.Designados],
-                            backgroundColor: ['#28a745', '#ffc107', '#dc3545', '#6f42c1'],
+                            data: [
+                                estadoData.Activos,
+                                estadoData['Por Vencer'],
+                                estadoData.Críticos,
+                                estadoData.Vencidos,
+                                estadoData.Designados
+                            ],
+                            backgroundColor: [
+                                '#28a745',
+                                '#ffc107',
+                                '#fd7e14',
+                                '#dc3545',
+                                '#6f42c1'
+                            ],
                             borderWidth: 0,
-                            borderRadius: 5
+                            borderRadius: 8,
+                            borderSkipped: false
                         }]
                     },
                     options: {
@@ -2064,70 +2859,133 @@
                                 beginAtZero: true,
                                 ticks: {
                                     stepSize: 1
+                                },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
                                 }
                             }
                         }
                     }
                 });
+                
+                const total = allChips.length;
+                document.getElementById('estadoStats').innerHTML = `
+                    <div class="stats-detail-item">
+                        <span>Total Activos:</span>
+                        <span>${estadoData.Activos} (${Math.round((estadoData.Activos/total)*100)}%)</span>
+                    </div>
+                    <div class="stats-detail-item">
+                        <span>Por Vencer:</span>
+                        <span>${estadoData['Por Vencer']} (${Math.round((estadoData['Por Vencer']/total)*100)}%)</span>
+                    </div>
+                    <div class="stats-detail-item">
+                        <span>Chips Críticos:</span>
+                        <span>${estadoData.Críticos} (${Math.round((estadoData.Críticos/total)*100)}%)</span>
+                    </div>
+                    <div class="stats-detail-item">
+                        <span>Total Vencidos:</span>
+                        <span>${estadoData.Vencidos} (${Math.round((estadoData.Vencidos/total)*100)}%)</span>
+                    </div>
+                `;
             }
 
             async exportToExcel() {
-                const data = allChips.map(chip => {
+                // Aplicar numeración para exportación completa
+                const chipsToExport = [...allChips];
+                const groupedByCategory = {};
+                
+                chipsToExport.forEach(chip => {
+                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                    const categoryKey = categoria ? `${categoria.operadora}-${categoria.categoria_id}` : 'sin-categoria';
+                    
+                    if (!groupedByCategory[categoryKey]) {
+                        groupedByCategory[categoryKey] = [];
+                    }
+                    groupedByCategory[categoryKey].push(chip);
+                });
+                
+                // Renumerar para exportación
+                Object.values(groupedByCategory).forEach(chipsInCategory => {
+                    chipsInCategory.sort((a, b) => a.id - b.id);
+                    chipsInCategory.forEach((chip, index) => {
+                        chip.numero_secuencia_export = index + 1;
+                    });
+                });
+                
+                const data = chipsToExport.map(chip => {
                     const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                     const estado = this.determinarEstado(chip);
                     
                     return {
-                        'Número Secuencia': chip.numero_secuencia,
+                        '#': chip.numero_secuencia_export || '',
                         'Número Chip': chip.numero_chip,
                         'Operadora': chip.operadora,
+                        'ID Categoría': categoria?.categoria_id || 'N/A',
+                        'Letra Categoría': categoria?.letra_categoria || 'N/A',
                         'Categoría': categoria?.nombre || 'N/A',
                         'Fecha Nacimiento': chip.fecha_activacion,
                         'Fecha Vencimiento': chip.fecha_vencimiento,
                         'Días Restantes': chip.dias_restantes,
                         'Estado': estado,
                         'Designado a': chip.designado_a || '',
-                        'Observaciones': chip.designado_observaciones || ''
+                        'Observaciones Designación': chip.designado_observaciones || ''
                     };
                 });
 
                 const worksheet = XLSX.utils.json_to_sheet(data);
                 const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario");
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario Completo");
                 
-                // Ajustar anchos de columnas
                 const wscols = [
-                    {wch: 15}, {wch: 15}, {wch: 10}, {wch: 20},
-                    {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
-                    {wch: 25}, {wch: 30}
+                    {wch: 5},  // #
+                    {wch: 15}, // Número Chip
+                    {wch: 10}, // Operadora
+                    {wch: 15}, // ID Categoría
+                    {wch: 15}, // Letra Categoría
+                    {wch: 20}, // Categoría
+                    {wch: 15}, // Fecha Nacimiento
+                    {wch: 15}, // Fecha Vencimiento
+                    {wch: 15}, // Días Restantes
+                    {wch: 15}, // Estado
+                    {wch: 25}, // Designado a
+                    {wch: 30}  // Observaciones
                 ];
                 worksheet['!cols'] = wscols;
 
-                XLSX.writeFile(workbook, `inventario_chips_${new Date().toISOString().slice(0,10)}.xlsx`);
-                this.showAlert('Éxito', 'Archivo Excel generado', 'success');
+                const fecha = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(workbook, `inventario_completo_${fecha}.xlsx`);
+                this.showAlert('Éxito', `Archivo Excel generado (${allChips.length} registros)`, 'success');
             }
 
             exportToPDF() {
-                // Para PDF necesitaríamos jsPDF, pero por simplicidad solo haremos Excel y CSV
                 this.showAlert('Info', 'La exportación PDF requiere librerías adicionales. Use Excel o CSV.', 'info');
             }
 
             exportToCSV() {
                 const csvContent = [
-                    ['Número Secuencia', 'Número Chip', 'Operadora', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a'].join(','),
+                    ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Letra Categoría', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
                     ...allChips.map(chip => {
                         const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                         const estado = this.determinarEstado(chip);
                         
                         return [
-                            chip.numero_secuencia,
+                            chip.numero_secuencia || '',
                             chip.numero_chip,
                             chip.operadora,
+                            categoria?.categoria_id || 'N/A',
+                            categoria?.letra_categoria || 'N/A',
                             `"${categoria?.nombre || 'N/A'}"`,
                             chip.fecha_activacion,
                             chip.fecha_vencimiento,
                             chip.dias_restantes,
                             estado,
-                            `"${chip.designado_a || ''}"`
+                            `"${chip.designado_a || ''}"`,
+                            `"${chip.designado_observaciones || ''}"`
                         ].join(',');
                     })
                 ].join('\n');
@@ -2135,7 +2993,8 @@
                 const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
                 const link = document.createElement('a');
                 link.href = URL.createObjectURL(blob);
-                link.download = `inventario_chips_${new Date().toISOString().slice(0,10)}.csv`;
+                const fecha = new Date().toISOString().slice(0,10);
+                link.download = `inventario_chips_${fecha}.csv`;
                 link.click();
                 
                 this.showAlert('Éxito', 'Archivo CSV generado', 'success');
@@ -2149,7 +3008,7 @@
                         'ID Categoría': cat.categoria_id,
                         'Letra': cat.letra_categoria,
                         'Operadora': cat.operadora,
-                        'Nombre': cat.nombre,
+                        'Nombre Categoría': cat.nombre,
                         'Fecha Nacimiento': cat.fecha_activacion,
                         'Fecha Vencimiento': cat.fecha_vencimiento,
                         'Días Vencimiento': cat.dias_vencimiento,
@@ -2161,13 +3020,64 @@
                 const worksheet = XLSX.utils.json_to_sheet(data);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Categorías");
-                XLSX.writeFile(workbook, `categorias_chips_${new Date().toISOString().slice(0,10)}.xlsx`);
                 
-                this.showAlert('Éxito', 'Categorías exportadas a Excel', 'success');
+                const wscols = [
+                    {wch: 15}, {wch: 10}, {wch: 10}, {wch: 25},
+                    {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
+                    {wch: 30}
+                ];
+                worksheet['!cols'] = wscols;
+                
+                const fecha = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(workbook, `categorias_completas_${fecha}.xlsx`);
+                
+                this.showAlert('Éxito', `Categorías exportadas a Excel (${allCategories.length} registros)`, 'success');
             }
 
             exportReport() {
-                this.exportToExcel();
+                const reportData = {
+                    fecha: new Date().toISOString().slice(0,10),
+                    totalChips: allChips.length,
+                    estadisticas: {
+                        entel: allChips.filter(chip => chip.operadora === 'ENTEL').length,
+                        tigo: allChips.filter(chip => chip.operadora === 'TIGO').length,
+                        viva: allChips.filter(chip => chip.operadora === 'VIVA').length,
+                        activos: allChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length,
+                        porVencer: allChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER').length,
+                        criticos: allChips.filter(chip => this.determinarEstado(chip) === 'CRITICO').length,
+                        vencidos: allChips.filter(chip => this.determinarEstado(chip) === 'VENCIDO').length,
+                        designados: allChips.filter(chip => chip.designado_a).length
+                    }
+                };
+
+                const worksheet = XLSX.utils.json_to_sheet([
+                    { 'Reporte': 'Inventario de Chips', 'Fecha': reportData.fecha },
+                    { 'Reporte': 'Total Chips', 'Valor': reportData.totalChips },
+                    {},
+                    { 'Reporte': 'Estadísticas por Operadora', 'Valor': '' },
+                    { 'Reporte': 'ENTEL', 'Valor': reportData.estadisticas.entel },
+                    { 'Reporte': 'TIGO', 'Valor': reportData.estadisticas.tigo },
+                    { 'Reporte': 'VIVA', 'Valor': reportData.estadisticas.viva },
+                    {},
+                    { 'Reporte': 'Estadísticas por Estado', 'Valor': '' },
+                    { 'Reporte': 'Activos', 'Valor': reportData.estadisticas.activos },
+                    { 'Reporte': 'Por Vencer', 'Valor': reportData.estadisticas.porVencer },
+                    { 'Reporte': 'Críticos', 'Valor': reportData.estadisticas.criticos },
+                    { 'Reporte': 'Vencidos', 'Valor': reportData.estadisticas.vencidos },
+                    { 'Reporte': 'Designados', 'Valor': reportData.estadisticas.designados }
+                ]);
+                
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+                
+                const wscols = [
+                    {wch: 25}, {wch: 15}
+                ];
+                worksheet['!cols'] = wscols;
+                
+                XLSX.writeFile(workbook, `reporte_chips_${reportData.fecha}.xlsx`);
+                
+                this.showAlert('Éxito', 'Reporte exportado a Excel', 'success');
             }
 
             exportPorVencer() {
@@ -2175,9 +3085,11 @@
                     const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                     
                     return {
-                        'Número Secuencia': chip.numero_secuencia,
+                        '#': chip.numero_secuencia || chip.numero_chip,
                         'Número Chip': chip.numero_chip,
                         'Operadora': chip.operadora,
+                        'ID Categoría': categoria?.categoria_id || 'N/A',
+                        'Letra Categoría': categoria?.letra_categoria || 'N/A',
                         'Categoría': categoria?.nombre || 'N/A',
                         'Fecha Vencimiento': chip.fecha_vencimiento,
                         'Días Restantes': chip.dias_restantes,
@@ -2189,9 +3101,18 @@
                 const worksheet = XLSX.utils.json_to_sheet(data);
                 const workbook = XLSX.utils.book_new();
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Chips por Vencer");
-                XLSX.writeFile(workbook, `chips_por_vencer_${new Date().toISOString().slice(0,10)}.xlsx`);
                 
-                this.showAlert('Éxito', 'Chips por vencer exportados a Excel', 'success');
+                const wscols = [
+                    {wch: 5}, {wch: 15}, {wch: 10}, {wch: 15},
+                    {wch: 15}, {wch: 20}, {wch: 15}, {wch: 15},
+                    {wch: 25}, {wch: 15}
+                ];
+                worksheet['!cols'] = wscols;
+                
+                const fecha = new Date().toISOString().slice(0,10);
+                XLSX.writeFile(workbook, `chips_por_vencer_${fecha}.xlsx`);
+                
+                this.showAlert('Éxito', `Chips por vencer exportados a Excel (${chipsPorVencer.length} registros)`, 'success');
             }
 
             async refreshData() {
