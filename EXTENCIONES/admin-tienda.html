@@ -1583,6 +1583,22 @@
         function displaySales(sales) {
             const tbody = document.getElementById('salesTable');
             
+            if (sales.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div class="empty-state-text">No hay ventas registradas</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+                return;
+            }
+            
             tbody.innerHTML = sales.map(sale => {
                 // Buscar vendedor
                 const seller = allUsers.find(u => u.id === sale.user_id);
@@ -1657,17 +1673,16 @@
                 return;
             }
             
-            // Filtrar ventas por fecha seleccionada - MODIFICADO: comparar con fecha_hora
+            // Filtrar ventas por fecha seleccionada - MEJORADO
             const filteredSales = allSales.filter(sale => {
                 if (!sale.fecha_hora) return false;
                 
-                // Extraer solo la parte de fecha de fecha_hora
-                const saleDatePart = sale.fecha_hora.split(' ')[0];
-                const filterDate = new Date(selectedDate);
-                const filterDateStr = filterDate.toISOString().split('T')[0];
+                // Función mejorada para extraer la fecha de fecha_hora
+                const saleDateStr = extractDateFromFechaHora(sale.fecha_hora);
+                if (!saleDateStr) return false;
                 
-                // Comparar fechas
-                return saleDatePart === filterDateStr;
+                // Comparar fechas en formato YYYY-MM-DD
+                return saleDateStr === selectedDate;
             });
             
             // Filtrar por usuario si se seleccionó uno específico
@@ -1776,7 +1791,7 @@
                 <tr>
                     <td>
                         <strong>${userData.userName}</strong>
-                        <br><small class="text-muted">ID: ${Object.keys(salesByUser)[0]}</small>
+                        <br><small class="text-muted">ID: ${Object.keys(salesByUser).find(key => salesByUser[key] === userData)}</small>
                     </td>
                     <td class="money fw-bold">${userData.totalSales.toFixed(2)}</td>
                     <td>${userData.salesCount} ventas</td>
@@ -1815,6 +1830,91 @@
             </tr>
             `;
             tbody.innerHTML = headerRow + tbody.innerHTML;
+        }
+
+        function extractDateFromFechaHora(fechaHora) {
+            if (!fechaHora) return null;
+            
+            try {
+                // Intentar diferentes formatos de fecha
+                let dateObj;
+                
+                // Si ya está en formato ISO (YYYY-MM-DD)
+                if (fechaHora.includes('T') || fechaHora.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    dateObj = new Date(fechaHora);
+                } 
+                // Si está en formato DD/MM/YYYY HH:MM:SS
+                else if (fechaHora.includes('/')) {
+                    const parts = fechaHora.split(' ');
+                    const dateParts = parts[0].split('/');
+                    if (dateParts.length === 3) {
+                        dateObj = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+                    }
+                }
+                // Si está en formato YYYY-MM-DD HH:MM:SS
+                else if (fechaHora.includes('-') && fechaHora.includes(':')) {
+                    dateObj = new Date(fechaHora.split(' ')[0]);
+                }
+                
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    // Formatear a YYYY-MM-DD
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+                
+                return null;
+            } catch (e) {
+                console.error('Error parsing fecha_hora:', fechaHora, e);
+                return null;
+            }
+        }
+
+        function filterSales() {
+            const dateFilter = document.getElementById('salesDateFilter').value;
+            const userFilter = document.getElementById('salesUserFilter').value;
+            
+            let filtered = allSales;
+            
+            // Filtrar por fecha - MEJORADO
+            if (dateFilter) {
+                filtered = filtered.filter(sale => {
+                    if (!sale.fecha_hora) return false;
+                    
+                    // Extraer fecha de fecha_hora usando función mejorada
+                    const saleDateStr = extractDateFromFechaHora(sale.fecha_hora);
+                    if (!saleDateStr) return false;
+                    
+                    // Comparar fechas
+                    return saleDateStr === dateFilter;
+                });
+            }
+            
+            // Filtrar por usuario
+            if (userFilter) {
+                filtered = filtered.filter(sale => sale.user_id == userFilter);
+            }
+            
+            // Mostrar resultados
+            if (filtered.length === 0) {
+                let message = 'No hay ventas que coincidan con los filtros.';
+                if (dateFilter || userFilter) {
+                    message += '<br><small class="text-muted">';
+                    if (dateFilter) message += `Fecha: ${dateFilter} `;
+                    if (userFilter) {
+                        const user = allUsers.find(u => u.id == userFilter);
+                        message += `Vendedor: ${user ? user.nombre : userFilter}`;
+                    }
+                    message += '</small>';
+                }
+                
+                displaySales(filtered);
+                showNotification(message, 'info');
+            } else {
+                displaySales(filtered);
+                showNotification(`Se encontraron ${filtered.length} ventas`, 'success');
+            }
         }
 
         function markCashAsCollected() {
@@ -1950,34 +2050,6 @@
                 </tr>
                 `;
             }).join('');
-        }
-
-        function filterSales() {
-            const dateFilter = document.getElementById('salesDateFilter').value;
-            const userFilter = document.getElementById('salesUserFilter').value;
-            
-            let filtered = allSales;
-            
-            // Filtrar por fecha - MODIFICADO: usar fecha_hora
-            if (dateFilter) {
-                filtered = filtered.filter(sale => {
-                    if (!sale.fecha_hora) return false;
-                    
-                    // Extraer solo la parte de fecha de fecha_hora
-                    const saleDatePart = sale.fecha_hora.split(' ')[0];
-                    const filterDate = new Date(dateFilter);
-                    const filterDateStr = filterDate.toISOString().split('T')[0];
-                    
-                    return saleDatePart === filterDateStr;
-                });
-            }
-            
-            // Filtrar por usuario
-            if (userFilter) {
-                filtered = filtered.filter(sale => sale.user_id == userFilter);
-            }
-            
-            displaySales(filtered);
         }
 
         function showAddProductModal() {
@@ -2817,9 +2889,9 @@
             allSales.forEach(sale => {
                 if (!sale.fecha_hora) return;
                 
-                // Extraer solo la parte de fecha
-                const saleDate = sale.fecha_hora.split(' ')[0];
-                const dateKey = saleDate;
+                // Extraer fecha usando función mejorada
+                const saleDate = extractDateFromFechaHora(sale.fecha_hora);
+                if (!saleDate) return;
                 
                 let total = 0;
                 try {
@@ -2831,10 +2903,10 @@
                     console.error('Error parsing sale:', e);
                 }
                 
-                if (salesByDay[dateKey]) {
-                    salesByDay[dateKey] += total;
+                if (salesByDay[saleDate]) {
+                    salesByDay[saleDate] += total;
                 } else {
-                    salesByDay[dateKey] = total;
+                    salesByDay[saleDate] = total;
                 }
             });
             
