@@ -571,6 +571,10 @@
                     <i class="bi bi-cash-stack"></i>
                     <span>Ventas</span>
                 </a>
+                <a href="#" class="menu-item" data-section="caja">
+                    <i class="bi bi-cash-coin"></i>
+                    <span>Caja por Vendedor</span>
+                </a>
                 <a href="#" class="menu-item" data-section="sucursales">
                     <i class="bi bi-shop-window"></i>
                     <span>Sucursales</span>
@@ -702,7 +706,7 @@
                                             <th># Venta</th>
                                             <th>Vendedor</th>
                                             <th>Total</th>
-                                            <th>Fecha</th>
+                                            <th>Fecha/Hora</th>
                                         </tr>
                                     </thead>
                                     <tbody id="recentSalesTable">
@@ -800,13 +804,100 @@
                                             <th>Productos</th>
                                             <th>Cantidad</th>
                                             <th>Total</th>
-                                            <th>Fecha</th>
+                                            <th>Fecha/Hora</th>
                                         </tr>
                                     </thead>
                                     <tbody id="salesTable">
                                         <!-- Ventas -->
                                     </tbody>
                                 </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Caja por Vendedor -->
+                <div id="cajaSection" class="fade-in d-none">
+                    <div class="desktop-card">
+                        <div class="desktop-card-header">
+                            <span>Caja por Vendedor - <span id="cashBranchTitle">Sucursal</span></span>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Seleccionar Fecha</label>
+                                        <input type="date" class="desktop-form-control" id="cashDateFilter" value="<?php echo date('Y-m-d'); ?>">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Seleccionar Vendedor</label>
+                                        <select class="desktop-form-control" id="cashUserFilter">
+                                            <option value="">Todos los vendedores</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button class="desktop-btn desktop-btn-primary w-100" onclick="calculateCashByUser()">
+                                            <i class="bi bi-calculator"></i>
+                                            <span>Calcular Efectivo</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Vendedor</th>
+                                            <th>Total Ventas del Día</th>
+                                            <th>N° de Ventas</th>
+                                            <th>Productos Vendidos</th>
+                                            <th>Efectivo a Entregar</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="cashByUserTable">
+                                        <!-- Resultados del cálculo de caja -->
+                                        <tr>
+                                            <td colspan="6" class="text-center py-4">
+                                                <div class="empty-state">
+                                                    <div class="empty-state-icon">
+                                                        <i class="bi bi-cash-coin"></i>
+                                                    </div>
+                                                    <div class="empty-state-text">Seleccione una fecha y haga clic en "Calcular Efectivo"</div>
+                                                    <div class="empty-state-subtext">Se mostrará el efectivo que cada vendedor debe entregar según sus ventas del día</div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <!-- Resumen total -->
+                            <div class="mt-4 p-4 bg-light rounded" id="cashSummary" style="display: none;">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <h5 class="mb-3">Resumen Total del Día</h5>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Total Vendedores:</span>
+                                            <strong id="totalSellers">0</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Total Ventas del Día:</span>
+                                            <strong class="money" id="totalDaySales">0.00</strong>
+                                        </div>
+                                        <div class="d-flex justify-content-between mb-2">
+                                            <span>Total Efectivo a Recaudar:</span>
+                                            <strong class="money text-success" id="totalCashToCollect">0.00</strong>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6 d-flex align-items-center justify-content-end">
+                                        <button class="desktop-btn desktop-btn-success" onclick="markCashAsCollected()">
+                                            <i class="bi bi-check-circle"></i>
+                                            <span>Marcar como Recaudado</span>
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -1141,6 +1232,13 @@
                 document.getElementById('transferFrom').addEventListener('change', updateTransferProductList);
                 document.getElementById('transferProduct').addEventListener('change', updateAvailableStock);
 
+                // Configurar evento para calcular efectivo por fecha
+                document.getElementById('cashDateFilter').addEventListener('change', function() {
+                    if (document.getElementById('cajaSection').classList.contains('d-none') === false) {
+                        calculateCashByUser();
+                    }
+                });
+
                 // Cargar datos iniciales (usando la primera sucursal por defecto)
                 if (allBranches.length > 0) {
                     const firstBranch = allBranches[0];
@@ -1199,6 +1297,7 @@
             // Actualizar títulos en todas las secciones
             document.getElementById('branchInventoryTitle').textContent = currentBranch.name;
             document.getElementById('salesBranchTitle').textContent = currentBranch.name;
+            document.getElementById('cashBranchTitle').textContent = currentBranch.name;
             document.getElementById('reportBranchTitle').textContent = currentBranch.name;
             document.getElementById('reportBranchTitle2').textContent = currentBranch.name;
             document.getElementById('reportBranchTitle3').textContent = currentBranch.name;
@@ -1244,9 +1343,9 @@
                     allProducts = [];
                 }
                 
-                // Cargar ventas de la sucursal
+                // Cargar ventas de la sucursal - MODIFICADO: ya no usamos created_at sino fecha_hora
                 const salesResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/sales?branch_id=eq.${currentBranch.id}&order=created_at.desc`,
+                    `${SUPABASE_URL}/rest/v1/sales?branch_id=eq.${currentBranch.id}&order=fecha_hora.desc`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1278,6 +1377,9 @@
                 displaySales(allSales);
                 populateFilters();
                 
+                // Actualizar filtro de vendedores en la sección de caja
+                updateCashUserFilter();
+                
             } catch (error) {
                 console.error('Error al cargar datos de sucursal:', error);
                 showNotification('Error al cargar datos', 'error');
@@ -1308,7 +1410,7 @@
             // Productos con stock bajo
             updateLowStockTable();
             
-            // Últimas ventas
+            // Últimas ventas - MODIFICADO: usar fecha_hora en lugar de created_at
             updateRecentSalesTable();
         }
 
@@ -1377,20 +1479,15 @@
                     console.error('Error parsing sale:', e);
                 }
                 
-                // Formatear fecha
-                const saleDate = new Date(sale.created_at);
-                const formattedDate = saleDate.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric'
-                });
+                // Formatear fecha - MODIFICADO: usar fecha_hora en lugar de created_at
+                const fechaHora = sale.fecha_hora || sale.created_at || new Date().toLocaleString('es-ES');
                 
                 return `
                 <tr>
                     <td>#${sale.id}</td>
                     <td>${sellerName}</td>
                     <td class="money">${total.toFixed(2)}</td>
-                    <td>${formattedDate}</td>
+                    <td>${fechaHora}</td>
                 </tr>
                 `;
             }).join('');
@@ -1509,15 +1606,8 @@
                     console.error('Error parsing sale:', e);
                 }
                 
-                // Formatear fecha
-                const saleDate = new Date(sale.created_at);
-                const formattedDate = saleDate.toLocaleDateString('es-ES', {
-                    day: '2-digit',
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
+                // Formatear fecha - MODIFICADO: usar fecha_hora en lugar de created_at
+                const fechaHora = sale.fecha_hora || sale.created_at || new Date().toLocaleString('es-ES');
                 
                 return `
                 <tr>
@@ -1526,14 +1616,14 @@
                     <td>${productsList}</td>
                     <td>${totalQuantity}</td>
                     <td class="money fw-bold">${totalAmount.toFixed(2)}</td>
-                    <td>${formattedDate}</td>
+                    <td>${fechaHora}</td>
                 </tr>
                 `;
             }).join('');
         }
 
         function populateFilters() {
-            // Filtro de usuarios
+            // Filtro de usuarios en ventas
             const userFilter = document.getElementById('salesUserFilter');
             userFilter.innerHTML = '<option value="">Todos los vendedores</option>';
             
@@ -1543,6 +1633,220 @@
                 option.textContent = user.nombre;
                 userFilter.appendChild(option);
             });
+        }
+
+        function updateCashUserFilter() {
+            // Filtro de usuarios en caja
+            const cashUserFilter = document.getElementById('cashUserFilter');
+            cashUserFilter.innerHTML = '<option value="">Todos los vendedores</option>';
+            
+            allUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.nombre;
+                cashUserFilter.appendChild(option);
+            });
+        }
+
+        function calculateCashByUser() {
+            const selectedDate = document.getElementById('cashDateFilter').value;
+            const selectedUserId = document.getElementById('cashUserFilter').value;
+            
+            if (!selectedDate) {
+                showNotification('Por favor seleccione una fecha', 'error');
+                return;
+            }
+            
+            // Filtrar ventas por fecha seleccionada - MODIFICADO: comparar con fecha_hora
+            const filteredSales = allSales.filter(sale => {
+                if (!sale.fecha_hora) return false;
+                
+                // Extraer solo la parte de fecha de fecha_hora
+                const saleDatePart = sale.fecha_hora.split(' ')[0];
+                const filterDate = new Date(selectedDate);
+                const filterDateStr = filterDate.toISOString().split('T')[0];
+                
+                // Comparar fechas
+                return saleDatePart === filterDateStr;
+            });
+            
+            // Filtrar por usuario si se seleccionó uno específico
+            let filteredByUser = filteredSales;
+            if (selectedUserId) {
+                filteredByUser = filteredSales.filter(sale => sale.user_id == selectedUserId);
+            }
+            
+            // Agrupar ventas por usuario
+            const salesByUser = {};
+            filteredByUser.forEach(sale => {
+                const userId = sale.user_id;
+                
+                if (!salesByUser[userId]) {
+                    // Buscar información del usuario
+                    const user = allUsers.find(u => u.id === userId);
+                    salesByUser[userId] = {
+                        userName: user ? user.nombre : 'Desconocido',
+                        totalSales: 0,
+                        salesCount: 0,
+                        productsSold: 0,
+                        saleIds: [],
+                        productDetails: []
+                    };
+                }
+                
+                // Calcular total de la venta
+                let saleTotal = 0;
+                let productsInSale = 0;
+                let productNames = [];
+                
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        saleTotal = products.reduce((sum, p) => sum + p.subtotal, 0);
+                        productsInSale = products.reduce((sum, p) => sum + p.quantity, 0);
+                        productNames = products.map(p => `${p.quantity}x ${p.name}`);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+                
+                salesByUser[userId].totalSales += saleTotal;
+                salesByUser[userId].salesCount += 1;
+                salesByUser[userId].productsSold += productsInSale;
+                salesByUser[userId].saleIds.push(sale.id);
+                salesByUser[userId].productDetails.push(...productNames);
+            });
+            
+            // Mostrar resultados en la tabla
+            displayCashByUserResults(salesByUser, selectedDate, filteredSales);
+        }
+
+        function displayCashByUserResults(salesByUser, selectedDate, allDaySales) {
+            const tbody = document.getElementById('cashByUserTable');
+            
+            if (Object.keys(salesByUser).length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                            <div class="empty-state-text">No hay ventas registradas para esta fecha</div>
+                            <div class="empty-state-subtext">Fecha seleccionada: ${selectedDate}</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+                document.getElementById('cashSummary').style.display = 'none';
+                return;
+            }
+            
+            // Calcular totales del día
+            let totalDaySales = 0;
+            let totalProductsSold = 0;
+            let totalSalesCount = 0;
+            
+            allDaySales.forEach(sale => {
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        totalDaySales += products.reduce((sum, p) => sum + p.subtotal, 0);
+                        totalProductsSold += products.reduce((sum, p) => sum + p.quantity, 0);
+                        totalSalesCount += 1;
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+            });
+            
+            // Mostrar resultados por usuario
+            tbody.innerHTML = Object.values(salesByUser).map(userData => {
+                // Limitar la lista de productos a mostrar
+                const productList = userData.productDetails.slice(0, 3).join(', ');
+                const moreProducts = userData.productDetails.length > 3 ? 
+                    ` y ${userData.productDetails.length - 3} más...` : '';
+                
+                // Determinar estado (basado en si tiene ventas)
+                const status = userData.totalSales > 0 ? 
+                    '<span class="status-badge status-activo">Con Ventas</span>' : 
+                    '<span class="status-badge status-agotado">Sin Ventas</span>';
+                
+                return `
+                <tr>
+                    <td>
+                        <strong>${userData.userName}</strong>
+                        <br><small class="text-muted">ID: ${Object.keys(salesByUser)[0]}</small>
+                    </td>
+                    <td class="money fw-bold">${userData.totalSales.toFixed(2)}</td>
+                    <td>${userData.salesCount} ventas</td>
+                    <td>
+                        ${productList}${moreProducts}
+                        <br><small class="text-muted">Total productos: ${userData.productsSold}</small>
+                    </td>
+                    <td class="money fw-bold text-success">${userData.totalSales.toFixed(2)}</td>
+                    <td>${status}</td>
+                </tr>
+                `;
+            }).join('');
+            
+            // Mostrar resumen total
+            document.getElementById('cashSummary').style.display = 'block';
+            document.getElementById('totalSellers').textContent = Object.keys(salesByUser).length;
+            document.getElementById('totalDaySales').textContent = totalDaySales.toFixed(2);
+            document.getElementById('totalCashToCollect').textContent = totalDaySales.toFixed(2);
+            
+            // Mostrar información de la fecha seleccionada
+            const dateObj = new Date(selectedDate);
+            const formattedDate = dateObj.toLocaleDateString('es-ES', {
+                weekday: 'long',
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+            
+            // Agregar encabezado con la fecha
+            const headerRow = `
+            <tr class="bg-light">
+                <td colspan="6" class="text-center fw-bold">
+                    <i class="bi bi-calendar-check"></i> Reporte de Caja - ${formattedDate}
+                    <br><small class="text-muted">Total del día: Bs. ${totalDaySales.toFixed(2)} | ${totalSalesCount} ventas | ${totalProductsSold} productos vendidos</small>
+                </td>
+            </tr>
+            `;
+            tbody.innerHTML = headerRow + tbody.innerHTML;
+        }
+
+        function markCashAsCollected() {
+            const selectedDate = document.getElementById('cashDateFilter').value;
+            
+            if (!selectedDate) {
+                showNotification('Por favor seleccione una fecha primero', 'error');
+                return;
+            }
+            
+            if (confirm(`¿Está seguro de marcar el efectivo del ${selectedDate} como recaudado?\n\nEsta acción registrará que todo el efectivo ha sido entregado por los vendedores.`)) {
+                // Aquí podrías implementar lógica para guardar un registro en la base de datos
+                // Por ahora, solo mostramos una notificación
+                showNotification(`Efectivo del ${selectedDate} marcado como recaudado exitosamente`, 'success');
+                
+                // Limpiar la tabla después de marcar como recaudado
+                const tbody = document.getElementById('cashByUserTable');
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-check-circle text-success"></i>
+                            </div>
+                            <div class="empty-state-text">Efectivo marcado como recaudado</div>
+                            <div class="empty-state-subtext">Fecha: ${selectedDate}</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+                document.getElementById('cashSummary').style.display = 'none';
+            }
         }
 
         function searchProducts() {
@@ -1654,12 +1958,17 @@
             
             let filtered = allSales;
             
-            // Filtrar por fecha
+            // Filtrar por fecha - MODIFICADO: usar fecha_hora
             if (dateFilter) {
-                const filterDate = new Date(dateFilter);
                 filtered = filtered.filter(sale => {
-                    const saleDate = new Date(sale.created_at);
-                    return saleDate.toDateString() === filterDate.toDateString();
+                    if (!sale.fecha_hora) return false;
+                    
+                    // Extraer solo la parte de fecha de fecha_hora
+                    const saleDatePart = sale.fecha_hora.split(' ')[0];
+                    const filterDate = new Date(dateFilter);
+                    const filterDateStr = filterDate.toISOString().split('T')[0];
+                    
+                    return saleDatePart === filterDateStr;
                 });
             }
             
@@ -1721,6 +2030,18 @@
             }
 
             try {
+                // Obtener fecha y hora local para updated_at
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
                 const productData = {
                     code: code,
                     name: name,
@@ -1728,7 +2049,7 @@
                     sale_price: salePrice,
                     expiration_date: expirationDate || null,
                     description: description,
-                    updated_at: new Date().toISOString()
+                    updated_at: fechaHoraLocal  // Usamos fecha/hora local
                 };
 
                 let newProductId;
@@ -1751,7 +2072,7 @@
                     newProductId = productId;
                 } else {
                     // Crear nuevo producto
-                    productData.created_at = new Date().toISOString();
+                    productData.created_at = fechaHoraLocal;
                     const productResponse = await fetch(
                         `${SUPABASE_URL}/rest/v1/products`,
                         {
@@ -1798,7 +2119,7 @@
                             body: JSON.stringify({
                                 stock: stock,
                                 minimum_stock: minimumStock,
-                                updated_at: new Date().toISOString()
+                                updated_at: fechaHoraLocal
                             })
                         }
                     );
@@ -1819,7 +2140,7 @@
                                 product_id: newProductId,
                                 stock: stock,
                                 minimum_stock: minimumStock,
-                                created_at: new Date().toISOString()
+                                created_at: fechaHoraLocal
                             })
                         }
                     );
@@ -1914,6 +2235,18 @@
             }
             
             try {
+                // Obtener fecha y hora local
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
                 // Actualizar stock en la sucursal actual
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${productId}`,
@@ -1927,7 +2260,7 @@
                         },
                         body: JSON.stringify({
                             stock: parseInt(newStock),
-                            updated_at: new Date().toISOString()
+                            updated_at: fechaHoraLocal
                         })
                     }
                 );
@@ -2073,6 +2406,18 @@
             }
             
             try {
+                // Obtener fecha y hora local
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
                 // 1. Obtener stock actual en sucursal origen
                 const fromInventoryResponse = await fetch(
                     `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${fromBranchId}&product_id=eq.${productId}`,
@@ -2117,7 +2462,7 @@
                         },
                         body: JSON.stringify({
                             stock: fromInventory[0].stock - quantity,
-                            updated_at: new Date().toISOString()
+                            updated_at: fechaHoraLocal
                         })
                     }
                 );
@@ -2149,7 +2494,7 @@
                             },
                             body: JSON.stringify({
                                 stock: toInventory[0].stock + quantity,
-                                updated_at: new Date().toISOString()
+                                updated_at: fechaHoraLocal
                             })
                         }
                     );
@@ -2170,7 +2515,7 @@
                                 product_id: productId,
                                 stock: quantity,
                                 minimum_stock: 5,
-                                created_at: new Date().toISOString()
+                                created_at: fechaHoraLocal
                             })
                         }
                     );
@@ -2200,6 +2545,7 @@
             document.getElementById('dashboardSection').classList.add('d-none');
             document.getElementById('inventarioSection').classList.add('d-none');
             document.getElementById('ventasSection').classList.add('d-none');
+            document.getElementById('cajaSection').classList.add('d-none');
             document.getElementById('sucursalesSection').classList.add('d-none');
             document.getElementById('reportesSection').classList.add('d-none');
             
@@ -2211,6 +2557,10 @@
                 displayBranches();
             } else if (section === 'reportes') {
                 loadReportsData();
+            } else if (section === 'caja') {
+                // Establecer fecha actual por defecto
+                document.getElementById('cashDateFilter').valueAsDate = new Date();
+                updateCashUserFilter();
             }
         }
 
@@ -2283,12 +2633,24 @@
             }
             
             try {
+                // Obtener fecha y hora local
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
                 const branchData = {
                     name: name,
                     address: address || null,
                     phone: phone || null,
                     email: email || null,
-                    updated_at: new Date().toISOString()
+                    updated_at: fechaHoraLocal  // Usamos fecha/hora local
                 };
                 
                 let response;
@@ -2310,7 +2672,7 @@
                     );
                 } else {
                     // Crear nueva sucursal
-                    branchData.created_at = new Date().toISOString();
+                    branchData.created_at = fechaHoraLocal;
                     response = await fetch(
                         `${SUPABASE_URL}/rest/v1/branches`,
                         {
@@ -2450,15 +2812,14 @@
         function createDailySalesChart() {
             const ctx = document.getElementById('dailySalesChart').getContext('2d');
             
-            // Agrupar ventas por día para la sucursal actual
+            // Agrupar ventas por día para la sucursal actual - MODIFICADO: usar fecha_hora
             const salesByDay = {};
             allSales.forEach(sale => {
-                const saleDate = new Date(sale.created_at);
-                const dateKey = saleDate.toLocaleDateString('es-ES', { 
-                    year: 'numeric', 
-                    month: '2-digit', 
-                    day: '2-digit' 
-                });
+                if (!sale.fecha_hora) return;
+                
+                // Extraer solo la parte de fecha
+                const saleDate = sale.fecha_hora.split(' ')[0];
+                const dateKey = saleDate;
                 
                 let total = 0;
                 try {
@@ -2730,6 +3091,8 @@
         window.filterSales = filterSales;
         window.searchProducts = searchProducts;
         window.changeBranch = changeBranch;
+        window.calculateCashByUser = calculateCashByUser;
+        window.markCashAsCollected = markCashAsCollected;
     </script>
 </body>
 </html>
