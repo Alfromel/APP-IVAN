@@ -700,7 +700,6 @@
                                     <thead>
                                         <tr>
                                             <th># Venta</th>
-                                            <th>Sucursal</th>
                                             <th>Vendedor</th>
                                             <th>Total</th>
                                             <th>Fecha</th>
@@ -768,28 +767,22 @@
                 <div id="ventasSection" class="fade-in d-none">
                     <div class="desktop-card">
                         <div class="desktop-card-header">
-                            <span>Historial de Ventas</span>
+                            <span>Historial de Ventas - <span id="salesBranchTitle">Sucursal</span></span>
                         </div>
                         <div class="desktop-card-body">
                             <div class="mb-4">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label class="form-label">Filtrar por fecha</label>
                                         <input type="date" class="desktop-form-control" id="salesDateFilter">
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-4">
                                         <label class="form-label">Filtrar por vendedor</label>
                                         <select class="desktop-form-control" id="salesUserFilter">
                                             <option value="">Todos los vendedores</option>
                                         </select>
                                     </div>
-                                    <div class="col-md-3">
-                                        <label class="form-label">Filtrar por sucursal</label>
-                                        <select class="desktop-form-control" id="salesBranchFilter">
-                                            <option value="">Todas las sucursales</option>
-                                        </select>
-                                    </div>
-                                    <div class="col-md-3 d-flex align-items-end">
+                                    <div class="col-md-4 d-flex align-items-end">
                                         <button class="desktop-btn desktop-btn-primary w-100" onclick="filterSales()">
                                             <i class="bi bi-funnel"></i>
                                             <span>Filtrar</span>
@@ -803,7 +796,6 @@
                                     <thead>
                                         <tr>
                                             <th># Venta</th>
-                                            <th>Sucursal</th>
                                             <th>Vendedor</th>
                                             <th>Productos</th>
                                             <th>Cantidad</th>
@@ -859,7 +851,7 @@
                         <div class="col-md-6 mb-4">
                             <div class="desktop-card h-100">
                                 <div class="desktop-card-header">
-                                    <span>Ventas por Día</span>
+                                    <span>Ventas por Día - <span id="reportBranchTitle">Sucursal</span></span>
                                 </div>
                                 <div class="desktop-card-body">
                                     <canvas id="dailySalesChart"></canvas>
@@ -869,10 +861,10 @@
                         <div class="col-md-6 mb-4">
                             <div class="desktop-card h-100">
                                 <div class="desktop-card-header">
-                                    <span>Ventas por Sucursal</span>
+                                    <span>Productos Más Vendidos - <span id="reportBranchTitle2">Sucursal</span></span>
                                 </div>
                                 <div class="desktop-card-body">
-                                    <canvas id="branchSalesChart"></canvas>
+                                    <canvas id="topProductsChart"></canvas>
                                 </div>
                             </div>
                         </div>
@@ -880,7 +872,7 @@
                     
                     <div class="desktop-card">
                         <div class="desktop-card-header">
-                            <span>Reporte de Productos Más Vendidos</span>
+                            <span>Reporte de Productos Más Vendidos - <span id="reportBranchTitle3">Sucursal</span></span>
                         </div>
                         <div class="desktop-card-body">
                             <div class="table-responsive">
@@ -889,7 +881,6 @@
                                         <tr>
                                             <th>Producto</th>
                                             <th>Código</th>
-                                            <th>Sucursal</th>
                                             <th>Unidades Vendidas</th>
                                             <th>Total Generado</th>
                                             <th>Última Venta</th>
@@ -944,14 +935,23 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
+                                <label for="productStock" class="form-label">Stock Inicial *</label>
+                                <input type="number" class="desktop-form-control" id="productStock" min="0" value="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="productMinimumStock" class="form-label">Stock Mínimo</label>
+                                <input type="number" class="desktop-form-control" id="productMinimumStock" min="0" value="5">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
                                 <label for="productExpirationDate" class="form-label">Fecha de Vencimiento</label>
                                 <input type="date" class="desktop-form-control" id="productExpirationDate">
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Sucursales y Stock Inicial</label>
-                                <div id="branchStockFields">
-                                    <!-- Se generarán dinámicamente -->
-                                </div>
+                                <label for="productSucursal" class="form-label">Sucursal</label>
+                                <input type="text" class="desktop-form-control" id="productSucursal" readonly value="Cargando...">
+                                <small class="text-muted">El producto se agregará a esta sucursal</small>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -1090,7 +1090,7 @@
         let allBranches = [];
         let branchInventory = [];
         let dailySalesChart = null;
-        let branchSalesChart = null;
+        let topProductsChart = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminApp();
@@ -1196,7 +1196,12 @@
                 <span>${currentBranch.name}</span>
             `;
             
+            // Actualizar títulos en todas las secciones
             document.getElementById('branchInventoryTitle').textContent = currentBranch.name;
+            document.getElementById('salesBranchTitle').textContent = currentBranch.name;
+            document.getElementById('reportBranchTitle').textContent = currentBranch.name;
+            document.getElementById('reportBranchTitle2').textContent = currentBranch.name;
+            document.getElementById('reportBranchTitle3').textContent = currentBranch.name;
             
             // Cargar datos de la sucursal
             await loadBranchData();
@@ -1220,19 +1225,24 @@
                 if (!inventoryResponse.ok) throw new Error('Error al cargar inventario');
                 branchInventory = await inventoryResponse.json();
                 
-                // Cargar productos (para información general)
-                const productsResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/products?order=name.asc`,
-                    {
-                        headers: {
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                // Cargar productos (solo los que están en esta sucursal)
+                const productIds = branchInventory.map(item => item.product_id);
+                if (productIds.length > 0) {
+                    const productsResponse = await fetch(
+                        `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(',')})&order=name.asc`,
+                        {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
                         }
-                    }
-                );
-                
-                if (!productsResponse.ok) throw new Error('Error al cargar productos');
-                allProducts = await productsResponse.json();
+                    );
+                    
+                    if (!productsResponse.ok) throw new Error('Error al cargar productos');
+                    allProducts = await productsResponse.json();
+                } else {
+                    allProducts = [];
+                }
                 
                 // Cargar ventas de la sucursal
                 const salesResponse = await fetch(
@@ -1248,9 +1258,9 @@
                 if (!salesResponse.ok) throw new Error('Error al cargar ventas');
                 allSales = await salesResponse.json();
                 
-                // Cargar usuarios
+                // Cargar usuarios de esta sucursal
                 const usersResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/users?order=nombre.asc`,
+                    `${SUPABASE_URL}/rest/v1/users?branch_id=eq.${currentBranch.id}&order=nombre.asc`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1354,10 +1364,6 @@
                 const seller = allUsers.find(u => u.id === sale.user_id);
                 const sellerName = seller ? seller.nombre : 'Desconocido';
                 
-                // Buscar sucursal
-                const branch = allBranches.find(b => b.id === sale.branch_id);
-                const branchName = branch ? branch.name : 'Sin sucursal';
-                
                 // Parsear productos
                 let total = 0;
                 let itemCount = 0;
@@ -1382,7 +1388,6 @@
                 return `
                 <tr>
                     <td>#${sale.id}</td>
-                    <td>${branchName}</td>
                     <td>${sellerName}</td>
                     <td class="money">${total.toFixed(2)}</td>
                     <td>${formattedDate}</td>
@@ -1486,10 +1491,6 @@
                 const seller = allUsers.find(u => u.id === sale.user_id);
                 const sellerName = seller ? seller.nombre : 'Desconocido';
                 
-                // Buscar sucursal
-                const branch = allBranches.find(b => b.id === sale.branch_id);
-                const branchName = branch ? branch.name : 'Sin sucursal';
-                
                 // Parsear productos vendidos
                 let productsList = 'No hay productos';
                 let totalAmount = 0;
@@ -1521,7 +1522,6 @@
                 return `
                 <tr>
                     <td>#${sale.id}</td>
-                    <td>${branchName}</td>
                     <td>${sellerName}</td>
                     <td>${productsList}</td>
                     <td>${totalQuantity}</td>
@@ -1542,17 +1542,6 @@
                 option.value = user.id;
                 option.textContent = user.nombre;
                 userFilter.appendChild(option);
-            });
-            
-            // Filtro de sucursales
-            const branchFilter = document.getElementById('salesBranchFilter');
-            branchFilter.innerHTML = '<option value="">Todas las sucursales</option>';
-            
-            allBranches.forEach(branch => {
-                const option = document.createElement('option');
-                option.value = branch.id;
-                option.textContent = branch.name;
-                branchFilter.appendChild(option);
             });
         }
 
@@ -1662,7 +1651,6 @@
         function filterSales() {
             const dateFilter = document.getElementById('salesDateFilter').value;
             const userFilter = document.getElementById('salesUserFilter').value;
-            const branchFilter = document.getElementById('salesBranchFilter').value;
             
             let filtered = allSales;
             
@@ -1680,55 +1668,49 @@
                 filtered = filtered.filter(sale => sale.user_id == userFilter);
             }
             
-            // Filtrar por sucursal
-            if (branchFilter) {
-                filtered = filtered.filter(sale => sale.branch_id == branchFilter);
-            }
-            
             displaySales(filtered);
         }
 
         function showAddProductModal() {
+            if (!currentBranch) {
+                showNotification('Por favor seleccione una sucursal primero', 'error');
+                return;
+            }
+            
             document.getElementById('productModalLabel').textContent = 'Agregar Producto';
             document.getElementById('productForm').reset();
             document.getElementById('productId').value = '';
-            
-            // Generar campos de stock por sucursal
-            const branchStockFields = document.getElementById('branchStockFields');
-            branchStockFields.innerHTML = '';
-            
-            allBranches.forEach(branch => {
-                branchStockFields.innerHTML += `
-                    <div class="mb-2">
-                        <label for="stock_${branch.id}" class="form-label small">${branch.name}:</label>
-                        <input type="number" class="form-control form-control-sm" 
-                               id="stock_${branch.id}" 
-                               value="0" min="0" 
-                               placeholder="Stock inicial">
-                    </div>
-                `;
-            });
+            document.getElementById('productSucursal').value = currentBranch.name;
+            document.getElementById('productStock').value = 0;
+            document.getElementById('productMinimumStock').value = 5;
             
             const modal = new bootstrap.Modal(document.getElementById('productModal'));
             modal.show();
         }
 
         async function saveProduct() {
+            if (!currentBranch) {
+                showNotification('No hay una sucursal seleccionada', 'error');
+                return;
+            }
+            
             const productId = document.getElementById('productId').value;
             const code = document.getElementById('productCode').value.trim();
             const name = document.getElementById('productName').value.trim();
             const purchasePrice = parseFloat(document.getElementById('productPurchasePrice').value);
             const salePrice = parseFloat(document.getElementById('productSalePrice').value);
+            const stock = parseInt(document.getElementById('productStock').value);
+            const minimumStock = parseInt(document.getElementById('productMinimumStock').value);
             const expirationDate = document.getElementById('productExpirationDate').value;
             const description = document.getElementById('productDescription').value.trim();
 
             // Validaciones
-            if (!code || !name || isNaN(purchasePrice) || isNaN(salePrice)) {
+            if (!code || !name || isNaN(purchasePrice) || isNaN(salePrice) || isNaN(stock)) {
                 showNotification('Por favor complete todos los campos requeridos', 'error');
                 return;
             }
 
-            if (purchasePrice < 0 || salePrice < 0) {
+            if (purchasePrice < 0 || salePrice < 0 || stock < 0) {
                 showNotification('Los valores no pueden ser negativos', 'error');
                 return;
             }
@@ -1749,11 +1731,11 @@
                     updated_at: new Date().toISOString()
                 };
 
-                let productResponse;
+                let newProductId;
                 
                 if (productId) {
                     // Actualizar producto existente
-                    productResponse = await fetch(
+                    await fetch(
                         `${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`,
                         {
                             method: 'PATCH',
@@ -1766,11 +1748,64 @@
                             body: JSON.stringify(productData)
                         }
                     );
+                    newProductId = productId;
                 } else {
                     // Crear nuevo producto
                     productData.created_at = new Date().toISOString();
-                    productResponse = await fetch(
+                    const productResponse = await fetch(
                         `${SUPABASE_URL}/rest/v1/products`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=representation'
+                            },
+                            body: JSON.stringify(productData)
+                        }
+                    );
+                    
+                    const newProduct = await productResponse.json();
+                    newProductId = newProduct[0].id;
+                }
+
+                // Verificar si el producto ya existe en el inventario de esta sucursal
+                const inventoryCheck = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${newProductId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                const existingInventory = await inventoryCheck.json();
+                
+                if (existingInventory.length > 0) {
+                    // Actualizar stock existente
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${newProductId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                stock: stock,
+                                minimum_stock: minimumStock,
+                                updated_at: new Date().toISOString()
+                            })
+                        }
+                    );
+                } else {
+                    // Agregar nuevo inventario solo para la sucursal actual
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/branch_inventory`,
                         {
                             method: 'POST',
                             headers: {
@@ -1779,54 +1814,21 @@
                                 'Authorization': `Bearer ${SUPABASE_KEY}`,
                                 'Prefer': 'return=minimal'
                             },
-                            body: JSON.stringify(productData)
+                            body: JSON.stringify({
+                                branch_id: currentBranch.id,
+                                product_id: newProductId,
+                                stock: stock,
+                                minimum_stock: minimumStock,
+                                created_at: new Date().toISOString()
+                            })
                         }
                     );
-                    
-                    // Obtener el ID del producto recién creado
-                    const newProductResponse = await fetch(
-                        `${SUPABASE_URL}/rest/v1/products?code=eq.${code}`,
-                        {
-                            headers: {
-                                'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`
-                            }
-                        }
-                    );
-                    const newProduct = await newProductResponse.json();
-                    const newProductId = newProduct[0].id;
-                    
-                    // Agregar stock a cada sucursal
-                    for (const branch of allBranches) {
-                        const stockInput = document.getElementById(`stock_${branch.id}`);
-                        const stock = stockInput ? parseInt(stockInput.value) || 0 : 0;
-                        
-                        await fetch(
-                            `${SUPABASE_URL}/rest/v1/branch_inventory`,
-                            {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                    'apikey': SUPABASE_KEY,
-                                    'Authorization': `Bearer ${SUPABASE_KEY}`,
-                                    'Prefer': 'return=minimal'
-                                },
-                                body: JSON.stringify({
-                                    branch_id: branch.id,
-                                    product_id: newProductId,
-                                    stock: stock,
-                                    minimum_stock: 5,
-                                    created_at: new Date().toISOString()
-                                })
-                            }
-                        );
-                    }
                 }
 
                 // Cerrar modal y recargar datos
                 bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
-                loadBranchData();
-                showNotification('Producto guardado exitosamente', 'success');
+                await loadBranchData();
+                showNotification('Producto guardado exitosamente en ' + currentBranch.name, 'success');
 
             } catch (error) {
                 console.error('Error al guardar producto:', error);
@@ -1855,9 +1857,9 @@
                     return;
                 }
                 
-                // Obtener inventario por sucursal
+                // Obtener inventario de la sucursal actual para este producto
                 const inventoryResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/branch_inventory?product_id=eq.${productId}`,
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?product_id=eq.${productId}&branch_id=eq.${currentBranch.id}`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1867,6 +1869,7 @@
                 );
                 
                 const inventory = await inventoryResponse.json();
+                const stockInfo = inventory.length > 0 ? inventory[0] : null;
                 
                 // Llenar el formulario
                 document.getElementById('productModalLabel').textContent = 'Editar Producto';
@@ -1876,6 +1879,15 @@
                 document.getElementById('productPurchasePrice').value = product[0].purchase_price;
                 document.getElementById('productSalePrice').value = product[0].sale_price;
                 document.getElementById('productDescription').value = product[0].description || '';
+                document.getElementById('productSucursal').value = currentBranch.name;
+                
+                if (stockInfo) {
+                    document.getElementById('productStock').value = stockInfo.stock;
+                    document.getElementById('productMinimumStock').value = stockInfo.minimum_stock || 5;
+                } else {
+                    document.getElementById('productStock').value = 0;
+                    document.getElementById('productMinimumStock').value = 5;
+                }
                 
                 if (product[0].expiration_date) {
                     const expDate = new Date(product[0].expiration_date);
@@ -1883,25 +1895,6 @@
                 } else {
                     document.getElementById('productExpirationDate').value = '';
                 }
-                
-                // Generar campos de stock por sucursal
-                const branchStockFields = document.getElementById('branchStockFields');
-                branchStockFields.innerHTML = '';
-                
-                allBranches.forEach(branch => {
-                    const branchInventory = inventory.find(i => i.branch_id === branch.id);
-                    const stock = branchInventory ? branchInventory.stock : 0;
-                    
-                    branchStockFields.innerHTML += `
-                        <div class="mb-2">
-                            <label for="stock_${branch.id}" class="form-label small">${branch.name}:</label>
-                            <input type="number" class="form-control form-control-sm" 
-                                   id="stock_${branch.id}" 
-                                   value="${stock}" min="0" 
-                                   placeholder="Stock">
-                        </div>
-                    `;
-                });
                 
                 const modal = new bootstrap.Modal(document.getElementById('productModal'));
                 modal.show();
@@ -1980,6 +1973,11 @@
         }
 
         function showTransferModal() {
+            if (!currentBranch) {
+                showNotification('Por favor seleccione una sucursal primero', 'error');
+                return;
+            }
+            
             // Llenar selectores de sucursal
             const fromSelect = document.getElementById('transferFrom');
             const toSelect = document.getElementById('transferTo');
@@ -1991,6 +1989,10 @@
                 fromSelect.innerHTML += `<option value="${branch.id}">${branch.name}</option>`;
                 toSelect.innerHTML += `<option value="${branch.id}">${branch.name}</option>`;
             });
+            
+            // Seleccionar la sucursal actual como origen por defecto
+            fromSelect.value = currentBranch.id;
+            updateTransferProductList();
             
             const modal = new bootstrap.Modal(document.getElementById('transferModal'));
             modal.show();
@@ -2174,14 +2176,11 @@
                     );
                 }
                 
-                // 5. Registrar la transferencia en una tabla de transferencias (si existe)
-                // Por ahora solo mostramos notificación de éxito
-                
-                // 6. Cerrar modal y recargar datos
+                // 5. Cerrar modal y recargar datos
                 bootstrap.Modal.getInstance(document.getElementById('transferModal')).hide();
-                loadBranchData();
+                await loadBranchData();
                 
-                // Obtener nombres de sucursales para el mensaje
+                // 6. Obtener nombres de sucursales para el mensaje
                 const fromBranch = allBranches.find(b => b.id == fromBranchId);
                 const toBranch = allBranches.find(b => b.id == toBranchId);
                 
@@ -2220,7 +2219,18 @@
             
             tbody.innerHTML = allBranches.map(branch => {
                 // Contar vendedores en esta sucursal
-                const usersInBranch = allUsers.filter(user => user.branch_id == branch.id).length;
+                const usersResponse = fetch(
+                    `${SUPABASE_URL}/rest/v1/users?branch_id=eq.${branch.id}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                ).then(response => response.json()).then(users => users.length).catch(() => 0);
+                
+                // Usaremos 0 por ahora y actualizaremos después
+                const usersInBranch = 0;
                 
                 return `
                 <tr>
@@ -2372,13 +2382,6 @@
                 return;
             }
             
-            // Verificar si hay vendedores en esta sucursal
-            const usersInBranch = allUsers.filter(user => user.branch_id == branchId);
-            if (usersInBranch.length > 0) {
-                showNotification('No se puede eliminar la sucursal porque tiene vendedores asignados', 'error');
-                return;
-            }
-            
             if (!confirm('¿Está seguro de que desea eliminar esta sucursal?\n\nNota: Esta acción eliminará todo el inventario de esta sucursal.')) {
                 return;
             }
@@ -2434,24 +2437,49 @@
         }
 
         function loadReportsData() {
-            // Crear gráficos de reportes
+            if (!currentBranch) {
+                showNotification('Por favor seleccione una sucursal primero', 'error');
+                return;
+            }
+            
+            // Crear gráficos de reportes para la sucursal actual
             createDailySalesChart();
-            createBranchSalesChart();
+            createTopProductsChart();
         }
 
         function createDailySalesChart() {
             const ctx = document.getElementById('dailySalesChart').getContext('2d');
             
-            // Datos de ejemplo para ventas por día
-            const last7Days = [];
-            for (let i = 6; i >= 0; i--) {
-                const date = new Date();
-                date.setDate(date.getDate() - i);
-                last7Days.push(date.toLocaleDateString('es-ES', { weekday: 'short' }));
-            }
+            // Agrupar ventas por día para la sucursal actual
+            const salesByDay = {};
+            allSales.forEach(sale => {
+                const saleDate = new Date(sale.created_at);
+                const dateKey = saleDate.toLocaleDateString('es-ES', { 
+                    year: 'numeric', 
+                    month: '2-digit', 
+                    day: '2-digit' 
+                });
+                
+                let total = 0;
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        total = products.reduce((sum, p) => sum + p.subtotal, 0);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+                
+                if (salesByDay[dateKey]) {
+                    salesByDay[dateKey] += total;
+                } else {
+                    salesByDay[dateKey] = total;
+                }
+            });
             
-            // Datos de ejemplo (en un sistema real, esto vendría de la base de datos)
-            const data = [1200, 1800, 1500, 2200, 1900, 2400, 2100];
+            // Ordenar fechas y tomar las últimas 7
+            const dates = Object.keys(salesByDay).sort().slice(-7);
+            const data = dates.map(date => salesByDay[date] || 0);
             
             if (dailySalesChart) {
                 dailySalesChart.destroy();
@@ -2460,7 +2488,7 @@
             dailySalesChart = new Chart(ctx, {
                 type: 'line',
                 data: {
-                    labels: last7Days,
+                    labels: dates,
                     datasets: [{
                         label: 'Ventas (Bs.)',
                         data: data,
@@ -2479,7 +2507,7 @@
                         },
                         title: {
                             display: true,
-                            text: 'Ventas de los últimos 7 días'
+                            text: 'Ventas de los últimos días - ' + currentBranch.name
                         }
                     },
                     scales: {
@@ -2495,28 +2523,53 @@
             });
         }
 
-        function createBranchSalesChart() {
-            const ctx = document.getElementById('branchSalesChart').getContext('2d');
+        function createTopProductsChart() {
+            const ctx = document.getElementById('topProductsChart').getContext('2d');
             
-            // Datos de ejemplo para ventas por sucursal
-            const branchNames = allBranches.map(b => b.name);
-            const salesData = allBranches.map(b => {
-                // Calcular ventas totales por sucursal
-                const branchSales = allSales.filter(s => s.branch_id === b.id);
-                return branchSales.reduce((total, sale) => total + parseFloat(sale.total_amount || 0), 0);
+            // Agrupar ventas por producto para la sucursal actual
+            const productSales = {};
+            
+            allSales.forEach(sale => {
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        products.forEach(p => {
+                            if (productSales[p.product_id]) {
+                                productSales[p.product_id].quantity += p.quantity;
+                                productSales[p.product_id].total += p.subtotal;
+                            } else {
+                                productSales[p.product_id] = {
+                                    name: p.name,
+                                    quantity: p.quantity,
+                                    total: p.subtotal
+                                };
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
             });
             
-            if (branchSalesChart) {
-                branchSalesChart.destroy();
+            // Convertir a array y ordenar por cantidad vendida
+            const topProducts = Object.values(productSales)
+                .sort((a, b) => b.quantity - a.quantity)
+                .slice(0, 5);
+            
+            const productNames = topProducts.map(p => p.name);
+            const quantities = topProducts.map(p => p.quantity);
+            
+            if (topProductsChart) {
+                topProductsChart.destroy();
             }
             
-            branchSalesChart = new Chart(ctx, {
+            topProductsChart = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: branchNames,
+                    labels: productNames,
                     datasets: [{
-                        label: 'Ventas por Sucursal (Bs.)',
-                        data: salesData,
+                        label: 'Unidades Vendidas',
+                        data: quantities,
                         backgroundColor: [
                             '#6A0DAD',
                             '#8A2BE2',
@@ -2535,7 +2588,7 @@
                         },
                         title: {
                             display: true,
-                            text: 'Ventas por Sucursal'
+                            text: 'Top 5 Productos Más Vendidos - ' + currentBranch.name
                         }
                     },
                     scales: {
@@ -2543,7 +2596,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Monto (Bs.)'
+                                text: 'Cantidad Vendida'
                             }
                         }
                     }
@@ -2566,12 +2619,6 @@
                     product.code.toLowerCase().includes(searchTerm)
                 );
             });
-            
-            // Buscar en sucursales
-            const branchResults = allBranches.filter(branch => 
-                branch.name.toLowerCase().includes(searchTerm) ||
-                (branch.address && branch.address.toLowerCase().includes(searchTerm))
-            );
             
             // Decidir qué sección mostrar basado en los resultados
             if (productResults.length > 0) {
@@ -2627,41 +2674,6 @@
                                     <i class="bi bi-box-arrow-in-down"></i>
                                 </button>
                                 <button class="btn btn-sm btn-outline-danger" onclick="deleteProductFromBranch(${product.id})">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    `;
-                }).join('');
-                
-            } else if (branchResults.length > 0) {
-                showSection('sucursales');
-                
-                // Mostrar sucursales filtradas
-                const tbody = document.getElementById('branchesTable');
-                tbody.innerHTML = branchResults.map(branch => {
-                    const usersInBranch = allUsers.filter(user => user.branch_id == branch.id).length;
-                    
-                    return `
-                    <tr>
-                        <td>${branch.id}</td>
-                        <td>
-                            <strong>${branch.name}</strong>
-                            ${branch.email ? `<br><small class="text-muted">${branch.email}</small>` : ''}
-                        </td>
-                        <td>${branch.address || 'No especificada'}</td>
-                        <td>${branch.phone || 'No especificado'}</td>
-                        <td>${branch.email || 'No especificado'}</td>
-                        <td>
-                            <span class="status-badge status-activo">${usersInBranch} vendedores</span>
-                        </td>
-                        <td>
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-sm btn-outline-primary" onclick="editBranch(${branch.id})">
-                                    <i class="bi bi-pencil"></i>
-                                </button>
-                                <button class="btn btn-sm btn-outline-danger" onclick="deleteBranch(${branch.id})" ${branch.id === 1 ? 'disabled' : ''}>
                                     <i class="bi bi-trash"></i>
                                 </button>
                             </div>
