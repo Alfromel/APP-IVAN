@@ -3,1779 +3,1620 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema de Inventario - Admin</title>
-    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
-    <!-- Librería moderna y con estilos para QR más potente -->
-    <script src="https://cdn.jsdelivr.net/npm/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Admin - Inventario Tienda</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
     <style>
         :root {
-            --primary: #4A235A; /* Morado oscuro */
-            --secondary: #FFFFFF; /* Blanco */
-            --accent: #8E44AD; /* Morado más claro para acentos */
-            --success: #27ae60;
-            --danger: #e74c3c;
-            --warning: #f39c12;
-            --light: #f8f9fa;
-            --dark: #2C3E50;
-            --info: #3498db;
-            --profit: #2ecc71;
-            --capital: #9b59b6;
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --light-purple: #E6E6FA;
+            --dark-purple: #4B0082;
+            --white: #FFFFFF;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --gray-light: #f8f9fa;
+            --gray-dark: #343a40;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #4A235A 0%, #6C3483 100%);
-            min-height: 100vh;
-            color: #333;
-            line-height: 1.6;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background: var(--secondary);
-            color: var(--primary);
-            padding: 20px 0;
-            text-align: center;
-            border-radius: 15px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        
-        h1 {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
-            color: var(--primary);
-        }
-        
-        .subtitle {
-            font-size: 1.2rem;
-            opacity: 0.8;
-            color: var(--dark);
-        }
-        
-        /* Navegación */
-        .nav-tabs {
-            display: flex;
-            background: var(--secondary);
-            border-radius: 12px;
-            padding: 10px;
-            margin-bottom: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            overflow-x: auto;
-        }
-        
-        .nav-tab {
-            flex: 1;
-            padding: 15px 20px;
-            text-align: center;
-            background: none;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--dark);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            white-space: nowrap;
-        }
-        
-        .nav-tab:hover {
-            background: rgba(74, 35, 90, 0.1);
-        }
-        
-        .nav-tab.active {
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            color: white;
-            box-shadow: 0 4px 12px rgba(74, 35, 90, 0.3);
-        }
-        
-        /* Contenido de ventanas */
-        .window {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-        
-        .window.active {
-            display: block;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .card {
-            background: var(--secondary);
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
-            margin-bottom: 25px;
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
-        }
-        
-        .card h2 {
-            color: var(--primary);
-            margin-bottom: 20px;
-            padding-bottom: 12px;
-            border-bottom: 2px solid #f0f0f0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 1.4rem;
-        }
-        
-        .card h2 i {
-            color: var(--accent);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: var(--primary);
-            font-size: 1rem;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 2px solid #e1e5ee;
-            border-radius: 8px;
-            font-size: 15px;
-            transition: all 0.3s;
-            background: white;
-        }
-        
-        input:focus, select:focus {
-            border-color: var(--accent);
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(142, 68, 173, 0.2);
-        }
-        
-        button {
-            background: linear-gradient(135deg, var(--accent), var(--primary));
-            color: white;
-            border: none;
-            padding: 12px 24px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 15px;
-            font-weight: 600;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 12px rgba(0, 0, 0, 0.2);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, var(--success), #2ecc71);
-        }
-        
-        .btn-danger {
-            background: linear-gradient(135deg, var(--danger), #c0392b);
-        }
-        
-        .btn-warning {
-            background: linear-gradient(135deg, var(--warning), #e67e22);
-        }
-        
-        .btn-info {
-            background: linear-gradient(135deg, var(--info), #2980b9);
-        }
-        
-        .btn-profit {
-            background: linear-gradient(135deg, var(--profit), #27ae60);
-        }
-        
-        .btn-capital {
-            background: linear-gradient(135deg, var(--capital), #8e44ad);
-        }
-        
-        .qrcode-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 25px;
-            align-items: start;
-        }
-        
-        .qrcode-container {
-            text-align: center;
-            padding: 25px;
-            border: 2px dashed #ddd;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        
-        .qrcode-preview {
-            min-height: 220px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-        }
-        
-        #qrcode {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 180px;
-        }
-        
-        .qrcode-info {
-            margin-top: 15px;
-            padding: 18px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            text-align: left;
-        }
-        
-        .qrcode-info h3 {
-            margin-bottom: 12px;
-            color: var(--primary);
-        }
-        
-        .download-btn {
-            background: linear-gradient(135deg, var(--success), #2ecc71);
-            margin-top: 15px;
-            width: 100%;
-        }
-        
-        .download-buttons {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-        }
-        
-        .download-buttons button {
-            flex: 1;
-        }
-        
-        .inventory-table-container {
-            overflow-x: auto;
-            margin-top: 15px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-        }
-        
-        .inventory-table {
-            width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 8px;
+            background: linear-gradient(135deg, var(--light-purple) 0%, #f5f5f5 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
             overflow: hidden;
         }
         
-        .inventory-table th, .inventory-table td {
-            padding: 12px 16px;
-            text-align: left;
-            border-bottom: 1px solid #eee;
+        /* Estilo de aplicación de escritorio nativa */
+        .desktop-app {
+            display: flex;
+            height: 100vh;
+            background: var(--white);
+            box-shadow: 0 0 40px rgba(0,0,0,0.1);
         }
         
-        .inventory-table th {
-            background: linear-gradient(135deg, var(--primary), var(--accent));
-            color: white;
+        /* Sidebar estilo Windows/Mac */
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+            color: var(--white);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 5px 0 15px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h3 {
+            font-size: 1.3rem;
             font-weight: 600;
-            position: sticky;
-            top: 0;
-        }
-        
-        .inventory-table tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .stock-low {
-            color: var(--danger);
-            font-weight: bold;
-        }
-        
-        .stock-ok {
-            color: var(--success);
-            font-weight: bold;
-        }
-        
-        .expired {
-            color: var(--danger);
-            font-weight: bold;
-        }
-        
-        .expiring-soon {
-            color: var(--warning);
-            font-weight: bold;
-        }
-        
-        .action-buttons {
+            margin: 0;
             display: flex;
-            gap: 6px;
+            align-items: center;
+            gap: 10px;
         }
         
-        .action-btn {
-            padding: 6px 10px;
-            font-size: 13px;
-            border-radius: 5px;
+        .sidebar-menu {
+            padding: 20px 0;
+            flex-grow: 1;
         }
         
-        .nav-buttons {
+        .menu-item {
             display: flex;
-            justify-content: center;
-            gap: 15px;
-            margin-top: 30px;
-        }
-        
-        .nav-btn {
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.8);
             text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+            font-weight: 500;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            border-left-color: var(--white);
+        }
+        
+        .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            color: var(--white);
+            border-left-color: var(--white);
+        }
+        
+        .menu-item i {
+            width: 24px;
+            font-size: 1.2rem;
+            margin-right: 12px;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .user-details {
+            text-align: left;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        .user-role {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+        
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--white);
+        }
+        
+        .content-header {
+            padding: 20px 30px;
+            background: var(--white);
+            border-bottom: 1px solid #e9ecef;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .content-body {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+            background: var(--gray-light);
+        }
+        
+        /* Tarjetas estilo escritorio */
+        .desktop-card {
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            border: 1px solid #e9ecef;
+            margin-bottom: 25px;
+            overflow: hidden;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .desktop-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.12);
+        }
+        
+        .desktop-card-header {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, var(--light-purple) 0%, #f0f0ff 100%);
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .desktop-card-body {
+            padding: 25px;
+        }
+        
+        /* Botones estilo escritorio */
+        .desktop-btn {
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.3s;
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
+            cursor: pointer;
+            font-size: 0.95rem;
         }
         
-        .stats {
+        .desktop-btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+        }
+        
+        .desktop-btn-primary:hover {
+            background: linear-gradient(135deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(106, 13, 173, 0.3);
+        }
+        
+        .desktop-btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: var(--white);
+        }
+        
+        .desktop-btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc3545 100%);
+            color: var(--white);
+        }
+        
+        .desktop-btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ffc107 100%);
+            color: var(--gray-dark);
+        }
+        
+        /* Tablas estilo escritorio */
+        .desktop-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        
+        .desktop-table th {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 15px 20px;
+            font-weight: 600;
+            border: none;
+            text-align: left;
+        }
+        
+        .desktop-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .desktop-table tbody tr:hover {
+            background-color: var(--light-purple);
+            cursor: pointer;
+        }
+        
+        /* Estadísticas */
+        .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
-            margin-bottom: 25px;
+            margin-bottom: 30px;
         }
         
         .stat-card {
-            background: var(--secondary);
+            background: var(--white);
             border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.3s ease;
+            padding: 25px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid var(--primary-purple);
+            transition: transform 0.3s;
         }
         
         .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-5px);
         }
         
-        .stat-icon {
+        .stat-number {
             font-size: 2.2rem;
-            margin-bottom: 12px;
-            color: var(--accent);
-        }
-        
-        .stat-value {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: var(--primary);
-            margin: 8px 0;
+            font-weight: 800;
+            color: var(--primary-purple);
+            margin-bottom: 5px;
+            line-height: 1;
         }
         
         .stat-label {
             color: #6c757d;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             font-weight: 500;
         }
         
-        .notification {
+        .stat-icon {
+            font-size: 2.5rem;
+            color: var(--light-purple);
+            margin-bottom: 15px;
+        }
+        
+        /* Formularios */
+        .desktop-form-control {
+            border-radius: 8px;
+            padding: 12px 15px;
+            border: 1px solid #dee2e6;
+            transition: all 0.3s;
+            width: 100%;
+            font-size: 0.95rem;
+        }
+        
+        .desktop-form-control:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.15);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+        }
+        
+        /* Notificaciones estilo escritorio */
+        .desktop-notification {
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 12px 20px;
+            padding: 15px 20px;
             border-radius: 8px;
-            color: white;
-            font-weight: 600;
-            z-index: 1000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            color: var(--white);
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            transform: translateX(150%);
+            transition: transform 0.3s;
+            max-width: 350px;
         }
         
-        .notification.show {
+        .desktop-notification.show {
             transform: translateX(0);
         }
         
-        .notification.success {
-            background: linear-gradient(135deg, var(--success), #2ecc71);
+        .desktop-notification.success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
         }
         
-        .notification.error {
-            background: linear-gradient(135deg, var(--danger), #c0392b);
+        .desktop-notification.error {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc3545 100%);
         }
         
-        /* Modal de edición */
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.6);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 2000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s ease;
+        .desktop-notification.info {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
         }
         
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
+        /* Badges */
+        .status-badge {
+            border-radius: 20px;
+            padding: 5px 15px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
         }
         
-        .modal {
-            background: white;
+        .status-activo {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: var(--white);
+        }
+        
+        .status-bajo {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ffc107 100%);
+            color: var(--gray-dark);
+        }
+        
+        .status-agotado {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc3545 100%);
+            color: var(--white);
+        }
+        
+        /* Dinero */
+        .money {
+            color: var(--primary-purple);
+            font-weight: 600;
+        }
+        
+        .money::before {
+            content: 'Bs. ';
+        }
+        
+        /* Buscador */
+        .desktop-search {
+            position: relative;
+            max-width: 400px;
+        }
+        
+        .desktop-search-input {
+            padding: 12px 20px 12px 45px;
+            border-radius: 25px;
+            border: 1px solid #dee2e6;
+            width: 100%;
+            font-size: 0.95rem;
+            background: var(--white);
+            transition: all 0.3s;
+        }
+        
+        .desktop-search-input:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 3px rgba(106, 13, 173, 0.15);
+        }
+        
+        .desktop-search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-purple);
+            font-size: 1.1rem;
+        }
+        
+        /* Modal */
+        .desktop-modal .modal-content {
             border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            padding: 25px;
-            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-            transform: translateY(-30px);
-            transition: transform 0.3s ease;
-        }
-        
-        .modal-overlay.active .modal {
-            transform: translateY(0);
-        }
-        
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f0f0f0;
-        }
-        
-        .modal-title {
-            color: var(--primary);
-            font-size: 1.4rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .close-modal {
-            background: none;
             border: none;
-            font-size: 1.5rem;
-            color: #6c757d;
-            cursor: pointer;
-            padding: 5px;
-            transition: color 0.3s;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
         }
         
-        .close-modal:hover {
-            color: var(--danger);
+        .desktop-modal .modal-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 25px;
         }
         
-        .modal-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 20px;
+        .desktop-modal .modal-body {
+            padding: 25px;
         }
         
-        .modal-actions button {
-            flex: 1;
+        .desktop-modal .modal-footer {
+            border-top: 1px solid #e9ecef;
+            padding: 20px 25px;
         }
         
-        @media (max-width: 1200px) {
-            .qrcode-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .nav-tabs {
-                flex-wrap: wrap;
-            }
-            
-            .nav-tab {
-                flex: 1 0 45%;
-                margin-bottom: 10px;
-            }
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
         
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-purple);
+            border-radius: 4px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-purple);
+        }
+        
+        /* Responsive */
         @media (max-width: 768px) {
-            .container {
-                padding: 15px;
+            .sidebar {
+                width: 70px;
             }
             
-            h1 {
-                font-size: 2rem;
+            .sidebar-header h3 span,
+            .menu-item span,
+            .user-details {
+                display: none;
             }
             
-            .stats {
-                grid-template-columns: 1fr 1fr;
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.4rem;
             }
             
-            .action-buttons {
-                flex-direction: column;
-            }
-            
-            .download-buttons {
-                flex-direction: column;
-            }
-            
-            .nav-tab {
-                flex: 1 0 100%;
-                margin-bottom: 5px;
+            .user-avatar {
+                width: 40px;
+                height: 40px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-
-        
-        <!-- Navegación por pestañas -->
-        <div class="nav-tabs">
-            <button class="nav-tab active" data-window="dashboard">
-                <i class="fas fa-chart-bar"></i> Estadísticas
-            </button>
-            <button class="nav-tab" data-window="add-product">
-                <i class="fas fa-plus-circle"></i> Agregar Producto
-            </button>
-            <button class="nav-tab" data-window="daily-report">
-                <i class="fas fa-calendar-day"></i> Reporte Diario
-            </button>
-            <button class="nav-tab" data-window="inventory">
-                <i class="fas fa-boxes"></i> Inventario Actual
-            </button>
-        </div>
-        
-        <!-- Ventana 1: Dashboard/Estadísticas -->
-        <div class="window active" id="dashboard">
-            <div class="stats">
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-boxes"></i>
-                    </div>
-                    <div class="stat-value" id="products-count">0</div>
-                    <div class="stat-label">Productos Registrados</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-cubes"></i>
-                    </div>
-                    <div class="stat-value" id="total-stock">0</div>
-                    <div class="stat-label">Stock Total</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-dollar-sign"></i>
-                    </div>
-                    <div class="stat-value" id="inventory-value">Bs 0</div>
-                    <div class="stat-label">Valor Inventario</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <div class="stat-value" id="low-stock-count">0</div>
-                    <div class="stat-label">Productos con Stock Bajo</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div class="stat-value" id="daily-earnings">Bs 0</div>
-                    <div class="stat-label">Ganancias del Día</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-piggy-bank"></i>
-                    </div>
-                    <div class="stat-value" id="daily-capital">Bs 0</div>
-                    <div class="stat-label">Capital del Día</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <div class="stat-value" id="daily-profit">Bs 0</div>
-                    <div class="stat-label">Ganancias Netas</div>
-                </div>
+    <div class="desktop-app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>
+                    <i class="bi bi-shop"></i>
+                    <span>TIENDA ADMIN</span>
+                </h3>
             </div>
             
-            <div class="nav-buttons">
-                <a href="scanner.html" class="nav-btn btn-success">
-                    <i class="fas fa-camera"></i> Ir al Escáner de Venta
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
                 </a>
-                <button onclick="exportInventory()" class="nav-btn btn-warning">
-                    <i class="fas fa-file-export"></i> Exportar Inventario
+                <a href="#" class="menu-item" data-section="inventario">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#" class="menu-item" data-section="ventas">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="#" class="menu-item" data-section="reportes">
+                    <i class="bi bi-graph-up"></i>
+                    <span>Reportes</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>A</span>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Super Admin</div>
+                    </div>
+                </div>
+                <button class="desktop-btn desktop-btn-danger w-100" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar Sesión</span>
                 </button>
             </div>
         </div>
-        
-        <!-- Ventana 2: Agregar Producto -->
-        <div class="window" id="add-product">
-            <div class="dashboard">
-                <div class="card">
-                    <h2><i class="fas fa-plus-circle"></i> Agregar Nuevo Producto</h2>
-                    <form id="product-form">
-                        <div class="form-group">
-                            <label for="product-name"><i class="fas fa-tag"></i> Nombre del Producto</label>
-                            <input type="text" id="product-name" placeholder="Ej: Laptop Dell XPS 13" required>
+
+        <!-- Contenido Principal -->
+        <div class="main-content">
+            <!-- Header del contenido -->
+            <div class="content-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 id="pageTitle" class="mb-0">Dashboard</h2>
+                    <div class="d-flex align-items-center gap-3">
+                        <div class="desktop-search">
+                            <i class="bi bi-search desktop-search-icon"></i>
+                            <input type="text" class="desktop-search-input" id="globalSearch" 
+                                   placeholder="Buscar en el sistema...">
                         </div>
-                        <div class="form-group">
-                            <label for="product-purchase-price"><i class="fas fa-dollar-sign"></i> Precio de Compra</label>
-                            <input type="number" id="product-purchase-price" min="0" step="0.01" placeholder="0.00" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-price"><i class="fas fa-dollar-sign"></i> Precio de Venta</label>
-                            <input type="number" id="product-price" min="0" step="0.01" placeholder="0.00" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-stock"><i class="fas fa-cubes"></i> Stock Inicial</label>
-                            <input type="number" id="product-stock" min="0" placeholder="0" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="product-expiration"><i class="fas fa-calendar-alt"></i> Fecha de Vencimiento</label>
-                            <input type="date" id="product-expiration">
-                        </div>
-                        <button type="submit">
-                            <i class="fas fa-qrcode"></i> Generar Código QR
+                        <button class="desktop-btn desktop-btn-primary" id="refreshBtn">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span>Actualizar</span>
                         </button>
-                    </form>
+                    </div>
                 </div>
-                
-                <div class="card">
-                    <h2><i class="fas fa-qrcode"></i> Código QR Generado</h2>
-                    <div class="qrcode-section">
-                        <div class="qrcode-container">
-                            <div class="qrcode-preview">
-                                <div id="qrcode">
-                                    <i class="fas fa-qrcode" style="font-size: 70px; color: #ddd; margin-bottom: 12px;"></i>
-                                    <p style="color: #999;">El código QR aparecerá aquí después de agregar un producto</p>
+            </div>
+
+            <!-- Cuerpo del contenido -->
+            <div class="content-body">
+                <!-- Dashboard -->
+                <div id="dashboardSection" class="fade-in">
+                    <!-- Estadísticas -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <div class="stat-number" id="totalProducts">0</div>
+                            <div class="stat-label">Total Productos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-number" id="lowStockProducts">0</div>
+                            <div class="stat-label">Stock Bajo</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                            <div class="stat-number" id="outOfStockProducts">0</div>
+                            <div class="stat-label">Agotados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                            <div class="stat-number" id="totalValue">Bs. 0</div>
+                            <div class="stat-label">Valor Inventario</div>
+                        </div>
+                    </div>
+
+                    <!-- Productos con stock bajo -->
+                    <div class="desktop-card">
+                        <div class="desktop-card-header">
+                            <span>Productos con Stock Bajo</span>
+                            <small class="text-muted" id="lowStockCount">0 productos</small>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Producto</th>
+                                            <th>Stock Actual</th>
+                                            <th>Stock Mínimo</th>
+                                            <th>Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lowStockTable">
+                                        <!-- Productos con stock bajo -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Últimas ventas -->
+                    <div class="desktop-card">
+                        <div class="desktop-card-header">
+                            <span>Últimas Ventas</span>
+                            <button class="desktop-btn desktop-btn-primary btn-sm" onclick="showSection('ventas')">
+                                Ver Todas
+                            </button>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th># Venta</th>
+                                            <th>Vendedor</th>
+                                            <th>Total</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentSalesTable">
+                                        <!-- Últimas ventas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventario -->
+                <div id="inventarioSection" class="fade-in d-none">
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Gestión de Inventario</span>
+                            <button class="desktop-btn desktop-btn-primary" id="addProductBtn">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>Agregar Producto</span>
+                            </button>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="mb-4">
+                                <div class="desktop-search">
+                                    <i class="bi bi-search desktop-search-icon"></i>
+                                    <input type="text" class="desktop-search-input" id="productSearch" 
+                                           placeholder="Buscar productos por código o nombre...">
                                 </div>
                             </div>
-                            <div class="download-buttons" id="download-buttons" style="display: none;">
-                                <button id="download-qr-btn" class="download-btn">
-                                    <i class="fas fa-download"></i> Descargar QR
-                                </button>
-                                <button id="download-barcode-btn" class="download-btn btn-warning">
-                                    <i class="fas fa-barcode"></i> Descargar Código de Barras
-                                </button>
+
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Código</th>
+                                            <th>Nombre</th>
+                                            <th>Stock</th>
+                                            <th>Precio Compra</th>
+                                            <th>Precio Venta</th>
+                                            <th>Vencimiento</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTable">
+                                        <!-- Productos -->
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
-                        
-                        <div class="qrcode-info" id="qrcode-info" style="display: none;">
-                            <h3><i class="fas fa-info-circle"></i> Información del Producto</h3>
-                            <p><strong>Nombre:</strong> <span id="info-name"></span></p>
-                            <p><strong>Precio Compra:</strong> Bs <span id="info-purchase-price"></span></p>
-                            <p><strong>Precio Venta:</strong> Bs <span id="info-price"></span></p>
-                            <p><strong>Stock:</strong> <span id="info-stock"></span> unidades</p>
-                            <p><strong>Fecha Vencimiento:</strong> <span id="info-expiration"></span></p>
-                            <p><strong>ID:</strong> <span id="info-id"></span></p>
-                            <p><strong>Código:</strong> <span id="info-barcode"></span></p>
-                            <p><strong>Fecha:</strong> <span id="info-date"></span></p>
+                    </div>
+                </div>
+
+                <!-- Ventas -->
+                <div id="ventasSection" class="fade-in d-none">
+                    <div class="desktop-card">
+                        <div class="desktop-card-header">
+                            <span>Historial de Ventas</span>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="mb-4">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Filtrar por fecha</label>
+                                        <input type="date" class="desktop-form-control" id="salesDateFilter">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Filtrar por vendedor</label>
+                                        <select class="desktop-form-control" id="salesUserFilter">
+                                            <option value="">Todos los vendedores</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button class="desktop-btn desktop-btn-primary w-100" onclick="filterSales()">
+                                            <i class="bi bi-funnel"></i>
+                                            <span>Filtrar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th># Venta</th>
+                                            <th>Vendedor</th>
+                                            <th>Productos</th>
+                                            <th>Cantidad</th>
+                                            <th>Total</th>
+                                            <th>Fecha</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="salesTable">
+                                        <!-- Ventas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Reportes -->
+                <div id="reportesSection" class="fade-in d-none">
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="desktop-card h-100">
+                                <div class="desktop-card-header">
+                                    <span>Ventas por Día</span>
+                                </div>
+                                <div class="desktop-card-body">
+                                    <canvas id="dailySalesChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            <div class="desktop-card h-100">
+                                <div class="desktop-card-header">
+                                    <span>Top Vendedores</span>
+                                </div>
+                                <div class="desktop-card-body">
+                                    <canvas id="topSellersChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="desktop-card">
+                        <div class="desktop-card-header">
+                            <span>Reporte de Productos Más Vendidos</span>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Producto</th>
+                                            <th>Código</th>
+                                            <th>Unidades Vendidas</th>
+                                            <th>Total Generado</th>
+                                            <th>Última Venta</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="topProductsTable">
+                                        <!-- Productos más vendidos -->
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        
-        <!-- Ventana 3: Reporte Diario -->
-        <div class="window" id="daily-report">
-            <div class="card">
-                <h2><i class="fas fa-calendar-day"></i> Reporte Diario</h2>
-                <div style="display:flex;gap:15px;align-items:center;flex-wrap:wrap;">
-                    <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
-                        <div style="font-size:0.85rem;color:#6c757d;">Ganancias Totales</div>
-                        <div id="daily-total-earnings" style="font-size:1.4rem;font-weight:700;color:var(--primary);">Bs 0.00</div>
-                    </div>
-                    <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
-                        <div style="font-size:0.85rem;color:#6c757d;">Ventas Hoy</div>
-                        <div id="daily-total-sales" style="font-size:1.4rem;font-weight:700;color:var(--primary);">0</div>
-                    </div>
-                    <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
-                        <div style="font-size:0.85rem;color:#6c757d;">Capital Invertido</div>
-                        <div id="daily-total-capital" style="font-size:1.4rem;font-weight:700;color:var(--capital);">Bs 0.00</div>
-                    </div>
-                    <div style="flex:1;min-width:200px;padding:12px;border-radius:8px;background:#fff;box-shadow:0 4px 10px rgba(0,0,0,0.04);">
-                        <div style="font-size:0.85rem;color:#6c757d;">Ganancias Netas</div>
-                        <div id="daily-total-profit" style="font-size:1.4rem;font-weight:700;color:var(--profit);">Bs 0.00</div>
-                    </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notification" class="desktop-notification d-none"></div>
+
+    <!-- Modal para Agregar/Editar Producto -->
+    <div class="modal fade desktop-modal" id="productModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Agregar Producto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
                 </div>
-                <div style="margin-top:15px;">
-                    <h3 style="margin-bottom:8px;color:var(--primary);">Ventas recientes</h3>
-                    <div id="daily-sales-list" style="background:#fff;padding:10px;border-radius:6px;min-height:50px;">Cargando...</div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="productCode" class="form-label">Código del Producto *</label>
+                                <input type="text" class="desktop-form-control" id="productCode" required>
+                                <small class="text-muted">Código único (ej: PROD001)</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="productName" class="form-label">Nombre del Producto *</label>
+                                <input type="text" class="desktop-form-control" id="productName" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="productStock" class="form-label">Stock Inicial *</label>
+                                <input type="number" class="desktop-form-control" id="productStock" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="minimumStock" class="form-label">Stock Mínimo *</label>
+                                <input type="number" class="desktop-form-control" id="minimumStock" min="1" value="5" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="purchasePrice" class="form-label">Precio de Compra (Bs.) *</label>
+                                <input type="number" step="0.01" class="desktop-form-control" id="purchasePrice" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="salePrice" class="form-label">Precio de Venta (Bs.) *</label>
+                                <input type="number" step="0.01" class="desktop-form-control" id="salePrice" min="0" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="expirationDate" class="form-label">Fecha de Vencimiento</label>
+                                <input type="date" class="desktop-form-control" id="expirationDate">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="productDescription" class="form-label">Descripción</label>
+                            <textarea class="desktop-form-control" id="productDescription" rows="3"></textarea>
+                        </div>
+                    </form>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Ventana 4: Inventario Actual -->
-        <div class="window" id="inventory">
-            <div class="card">
-                <h2><i class="fas fa-boxes"></i> Inventario Actual</h2>
-                <div class="inventory-table-container">
-                    <table class="inventory-table">
-                        <thead>
-                            <tr>
-                                <th>ID</th>
-                                <th>Nombre</th>
-                                <th>Precio Compra</th>
-                                <th>Precio Venta</th>
-                                <th>Stock</th>
-                                <th>Vencimiento</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="inventory-body">
-                            <!-- Los productos se cargarán aquí -->
-                        </tbody>
-                    </table>
+                <div class="modal-footer">
+                    <button type="button" class="desktop-btn desktop-btn-danger" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="desktop-btn desktop-btn-primary" id="saveProductBtn">
+                        Guardar Producto
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Modal para editar producto -->
-    <div class="modal-overlay" id="edit-modal">
-        <div class="modal">
-            <div class="modal-header">
-                <h2 class="modal-title"><i class="fas fa-edit"></i> Editar Producto</h2>
-                <button class="close-modal">&times;</button>
-            </div>
-            <form id="edit-product-form">
-                <div class="form-group">
-                    <label for="edit-product-name"><i class="fas fa-tag"></i> Nombre del Producto</label>
-                    <input type="text" id="edit-product-name" placeholder="Ej: Laptop Dell XPS 13" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-purchase-price"><i class="fas fa-dollar-sign"></i> Precio de Compra</label>
-                    <input type="number" id="edit-product-purchase-price" min="0" step="0.01" placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-price"><i class="fas fa-dollar-sign"></i> Precio de Venta</label>
-                    <input type="number" id="edit-product-price" min="0" step="0.01" placeholder="0.00" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-stock"><i class="fas fa-cubes"></i> Stock</label>
-                    <input type="number" id="edit-product-stock" min="0" placeholder="0" required>
-                </div>
-                <div class="form-group">
-                    <label for="edit-product-expiration"><i class="fas fa-calendar-alt"></i> Fecha de Vencimiento</label>
-                    <input type="date" id="edit-product-expiration">
-                </div>
-                <div class="modal-actions">
-                    <button type="button" class="btn-warning" id="cancel-edit">
-                        <i class="fas fa-times"></i> Cancelar
-                    </button>
-                    <button type="submit" class="btn-success">
-                        <i class="fas fa-save"></i> Guardar Cambios
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div id="notification" class="notification"></div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         // Configuración de Supabase
-        const SUPABASE_URL = 'https://zcjhxrqqdqkthnbqtqgr.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inpjamh4cnFxZHFrdGhuYnF0cWdyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjEwNjI5OTEsImV4cCI6MjA3NjYzODk5MX0.s7GXQ___tDKc7WW01wa7EvZKKUnjDv9L7GKDeeb76Us';
-        
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        
-        // Elementos del DOM
-        const productForm = document.getElementById('product-form');
-        const qrcodeDiv = document.getElementById('qrcode');
-        const downloadButtons = document.getElementById('download-buttons');
-        const downloadQrBtn = document.getElementById('download-qr-btn');
-        const downloadBarcodeBtn = document.getElementById('download-barcode-btn');
-        const qrcodeInfo = document.getElementById('qrcode-info');
-        const inventoryBody = document.getElementById('inventory-body');
-        const productsCount = document.getElementById('products-count');
-        const totalStock = document.getElementById('total-stock');
-        const inventoryValue = document.getElementById('inventory-value');
-        const lowStockCount = document.getElementById('low-stock-count');
-        const dailyEarnings = document.getElementById('daily-earnings');
-        const dailyCapital = document.getElementById('daily-capital');
-        const dailyProfit = document.getElementById('daily-profit');
-        const notification = document.getElementById('notification');
-        
-        // Elementos del modal de edición
-        const editModal = document.getElementById('edit-modal');
-        const editProductForm = document.getElementById('edit-product-form');
-        const closeModalBtn = document.querySelector('.close-modal');
-        const cancelEditBtn = document.getElementById('cancel-edit');
-        
-        // Elementos de navegación
-        const navTabs = document.querySelectorAll('.nav-tab');
-        const windows = document.querySelectorAll('.window');
-        
-        let currentProductId = null;
-        let currentProductData = null;
-        let currentQrStyled = null;
-        let editingProductId = null;
-        
-        // Cargar inventario y reporte diario al iniciar
-        document.addEventListener('DOMContentLoaded', () => { 
-            loadInventory(); 
-            loadDailyReport(); 
-            updateFinancialStats();
-            
-            // Configurar eventos del modal
-            closeModalBtn.addEventListener('click', closeEditModal);
-            cancelEditBtn.addEventListener('click', closeEditModal);
-            
-            // Cerrar modal al hacer clic fuera
-            editModal.addEventListener('click', (e) => {
-                if (e.target === editModal) {
-                    closeEditModal();
-                }
-            });
-            
-            // Manejar envío del formulario de edición
-            editProductForm.addEventListener('submit', handleEditSubmit);
-            
-            // Configurar navegación por pestañas
-            navTabs.forEach(tab => {
-                tab.addEventListener('click', () => {
-                    const windowId = tab.getAttribute('data-window');
-                    switchWindow(windowId);
+        const SUPABASE_URL = 'https://zrbhhiayfaedatwlzqch.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYmhoaWF5ZmFlZGF0d2x6cWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExMTcwMjgsImV4cCI6MjA3NjY5MzAyOH0.b97mGNErXGRuIorOPTf6m1awGlIyrXaAI4VS65aR-5o';
+
+        // Variables globales
+        let allProducts = [];
+        let allSales = [];
+        let allUsers = [];
+        let dailySalesChart = null;
+        let topSellersChart = null;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdminApp();
+        });
+
+        function initializeAdminApp() {
+            // Configurar navegación del sidebar
+            document.querySelectorAll('.menu-item').forEach(item => {
+                item.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const section = this.getAttribute('data-section');
+                    showSection(section);
+                    
+                    // Actualizar clase activa
+                    document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Actualizar título de página
+                    document.getElementById('pageTitle').textContent = 
+                        this.querySelector('span').textContent;
                 });
             });
-        });
-        
-        // Cambiar entre ventanas
-        function switchWindow(windowId) {
-            // Remover clase active de todas las pestañas y ventanas
-            navTabs.forEach(tab => tab.classList.remove('active'));
-            windows.forEach(window => window.classList.remove('active'));
+
+            // Configurar eventos de botones
+            document.getElementById('addProductBtn').addEventListener('click', showAddProductModal);
+            document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
+            document.getElementById('refreshBtn').addEventListener('click', refreshData);
+            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+            document.getElementById('productSearch').addEventListener('input', searchProducts);
+            document.getElementById('globalSearch').addEventListener('input', globalSearch);
+
+            // Cargar datos iniciales
+            loadAllData();
+        }
+
+        function showSection(section) {
+            // Ocultar todas las secciones
+            document.getElementById('dashboardSection').classList.add('d-none');
+            document.getElementById('inventarioSection').classList.add('d-none');
+            document.getElementById('ventasSection').classList.add('d-none');
+            document.getElementById('reportesSection').classList.add('d-none');
             
-            // Activar la pestaña y ventana seleccionada
-            document.querySelector(`.nav-tab[data-window="${windowId}"]`).classList.add('active');
-            document.getElementById(windowId).classList.add('active');
+            // Mostrar la sección seleccionada
+            document.getElementById(section + 'Section').classList.remove('d-none');
             
-            // Si se cambia a inventario, cargar los datos actualizados
-            if (windowId === 'inventory') {
-                loadInventory();
-            }
-            
-            // Si se cambia a reporte diario, cargar datos actualizados
-            if (windowId === 'daily-report') {
-                loadDailyReport();
-                updateFinancialStats();
+            // Cargar datos específicos si es necesario
+            if (section === 'reportes') {
+                loadReportsData();
             }
         }
-        
-        // Mostrar notificación
-        function showNotification(message, type = 'success') {
+
+        async function loadAllData() {
+            try {
+                // Cargar productos
+                const productsResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/products?order=name.asc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!productsResponse.ok) throw new Error('Error al cargar productos');
+                allProducts = await productsResponse.json();
+
+                // Cargar ventas
+                const salesResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/sales?order=created_at.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!salesResponse.ok) throw new Error('Error al cargar ventas');
+                allSales = await salesResponse.json();
+
+                // Cargar usuarios
+                const usersResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/users`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!usersResponse.ok) throw new Error('Error al cargar usuarios');
+                allUsers = await usersResponse.json();
+
+                // Actualizar todas las vistas
+                updateDashboard();
+                displayProducts(allProducts);
+                displaySales(allSales);
+                populateUserFilter();
+
+            } catch (error) {
+                console.error('Error al cargar datos:', error);
+                showNotification('Error al cargar datos', 'error');
+            }
+        }
+
+        function updateDashboard() {
+            // Estadísticas generales
+            document.getElementById('totalProducts').textContent = allProducts.length;
+            
+            const lowStock = allProducts.filter(p => p.stock <= p.minimum_stock && p.stock > 0).length;
+            document.getElementById('lowStockProducts').textContent = lowStock;
+            
+            const outOfStock = allProducts.filter(p => p.stock === 0).length;
+            document.getElementById('outOfStockProducts').textContent = outOfStock;
+            
+            const totalValue = allProducts.reduce((sum, p) => sum + (p.stock * p.purchase_price), 0);
+            document.getElementById('totalValue').textContent = `Bs. ${totalValue.toFixed(2)}`;
+            
+            // Productos con stock bajo
+            updateLowStockTable();
+            
+            // Últimas ventas
+            updateRecentSalesTable();
+        }
+
+        function updateLowStockTable() {
+            const tbody = document.getElementById('lowStockTable');
+            const lowStockProducts = allProducts.filter(p => p.stock <= p.minimum_stock);
+            
+            document.getElementById('lowStockCount').textContent = `${lowStockProducts.length} productos`;
+            
+            tbody.innerHTML = lowStockProducts.map(product => {
+                let statusClass = 'status-activo';
+                let statusText = 'Normal';
+                
+                if (product.stock === 0) {
+                    statusClass = 'status-agotado';
+                    statusText = 'Agotado';
+                } else if (product.stock <= product.minimum_stock) {
+                    statusClass = 'status-bajo';
+                    statusText = 'Stock Bajo';
+                }
+                
+                return `
+                <tr onclick="editProduct(${product.id})" style="cursor: pointer;">
+                    <td>${product.id}</td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        <br><small class="text-muted">${product.code}</small>
+                    </td>
+                    <td class="fw-bold ${product.stock <= product.minimum_stock ? 'text-warning' : ''}">
+                        ${product.stock}
+                    </td>
+                    <td>${product.minimum_stock}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function updateRecentSalesTable() {
+            const tbody = document.getElementById('recentSalesTable');
+            const recentSales = allSales.slice(0, 10);
+            
+            tbody.innerHTML = recentSales.map(sale => {
+                // Buscar vendedor
+                const seller = allUsers.find(u => u.id === sale.user_id);
+                const sellerName = seller ? seller.nombre : 'Desconocido';
+                
+                // Parsear productos
+                let total = 0;
+                let itemCount = 0;
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        total = products.reduce((sum, p) => sum + p.subtotal, 0);
+                        itemCount = products.reduce((sum, p) => sum + p.quantity, 0);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+                
+                // Formatear fecha
+                const saleDate = new Date(sale.created_at);
+                const formattedDate = saleDate.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+                
+                return `
+                <tr>
+                    <td>#${sale.id}</td>
+                    <td>${sellerName}</td>
+                    <td class="money">${total.toFixed(2)}</td>
+                    <td>${formattedDate}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function displayProducts(products) {
+            const tbody = document.getElementById('productsTable');
+            
+            tbody.innerHTML = products.map(product => {
+                // Determinar estado del stock
+                let statusClass = 'status-activo';
+                let statusText = 'Disponible';
+                
+                if (product.stock === 0) {
+                    statusClass = 'status-agotado';
+                    statusText = 'Agotado';
+                } else if (product.stock <= product.minimum_stock) {
+                    statusClass = 'status-bajo';
+                    statusText = 'Stock Bajo';
+                }
+                
+                // Formatear fecha de vencimiento
+                let expirationDisplay = 'Sin fecha';
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    expirationDisplay = expDate.toLocaleDateString('es-ES');
+                    
+                    // Marcar si está próximo a vencer o vencido
+                    const today = new Date();
+                    if (expDate < today) {
+                        expirationDisplay = `<span class="text-danger fw-bold">${expirationDisplay} (Vencido)</span>`;
+                    } else if (expDate < new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+                        expirationDisplay = `<span class="text-warning fw-bold">${expirationDisplay} (Próximo)</span>`;
+                    }
+                }
+                
+                return `
+                <tr>
+                    <td>${product.id}</td>
+                    <td><code>${product.code}</code></td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        ${product.description ? `<br><small class="text-muted">${product.description}</small>` : ''}
+                    </td>
+                    <td class="fw-bold ${product.stock <= product.minimum_stock ? 'text-warning' : ''}">
+                        ${product.stock}
+                    </td>
+                    <td class="money">${product.purchase_price.toFixed(2)}</td>
+                    <td class="money">${product.sale_price.toFixed(2)}</td>
+                    <td>${expirationDisplay}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-2">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editProduct(${product.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteProduct(${product.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function displaySales(sales) {
+            const tbody = document.getElementById('salesTable');
+            
+            tbody.innerHTML = sales.map(sale => {
+                // Buscar vendedor
+                const seller = allUsers.find(u => u.id === sale.user_id);
+                const sellerName = seller ? seller.nombre : 'Desconocido';
+                
+                // Parsear productos vendidos
+                let productsList = 'No hay productos';
+                let totalAmount = 0;
+                let totalQuantity = 0;
+                
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        productsList = products.map(p => 
+                            `${p.quantity}x ${p.name}`
+                        ).join(', ');
+                        totalAmount = products.reduce((sum, p) => sum + p.subtotal, 0);
+                        totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+                
+                // Formatear fecha
+                const saleDate = new Date(sale.created_at);
+                const formattedDate = saleDate.toLocaleDateString('es-ES', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+                
+                return `
+                <tr>
+                    <td>#${sale.id}</td>
+                    <td>${sellerName}</td>
+                    <td>${productsList}</td>
+                    <td>${totalQuantity}</td>
+                    <td class="money fw-bold">${totalAmount.toFixed(2)}</td>
+                    <td>${formattedDate}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function populateUserFilter() {
+            const filter = document.getElementById('salesUserFilter');
+            filter.innerHTML = '<option value="">Todos los vendedores</option>';
+            
+            allUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.nombre;
+                filter.appendChild(option);
+            });
+        }
+
+        function searchProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                displayProducts(allProducts);
+                return;
+            }
+
+            const filtered = allProducts.filter(product => {
+                return (
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.code.toLowerCase().includes(searchTerm) ||
+                    (product.description && product.description.toLowerCase().includes(searchTerm))
+                );
+            });
+
+            displayProducts(filtered);
+        }
+
+        function filterSales() {
+            const dateFilter = document.getElementById('salesDateFilter').value;
+            const userFilter = document.getElementById('salesUserFilter').value;
+            
+            let filtered = allSales;
+            
+            // Filtrar por fecha
+            if (dateFilter) {
+                const filterDate = new Date(dateFilter);
+                filtered = filtered.filter(sale => {
+                    const saleDate = new Date(sale.created_at);
+                    return saleDate.toDateString() === filterDate.toDateString();
+                });
+            }
+            
+            // Filtrar por usuario
+            if (userFilter) {
+                filtered = filtered.filter(sale => sale.user_id == userFilter);
+            }
+            
+            displaySales(filtered);
+        }
+
+        function showAddProductModal() {
+            document.getElementById('productModalLabel').textContent = 'Agregar Producto';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('minimumStock').value = '5';
+            
+            const modal = new bootstrap.Modal(document.getElementById('productModal'));
+            modal.show();
+        }
+
+        async function saveProduct() {
+            const productId = document.getElementById('productId').value;
+            const code = document.getElementById('productCode').value.trim();
+            const name = document.getElementById('productName').value.trim();
+            const stock = parseInt(document.getElementById('productStock').value);
+            const purchasePrice = parseFloat(document.getElementById('purchasePrice').value);
+            const salePrice = parseFloat(document.getElementById('salePrice').value);
+            const expirationDate = document.getElementById('expirationDate').value;
+            const minimumStock = parseInt(document.getElementById('minimumStock').value);
+            const description = document.getElementById('productDescription').value.trim();
+
+            // Validaciones
+            if (!code || !name || isNaN(stock) || isNaN(purchasePrice) || isNaN(salePrice)) {
+                showNotification('Por favor complete todos los campos requeridos', 'error');
+                return;
+            }
+
+            if (purchasePrice < 0 || salePrice < 0 || stock < 0 || minimumStock < 0) {
+                showNotification('Los valores no pueden ser negativos', 'error');
+                return;
+            }
+
+            if (salePrice < purchasePrice) {
+                showNotification('El precio de venta no puede ser menor al precio de compra', 'error');
+                return;
+            }
+
+            try {
+                const productData = {
+                    code: code,
+                    name: name,
+                    stock: stock,
+                    purchase_price: purchasePrice,
+                    sale_price: salePrice,
+                    expiration_date: expirationDate || null,
+                    minimum_stock: minimumStock,
+                    description: description,
+                    updated_at: new Date().toISOString()
+                };
+
+                let response;
+                if (productId) {
+                    // Actualizar producto
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(productData)
+                        }
+                    );
+                } else {
+                    // Crear nuevo producto
+                    productData.created_at = new Date().toISOString();
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/products`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(productData)
+                        }
+                    );
+                }
+
+                if (!response.ok) throw new Error('Error al guardar producto');
+
+                // Cerrar modal y recargar datos
+                bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+                loadAllData();
+                showNotification('Producto guardado exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al guardar producto:', error);
+                showNotification('Error al guardar producto', 'error');
+            }
+        }
+
+        function editProduct(productId) {
+            const product = allProducts.find(p => p.id === productId);
+            if (!product) return;
+
+            document.getElementById('productModalLabel').textContent = 'Editar Producto';
+            document.getElementById('productId').value = product.id;
+            document.getElementById('productCode').value = product.code;
+            document.getElementById('productName').value = product.name;
+            document.getElementById('productStock').value = product.stock;
+            document.getElementById('purchasePrice').value = product.purchase_price;
+            document.getElementById('salePrice').value = product.sale_price;
+            document.getElementById('minimumStock').value = product.minimum_stock;
+            document.getElementById('productDescription').value = product.description || '';
+            
+            if (product.expiration_date) {
+                const expDate = new Date(product.expiration_date);
+                document.getElementById('expirationDate').value = expDate.toISOString().split('T')[0];
+            } else {
+                document.getElementById('expirationDate').value = '';
+            }
+
+            const modal = new bootstrap.Modal(document.getElementById('productModal'));
+            modal.show();
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm('¿Está seguro de que desea eliminar este producto?\nEsta acción no se puede deshacer.')) {
+                return;
+            }
+
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al eliminar producto');
+
+                loadAllData();
+                showNotification('Producto eliminado exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al eliminar producto:', error);
+                showNotification('Error al eliminar producto', 'error');
+            }
+        }
+
+        function loadReportsData() {
+            // Crear gráfico de ventas por día
+            createDailySalesChart();
+            
+            // Crear gráfico de top vendedores
+            createTopSellersChart();
+            
+            // Actualizar tabla de productos más vendidos
+            updateTopProductsTable();
+        }
+
+        function createDailySalesChart() {
+            const ctx = document.getElementById('dailySalesChart').getContext('2d');
+            
+            // Obtener ventas de los últimos 7 días
+            const last7Days = [];
+            for (let i = 6; i >= 0; i--) {
+                const date = new Date();
+                date.setDate(date.getDate() - i);
+                last7Days.push(date.toLocaleDateString('es-ES', { weekday: 'short' }));
+            }
+            
+            // Datos de ejemplo (en un sistema real, esto vendría de la base de datos)
+            const data = [1200, 1800, 1500, 2200, 1900, 2400, 2100];
+            
+            if (dailySalesChart) {
+                dailySalesChart.destroy();
+            }
+            
+            dailySalesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: last7Days,
+                    datasets: [{
+                        label: 'Ventas (Bs.)',
+                        data: data,
+                        borderColor: '#6A0DAD',
+                        backgroundColor: 'rgba(106, 13, 173, 0.1)',
+                        borderWidth: 2,
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Ventas de los últimos 7 días'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Monto (Bs.)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createTopSellersChart() {
+            const ctx = document.getElementById('topSellersChart').getContext('2d');
+            
+            // Datos de ejemplo
+            const labels = ['Juan Pérez', 'María García', 'Carlos López', 'Ana Martínez', 'Pedro Rodríguez'];
+            const data = [12, 8, 6, 4, 3];
+            
+            if (topSellersChart) {
+                topSellersChart.destroy();
+            }
+            
+            topSellersChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ventas',
+                        data: data,
+                        backgroundColor: [
+                            '#6A0DAD',
+                            '#8A2BE2',
+                            '#9370DB',
+                            '#BA55D3',
+                            '#DA70D6'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Top 5 Vendedores'
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateTopProductsTable() {
+            const tbody = document.getElementById('topProductsTable');
+            
+            // Datos de ejemplo
+            const topProducts = [
+                { name: 'Coca Cola 2L', code: 'COC001', sold: 150, total: 5250, lastSale: '2024-01-15' },
+                { name: 'Galletas Oreo', code: 'GAL002', sold: 120, total: 3600, lastSale: '2024-01-15' },
+                { name: 'Arroz 1kg', code: 'ARR003', sold: 80, total: 1600, lastSale: '2024-01-14' },
+                { name: 'Aceite 1L', code: 'ACE004', sold: 75, total: 2250, lastSale: '2024-01-14' },
+                { name: 'Jabón Líquido', code: 'JAB005', sold: 60, total: 1800, lastSale: '2024-01-13' }
+            ];
+            
+            tbody.innerHTML = topProducts.map(product => {
+                const lastSaleDate = new Date(product.lastSale);
+                const formattedDate = lastSaleDate.toLocaleDateString('es-ES');
+                
+                return `
+                <tr>
+                    <td>${product.name}</td>
+                    <td><code>${product.code}</code></td>
+                    <td>${product.sold}</td>
+                    <td class="money">${product.total.toFixed(2)}</td>
+                    <td>${formattedDate}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function globalSearch() {
+            const searchTerm = document.getElementById('globalSearch').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                // Si está vacío, volver al dashboard
+                showSection('dashboard');
+                return;
+            }
+            
+            // Buscar en productos
+            const productResults = allProducts.filter(product => 
+                product.name.toLowerCase().includes(searchTerm) ||
+                product.code.toLowerCase().includes(searchTerm)
+            );
+            
+            // Buscar en ventas
+            const salesResults = allSales.filter(sale => {
+                const seller = allUsers.find(u => u.id === sale.user_id);
+                return seller && seller.nombre.toLowerCase().includes(searchTerm);
+            });
+            
+            // Decidir qué sección mostrar basado en los resultados
+            if (productResults.length > 0) {
+                showSection('inventario');
+                displayProducts(productResults);
+            } else if (salesResults.length > 0) {
+                showSection('ventas');
+                displaySales(salesResults);
+            } else {
+                showNotification('No se encontraron resultados', 'info');
+            }
+        }
+
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> Actualizando...';
+            btn.disabled = true;
+            
+            loadAllData().then(() => {
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    showNotification('Datos actualizados correctamente', 'success');
+                }, 500);
+            });
+        }
+
+        function handleLogout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
             notification.textContent = message;
-            notification.className = `notification ${type}`;
-            notification.classList.add('show');
+            notification.className = `desktop-notification ${type} show`;
             
             setTimeout(() => {
                 notification.classList.remove('show');
             }, 4000);
         }
-        
-        // Manejar envío del formulario principal
-        productForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const name = document.getElementById('product-name').value;
-            const purchasePrice = parseFloat(document.getElementById('product-purchase-price').value);
-            const price = parseFloat(document.getElementById('product-price').value);
-            const stock = parseInt(document.getElementById('product-stock').value);
-            const expirationDate = document.getElementById('product-expiration').value;
-            
-            // Generar datos únicos para el código de barras/QR
-            const barcodeData = `PROD-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            
-            // Insertar nuevo producto en la base de datos
-            const { data, error } = await supabase
-                .from('products')
-                .insert([{ 
-                    name, 
-                    purchase_price: purchasePrice,
-                    price, 
-                    stock,
-                    expiration_date: expirationDate || null,
-                    barcode_data: barcodeData
-                }])
-                .select();
-            
-            if (error) {
-                // Si falla la inserción en Supabase, generar un producto temporal localmente
-                console.error('Error al insertar en Supabase:', error);
-                showNotification('No se pudo guardar en la base de datos, pero se generará el QR localmente', 'warning');
 
-                const tempId = `local-${Date.now()}`;
-                const product = {
-                    id: tempId,
-                    name,
-                    purchase_price: purchasePrice,
-                    price,
-                    stock,
-                    expiration_date: expirationDate || null,
-                    barcode_data: barcodeData
-                };
-
-                currentProductId = product.id;
-                currentProductData = product;
-
-                // Generar QR localmente
-                generateQRCode(product);
-
-                // Limpiar formulario
-                productForm.reset();
-
-                // No hacemos loadInventory porque no se guardó en la base de datos
-                return;
-            }
-
-            const product = data[0];
-            currentProductId = product.id;
-            currentProductData = product;
-            
-            // Generar QR
-            generateQRCode(product);
-            
-            // Limpiar formulario
-            productForm.reset();
-            
-            // Actualizar inventario
-            loadInventory();
-            
-            showNotification(`Producto "${product.name}" agregado correctamente`);
-            
-            // Actualizar reporte diario cuando se agrega un producto (si corresponde a una venta)
-            try { 
-                loadDailyReport(); 
-                updateFinancialStats();
-            } catch (e) { console.warn('loadDailyReport no disponible aún', e); }
-        });
-        
-        // Generar código QR (usa qr-code-styling si está disponible, con fallback)
-        function generateQRCode(product) {
-            // Limpiar contenedor
-            qrcodeDiv.innerHTML = '';
-
-            // Datos del QR
-            const qrData = JSON.stringify({
-                id: product.id,
-                name: product.name,
-                purchase_price: product.purchase_price,
-                price: product.price,
-                barcode: product.barcode_data,
-                expiration_date: product.expiration_date,
-                type: 'product'
-            });
-
-            // Preferir qr-code-styling para un QR más potente y estilizado
-            if (window.QRCodeStyling) {
-                try {
-                    // Limpiar instancia previa
-                    currentQrStyled = null;
-
-                    currentQrStyled = new QRCodeStyling({
-                        width: 280,
-                        height: 280,
-                        data: qrData,
-                        margin: 10,
-                        qrOptions: { errorCorrectionLevel: 'H' },
-                        imageOptions: { crossOrigin: 'anonymous', margin: 5 },
-                        dotsOptions: { color: '#4A235A', type: 'rounded' },
-                        backgroundOptions: { color: '#ffffff' },
-                        image: null // podrías poner un logo aquí
-                    });
-
-                    // Renderizar como SVG/Canvas dentro del div
-                    // QRCodeStyling puede renderizar en un elemento HTML específico
-                    const wrapper = document.createElement('div');
-                    wrapper.style.display = 'flex';
-                    wrapper.style.justifyContent = 'center';
-                    wrapper.style.alignItems = 'center';
-                    qrcodeDiv.appendChild(wrapper);
-
-                    currentQrStyled.append(wrapper);
-
-                    // Esperar un ciclo para asegurar renderizado
-                    setTimeout(() => setupDownloadButtons(product), 50);
-                    return;
-                } catch (err) {
-                    console.error('Error usando QRCodeStyling:', err);
-                    // continue to fallback
-                }
-            }
-
-            // Fallback: generar con la librería QRCode clásica
-            try {
-                const canvas = document.createElement('canvas');
-                canvas.width = 200;
-                canvas.height = 200;
-                qrcodeDiv.appendChild(canvas);
-
-                const options = {
-                    width: 200,
-                    margin: 1,
-                    errorCorrectionLevel: 'H',
-                    color: {
-                        dark: '#4A235A',
-                        light: '#ffffff'
-                    }
-                };
-
-                QRCode.toCanvas(canvas, qrData, options, function(error) {
-                    if (error) {
-                        console.error('Error generando QR en canvas (fallback):', error);
-                        qrcodeDiv.innerHTML = '';
-                        generateQRCodeAlternative(product, qrData);
-                        return;
-                    }
-                    setupDownloadButtons(product);
-                });
-            } catch (error) {
-                console.error('Excepción al generar QR (fallback):', error);
-                qrcodeDiv.innerHTML = '';
-                generateQRCodeAlternative(product, qrData);
-            }
-        }
-        
-        // Método alternativo para generar QR (SVG)
-        function generateQRCodeAlternative(product, qrData) {
-            try {
-                const options = {
-                    type: 'svg',
-                    width: 200,
-                    errorCorrectionLevel: 'H',
-                    color: {
-                        dark: '#4A235A',
-                        light: '#ffffff'
-                    }
-                };
-
-                QRCode.toString(qrData, options, function(err, svg) {
-                    if (err) {
-                        console.error('Error generando QR SVG:', err);
-                        showNotification('Error generando código QR', 'error');
-                        return;
-                    }
-
-                    // Insertar SVG directamente
-                    qrcodeDiv.innerHTML = svg;
-                    setupDownloadButtons(product);
-                });
-            } catch (error) {
-                console.error('Error alternativo:', error);
-                showNotification('Error generando código QR', 'error');
-            }
-        }
-        
-        // Configurar botones de descarga
-        function setupDownloadButtons(product) {
-            // Mostrar información y botones de descarga (asegurar visibilidad y habilitación)
-            qrcodeInfo.style.display = 'block';
-            // Forzar visibilidad en caso de que existan estilos inline o reglas que lo oculten
-            downloadButtons.style.display = 'flex';
-            downloadButtons.style.visibility = 'visible';
-            downloadButtons.style.opacity = '1';
-            downloadButtons.hidden = false;
-            downloadButtons.setAttribute('aria-hidden', 'false');
-            
-            // Llenar información del producto
-            document.getElementById('info-name').textContent = product.name;
-            document.getElementById('info-purchase-price').textContent = product.purchase_price.toFixed(2);
-            document.getElementById('info-price').textContent = product.price.toFixed(2);
-            document.getElementById('info-stock').textContent = product.stock;
-            document.getElementById('info-expiration').textContent = product.expiration_date || 'No aplica';
-            document.getElementById('info-id').textContent = product.id;
-            document.getElementById('info-barcode').textContent = product.barcode_data;
-            document.getElementById('info-date').textContent = new Date().toLocaleDateString();
-            
-            // Configurar descarga de QR
-            if (downloadQrBtn) {
-                downloadQrBtn.disabled = false;
-                downloadQrBtn.onclick = function() {
-                    downloadQRImage(product, 'qr');
-                };
-            }
-            
-            // Configurar descarga de código de barras (simulado)
-            if (downloadBarcodeBtn) {
-                downloadBarcodeBtn.disabled = false;
-                downloadBarcodeBtn.onclick = function() {
-                    downloadQRImage(product, 'barcode');
-                };
-            }
-        }
-        
-        // Descargar imagen del QR
-        function downloadQRImage(product, type) {
-            // Si usamos QRCodeStyling, descargar desde allí (mejor calidad/estilos)
-            if (currentQrStyled) {
-                downloadStyledQrAsJpg(product, type);
-                return;
-            }
-            // Intentar obtener canvas primero
-            const canvas = qrcodeDiv.querySelector('canvas');
-            if (canvas) {
-                downloadCanvas(canvas, product, type);
-                return;
-            }
-
-            // Si no hay canvas, buscar SVG y convertir a canvas antes de descargar
-            const svg = qrcodeDiv.querySelector('svg');
-            if (svg) {
-                const svgData = new XMLSerializer().serializeToString(svg);
-
-                // Crear una imagen a partir del SVG (usando URL seguro para unicode)
-                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-                const url = URL.createObjectURL(svgBlob);
-                const img = new Image();
-
-                img.onload = function() {
-                    const tmpCanvas = document.createElement('canvas');
-                    tmpCanvas.width = img.width || 200;
-                    tmpCanvas.height = img.height || 200;
-                    const ctx = tmpCanvas.getContext('2d');
-                    // Pintar fondo blanco para evitar transparencia sobre fondo claro
-                    ctx.fillStyle = '#ffffff';
-                    ctx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(url);
-                    downloadCanvas(tmpCanvas, product, type);
-                };
-
-                img.onerror = function(e) {
-                    URL.revokeObjectURL(url);
-                    console.error('Error cargando SVG como imagen:', e);
-                    showNotification('No se pudo generar la imagen para descargar', 'error');
-                };
-
-                img.src = url;
-                return;
-            }
-
-            showNotification('No se pudo generar la imagen para descargar', 'error');
-        }
-        
-        // Descargar desde canvas
-        function downloadCanvas(canvas, product, type) {
-            try {
-                const link = document.createElement('a');
-                let fileName = '';
-
-                if (type === 'qr') {
-                    fileName = `QR-${product.name.replace(/\s+/g, '-')}-${product.id}.jpg`;
-                } else {
-                    fileName = `CODIGO-BARRAS-${product.name.replace(/\s+/g, '-')}-${product.id}.jpg`;
-                }
-
-                // Dibujar en un canvas temporal con fondo blanco para exportar JPEG
-                const tmpCanvas = document.createElement('canvas');
-                tmpCanvas.width = canvas.width || 200;
-                tmpCanvas.height = canvas.height || 200;
-                const ctx = tmpCanvas.getContext('2d');
-                // fondo blanco para evitar transparencia en JPEG
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, tmpCanvas.width, tmpCanvas.height);
-                ctx.drawImage(canvas, 0, 0, tmpCanvas.width, tmpCanvas.height);
-
-                tmpCanvas.toBlob(function(blob) {
-                    if (!blob) {
-                        showNotification('No se pudo crear el archivo de imagen', 'error');
-                        return;
-                    }
-
-                    const url = URL.createObjectURL(blob);
-                    link.href = url;
-                    link.download = fileName;
-                    document.body.appendChild(link);
-                    link.click();
-                    document.body.removeChild(link);
-                    URL.revokeObjectURL(url);
-                    showNotification(`Imagen descargada: ${fileName}`);
-                }, 'image/jpeg', 0.95);
-            } catch (error) {
-                console.error('Error descargando imagen:', error);
-                showNotification('Error al descargar la imagen', 'error');
-            }
-        }
-
-        // Descargar usando qr-code-styling: obtener PNG/Blob y convertir a JPG
-        function downloadStyledQrAsJpg(product, type) {
-            // QRCodeStyling tiene getRawData o toDataURL según versión; intentamos varias rutas
-            // 1) getRawData('png') -> Blob
-            if (typeof currentQrStyled.getRawData === 'function') {
-                currentQrStyled.getRawData('png').then(function(blob) {
-                    // Convertir blob PNG a JPG a través de canvas
-                    const url = URL.createObjectURL(blob);
-                    const img = new Image();
-                    img.onload = function() {
-                        const tmp = document.createElement('canvas');
-                        tmp.width = img.naturalWidth || 300;
-                        tmp.height = img.naturalHeight || 300;
-                        const ctx = tmp.getContext('2d');
-                        ctx.fillStyle = '#ffffff';
-                        ctx.fillRect(0, 0, tmp.width, tmp.height);
-                        ctx.drawImage(img, 0, 0);
-                        URL.revokeObjectURL(url);
-                        // Descargar como JPG
-                        tmp.toBlob(function(jpgBlob) {
-                            if (!jpgBlob) {
-                                showNotification('No se pudo crear la imagen JPG', 'error');
-                                return;
-                            }
-                            const link = document.createElement('a');
-                            const fileName = type === 'qr' ? `QR-${product.name.replace(/\s+/g, '-')}-${product.id}.jpg` : `CODIGO-BARRAS-${product.name.replace(/\s+/g, '-')}-${product.id}.jpg`;
-                            const jpgUrl = URL.createObjectURL(jpgBlob);
-                            link.href = jpgUrl;
-                            link.download = fileName;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                            URL.revokeObjectURL(jpgUrl);
-                            showNotification(`Imagen descargada: ${fileName}`);
-                        }, 'image/jpeg', 0.95);
-                    };
-                    img.onerror = function(e) {
-                        URL.revokeObjectURL(url);
-                        console.error('Error cargando PNG generado por QRCodeStyling:', e);
-                        showNotification('Error generando la imagen para descargar', 'error');
-                    };
-                    img.src = url;
-                }).catch(function(err) {
-                    console.warn('getRawData no disponible o falló, intentando toDataURL...', err);
-                    // Intentar toDataURL si existe un canvas interno
-                    try {
-                        currentQrStyled.getDataURL().then(function(dataUrl) {
-                            // convertir dataURL a imagen y proceder igual
-                            const img = new Image();
-                            img.onload = function() {
-                                const tmp = document.createElement('canvas');
-                                tmp.width = img.naturalWidth || 300;
-                                tmp.height = img.naturalHeight || 300;
-                                const ctx = tmp.getContext('2d');
-                                ctx.fillStyle = '#ffffff';
-                                ctx.fillRect(0, 0, tmp.width, tmp.height);
-                                ctx.drawImage(img, 0, 0);
-                                tmp.toBlob(function(jpgBlob) {
-                                    if (!jpgBlob) { showNotification('No se pudo crear la imagen JPG', 'error'); return; }
-                                    const link = document.createElement('a');
-                                    const fileName = type === 'qr' ? `QR-${product.name.replace(/\s+/g, '-')}-${product.id}.jpg` : `CODIGO-BARRAS-${product.name.replace(/\s+/g, '-')}-${product.id}.jpg`;
-                                    const jpgUrl = URL.createObjectURL(jpgBlob);
-                                    link.href = jpgUrl;
-                                    link.download = fileName;
-                                    document.body.appendChild(link);
-                                    link.click();
-                                    document.body.removeChild(link);
-                                    URL.revokeObjectURL(jpgUrl);
-                                    showNotification(`Imagen descargada: ${fileName}`);
-                                }, 'image/jpeg', 0.95);
-                            };
-                            img.onerror = function(e) { console.error('Error cargando dataURL de QRCodeStyling', e); showNotification('Error generando la imagen', 'error'); };
-                            img.src = dataUrl;
-                        }).catch(function(e) { console.error('getDataURL falló', e); showNotification('No se pudo obtener la imagen del QR', 'error'); });
-                    } catch (e) {
-                        console.error('No se pudo convertir QR styled a imagen:', e);
-                        showNotification('No se pudo generar la imagen del QR', 'error');
-                    }
-                });
-                return;
-            }
-
-            // Si no hay getRawData, intentar obtener el canvas dentro del contenedor y usar downloadCanvas
-            const canvas = qrcodeDiv.querySelector('canvas');
-            if (canvas) {
-                downloadCanvas(canvas, product, type);
-                return;
-            }
-
-            // Por último, intentar el fallback normal
-            const svg = qrcodeDiv.querySelector('svg');
-            if (svg) {
-                const svgData = new XMLSerializer().serializeToString(svg);
-                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-                const url = URL.createObjectURL(svgBlob);
-                const img = new Image();
-                img.onload = function() {
-                    const tmpCanvas = document.createElement('canvas');
-                    tmpCanvas.width = img.width || 300;
-                    tmpCanvas.height = img.height || 300;
-                    const ctx = tmpCanvas.getContext('2d');
-                    ctx.fillStyle = '#ffffff'; ctx.fillRect(0,0,tmpCanvas.width,tmpCanvas.height);
-                    ctx.drawImage(img, 0, 0);
-                    URL.revokeObjectURL(url);
-                    downloadCanvas(tmpCanvas, product, type);
-                };
-                img.onerror = function(e) { URL.revokeObjectURL(url); showNotification('No se pudo generar la imagen para descargar', 'error'); };
-                img.src = url;
-            } else {
-                showNotification('No se encontró imagen generada para descargar', 'error');
-            }
-        }
-        
-        // Cargar inventario desde Supabase
-        async function loadInventory() {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .order('id', { ascending: true });
-            
-            if (error) {
-                console.error('Error cargando inventario:', error);
-                showNotification('Error cargando inventario', 'error');
-                return;
-            }
-            
-            // Actualizar tabla
-            inventoryBody.innerHTML = '';
-            let totalProducts = 0;
-            let totalStockValue = 0;
-            let totalInventoryValue = 0;
-            let lowStockItems = 0;
-            
-            data.forEach(product => {
-                const stockClass = product.stock < 10 ? 'stock-low' : 'stock-ok';
-                const stockStatus = product.stock < 10 ? 'Stock Bajo' : 'En Stock';
-                
-                // Verificar estado de vencimiento
-                let expirationStatus = '';
-                let expirationClass = '';
-                if (product.expiration_date) {
-                    const today = new Date();
-                    const expiration = new Date(product.expiration_date);
-                    const daysUntilExpiration = Math.ceil((expiration - today) / (1000 * 60 * 60 * 24));
-                    
-                    if (daysUntilExpiration < 0) {
-                        expirationStatus = 'Vencido';
-                        expirationClass = 'expired';
-                    } else if (daysUntilExpiration <= 7) {
-                        expirationStatus = `Vence en ${daysUntilExpiration} días`;
-                        expirationClass = 'expiring-soon';
-                    } else {
-                        expirationStatus = expiration.toLocaleDateString();
-                    }
-                } else {
-                    expirationStatus = 'No aplica';
-                }
-                
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.id}</td>
-                    <td>${product.name}</td>
-                    <td>Bs ${product.purchase_price.toFixed(2)}</td>
-                    <td>Bs ${product.price.toFixed(2)}</td>
-                    <td class="${stockClass}">${product.stock}</td>
-                    <td class="${expirationClass}">${expirationStatus}</td>
-                    <td>${stockStatus}</td>
-                    <td class="action-buttons">
-                        <button onclick="regenerateQR(${product.id})" class="action-btn">
-                            <i class="fas fa-qrcode"></i> QR
-                        </button>
-                        <button onclick="editProduct(${product.id})" class="action-btn btn-warning">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button onclick="deleteProduct(${product.id})" class="action-btn btn-danger">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                inventoryBody.appendChild(row);
-                
-                totalProducts++;
-                totalStockValue += product.stock;
-                totalInventoryValue += product.price * product.stock;
-                
-                if (product.stock < 10) {
-                    lowStockItems++;
-                }
-            });
-            
-            // Actualizar estadísticas
-            productsCount.textContent = totalProducts;
-            totalStock.textContent = totalStockValue;
-            inventoryValue.textContent = `Bs ${totalInventoryValue.toFixed(2)}`;
-            lowStockCount.textContent = lowStockItems;
-        }
-
-        // Cargar reporte diario: ganancias totales y lista de ventas del día (similar a vendedores.html)
-        async function loadDailyReport() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-
-                // Intentar obtener ganancias desde tabla daily_earnings si existe
-                const { data: dailyData, error: dailyError } = await supabase
-                    .from('daily_earnings')
-                    .select('*')
-                    .eq('date', today)
-                    .single();
-
-                if (!dailyError && dailyData) {
-                    document.getElementById('daily-total-earnings').textContent = `Bs ${(dailyData.total_earnings || 0).toFixed(2)}`;
-                    document.getElementById('daily-total-sales').textContent = `${dailyData.total_sales || 0}`;
-                } else {
-                    // Si no hay tabla, calcular a partir de sales
-                    const { data: salesData, error: salesErr } = await supabase
-                        .from('sales')
-                        .select('*')
-                        .gte('created_at', today + 'T00:00:00')
-                        .order('created_at', { ascending: false });
-
-                    if (!salesErr && salesData) {
-                        const totalEarnings = salesData.reduce((sum, s) => sum + (s.total_amount || 0), 0);
-                        document.getElementById('daily-total-earnings').textContent = `Bs ${totalEarnings.toFixed(2)}`;
-                        document.getElementById('daily-total-sales').textContent = `${salesData.length}`;
-                    } else {
-                        document.getElementById('daily-total-earnings').textContent = 'Bs 0.00';
-                        document.getElementById('daily-total-sales').textContent = '0';
-                    }
-                }
-
-                // Cargar ventas detalladas (últimas 20)
-                const { data: recentSales, error: recentErr } = await supabase
-                    .from('sales')
-                    .select('id, total_amount, created_at')
-                    .gte('created_at', today + 'T00:00:00')
-                    .order('created_at', { ascending: false })
-                    .limit(20);
-
-                const listEl = document.getElementById('daily-sales-list');
-                if (listEl) listEl.innerHTML = '';
-
-                if (recentErr) {
-                    console.error('Error cargando ventas recientes:', recentErr);
-                    if (listEl) listEl.innerHTML = '<div style="color:#c0392b;">No se pudieron cargar las ventas recientes.</div>';
-                    return;
-                }
-
-                if (!recentSales || recentSales.length === 0) {
-                    if (listEl) listEl.innerHTML = '<div style="color:#6c757d;">No hay ventas hoy.</div>';
-                    return;
-                }
-
-                // Para cada venta, obtener sus items y mostrarlos
-                for (const sale of recentSales) {
-                    const { data: items, error: itemsErr } = await supabase
-                        .from('sale_items')
-                        .select('product_id, quantity, price')
-                        .eq('sale_id', sale.id);
-
-                    let itemsHtml = '';
-                    if (!itemsErr && items && items.length > 0) {
-                        const productIds = items.map(i => i.product_id);
-                        const { data: prods } = await supabase
-                            .from('products')
-                            .select('id,name')
-                            .in('id', productIds);
-
-                        itemsHtml = items.map(it => {
-                            const p = (prods || []).find(x => x.id === it.product_id);
-                            const name = p ? p.name : `ID:${it.product_id}`;
-                            return `<div style="font-size:0.95rem;">${name} x${it.quantity} — Bs ${(it.price||0).toFixed(2)}</div>`;
-                        }).join('');
-                    } else {
-                        itemsHtml = '<div style="color:#6c757d;">No hay detalles.</div>';
-                    }
-
-                    const createdAt = new Date(sale.created_at).toLocaleTimeString();
-                    const saleHtml = `
-                        <div style="padding:10px;border-bottom:1px solid #f0f0f0;margin-bottom:8px;">
-                            <div style="font-weight:700;">Venta #${sale.id} — Bs ${(sale.total_amount||0).toFixed(2)} <span style="font-weight:400;color:#6c757d;">(${createdAt})</span></div>
-                            <div style="margin-top:6px;">${itemsHtml}</div>
-                        </div>
-                    `;
-
-                    if (listEl) listEl.insertAdjacentHTML('beforeend', saleHtml);
-                }
-
-            } catch (err) {
-                console.error('Error en loadDailyReport:', err);
-                const totalE = document.getElementById('daily-total-earnings'); if (totalE) totalE.textContent = 'Bs 0.00';
-                const totalS = document.getElementById('daily-total-sales'); if (totalS) totalS.textContent = '0';
-                const listEl = document.getElementById('daily-sales-list'); if (listEl) listEl.innerHTML = '<div style="color:#c0392b;">Error cargando reporte.</div>';
-            }
-        }
-        
-        // Actualizar estadísticas financieras (ganancias, capital y ganancias netas)
-        async function updateFinancialStats() {
-            try {
-                const today = new Date().toISOString().split('T')[0];
-                
-                // Obtener todas las ventas del día
-                const { data: salesData, error: salesErr } = await supabase
-                    .from('sales')
-                    .select('id, total_amount')
-                    .gte('created_at', today + 'T00:00:00');
-                
-                if (salesErr) {
-                    console.error('Error obteniendo ventas del día:', salesErr);
-                    return;
-                }
-                
-                // Calcular ganancias totales del día
-                const totalEarnings = salesData.reduce((sum, sale) => sum + (sale.total_amount || 0), 0);
-                
-                // Obtener los productos vendidos hoy
-                let totalCapital = 0;
-                if (salesData.length > 0) {
-                    const saleIds = salesData.map(sale => sale.id);
-                    
-                    const { data: saleItems, error: itemsErr } = await supabase
-                        .from('sale_items')
-                        .select('product_id, quantity')
-                        .in('sale_id', saleIds);
-                    
-                    if (!itemsErr && saleItems) {
-                        // Obtener los precios de compra de los productos vendidos
-                        const productIds = [...new Set(saleItems.map(item => item.product_id))];
-                        
-                        const { data: products, error: productsErr } = await supabase
-                            .from('products')
-                            .select('id, purchase_price')
-                            .in('id', productIds);
-                        
-                        if (!productsErr && products) {
-                            // Calcular el capital invertido (precio de compra * cantidad vendida)
-                            saleItems.forEach(item => {
-                                const product = products.find(p => p.id === item.product_id);
-                                if (product) {
-                                    totalCapital += product.purchase_price * item.quantity;
-                                }
-                            });
-                        }
-                    }
-                }
-                
-                // Calcular ganancias netas (ganancias totales - capital invertido)
-                const netProfit = totalEarnings - totalCapital;
-                
-                // Actualizar estadísticas en la interfaz
-                dailyEarnings.textContent = `Bs ${totalEarnings.toFixed(2)}`;
-                dailyCapital.textContent = `Bs ${totalCapital.toFixed(2)}`;
-                dailyProfit.textContent = `Bs ${netProfit.toFixed(2)}`;
-                
-                // Actualizar también en el reporte diario
-                document.getElementById('daily-total-capital').textContent = `Bs ${totalCapital.toFixed(2)}`;
-                document.getElementById('daily-total-profit').textContent = `Bs ${netProfit.toFixed(2)}`;
-                
-            } catch (error) {
-                console.error('Error actualizando estadísticas financieras:', error);
-            }
-        }
-        
-        // Regenerar QR para un producto existente
-        async function regenerateQR(productId) {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .eq('id', productId)
-                .single();
-            
-            if (error) {
-                showNotification('Error al cargar producto: ' + error.message, 'error');
-                return;
-            }
-            
-            currentProductId = productId;
-            currentProductData = data;
-            generateQRCode(data);
-            showNotification(`QR regenerado para: ${data.name}`);
-        }
-        
-        // Abrir modal para editar producto
-        async function editProduct(productId) {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .eq('id', productId)
-                .single();
-            
-            if (error) {
-                showNotification('Error al cargar producto: ' + error.message, 'error');
-                return;
-            }
-            
-            // Llenar el formulario del modal con los datos del producto
-            document.getElementById('edit-product-name').value = data.name;
-            document.getElementById('edit-product-purchase-price').value = data.purchase_price;
-            document.getElementById('edit-product-price').value = data.price;
-            document.getElementById('edit-product-stock').value = data.stock;
-            document.getElementById('edit-product-expiration').value = data.expiration_date || '';
-            
-            // Guardar el ID del producto que se está editando
-            editingProductId = productId;
-            
-            // Mostrar el modal
-            openEditModal();
-        }
-        
-        // Abrir modal de edición
-        function openEditModal() {
-            editModal.classList.add('active');
-            document.body.style.overflow = 'hidden'; // Prevenir scroll del body
-        }
-        
-        // Cerrar modal de edición
-        function closeEditModal() {
-            editModal.classList.remove('active');
-            document.body.style.overflow = ''; // Restaurar scroll del body
-            editingProductId = null;
-        }
-        
-        // Manejar envío del formulario de edición
-        async function handleEditSubmit(e) {
-            e.preventDefault();
-            
-            if (!editingProductId) {
-                showNotification('Error: No se ha seleccionado un producto para editar', 'error');
-                return;
-            }
-            
-            const name = document.getElementById('edit-product-name').value;
-            const purchasePrice = parseFloat(document.getElementById('edit-product-purchase-price').value);
-            const price = parseFloat(document.getElementById('edit-product-price').value);
-            const stock = parseInt(document.getElementById('edit-product-stock').value);
-            const expirationDate = document.getElementById('edit-product-expiration').value;
-            
-            // Actualizar producto en la base de datos
-            const { data, error } = await supabase
-                .from('products')
-                .update({ 
-                    name, 
-                    purchase_price: purchasePrice,
-                    price, 
-                    stock,
-                    expiration_date: expirationDate || null,
-                })
-                .eq('id', editingProductId)
-                .select();
-            
-            if (error) {
-                console.error('Error al actualizar producto:', error);
-                showNotification('Error al actualizar producto: ' + error.message, 'error');
-                return;
-            }
-            
-            const product = data[0];
-            
-            // Cerrar el modal
-            closeEditModal();
-            
-            // Actualizar inventario
-            loadInventory();
-            
-            showNotification(`Producto "${product.name}" actualizado correctamente`);
-        }
-        
-        // Eliminar producto
-        async function deleteProduct(productId) {
-            if (!confirm('¿Estás seguro de que quieres eliminar este producto? Esta acción no se puede deshacer.')) {
-                return;
-            }
-            
-            try {
-                // Primero, eliminar todas las referencias en sale_items
-                const { error: saleItemsError } = await supabase
-                    .from('sale_items')
-                    .delete()
-                    .eq('product_id', productId);
-                
-                if (saleItemsError) {
-                    console.error('Error eliminando referencias en sale_items:', saleItemsError);
-                    // Continuar a pesar del error, podría no haber referencias
-                }
-                
-                // Eliminar referencias en stock_history
-                const { error: stockHistoryError } = await supabase
-                    .from('stock_history')
-                    .delete()
-                    .eq('product_id', productId);
-                
-                if (stockHistoryError) {
-                    console.error('Error eliminando referencias en stock_history:', stockHistoryError);
-                    // Continuar a pesar del error, podría no haber referencias
-                }
-                
-                // Luego, eliminar el producto
-                const { error } = await supabase
-                    .from('products')
-                    .delete()
-                    .eq('id', productId);
-                
-                if (error) {
-                    showNotification('Error al eliminar producto: ' + error.message, 'error');
-                    return;
-                }
-                
-                showNotification('Producto eliminado correctamente');
-                loadInventory();
-                updateFinancialStats();
-            } catch (error) {
-                console.error('Error en proceso de eliminación:', error);
-                showNotification('Error al eliminar producto', 'error');
-            }
-        }
-        
-        // Exportar inventario a CSV
-        async function exportInventory() {
-            const { data, error } = await supabase
-                .from('products')
-                .select('*')
-                .order('id', { ascending: true });
-            
-            if (error) {
-                showNotification('Error exportando inventario', 'error');
-                return;
-            }
-            
-            let csvContent = "ID,Nombre,Precio Compra,Precio Venta,Stock,Fecha Vencimiento,Estado\n";
-            
-            data.forEach(product => {
-                const status = product.stock < 10 ? 'Stock Bajo' : 'En Stock';
-                csvContent += `${product.id},"${product.name}",${product.purchase_price},${product.price},${product.stock},"${product.expiration_date || 'No aplica'}",${status}\n`;
-            });
-            
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            link.setAttribute("href", url);
-            link.setAttribute("download", `inventario-${new Date().toISOString().split('T')[0]}.csv`);
-            link.style.visibility = 'hidden';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showNotification('Inventario exportado correctamente');
-        }
+        // Hacer funciones accesibles globalmente
+        window.editProduct = editProduct;
+        window.deleteProduct = deleteProduct;
+        window.showSection = showSection;
+        window.filterSales = filterSales;
     </script>
 </body>
 </html>
