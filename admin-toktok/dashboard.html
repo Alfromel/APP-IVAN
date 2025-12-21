@@ -30,6 +30,7 @@
             width: 250px;
             transition: all 0.3s;
             z-index: 1000;
+            overflow-y: auto;
         }
         
         .sidebar .nav-link {
@@ -505,9 +506,607 @@
             color: #dc2626;
             margin-bottom: 10px;
         }
+        
+        /* ===== MEJORAS PARA BÚSQUEDA Y FILTROS ===== */
+        .advanced-search-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .search-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+        }
+        
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+        
+        .date-range-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .date-range-group .filter-input {
+            flex: 1;
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .search-toggle-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .search-toggle-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .search-toggle-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .filter-tag {
+            background: #e9ecef;
+            border-radius: 16px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-tag .remove-filter {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.875rem;
+        }
+        
+        .filter-tag .remove-filter:hover {
+            color: #dc3545;
+        }
+        
+        .quick-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-filter-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-filter-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .quick-filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* ===== RESPONSIVIDAD PARA MÓVILES ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                border-radius: 20px 20px 0 0;
+                padding: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+            
+            .sidebar .p-4 {
+                display: none;
+            }
+            
+            .sidebar .nav {
+                flex-direction: row;
+                padding: 0.5rem;
+                justify-content: space-around;
+            }
+            
+            .sidebar .nav-item {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .sidebar .nav-link {
+                flex-direction: column;
+                padding: 0.5rem;
+                margin: 0;
+                font-size: 0.7rem;
+                border-radius: 8px;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                margin-bottom: 0.25rem;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 80px;
+                padding: 1rem;
+            }
+            
+            .navbar {
+                padding: 0.5rem 1rem;
+            }
+            
+            .navbar .search-box {
+                display: none;
+            }
+            
+            .navbar .dropdown {
+                width: 100%;
+            }
+            
+            .navbar .dropdown-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .stat-item {
+                padding: 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 1.25rem;
+            }
+            
+            .advanced-search-container {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .search-filters {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .date-range-group {
+                flex-direction: column;
+            }
+            
+            .search-actions {
+                flex-direction: column;
+            }
+            
+            .search-toggle-btn {
+                justify-content: center;
+            }
+            
+            .quick-filters {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .quick-filter-btn {
+                white-space: nowrap;
+            }
+            
+            .table-container {
+                border-radius: 8px;
+            }
+            
+            .table-responsive {
+                margin: -0.5rem;
+                width: calc(100% + 1rem);
+            }
+            
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                margin: 0;
+            }
+            
+            .recharge-actions {
+                flex-direction: column;
+            }
+            
+            .recharge-actions .btn {
+                width: 100%;
+            }
+            
+            .filter-tags {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .filter-tag {
+                white-space: nowrap;
+            }
+            
+            .mobile-search-bar {
+                display: flex !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+            }
+            
+            .mobile-search-bar .search-box {
+                flex: 1;
+            }
+            
+            .mobile-search-bar .close-search {
+                background: none;
+                border: none;
+                color: #6c757d;
+                font-size: 1.25rem;
+                margin-left: 0.5rem;
+            }
+            
+            .mobile-fab {
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: var(--primary);
+                color: white;
+                border: none;
+                box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+                z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch !important;
+            }
+            
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-link {
+                padding: 0.375rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar .p-4 h4 {
+                display: none;
+            }
+            
+            .sidebar .p-4 small {
+                display: none;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.25rem;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .search-filters {
+                flex-wrap: wrap;
+            }
+            
+            .filter-group {
+                min-width: calc(50% - 0.5rem);
+            }
+        }
+        
+        /* ===== MEJORAS PARA LA TABLA EN MÓVILES ===== */
+        .table-mobile-view {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .table-desktop-view {
+                display: none;
+            }
+            
+            .table-mobile-view {
+                display: block;
+            }
+            
+            .mobile-card {
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .mobile-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid #f1f1f1;
+            }
+            
+            .mobile-card-title {
+                font-weight: 600;
+                color: var(--primary);
+                font-size: 0.9rem;
+            }
+            
+            .mobile-card-status {
+                font-size: 0.7rem;
+                padding: 0.125rem 0.5rem;
+                border-radius: 10px;
+            }
+            
+            .mobile-card-body {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .mobile-card-field {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .mobile-card-label {
+                font-size: 0.7rem;
+                color: #6c757d;
+                margin-bottom: 0.25rem;
+            }
+            
+            .mobile-card-value {
+                font-size: 0.85rem;
+                color: #212529;
+                font-weight: 500;
+            }
+            
+            .mobile-card-actions {
+                display: flex;
+                gap: 0.5rem;
+                justify-content: flex-end;
+                padding-top: 0.75rem;
+                border-top: 1px solid #f1f1f1;
+            }
+        }
+        
+        /* ===== BÚSQUEDA AVANZADA RESPONSIVA ===== */
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .search-title {
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .search-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .search-advanced-filters {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .search-advanced-filters.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mobile-search-trigger {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-search-trigger {
+                display: flex;
+            }
+            
+            .search-toggle {
+                width: 100%;
+                justify-content: center;
+                padding: 0.5rem;
+                background: #f8f9fa;
+                border-radius: 8px;
+                margin-top: 0.5rem;
+            }
+        }
+        
+        /* ===== LOADING STATES ===== */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .search-loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
     </style>
 </head>
 <body>
+    <!-- Mobile Search Bar (hidden on desktop) -->
+    <div class="mobile-search-bar d-none">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" placeholder="Buscar..." id="mobile-global-search">
+        </div>
+        <button class="close-search">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
     <!-- Sidebar -->
     <div class="sidebar">
         <div class="p-4">
@@ -518,32 +1117,32 @@
         <ul class="nav flex-column">
             <li class="nav-item">
                 <a class="nav-link active" href="#" data-section="dashboard">
-                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                    <i class="fas fa-tachometer-alt"></i> <span>Dashboard</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="users">
-                    <i class="fas fa-users"></i> Usuarios
+                    <i class="fas fa-users"></i> <span>Usuarios</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="transactions">
-                    <i class="fas fa-exchange-alt"></i> Transacciones
+                    <i class="fas fa-exchange-alt"></i> <span>Transacciones</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="recharges">
-                    <i class="fas fa-mobile-alt"></i> Recargas
+                    <i class="fas fa-mobile-alt"></i> <span>Recargas</span>
                 </a>
             </li>
             <li class="nav-item">
                 <a class="nav-link" href="#" data-section="game-recharges">
-                    <i class="fas fa-gamepad"></i> Recargas Juegos
+                    <i class="fas fa-gamepad"></i> <span>Recargas Juegos</span>
                 </a>
             </li>
-            <li class="nav-item mt-4">
+            <li class="nav-item mt-4 d-none d-md-block">
                 <a class="nav-link" href="#" id="logout-btn">
-                    <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
                 </a>
             </li>
         </ul>
@@ -554,19 +1153,19 @@
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg mb-4">
             <div class="container-fluid">
-                <button class="navbar-toggler" type="button">
+                <button class="navbar-toggler" type="button" id="sidebar-toggle">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 
-                <div class="d-flex align-items-center">
-                    <div class="search-box me-3">
+                <div class="d-flex align-items-center w-100">
+                    <div class="search-box me-3 d-none d-lg-flex">
                         <i class="fas fa-search"></i>
-                        <input type="text" class="form-control" placeholder="Buscar...">
+                        <input type="text" class="form-control" placeholder="Buscar..." id="desktop-global-search">
                     </div>
                     
-                    <div class="dropdown">
+                    <div class="dropdown ms-auto">
                         <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user-circle me-2"></i> Administrador
+                            <i class="fas fa-user-circle me-2"></i> <span class="d-none d-md-inline">Administrador</span>
                         </button>
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a></li>
@@ -580,11 +1179,11 @@
 
         <!-- Dashboard Section -->
         <section id="dashboard-section">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
                 <h2>Dashboard</h2>
                 <div>
                     <button class="btn btn-primary" id="refresh-data">
-                        <i class="fas fa-sync-alt me-2"></i> Actualizar Datos
+                        <i class="fas fa-sync-alt me-2"></i> <span class="d-none d-md-inline">Actualizar Datos</span>
                     </button>
                 </div>
             </div>
@@ -652,50 +1251,140 @@
 
         <!-- Users Section -->
         <section id="users-section" class="d-none">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
                 <h2>Gestión de Usuarios</h2>
-                <div>
+                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-user-btn">
-                        <i class="fas fa-plus me-2"></i> Agregar Usuario
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Usuario</span>
                     </button>
+                </div>
+            </div>
+            
+            <!-- Advanced Search Container -->
+            <div class="advanced-search-container">
+                <div class="search-header">
+                    <h6 class="search-title">Búsqueda y Filtros</h6>
+                    <button class="search-toggle" id="toggle-users-filters">
+                        <i class="fas fa-filter"></i> Filtros Avanzados
+                    </button>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="quick-filters" id="users-quick-filters">
+                    <button class="quick-filter-btn active" data-filter="all">Todos</button>
+                    <button class="quick-filter-btn" data-filter="balance-positive">Balance +</button>
+                    <button class="quick-filter-btn" data-filter="balance-negative">Balance -</button>
+                    <button class="quick-filter-btn" data-filter="recent">Recientes</button>
+                    <button class="quick-filter-btn" data-filter="active">Activos</button>
+                </div>
+                
+                <!-- Search Input -->
+                <div class="search-box mb-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Buscar por ID, nombre, email o teléfono..." id="user-search">
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-advanced-filters" id="users-advanced-filters">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label for="user-status-filter">Estado</label>
+                            <select class="filter-select" id="user-status-filter">
+                                <option value="">Todos los estados</option>
+                                <option value="active">Activo</option>
+                                <option value="inactive">Inactivo</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="user-balance-filter">Balance</label>
+                            <select class="filter-select" id="user-balance-filter">
+                                <option value="">Cualquier balance</option>
+                                <option value="positive">Positivo</option>
+                                <option value="negative">Negativo</option>
+                                <option value="zero">Cero</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="user-date-from">Fecha Desde</label>
+                            <input type="date" class="filter-input" id="user-date-from">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="user-date-to">Fecha Hasta</label>
+                            <input type="date" class="filter-input" id="user-date-to">
+                        </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                        <button class="btn btn-primary" id="apply-users-filters">
+                            <i class="fas fa-search me-2"></i> Aplicar Filtros
+                        </button>
+                        <button class="btn btn-outline-secondary" id="reset-users-filters">
+                            <i class="fas fa-redo me-2"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Active Filters -->
+                <div class="filter-tags" id="users-filter-tags">
+                    <!-- Los tags de filtros activos se mostrarán aquí -->
                 </div>
             </div>
             
             <div class="table-container">
                 <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Todos los Usuarios</h5>
-                    <div class="d-flex">
+                    <div class="d-none d-md-flex">
                         <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, nombre o email..." id="user-search">
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="user-search-desktop">
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID Usuario</th>
-                                <th>Usuario</th>
-                                <th>Email</th>
-                                <th>Teléfono</th>
-                                <th>Balance</th>
-                                <th>Estado</th>
-                                <th>Registro</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-table-body">
-                            <tr>
-                                <td colspan="8" class="text-center py-4">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Cargando...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID Usuario</th>
+                                    <th>Usuario</th>
+                                    <th>Email</th>
+                                    <th>Teléfono</th>
+                                    <th>Balance</th>
+                                    <th>Estado</th>
+                                    <th>Registro</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="users-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="users-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="users-pagination">
@@ -708,50 +1397,153 @@
 
         <!-- Transactions Section -->
         <section id="transactions-section" class="d-none">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
                 <h2>Gestión de Transacciones</h2>
-                <div>
+                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-transaction-btn">
-                        <i class="fas fa-plus me-2"></i> Nueva Transacción
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Nueva Transacción</span>
                     </button>
+                </div>
+            </div>
+            
+            <!-- Advanced Search Container -->
+            <div class="advanced-search-container">
+                <div class="search-header">
+                    <h6 class="search-title">Búsqueda y Filtros</h6>
+                    <button class="search-toggle" id="toggle-transactions-filters">
+                        <i class="fas fa-filter"></i> Filtros Avanzados
+                    </button>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="quick-filters" id="transactions-quick-filters">
+                    <button class="quick-filter-btn active" data-filter="all">Todas</button>
+                    <button class="quick-filter-btn" data-filter="deposit">Ingresos</button>
+                    <button class="quick-filter-btn" data-filter="withdrawal">Retiros</button>
+                    <button class="quick-filter-btn" data-filter="transfer">Transferencias</button>
+                    <button class="quick-filter-btn" data-filter="today">Hoy</button>
+                    <button class="quick-filter-btn" data-filter="week">Esta Semana</button>
+                </div>
+                
+                <!-- Search Input -->
+                <div class="search-box mb-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Buscar por ID transacción, ID usuario o descripción..." id="transaction-search">
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-advanced-filters" id="transactions-advanced-filters">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label for="transaction-type-filter">Tipo</label>
+                            <select class="filter-select" id="transaction-type-filter">
+                                <option value="">Todos los tipos</option>
+                                <option value="deposit">Depósito</option>
+                                <option value="withdrawal">Retiro</option>
+                                <option value="transfer_send">Transferencia Envío</option>
+                                <option value="transfer_receive">Transferencia Recepción</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="transaction-status-filter">Estado</label>
+                            <select class="filter-select" id="transaction-status-filter">
+                                <option value="">Todos los estados</option>
+                                <option value="completed">Completado</option>
+                                <option value="pending">Pendiente</option>
+                                <option value="failed">Fallido</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="transaction-amount-min">Monto Mínimo</label>
+                            <input type="number" class="filter-input" id="transaction-amount-min" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="transaction-amount-max">Monto Máximo</label>
+                            <input type="number" class="filter-input" id="transaction-amount-max" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="transaction-date-from">Fecha Desde</label>
+                            <input type="date" class="filter-input" id="transaction-date-from">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="transaction-date-to">Fecha Hasta</label>
+                            <input type="date" class="filter-input" id="transaction-date-to">
+                        </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                        <button class="btn btn-primary" id="apply-transactions-filters">
+                            <i class="fas fa-search me-2"></i> Aplicar Filtros
+                        </button>
+                        <button class="btn btn-outline-secondary" id="reset-transactions-filters">
+                            <i class="fas fa-redo me-2"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Active Filters -->
+                <div class="filter-tags" id="transactions-filter-tags">
+                    <!-- Los tags de filtros activos se mostrarán aquí -->
                 </div>
             </div>
             
             <div class="table-container">
                 <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Todas las Transacciones</h5>
-                    <div class="d-flex">
+                    <div class="d-none d-md-flex">
                         <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID transacción o ID usuario..." id="transaction-search">
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="transaction-search-desktop">
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID Transacción</th>
-                                <th>ID Usuario</th>
-                                <th>Tipo</th>
-                                <th>Descripción</th>
-                                <th>Monto</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="transactions-table-body">
-                            <tr>
-                                <td colspan="8" class="text-center py-4">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Cargando...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID Transacción</th>
+                                    <th>ID Usuario</th>
+                                    <th>Tipo</th>
+                                    <th>Descripción</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="transactions-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="transactions-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="transactions-pagination">
@@ -764,50 +1556,152 @@
 
         <!-- Recharges Section -->
         <section id="recharges-section" class="d-none">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
                 <h2>Gestión de Recargas</h2>
-                <div>
+                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-recharge-btn">
-                        <i class="fas fa-plus me-2"></i> Nueva Recarga
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Nueva Recarga</span>
                     </button>
+                </div>
+            </div>
+            
+            <!-- Advanced Search Container -->
+            <div class="advanced-search-container">
+                <div class="search-header">
+                    <h6 class="search-title">Búsqueda y Filtros</h6>
+                    <button class="search-toggle" id="toggle-recharges-filters">
+                        <i class="fas fa-filter"></i> Filtros Avanzados
+                    </button>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="quick-filters" id="recharges-quick-filters">
+                    <button class="quick-filter-btn active" data-filter="all">Todas</button>
+                    <button class="quick-filter-btn" data-filter="entel">Entel</button>
+                    <button class="quick-filter-btn" data-filter="tigo">Tigo</button>
+                    <button class="quick-filter-btn" data-filter="viva">Viva</button>
+                    <button class="quick-filter-btn" data-filter="today">Hoy</button>
+                    <button class="quick-filter-btn" data-filter="completed">Completadas</button>
+                </div>
+                
+                <!-- Search Input -->
+                <div class="search-box mb-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Buscar por ID, teléfono, ID usuario o operadora..." id="recharge-search">
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-advanced-filters" id="recharges-advanced-filters">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label for="recharge-operator-filter">Operadora</label>
+                            <select class="filter-select" id="recharge-operator-filter">
+                                <option value="">Todas las operadoras</option>
+                                <option value="entel">Entel</option>
+                                <option value="tigo">Tigo</option>
+                                <option value="viva">Viva</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="recharge-status-filter">Estado</label>
+                            <select class="filter-select" id="recharge-status-filter">
+                                <option value="">Todos los estados</option>
+                                <option value="completed">Completado</option>
+                                <option value="pending">Pendiente</option>
+                                <option value="failed">Fallido</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="recharge-amount-min">Monto Mínimo</label>
+                            <input type="number" class="filter-input" id="recharge-amount-min" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="recharge-amount-max">Monto Máximo</label>
+                            <input type="number" class="filter-input" id="recharge-amount-max" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="recharge-date-from">Fecha Desde</label>
+                            <input type="date" class="filter-input" id="recharge-date-from">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="recharge-date-to">Fecha Hasta</label>
+                            <input type="date" class="filter-input" id="recharge-date-to">
+                        </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                        <button class="btn btn-primary" id="apply-recharges-filters">
+                            <i class="fas fa-search me-2"></i> Aplicar Filtros
+                        </button>
+                        <button class="btn btn-outline-secondary" id="reset-recharges-filters">
+                            <i class="fas fa-redo me-2"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Active Filters -->
+                <div class="filter-tags" id="recharges-filter-tags">
+                    <!-- Los tags de filtros activos se mostrarán aquí -->
                 </div>
             </div>
             
             <div class="table-container">
                 <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Todas las Recargas</h5>
-                    <div class="d-flex">
+                    <div class="d-none d-md-flex">
                         <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, teléfono o ID usuario..." id="recharge-search">
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="recharge-search-desktop">
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID Recarga</th>
-                                <th>ID Usuario</th>
-                                <th>Operadora</th>
-                                <th>Número</th>
-                                <th>Monto</th>
-                                <th>Fecha</th>
-                                <th>Estado</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="recharges-table-body">
-                            <tr>
-                                <td colspan="8" class="text-center py-4">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Cargando...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID Recarga</th>
+                                    <th>ID Usuario</th>
+                                    <th>Operadora</th>
+                                    <th>Número</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recharges-table-body">
+                                <tr>
+                                    <td colspan="8" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="recharges-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="recharges-pagination">
@@ -820,51 +1714,162 @@
 
         <!-- Game Recharges Section -->
         <section id="game-recharges-section" class="d-none">
-            <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
                 <h2>Gestión de Recargas de Juegos</h2>
-                <div>
+                <div class="d-flex gap-2">
                     <button class="btn btn-primary" id="add-game-recharge-btn">
-                        <i class="fas fa-plus me-2"></i> Nueva Recarga
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Nueva Recarga</span>
                     </button>
+                </div>
+            </div>
+            
+            <!-- Advanced Search Container -->
+            <div class="advanced-search-container">
+                <div class="search-header">
+                    <h6 class="search-title">Búsqueda y Filtros</h6>
+                    <button class="search-toggle" id="toggle-game-recharges-filters">
+                        <i class="fas fa-filter"></i> Filtros Avanzados
+                    </button>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="quick-filters" id="game-recharges-quick-filters">
+                    <button class="quick-filter-btn active" data-filter="all">Todas</button>
+                    <button class="quick-filter-btn" data-filter="freefire">Free Fire</button>
+                    <button class="quick-filter-btn" data-filter="mobilelegends">Mobile Legends</button>
+                    <button class="quick-filter-btn" data-filter="today">Hoy</button>
+                    <button class="quick-filter-btn" data-filter="high-diamonds">+100 Diamantes</button>
+                    <button class="quick-filter-btn" data-filter="completed">Completadas</button>
+                </div>
+                
+                <!-- Search Input -->
+                <div class="search-box mb-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Buscar por ID, jugador, ID juego o ID usuario..." id="game-recharge-search">
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-advanced-filters" id="game-recharges-advanced-filters">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label for="game-recharge-game-filter">Juego</label>
+                            <select class="filter-select" id="game-recharge-game-filter">
+                                <option value="">Todos los juegos</option>
+                                <option value="freefire">Free Fire</option>
+                                <option value="mobilelegends">Mobile Legends</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-status-filter">Estado</label>
+                            <select class="filter-select" id="game-recharge-status-filter">
+                                <option value="">Todos los estados</option>
+                                <option value="completed">Completado</option>
+                                <option value="pending">Pendiente</option>
+                                <option value="failed">Fallido</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-diamonds-min">Diamantes Mínimos</label>
+                            <input type="number" class="filter-input" id="game-recharge-diamonds-min" placeholder="0" min="0">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-diamonds-max">Diamantes Máximos</label>
+                            <input type="number" class="filter-input" id="game-recharge-diamonds-max" placeholder="0" min="0">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-amount-min">Monto Mínimo</label>
+                            <input type="number" class="filter-input" id="game-recharge-amount-min" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-amount-max">Monto Máximo</label>
+                            <input type="number" class="filter-input" id="game-recharge-amount-max" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-date-from">Fecha Desde</label>
+                            <input type="date" class="filter-input" id="game-recharge-date-from">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="game-recharge-date-to">Fecha Hasta</label>
+                            <input type="date" class="filter-input" id="game-recharge-date-to">
+                        </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                        <button class="btn btn-primary" id="apply-game-recharges-filters">
+                            <i class="fas fa-search me-2"></i> Aplicar Filtros
+                        </button>
+                        <button class="btn btn-outline-secondary" id="reset-game-recharges-filters">
+                            <i class="fas fa-redo me-2"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Active Filters -->
+                <div class="filter-tags" id="game-recharges-filter-tags">
+                    <!-- Los tags de filtros activos se mostrarán aquí -->
                 </div>
             </div>
             
             <div class="table-container">
                 <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Todas las Recargas de Juegos</h5>
-                    <div class="d-flex">
+                    <div class="d-none d-md-flex">
                         <div class="search-box me-2">
                             <i class="fas fa-search"></i>
-                            <input type="text" class="form-control form-control-sm" placeholder="Buscar por ID, jugador o ID usuario..." id="game-recharge-search">
+                            <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="game-recharge-search-desktop">
                         </div>
                     </div>
                 </div>
-                <div class="table-responsive">
-                    <table class="table table-hover mb-0">
-                        <thead>
-                            <tr>
-                                <th>ID Recarga</th>
-                                <th>ID Usuario</th>
-                                <th>Juego</th>
-                                <th>ID Juego</th>
-                                <th>Jugador</th>
-                                <th>Diamantes</th>
-                                <th>Monto</th>
-                                <th>Fecha</th>
-                                <th>Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody id="game-recharges-table-body">
-                            <tr>
-                                <td colspan="9" class="text-center py-4">
-                                    <div class="spinner-border text-primary" role="status">
-                                        <span class="visually-hidden">Cargando...</span>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID Recarga</th>
+                                    <th>ID Usuario</th>
+                                    <th>Juego</th>
+                                    <th>ID Juego</th>
+                                    <th>Jugador</th>
+                                    <th>Diamantes</th>
+                                    <th>Monto</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="game-recharges-table-body">
+                                <tr>
+                                    <td colspan="9" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="game-recharges-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
                 <div class="p-3 border-top">
                     <nav>
                         <ul class="pagination justify-content-center mb-0" id="game-recharges-pagination">
@@ -875,6 +1880,11 @@
             </div>
         </section>
     </div>
+
+    <!-- Mobile FAB Button for Search -->
+    <button class="mobile-fab d-md-none" id="mobile-search-trigger">
+        <i class="fas fa-search"></i>
+    </button>
 
     <!-- Modal de Borrar Historial -->
     <div class="deletion-progress-backdrop" id="deletion-progress-backdrop"></div>
@@ -1167,9 +2177,53 @@
         let transactionsData = [];
         let rechargesData = [];
         let gameRechargesData = [];
-        let userBalances = {}; // Para almacenar balances de usuarios
+        let userBalances = {};
         let deletionInProgress = false;
         let currentDeletionUserId = null;
+        
+        // Variables para filtros
+        let currentFilters = {
+            users: {
+                search: '',
+                status: '',
+                balance: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            },
+            transactions: {
+                search: '',
+                type: '',
+                status: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            },
+            recharges: {
+                search: '',
+                operator: '',
+                status: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            },
+            gameRecharges: {
+                search: '',
+                game: '',
+                status: '',
+                diamondsMin: '',
+                diamondsMax: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            }
+        };
         
         // Funciones de utilidad
         const formatCurrency = (amount) => {
@@ -1192,7 +2246,6 @@
         };
         
         const showToast = (message, type = 'success') => {
-            // Crear elemento toast
             const toast = document.createElement('div');
             toast.className = `toast align-items-center text-bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed top-0 end-0 m-3`;
             toast.setAttribute('role', 'alert');
@@ -1209,57 +2262,41 @@
             `;
             
             document.body.appendChild(toast);
-            
             const bsToast = new bootstrap.Toast(toast);
             bsToast.show();
             
-            // Remover el toast después de que se oculta
             toast.addEventListener('hidden.bs.toast', () => {
                 document.body.removeChild(toast);
             });
         };
         
-        // Función para calcular balances de usuarios de forma CORRECTA
+        // Función para calcular balances de usuarios
         const calculateUserBalances = async () => {
             try {
                 userBalances = {};
-                
-                // Obtener todas las transacciones
                 const { data: transactions, error: transactionsError } = await supabase
                     .from('transactions')
                     .select('*');
                 
                 if (transactionsError) throw transactionsError;
                 
-                // IMPORTANTE: Solo calcular balance basado en transacciones
-                // Las recargas y recargas de juegos NO afectan el balance
-                // El balance es solo lo que el usuario tiene disponible para transferir/retirar
-                
                 transactions.forEach(transaction => {
                     if (!userBalances[transaction.user_id]) {
                         userBalances[transaction.user_id] = 0;
                     }
                     
-                    // Solo considerar transacciones completadas
                     if (transaction.status === 'completed') {
                         if (transaction.type === 'deposit') {
-                            // Depósito: suma al balance (el usuario agrega dinero)
                             userBalances[transaction.user_id] += parseFloat(transaction.amount);
                         } else if (transaction.type === 'withdrawal') {
-                            // Retiro: resta del balance (el usuario saca dinero)
                             userBalances[transaction.user_id] -= parseFloat(transaction.amount);
                         } else if (transaction.type === 'transfer_send') {
-                            // Transferencia enviada: resta del balance
                             userBalances[transaction.user_id] -= parseFloat(transaction.amount);
                         } else if (transaction.type === 'transfer_receive') {
-                            // Transferencia recibida: suma al balance
                             userBalances[transaction.user_id] += parseFloat(transaction.amount);
                         }
                     }
                 });
-                
-                // NO restar recargas ni recargas de juegos
-                // Estas son gastos/pagos por servicios, no afectan el balance disponible
                 
                 return userBalances;
             } catch (error) {
@@ -1306,14 +2343,10 @@
         };
         
         const updateDeletionProgress = (step, percentage, status) => {
-            // Actualizar barra de progreso
             document.getElementById('progress-bar').style.width = `${percentage}%`;
             document.getElementById('progress-percentage').textContent = `${percentage}%`;
-            
-            // Actualizar estado
             document.getElementById('deletion-status').textContent = status;
             
-            // Actualizar pasos
             for (let i = 1; i <= 6; i++) {
                 const stepIcon = document.getElementById(`step-${i}-icon`);
                 const stepText = document.getElementById(`step-${i}-text`);
@@ -1342,13 +2375,11 @@
                 showDeletionProgress();
                 updateDeletionProgress(1, 0, 'Buscando usuario...');
                 
-                // Paso 1: Obtener balance actual del usuario
                 await calculateUserBalances();
                 const currentBalance = userBalances[userId] || 0;
                 
                 updateDeletionProgress(2, 20, 'Eliminando recargas...');
                 
-                // Paso 2: Borrar recargas del usuario (paginado)
                 let hasMoreRecharges = true;
                 let rechargePage = 0;
                 let totalRechargesDeleted = 0;
@@ -1380,7 +2411,6 @@
                 
                 updateDeletionProgress(3, 40, `Eliminadas ${totalRechargesDeleted} recargas. Eliminando recargas de juegos...`);
                 
-                // Paso 3: Borrar recargas de juegos del usuario (paginado)
                 let hasMoreGameRecharges = true;
                 let gameRechargePage = 0;
                 let totalGameRechargesDeleted = 0;
@@ -1412,7 +2442,6 @@
                 
                 updateDeletionProgress(4, 60, `Eliminadas ${totalGameRechargesDeleted} recargas de juegos. Eliminando transacciones...`);
                 
-                // Paso 4: Borrar transacciones del usuario (paginado)
                 let hasMoreTransactions = true;
                 let transactionPage = 0;
                 let totalTransactionsDeleted = 0;
@@ -1444,7 +2473,6 @@
                 
                 updateDeletionProgress(5, 80, `Eliminadas ${totalTransactionsDeleted} transacciones. Actualizando balance...`);
                 
-                // Paso 5: Crear una transacción de ajuste para mantener el balance actual
                 if (currentBalance !== 0) {
                     const adjustmentTransaction = {
                         user_id: userId,
@@ -1463,12 +2491,9 @@
                 
                 updateDeletionProgress(6, 100, 'Historial borrado exitosamente. Actualizando datos...');
                 
-                // Esperar un momento para que el usuario vea el 100%
                 await new Promise(resolve => setTimeout(resolve, 1000));
-                
                 hideDeletionProgress();
                 
-                // Actualizar datos
                 await calculateUserBalances();
                 loadUsers();
                 loadDashboardData();
@@ -1482,70 +2507,31 @@
             }
         };
         
-        // Funciones para cargar datos
-        const loadDashboardData = async () => {
-            try {
-                // Cargar estadísticas
-                const { data: users, error: usersError } = await supabase
-                    .from('user_profiles')
-                    .select('*');
-                
-                if (usersError) throw usersError;
-                
-                // Calcular balances de usuarios
-                await calculateUserBalances();
-                
-                // Obtener transacciones para estadísticas del día
-                const today = new Date().toISOString().split('T')[0];
-                
-                const { data: todayTransactions, error: todayTransactionsError } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .gte('created_at', today);
-                
-                if (todayTransactionsError) throw todayTransactionsError;
-                
-                const { data: todayRecharges, error: todayRechargesError } = await supabase
-                    .from('recharges')
-                    .select('*')
-                    .gte('created_at', today);
-                
-                if (todayRechargesError) throw todayRechargesError;
-                
-                // Calcular estadísticas
-                const totalBalance = Object.values(userBalances).reduce((sum, balance) => sum + balance, 0);
-                
-                // Actualizar UI
-                document.getElementById('total-users-count').textContent = users.length;
-                document.getElementById('today-transactions').textContent = todayTransactions.length;
-                document.getElementById('today-recharges').textContent = todayRecharges.length;
-                document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
-                
-                // Cargar transacciones recientes
-                const { data: recentTransactions, error: recentTransactionsError } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(10);
-                
-                if (recentTransactionsError) throw recentTransactionsError;
-                
-                renderRecentTransactions(recentTransactions, users);
-                
-            } catch (error) {
-                console.error('Error loading dashboard data:', error);
-                showToast('Error al cargar los datos del dashboard', 'error');
-            }
-        };
-        
-        const loadUsers = async (page = 1, search = '') => {
+        // Funciones para cargar datos con filtros
+        const loadUsers = async (page = 1) => {
             try {
                 let query = supabase
                     .from('user_profiles')
                     .select('*', { count: 'exact' });
                 
-                if (search) {
-                    query = query.or(`full_name.ilike.%${search}%,email.ilike.%${search}%,id.ilike.%${search}%`);
+                const filters = currentFilters.users;
+                
+                // Aplicar búsqueda
+                if (filters.search) {
+                    query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,id.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`);
+                }
+                
+                // Aplicar filtro de estado
+                if (filters.status) {
+                    query = query.eq('status', filters.status);
+                }
+                
+                // Aplicar filtro de fecha
+                if (filters.dateFrom) {
+                    query = query.gte('created_at', filters.dateFrom);
+                }
+                if (filters.dateTo) {
+                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
                 }
                 
                 const { data, error, count } = await query
@@ -1555,16 +2541,50 @@
                 if (error) throw error;
                 
                 usersData = data || [];
-                
-                // Asegurar que todos los usuarios tengan estado activo
                 usersData.forEach(user => {
                     if (user.status !== 'active') {
                         user.status = 'active';
                     }
                 });
                 
+                // Aplicar filtro de balance después de obtener los datos
+                if (filters.balance) {
+                    await calculateUserBalances();
+                    usersData = usersData.filter(user => {
+                        const balance = userBalances[user.id] || 0;
+                        if (filters.balance === 'positive') return balance > 0;
+                        if (filters.balance === 'negative') return balance < 0;
+                        if (filters.balance === 'zero') return balance === 0;
+                        return true;
+                    });
+                }
+                
+                // Aplicar filtros rápidos
+                if (filters.quickFilter !== 'all') {
+                    await calculateUserBalances();
+                    usersData = usersData.filter(user => {
+                        const balance = userBalances[user.id] || 0;
+                        switch(filters.quickFilter) {
+                            case 'balance-positive':
+                                return balance > 0;
+                            case 'balance-negative':
+                                return balance < 0;
+                            case 'recent':
+                                const sevenDaysAgo = new Date();
+                                sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+                                return new Date(user.created_at) >= sevenDaysAgo;
+                            case 'active':
+                                return user.status === 'active';
+                            default:
+                                return true;
+                        }
+                    });
+                }
+                
                 renderUsersTable(usersData);
-                renderUsersPagination(page, Math.ceil(count / 10));
+                renderUsersMobileList(usersData);
+                renderUsersPagination(page, Math.ceil((count || 0) / 10));
+                updateFilterTags('users');
                 
             } catch (error) {
                 console.error('Error loading users:', error);
@@ -1572,14 +2592,64 @@
             }
         };
         
-        const loadTransactions = async (page = 1, search = '') => {
+        const loadTransactions = async (page = 1) => {
             try {
                 let query = supabase
                     .from('transactions')
                     .select('*', { count: 'exact' });
                 
-                if (search) {
-                    query = query.or(`id.ilike.%${search}%,user_id.ilike.%${search}%`);
+                const filters = currentFilters.transactions;
+                
+                if (filters.search) {
+                    query = query.or(`id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+                }
+                
+                if (filters.type) {
+                    query = query.eq('type', filters.type);
+                }
+                
+                if (filters.status) {
+                    query = query.eq('status', filters.status);
+                }
+                
+                if (filters.amountMin) {
+                    query = query.gte('amount', parseFloat(filters.amountMin));
+                }
+                
+                if (filters.amountMax) {
+                    query = query.lte('amount', parseFloat(filters.amountMax));
+                }
+                
+                if (filters.dateFrom) {
+                    query = query.gte('created_at', filters.dateFrom);
+                }
+                if (filters.dateTo) {
+                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                }
+                
+                // Aplicar filtros rápidos
+                if (filters.quickFilter !== 'all') {
+                    const now = new Date();
+                    switch(filters.quickFilter) {
+                        case 'today':
+                            const today = now.toISOString().split('T')[0];
+                            query = query.gte('created_at', today);
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(now);
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            query = query.gte('created_at', weekAgo.toISOString().split('T')[0]);
+                            break;
+                        case 'deposit':
+                            query = query.eq('type', 'deposit');
+                            break;
+                        case 'withdrawal':
+                            query = query.eq('type', 'withdrawal');
+                            break;
+                        case 'transfer':
+                            query = query.in('type', ['transfer_send', 'transfer_receive']);
+                            break;
+                    }
                 }
                 
                 const { data, error, count } = await query
@@ -1589,8 +2659,6 @@
                 if (error) throw error;
                 
                 transactionsData = data || [];
-                
-                // Asegurar que todas las transacciones tengan estado completado
                 transactionsData.forEach(transaction => {
                     if (transaction.status !== 'completed') {
                         transaction.status = 'completed';
@@ -1598,7 +2666,9 @@
                 });
                 
                 renderTransactionsTable(transactionsData);
-                renderTransactionsPagination(page, Math.ceil(count / 10));
+                renderTransactionsMobileList(transactionsData);
+                renderTransactionsPagination(page, Math.ceil((count || 0) / 10));
+                updateFilterTags('transactions');
                 
             } catch (error) {
                 console.error('Error loading transactions:', error);
@@ -1606,14 +2676,62 @@
             }
         };
         
-        const loadRecharges = async (page = 1, search = '') => {
+        const loadRecharges = async (page = 1) => {
             try {
                 let query = supabase
                     .from('recharges')
                     .select('*', { count: 'exact' });
                 
-                if (search) {
-                    query = query.or(`phone_number.ilike.%${search}%,id.ilike.%${search}%,user_id.ilike.%${search}%`);
+                const filters = currentFilters.recharges;
+                
+                if (filters.search) {
+                    query = query.or(`phone_number.ilike.%${filters.search}%,id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,operator.ilike.%${filters.search}%`);
+                }
+                
+                if (filters.operator) {
+                    query = query.eq('operator', filters.operator);
+                }
+                
+                if (filters.status) {
+                    query = query.eq('status', filters.status);
+                }
+                
+                if (filters.amountMin) {
+                    query = query.gte('amount', parseFloat(filters.amountMin));
+                }
+                
+                if (filters.amountMax) {
+                    query = query.lte('amount', parseFloat(filters.amountMax));
+                }
+                
+                if (filters.dateFrom) {
+                    query = query.gte('created_at', filters.dateFrom);
+                }
+                if (filters.dateTo) {
+                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                }
+                
+                // Aplicar filtros rápidos
+                if (filters.quickFilter !== 'all') {
+                    const now = new Date();
+                    switch(filters.quickFilter) {
+                        case 'today':
+                            const today = now.toISOString().split('T')[0];
+                            query = query.gte('created_at', today);
+                            break;
+                        case 'entel':
+                            query = query.eq('operator', 'entel');
+                            break;
+                        case 'tigo':
+                            query = query.eq('operator', 'tigo');
+                            break;
+                        case 'viva':
+                            query = query.eq('operator', 'viva');
+                            break;
+                        case 'completed':
+                            query = query.eq('status', 'completed');
+                            break;
+                    }
                 }
                 
                 const { data, error, count } = await query
@@ -1624,7 +2742,9 @@
                 
                 rechargesData = data || [];
                 renderRechargesTable(rechargesData);
-                renderRechargesPagination(page, Math.ceil(count / 10));
+                renderRechargesMobileList(rechargesData);
+                renderRechargesPagination(page, Math.ceil((count || 0) / 10));
+                updateFilterTags('recharges');
                 
             } catch (error) {
                 console.error('Error loading recharges:', error);
@@ -1632,14 +2752,70 @@
             }
         };
         
-        const loadGameRecharges = async (page = 1, search = '') => {
+        const loadGameRecharges = async (page = 1) => {
             try {
                 let query = supabase
                     .from('game_recharges')
                     .select('*', { count: 'exact' });
                 
-                if (search) {
-                    query = query.or(`game_id.ilike.%${search}%,player_name.ilike.%${search}%,id.ilike.%${search}%,user_id.ilike.%${search}%`);
+                const filters = currentFilters.gameRecharges;
+                
+                if (filters.search) {
+                    query = query.or(`game_id.ilike.%${filters.search}%,player_name.ilike.%${filters.search}%,id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%`);
+                }
+                
+                if (filters.game) {
+                    query = query.eq('game', filters.game);
+                }
+                
+                if (filters.status) {
+                    query = query.eq('status', filters.status);
+                }
+                
+                if (filters.diamondsMin) {
+                    query = query.gte('diamonds', parseInt(filters.diamondsMin));
+                }
+                
+                if (filters.diamondsMax) {
+                    query = query.lte('diamonds', parseInt(filters.diamondsMax));
+                }
+                
+                if (filters.amountMin) {
+                    query = query.gte('amount', parseFloat(filters.amountMin));
+                }
+                
+                if (filters.amountMax) {
+                    query = query.lte('amount', parseFloat(filters.amountMax));
+                }
+                
+                if (filters.dateFrom) {
+                    query = query.gte('created_at', filters.dateFrom);
+                }
+                if (filters.dateTo) {
+                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                }
+                
+                // Aplicar filtros rápidos
+                if (filters.quickFilter !== 'all') {
+                    const now = new Date();
+                    switch(filters.quickFilter) {
+                        case 'today':
+                            const today = now.toISOString().split('T')[0];
+                            query = query.gte('created_at', today);
+                            break;
+                        case 'freefire':
+                            query = query.eq('game', 'freefire');
+                            break;
+                        case 'mobilelegends':
+                            query = query.eq('game', 'mobilelegends');
+                            break;
+                        case 'high-diamonds':
+                            query = query.gte('diamonds', 100);
+                            break;
+                        case 'completed':
+                            query = query.eq('status', 'completed');
+                            break;
+                    }
                 }
                 
                 const { data, error, count } = await query
@@ -1650,7 +2826,9 @@
                 
                 gameRechargesData = data || [];
                 renderGameRechargesTable(gameRechargesData);
-                renderGameRechargesPagination(page, Math.ceil(count / 10));
+                renderGameRechargesMobileList(gameRechargesData);
+                renderGameRechargesPagination(page, Math.ceil((count || 0) / 10));
+                updateFilterTags('gameRecharges');
                 
             } catch (error) {
                 console.error('Error loading game recharges:', error);
@@ -1658,7 +2836,246 @@
             }
         };
         
-        // Funciones para renderizar datos
+        // Funciones para renderizar datos en móvil
+        const renderUsersMobileList = (users) => {
+            const container = document.getElementById('users-mobile-list');
+            
+            if (!users || users.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-users"></i>
+                        <p>No se encontraron usuarios</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = users.map(user => {
+                const balance = userBalances[user.id] || 0;
+                const balanceClass = balance > 0 ? 'balance-positive' : (balance < 0 ? 'balance-negative' : 'balance-zero');
+                
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">${user.full_name}</div>
+                            <span class="badge bg-success mobile-card-status">Activo</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">ID:</span>
+                                <span class="mobile-card-value user-id-badge">${user.id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Email:</span>
+                                <span class="mobile-card-value">${user.email}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Teléfono:</span>
+                                <span class="mobile-card-value">${user.phone || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Balance:</span>
+                                <span class="mobile-card-value ${balanceClass}">${formatCurrency(balance)}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-user-detail" data-id="${user.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-user" data-id="${user.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-user-history" data-id="${user.id}" data-name="${user.full_name}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderTransactionsMobileList = (transactions) => {
+            const container = document.getElementById('transactions-mobile-list');
+            
+            if (!transactions || transactions.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-exchange-alt"></i>
+                        <p>No se encontraron transacciones</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = transactions.map(transaction => {
+                const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
+                const textColor = isPositive ? 'text-success' : 'text-danger';
+                const sign = isPositive ? '+' : '-';
+                const typeNames = {
+                    'deposit': 'Ingreso',
+                    'withdrawal': 'Retiro',
+                    'transfer_send': 'Transferencia Env.',
+                    'transfer_receive': 'Transferencia Rec.'
+                };
+                
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">${typeNames[transaction.type] || transaction.type}</div>
+                            <span class="badge bg-success mobile-card-status">Completado</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">ID:</span>
+                                <span class="mobile-card-value user-id-badge">${transaction.id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Usuario ID:</span>
+                                <span class="mobile-card-value user-id-badge">${transaction.user_id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Monto:</span>
+                                <span class="mobile-card-value ${textColor}">${sign}${formatCurrency(transaction.amount)}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Fecha:</span>
+                                <span class="mobile-card-value">${formatDate(transaction.created_at)}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-transaction-detail" data-id="${transaction.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-transaction" data-id="${transaction.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderRechargesMobileList = (recharges) => {
+            const container = document.getElementById('recharges-mobile-list');
+            
+            if (!recharges || recharges.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-mobile-alt"></i>
+                        <p>No se encontraron recargas</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = recharges.map(recharge => {
+                const operatorName = recharge.operator ? 
+                    recharge.operator.charAt(0).toUpperCase() + recharge.operator.slice(1) : 
+                    'Desconocida';
+                
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">Recarga ${operatorName}</div>
+                            <span class="badge bg-success mobile-card-status">Completado</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">ID:</span>
+                                <span class="mobile-card-value user-id-badge">${recharge.id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Usuario ID:</span>
+                                <span class="mobile-card-value user-id-badge">${recharge.user_id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Número:</span>
+                                <span class="mobile-card-value">${recharge.phone_number}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Monto:</span>
+                                <span class="mobile-card-value">${formatCurrency(recharge.amount)}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-recharge-detail" data-id="${recharge.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-recharge" data-id="${recharge.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderGameRechargesMobileList = (gameRecharges) => {
+            const container = document.getElementById('game-recharges-mobile-list');
+            
+            if (!gameRecharges || gameRecharges.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-gamepad"></i>
+                        <p>No se encontraron recargas de juegos</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = gameRecharges.map(recharge => {
+                const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
+                
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">${gameName}</div>
+                            <span class="badge bg-success mobile-card-status">Completado</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">ID:</span>
+                                <span class="mobile-card-value user-id-badge">${recharge.id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Usuario ID:</span>
+                                <span class="mobile-card-value user-id-badge">${recharge.user_id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Jugador:</span>
+                                <span class="mobile-card-value">${recharge.player_name}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Diamantes:</span>
+                                <span class="mobile-card-value">${recharge.diamonds}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Monto:</span>
+                                <span class="mobile-card-value">${formatCurrency(recharge.amount)}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-game-recharge-detail" data-id="${recharge.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-game-recharge" data-id="${recharge.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        // Funciones para renderizar datos en desktop (mantenidas igual)
         const renderRecentTransactions = (transactions, users) => {
             const container = document.getElementById('recent-transactions');
             
@@ -1902,359 +3319,321 @@
             container.innerHTML = html;
         };
         
-        // Funciones para mostrar detalles
-        const showUserDetails = async (userId) => {
-            try {
-                const user = usersData.find(u => u.id === userId);
-                if (!user) {
-                    showToast('Usuario no encontrado', 'error');
-                    return;
-                }
-                
-                // Obtener transacciones del usuario
-                const { data: userTransactions, error } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false });
-                
-                if (error) throw error;
-                
-                // Obtener recargas del usuario
-                const { data: userRecharges, error: rechargesError } = await supabase
-                    .from('recharges')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false });
-                
-                if (rechargesError) throw rechargesError;
-                
-                // Obtener recargas de juegos del usuario
-                const { data: userGameRecharges, error: gameRechargesError } = await supabase
-                    .from('game_recharges')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false });
-                
-                if (gameRechargesError) throw gameRechargesError;
-                
-                const balance = userBalances[userId] || 0;
-                const balanceClass = balance > 0 ? 'balance-positive' : (balance < 0 ? 'balance-negative' : 'balance-zero');
-                
-                let detailsHTML = `
-                    <div class="detail-item">
-                        <div class="detail-label">ID:</div>
-                        <div class="detail-value"><span class="user-id-badge">${user.id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Nombre:</div>
-                        <div class="detail-value">${user.full_name}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Email:</div>
-                        <div class="detail-value">${user.email}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Teléfono:</div>
-                        <div class="detail-value">${user.phone || 'No especificado'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Estado:</div>
-                        <div class="detail-value"><span class="badge bg-success">Activo</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Balance:</div>
-                        <div class="detail-value ${balanceClass}">${formatCurrency(balance)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Fecha de registro:</div>
-                        <div class="detail-value">${formatDate(user.created_at)}</div>
-                    </div>
-                    
-                    <div class="danger-zone">
-                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro</h6>
-                        <p class="small mb-3">Esta acción borrará todo el historial del usuario pero mantendrá su balance actual.</p>
-                        <button class="btn btn-sm btn-danger" id="delete-history-from-detail" data-id="${user.id}">
-                            <i class="fas fa-trash me-1"></i> Borrar Historial Completo
-                        </button>
+        // Funciones para actualizar tags de filtros
+        const updateFilterTags = (section) => {
+            const filters = currentFilters[section];
+            const container = document.getElementById(`${section}-filter-tags`);
+            let tagsHTML = '';
+            
+            if (filters.search) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Búsqueda: "${filters.search}"
+                        <button class="remove-filter" data-type="search">×</button>
                     </div>
                 `;
-                
-                // Mostrar últimas transacciones
-                if (userTransactions && userTransactions.length > 0) {
-                    detailsHTML += `
-                        <div class="detail-item">
-                            <div class="detail-label">Últimas transacciones:</div>
-                            <div class="detail-value">
-                                <ul class="list-unstyled mb-0">
-                    `;
-                    
-                    userTransactions.slice(0, 5).forEach(transaction => {
-                        const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
-                        const sign = isPositive ? '+' : '-';
-                        const typeNames = {
-                            'deposit': 'Ingreso',
-                            'withdrawal': 'Retiro',
-                            'transfer_send': 'Transferencia Envío',
-                            'transfer_receive': 'Transferencia Recepción'
-                        };
-                        
-                        detailsHTML += `
-                            <li class="mb-1">
-                                <small>${formatDate(transaction.created_at)} - ${typeNames[transaction.type] || transaction.type}: ${sign}${formatCurrency(transaction.amount)}</small>
-                            </li>
-                        `;
-                    });
-                    
-                    detailsHTML += `
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                // Mostrar últimas recargas
-                if (userRecharges && userRecharges.length > 0) {
-                    detailsHTML += `
-                        <div class="detail-item">
-                            <div class="detail-label">Últimas recargas:</div>
-                            <div class="detail-value">
-                                <ul class="list-unstyled mb-0">
-                    `;
-                    
-                    userRecharges.slice(0, 5).forEach(recharge => {
-                        detailsHTML += `
-                            <li class="mb-1">
-                                <small>${formatDate(recharge.created_at)} - ${recharge.operator}: ${formatCurrency(recharge.amount)}</small>
-                            </li>
-                        `;
-                    });
-                    
-                    detailsHTML += `
-                                </ul>
-                            </div>
-                        </div>
-                    `;
-                }
-                
-                showDetailModal(`Detalles del Usuario: ${user.full_name}`, detailsHTML);
-                
-                // Agregar evento al botón de borrar historial
-                document.getElementById('delete-history-from-detail').addEventListener('click', function() {
-                    const userId = this.getAttribute('data-id');
-                    if (confirm(`¿Está seguro de borrar todo el historial del usuario ${user.full_name}? Esta acción es irreversible pero mantendrá su balance actual.`)) {
-                        deleteUserHistory(userId);
-                        closeDetailModal();
-                    }
-                });
-                
-            } catch (error) {
-                console.error('Error loading user details:', error);
-                showToast('Error al cargar los detalles del usuario', 'error');
             }
-        };
-        
-        const showTransactionDetails = async (transactionId) => {
-            try {
-                const transaction = transactionsData.find(t => t.id === transactionId);
-                if (!transaction) {
-                    showToast('Transacción no encontrada', 'error');
-                    return;
-                }
-                
-                // Obtener información del usuario
-                const { data: user, error: userError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('id', transaction.user_id)
-                    .single();
-                
-                if (userError) throw userError;
-                
-                const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
-                const textColor = isPositive ? 'text-success' : 'text-danger';
-                const sign = isPositive ? '+' : '-';
+            
+            if (filters.status) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Estado: ${filters.status === 'active' ? 'Activo' : 'Inactivo'}
+                        <button class="remove-filter" data-type="status">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.type) {
                 const typeNames = {
-                    'deposit': 'Ingreso',
+                    'deposit': 'Depósito',
                     'withdrawal': 'Retiro',
-                    'transfer_send': 'Transferencia Enviada',
-                    'transfer_receive': 'Transferencia Recibida'
+                    'transfer_send': 'Transferencia Envío',
+                    'transfer_receive': 'Transferencia Recepción'
                 };
-                
-                const detailsHTML = `
-                    <div class="detail-item">
-                        <div class="detail-label">ID Transacción:</div>
-                        <div class="detail-value"><span class="user-id-badge">${transaction.id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">ID Usuario:</div>
-                        <div class="detail-value"><span class="user-id-badge">${transaction.user_id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Usuario:</div>
-                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Tipo:</div>
-                        <div class="detail-value text-capitalize">${typeNames[transaction.type] || transaction.type}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Monto:</div>
-                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Estado:</div>
-                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Descripción:</div>
-                        <div class="detail-value">${transaction.description || 'Sin descripción'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Fecha:</div>
-                        <div class="detail-value">${formatDate(transaction.created_at)}</div>
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Tipo: ${typeNames[filters.type] || filters.type}
+                        <button class="remove-filter" data-type="type">×</button>
                     </div>
                 `;
-                
-                showDetailModal(`Detalles de Transacción`, detailsHTML);
-                
-            } catch (error) {
-                console.error('Error loading transaction details:', error);
-                showToast('Error al cargar los detalles de la transacción', 'error');
             }
-        };
-        
-        const showRechargeDetails = async (rechargeId) => {
-            try {
-                const recharge = rechargesData.find(r => r.id === rechargeId);
-                if (!recharge) {
-                    showToast('Recarga no encontrada', 'error');
-                    return;
-                }
-                
-                // Obtener información del usuario
-                const { data: user, error: userError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('id', recharge.user_id)
-                    .single();
-                
-                if (userError) throw userError;
-                
-                const operatorName = recharge.operator ? 
-                    recharge.operator.charAt(0).toUpperCase() + recharge.operator.slice(1) : 
-                    'Desconocida';
-                
-                const detailsHTML = `
-                    <div class="detail-item">
-                        <div class="detail-label">ID Recarga:</div>
-                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">ID Usuario:</div>
-                        <div class="detail-value"><span class="user-id-badge">${recharge.user_id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Usuario:</div>
-                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Operadora:</div>
-                        <div class="detail-value">${operatorName}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Número:</div>
-                        <div class="detail-value">${recharge.phone_number}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Monto:</div>
-                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Estado:</div>
-                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Fecha:</div>
-                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+            
+            if (filters.operator) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Operadora: ${filters.operator}
+                        <button class="remove-filter" data-type="operator">×</button>
                     </div>
                 `;
-                
-                showDetailModal(`Detalles de Recarga`, detailsHTML);
-                
-            } catch (error) {
-                console.error('Error loading recharge details:', error);
-                showToast('Error al cargar los detalles de la recarga', 'error');
             }
-        };
-        
-        const showGameRechargeDetails = async (gameRechargeId) => {
-            try {
-                const recharge = gameRechargesData.find(r => r.id === gameRechargeId);
-                if (!recharge) {
-                    showToast('Recarga de juego no encontrada', 'error');
-                    return;
-                }
-                
-                // Obtener información del usuario
-                const { data: user, error: userError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('id', recharge.user_id)
-                    .single();
-                
-                if (userError) throw userError;
-                
-                const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
-                
-                const detailsHTML = `
-                    <div class="detail-item">
-                        <div class="detail-label">ID Recarga:</div>
-                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">ID Usuario:</div>
-                        <div class="detail-value"><span class="user-id-badge">${recharge.user_id}</span></div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Usuario:</div>
-                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Juego:</div>
-                        <div class="detail-value">${gameName}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">ID del Juego:</div>
-                        <div class="detail-value">${recharge.game_id}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Jugador:</div>
-                        <div class="detail-value">${recharge.player_name}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Diamantes:</div>
-                        <div class="detail-value">${recharge.diamonds}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Monto:</div>
-                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
-                    </div>
-                    <div class="detail-item">
-                        <div class="detail-label">Fecha:</div>
-                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+            
+            if (filters.game) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Juego: ${filters.game === 'freefire' ? 'Free Fire' : 'Mobile Legends'}
+                        <button class="remove-filter" data-type="game">×</button>
                     </div>
                 `;
-                
-                showDetailModal(`Detalles de Recarga de Juego`, detailsHTML);
-                
-            } catch (error) {
-                console.error('Error loading game recharge details:', error);
-                showToast('Error al cargar los detalles de la recarga de juego', 'error');
             }
+            
+            if (filters.balance) {
+                const balanceNames = {
+                    'positive': 'Balance Positivo',
+                    'negative': 'Balance Negativo',
+                    'zero': 'Balance Cero'
+                };
+                tagsHTML += `
+                    <div class="filter-tag">
+                        ${balanceNames[filters.balance]}
+                        <button class="remove-filter" data-type="balance">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.amountMin) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Monto mínimo: Bs ${filters.amountMin}
+                        <button class="remove-filter" data-type="amountMin">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.amountMax) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Monto máximo: Bs ${filters.amountMax}
+                        <button class="remove-filter" data-type="amountMax">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.diamondsMin) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Diamantes mínimos: ${filters.diamondsMin}
+                        <button class="remove-filter" data-type="diamondsMin">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.diamondsMax) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Diamantes máximos: ${filters.diamondsMax}
+                        <button class="remove-filter" data-type="diamondsMax">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.dateFrom) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Desde: ${filters.dateFrom}
+                        <button class="remove-filter" data-type="dateFrom">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.dateTo) {
+                tagsHTML += `
+                    <div class="filter-tag">
+                        Hasta: ${filters.dateTo}
+                        <button class="remove-filter" data-type="dateTo">×</button>
+                    </div>
+                `;
+            }
+            
+            if (filters.quickFilter && filters.quickFilter !== 'all') {
+                const quickFilterNames = {
+                    'balance-positive': 'Balance Positivo',
+                    'balance-negative': 'Balance Negativo',
+                    'recent': 'Recientes',
+                    'active': 'Activos',
+                    'deposit': 'Depósitos',
+                    'withdrawal': 'Retiros',
+                    'transfer': 'Transferencias',
+                    'today': 'Hoy',
+                    'week': 'Esta semana',
+                    'entel': 'Entel',
+                    'tigo': 'Tigo',
+                    'viva': 'Viva',
+                    'completed': 'Completadas',
+                    'freefire': 'Free Fire',
+                    'mobilelegends': 'Mobile Legends',
+                    'high-diamonds': '+100 Diamantes'
+                };
+                tagsHTML += `
+                    <div class="filter-tag">
+                        ${quickFilterNames[filters.quickFilter]}
+                        <button class="remove-filter" data-type="quickFilter">×</button>
+                    </div>
+                `;
+            }
+            
+            container.innerHTML = tagsHTML;
         };
         
-        // Funciones de paginación
+        // Funciones para aplicar filtros
+        const applyUsersFilters = () => {
+            currentFilters.users.search = document.getElementById('user-search').value;
+            currentFilters.users.status = document.getElementById('user-status-filter').value;
+            currentFilters.users.balance = document.getElementById('user-balance-filter').value;
+            currentFilters.users.dateFrom = document.getElementById('user-date-from').value;
+            currentFilters.users.dateTo = document.getElementById('user-date-to').value;
+            loadUsers(1);
+        };
+        
+        const applyTransactionsFilters = () => {
+            currentFilters.transactions.search = document.getElementById('transaction-search').value;
+            currentFilters.transactions.type = document.getElementById('transaction-type-filter').value;
+            currentFilters.transactions.status = document.getElementById('transaction-status-filter').value;
+            currentFilters.transactions.amountMin = document.getElementById('transaction-amount-min').value;
+            currentFilters.transactions.amountMax = document.getElementById('transaction-amount-max').value;
+            currentFilters.transactions.dateFrom = document.getElementById('transaction-date-from').value;
+            currentFilters.transactions.dateTo = document.getElementById('transaction-date-to').value;
+            loadTransactions(1);
+        };
+        
+        const applyRechargesFilters = () => {
+            currentFilters.recharges.search = document.getElementById('recharge-search').value;
+            currentFilters.recharges.operator = document.getElementById('recharge-operator-filter').value;
+            currentFilters.recharges.status = document.getElementById('recharge-status-filter').value;
+            currentFilters.recharges.amountMin = document.getElementById('recharge-amount-min').value;
+            currentFilters.recharges.amountMax = document.getElementById('recharge-amount-max').value;
+            currentFilters.recharges.dateFrom = document.getElementById('recharge-date-from').value;
+            currentFilters.recharges.dateTo = document.getElementById('recharge-date-to').value;
+            loadRecharges(1);
+        };
+        
+        const applyGameRechargesFilters = () => {
+            currentFilters.gameRecharges.search = document.getElementById('game-recharge-search').value;
+            currentFilters.gameRecharges.game = document.getElementById('game-recharge-game-filter').value;
+            currentFilters.gameRecharges.status = document.getElementById('game-recharge-status-filter').value;
+            currentFilters.gameRecharges.diamondsMin = document.getElementById('game-recharge-diamonds-min').value;
+            currentFilters.gameRecharges.diamondsMax = document.getElementById('game-recharge-diamonds-max').value;
+            currentFilters.gameRecharges.amountMin = document.getElementById('game-recharge-amount-min').value;
+            currentFilters.gameRecharges.amountMax = document.getElementById('game-recharge-amount-max').value;
+            currentFilters.gameRecharges.dateFrom = document.getElementById('game-recharge-date-from').value;
+            currentFilters.gameRecharges.dateTo = document.getElementById('game-recharge-date-to').value;
+            loadGameRecharges(1);
+        };
+        
+        // Funciones para resetear filtros
+        const resetUsersFilters = () => {
+            document.getElementById('user-search').value = '';
+            document.getElementById('user-status-filter').value = '';
+            document.getElementById('user-balance-filter').value = '';
+            document.getElementById('user-date-from').value = '';
+            document.getElementById('user-date-to').value = '';
+            
+            // Resetear filtros rápidos
+            document.querySelectorAll('#users-quick-filters .quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('#users-quick-filters .quick-filter-btn[data-filter="all"]').classList.add('active');
+            
+            currentFilters.users = {
+                search: '',
+                status: '',
+                balance: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            };
+            
+            loadUsers(1);
+        };
+        
+        const resetTransactionsFilters = () => {
+            document.getElementById('transaction-search').value = '';
+            document.getElementById('transaction-type-filter').value = '';
+            document.getElementById('transaction-status-filter').value = '';
+            document.getElementById('transaction-amount-min').value = '';
+            document.getElementById('transaction-amount-max').value = '';
+            document.getElementById('transaction-date-from').value = '';
+            document.getElementById('transaction-date-to').value = '';
+            
+            document.querySelectorAll('#transactions-quick-filters .quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('#transactions-quick-filters .quick-filter-btn[data-filter="all"]').classList.add('active');
+            
+            currentFilters.transactions = {
+                search: '',
+                type: '',
+                status: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            };
+            
+            loadTransactions(1);
+        };
+        
+        const resetRechargesFilters = () => {
+            document.getElementById('recharge-search').value = '';
+            document.getElementById('recharge-operator-filter').value = '';
+            document.getElementById('recharge-status-filter').value = '';
+            document.getElementById('recharge-amount-min').value = '';
+            document.getElementById('recharge-amount-max').value = '';
+            document.getElementById('recharge-date-from').value = '';
+            document.getElementById('recharge-date-to').value = '';
+            
+            document.querySelectorAll('#recharges-quick-filters .quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('#recharges-quick-filters .quick-filter-btn[data-filter="all"]').classList.add('active');
+            
+            currentFilters.recharges = {
+                search: '',
+                operator: '',
+                status: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            };
+            
+            loadRecharges(1);
+        };
+        
+        const resetGameRechargesFilters = () => {
+            document.getElementById('game-recharge-search').value = '';
+            document.getElementById('game-recharge-game-filter').value = '';
+            document.getElementById('game-recharge-status-filter').value = '';
+            document.getElementById('game-recharge-diamonds-min').value = '';
+            document.getElementById('game-recharge-diamonds-max').value = '';
+            document.getElementById('game-recharge-amount-min').value = '';
+            document.getElementById('game-recharge-amount-max').value = '';
+            document.getElementById('game-recharge-date-from').value = '';
+            document.getElementById('game-recharge-date-to').value = '';
+            
+            document.querySelectorAll('#game-recharges-quick-filters .quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('#game-recharges-quick-filters .quick-filter-btn[data-filter="all"]').classList.add('active');
+            
+            currentFilters.gameRecharges = {
+                search: '',
+                game: '',
+                status: '',
+                diamondsMin: '',
+                diamondsMax: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            };
+            
+            loadGameRecharges(1);
+        };
+        
+        // Funciones de paginación (mantenidas igual)
         const renderUsersPagination = (currentPage, totalPages) => {
             const container = document.getElementById('users-pagination');
             renderPagination(container, currentPage, totalPages, 'users');
@@ -2283,12 +3662,10 @@
             
             let html = '';
             
-            // Botón anterior
             if (currentPage > 1) {
                 html += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage - 1}" data-type="${type}">Anterior</a></li>`;
             }
             
-            // Páginas
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
                     html += `<li class="page-item active"><a class="page-link" href="#" data-page="${i}" data-type="${type}">${i}</a></li>`;
@@ -2303,7 +3680,6 @@
                 }
             }
             
-            // Botón siguiente
             if (currentPage < totalPages) {
                 html += `<li class="page-item"><a class="page-link" href="#" data-page="${currentPage + 1}" data-type="${type}">Siguiente</a></li>`;
             }
@@ -2313,22 +3689,18 @@
         
         // Funciones para cambiar secciones
         const showSection = (sectionId) => {
-            // Ocultar todas las secciones
             document.querySelectorAll('section').forEach(section => {
                 section.classList.add('d-none');
             });
             
-            // Mostrar la sección seleccionada
             document.getElementById(sectionId).classList.remove('d-none');
             
-            // Actualizar navegación
             document.querySelectorAll('.sidebar .nav-link').forEach(link => {
                 link.classList.remove('active');
             });
             
             document.querySelector(`.sidebar .nav-link[data-section="${sectionId.replace('-section', '')}"]`).classList.add('active');
             
-            // Cargar datos de la sección
             currentSection = sectionId.replace('-section', '');
             
             switch(currentSection) {
@@ -2350,12 +3722,10 @@
             }
         };
         
-        // Funciones CRUD para usuarios
+        // Funciones CRUD (mantenidas igual)
         const createUser = async (userData) => {
             try {
-                // Establecer estado activo por defecto
                 userData.status = 'active';
-                
                 const { data, error } = await supabase
                     .from('user_profiles')
                     .insert([userData])
@@ -2374,9 +3744,7 @@
         
         const updateUser = async (id, userData) => {
             try {
-                // Asegurar que el estado sea activo
                 userData.status = 'active';
-                
                 const { data, error } = await supabase
                     .from('user_profiles')
                     .update(userData)
@@ -2394,12 +3762,9 @@
             }
         };
         
-        // Funciones CRUD para transacciones
         const createTransaction = async (transactionData) => {
             try {
-                // Establecer estado completado por defecto
                 transactionData.status = 'completed';
-                
                 const { data, error } = await supabase
                     .from('transactions')
                     .insert([transactionData])
@@ -2418,9 +3783,7 @@
         
         const updateTransaction = async (id, transactionData) => {
             try {
-                // Asegurar que el estado sea completado
                 transactionData.status = 'completed';
-                
                 const { data, error } = await supabase
                     .from('transactions')
                     .update(transactionData)
@@ -2438,7 +3801,6 @@
             }
         };
         
-        // Funciones CRUD para recargas
         const createRecharge = async (rechargeData) => {
             try {
                 const { data, error } = await supabase
@@ -2476,7 +3838,6 @@
             }
         };
         
-        // Funciones CRUD para recargas de juegos
         const createGameRecharge = async (gameRechargeData) => {
             try {
                 const { data, error } = await supabase
@@ -2514,7 +3875,7 @@
             }
         };
         
-        // Funciones para abrir modales
+        // Funciones para abrir modales (mantenidas igual)
         const openUserModal = (user = null) => {
             const modalTitle = document.getElementById('userModalTitle');
             const form = document.getElementById('userForm');
@@ -2525,12 +3886,12 @@
                 document.getElementById('user-fullname').value = user.full_name || '';
                 document.getElementById('user-email').value = user.email || '';
                 document.getElementById('user-phone').value = user.phone || '';
-                document.getElementById('user-status').value = 'active'; // Siempre activo
+                document.getElementById('user-status').value = 'active';
             } else {
                 modalTitle.textContent = 'Agregar Usuario';
                 form.reset();
                 document.getElementById('user-id').value = '';
-                document.getElementById('user-status').value = 'active'; // Siempre activo
+                document.getElementById('user-status').value = 'active';
             }
             
             const userModal = new bootstrap.Modal(document.getElementById('userModal'));
@@ -2547,10 +3908,9 @@
                 document.getElementById('transaction-user').value = transaction.user_id;
                 document.getElementById('transaction-type').value = transaction.type;
                 document.getElementById('transaction-amount').value = transaction.amount;
-                document.getElementById('transaction-status').value = 'completed'; // Siempre completado
+                document.getElementById('transaction-status').value = 'completed';
                 document.getElementById('transaction-description').value = transaction.description || '';
                 
-                // Mostrar/ocultar sección de transferencia
                 if (transaction.type === 'transfer_send' || transaction.type === 'transfer_receive') {
                     document.getElementById('transfer-to-section').style.display = 'block';
                 }
@@ -2558,7 +3918,7 @@
                 modalTitle.textContent = 'Nueva Transacción';
                 form.reset();
                 document.getElementById('transaction-id').value = '';
-                document.getElementById('transaction-status').value = 'completed'; // Siempre completado
+                document.getElementById('transaction-status').value = 'completed';
                 document.getElementById('transfer-to-section').style.display = 'none';
             }
             
@@ -2682,21 +4042,196 @@
             // Cancelar borrado
             document.getElementById('cancel-deletion').addEventListener('click', hideDeletionProgress);
             
-            // Búsqueda en tablas
+            // Toggle de filtros avanzados
+            document.getElementById('toggle-users-filters').addEventListener('click', () => {
+                document.getElementById('users-advanced-filters').classList.toggle('show');
+            });
+            
+            document.getElementById('toggle-transactions-filters').addEventListener('click', () => {
+                document.getElementById('transactions-advanced-filters').classList.toggle('show');
+            });
+            
+            document.getElementById('toggle-recharges-filters').addEventListener('click', () => {
+                document.getElementById('recharges-advanced-filters').classList.toggle('show');
+            });
+            
+            document.getElementById('toggle-game-recharges-filters').addEventListener('click', () => {
+                document.getElementById('game-recharges-advanced-filters').classList.toggle('show');
+            });
+            
+            // Aplicar filtros
+            document.getElementById('apply-users-filters').addEventListener('click', applyUsersFilters);
+            document.getElementById('apply-transactions-filters').addEventListener('click', applyTransactionsFilters);
+            document.getElementById('apply-recharges-filters').addEventListener('click', applyRechargesFilters);
+            document.getElementById('apply-game-recharges-filters').addEventListener('click', applyGameRechargesFilters);
+            
+            // Resetear filtros
+            document.getElementById('reset-users-filters').addEventListener('click', resetUsersFilters);
+            document.getElementById('reset-transactions-filters').addEventListener('click', resetTransactionsFilters);
+            document.getElementById('reset-recharges-filters').addEventListener('click', resetRechargesFilters);
+            document.getElementById('reset-game-recharges-filters').addEventListener('click', resetGameRechargesFilters);
+            
+            // Búsqueda en tiempo real
             document.getElementById('user-search').addEventListener('input', (e) => {
-                loadUsers(1, e.target.value);
+                currentFilters.users.search = e.target.value;
+                loadUsers(1);
             });
             
             document.getElementById('transaction-search').addEventListener('input', (e) => {
-                loadTransactions(1, e.target.value);
+                currentFilters.transactions.search = e.target.value;
+                loadTransactions(1);
             });
             
             document.getElementById('recharge-search').addEventListener('input', (e) => {
-                loadRecharges(1, e.target.value);
+                currentFilters.recharges.search = e.target.value;
+                loadRecharges(1);
             });
             
             document.getElementById('game-recharge-search').addEventListener('input', (e) => {
-                loadGameRecharges(1, e.target.value);
+                currentFilters.gameRecharges.search = e.target.value;
+                loadGameRecharges(1);
+            });
+            
+            // Filtros rápidos
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.quick-filter-btn')) {
+                    const button = e.target.closest('.quick-filter-btn');
+                    const filter = button.dataset.filter;
+                    const section = button.closest('.quick-filters').id.replace('-quick-filters', '');
+                    
+                    // Remover activo de todos los botones en esta sección
+                    document.querySelectorAll(`#${section}-quick-filters .quick-filter-btn`).forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    // Activar el botón clickeado
+                    button.classList.add('active');
+                    
+                    // Actualizar filtro
+                    currentFilters[section].quickFilter = filter;
+                    
+                    // Recargar datos
+                    switch(section) {
+                        case 'users':
+                            loadUsers(1);
+                            break;
+                        case 'transactions':
+                            loadTransactions(1);
+                            break;
+                        case 'recharges':
+                            loadRecharges(1);
+                            break;
+                        case 'game-recharges':
+                            loadGameRecharges(1);
+                            break;
+                    }
+                }
+            });
+            
+            // Remover filtros individuales
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-filter')) {
+                    const filterType = e.target.dataset.type;
+                    const section = e.target.closest('.filter-tags').id.replace('-filter-tags', '');
+                    
+                    // Remover el filtro
+                    if (filterType === 'search') {
+                        document.getElementById(`${section}-search`).value = '';
+                        currentFilters[section].search = '';
+                    } else if (filterType === 'quickFilter') {
+                        document.querySelectorAll(`#${section}-quick-filters .quick-filter-btn`).forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        document.querySelector(`#${section}-quick-filters .quick-filter-btn[data-filter="all"]`).classList.add('active');
+                        currentFilters[section].quickFilter = 'all';
+                    } else {
+                        const inputId = `${section}-${filterType}`;
+                        const inputElement = document.getElementById(inputId);
+                        if (inputElement) {
+                            inputElement.value = '';
+                        }
+                        currentFilters[section][filterType] = '';
+                    }
+                    
+                    // Recargar datos
+                    switch(section) {
+                        case 'users':
+                            loadUsers(1);
+                            break;
+                        case 'transactions':
+                            loadTransactions(1);
+                            break;
+                        case 'recharges':
+                            loadRecharges(1);
+                            break;
+                        case 'game-recharges':
+                            loadGameRecharges(1);
+                            break;
+                    }
+                }
+            });
+            
+            // Mobile search
+            document.getElementById('mobile-search-trigger').addEventListener('click', () => {
+                document.querySelector('.mobile-search-bar').classList.remove('d-none');
+                document.getElementById('mobile-global-search').focus();
+            });
+            
+            document.querySelector('.close-search').addEventListener('click', () => {
+                document.querySelector('.mobile-search-bar').classList.add('d-none');
+            });
+            
+            document.getElementById('mobile-global-search').addEventListener('input', (e) => {
+                const searchTerm = e.target.value;
+                switch(currentSection) {
+                    case 'users':
+                        document.getElementById('user-search').value = searchTerm;
+                        currentFilters.users.search = searchTerm;
+                        loadUsers(1);
+                        break;
+                    case 'transactions':
+                        document.getElementById('transaction-search').value = searchTerm;
+                        currentFilters.transactions.search = searchTerm;
+                        loadTransactions(1);
+                        break;
+                    case 'recharges':
+                        document.getElementById('recharge-search').value = searchTerm;
+                        currentFilters.recharges.search = searchTerm;
+                        loadRecharges(1);
+                        break;
+                    case 'game-recharges':
+                        document.getElementById('game-recharge-search').value = searchTerm;
+                        currentFilters.gameRecharges.search = searchTerm;
+                        loadGameRecharges(1);
+                        break;
+                }
+            });
+            
+            // Global search (desktop)
+            document.getElementById('desktop-global-search').addEventListener('input', (e) => {
+                const searchTerm = e.target.value;
+                switch(currentSection) {
+                    case 'users':
+                        document.getElementById('user-search').value = searchTerm;
+                        currentFilters.users.search = searchTerm;
+                        loadUsers(1);
+                        break;
+                    case 'transactions':
+                        document.getElementById('transaction-search').value = searchTerm;
+                        currentFilters.transactions.search = searchTerm;
+                        loadTransactions(1);
+                        break;
+                    case 'recharges':
+                        document.getElementById('recharge-search').value = searchTerm;
+                        currentFilters.recharges.search = searchTerm;
+                        loadRecharges(1);
+                        break;
+                    case 'game-recharges':
+                        document.getElementById('game-recharge-search').value = searchTerm;
+                        currentFilters.gameRecharges.search = searchTerm;
+                        loadGameRecharges(1);
+                        break;
+                }
             });
             
             // Paginación
@@ -2708,16 +4243,16 @@
                     
                     switch(type) {
                         case 'users':
-                            loadUsers(page, document.getElementById('user-search').value);
+                            loadUsers(page);
                             break;
                         case 'transactions':
-                            loadTransactions(page, document.getElementById('transaction-search').value);
+                            loadTransactions(page);
                             break;
                         case 'recharges':
-                            loadRecharges(page, document.getElementById('recharge-search').value);
+                            loadRecharges(page);
                             break;
                         case 'game-recharges':
-                            loadGameRecharges(page, document.getElementById('game-recharge-search').value);
+                            loadGameRecharges(page);
                             break;
                     }
                 }
@@ -2764,7 +4299,7 @@
                     full_name: document.getElementById('user-fullname').value,
                     email: document.getElementById('user-email').value,
                     phone: document.getElementById('user-phone').value,
-                    status: 'active' // Siempre activo
+                    status: 'active'
                 };
                 
                 let result;
@@ -2778,7 +4313,7 @@
                     const userModal = bootstrap.Modal.getInstance(document.getElementById('userModal'));
                     userModal.hide();
                     loadUsers();
-                    loadDashboardData(); // Actualizar dashboard
+                    loadDashboardData();
                 }
             });
             
@@ -2787,7 +4322,6 @@
                 const transactionId = document.getElementById('transaction-id').value;
                 const transactionType = document.getElementById('transaction-type').value;
                 
-                // Si es transferencia, crear dos transacciones: una de envío y una de recepción
                 if (transactionType === 'transfer_send') {
                     const transferToUserId = document.getElementById('transfer-to-user').value;
                     if (!transferToUserId) {
@@ -2798,7 +4332,6 @@
                     const amount = parseFloat(document.getElementById('transaction-amount').value);
                     const description = document.getElementById('transaction-description').value;
                     
-                    // Crear transacción de envío
                     const sendTransaction = {
                         user_id: document.getElementById('transaction-user').value,
                         type: 'transfer_send',
@@ -2807,7 +4340,6 @@
                         description: `Transferencia enviada a usuario ${transferToUserId}: ${description}`
                     };
                     
-                    // Crear transacción de recepción
                     const receiveTransaction = {
                         user_id: transferToUserId,
                         type: 'transfer_receive',
@@ -2833,12 +4365,11 @@
                         showToast('Error al realizar la transferencia', 'error');
                     }
                 } else {
-                    // Transacción normal
                     const transactionData = {
                         user_id: document.getElementById('transaction-user').value,
                         type: transactionType,
                         amount: parseFloat(document.getElementById('transaction-amount').value),
-                        status: 'completed', // Siempre completado
+                        status: 'completed',
                         description: document.getElementById('transaction-description').value
                     };
                     
@@ -2853,7 +4384,7 @@
                         const transactionModal = bootstrap.Modal.getInstance(document.getElementById('transactionModal'));
                         transactionModal.hide();
                         loadTransactions();
-                        loadDashboardData(); // Actualizar dashboard
+                        loadDashboardData();
                     }
                 }
             });
@@ -2879,7 +4410,7 @@
                     const rechargeModal = bootstrap.Modal.getInstance(document.getElementById('rechargeModal'));
                     rechargeModal.hide();
                     loadRecharges();
-                    loadDashboardData(); // Actualizar dashboard
+                    loadDashboardData();
                 }
             });
             
@@ -2906,7 +4437,7 @@
                     const gameRechargeModal = bootstrap.Modal.getInstance(document.getElementById('gameRechargeModal'));
                     gameRechargeModal.hide();
                     loadGameRecharges();
-                    loadDashboardData(); // Actualizar dashboard
+                    loadDashboardData();
                 }
             });
             
@@ -2995,8 +4526,402 @@
             });
             
             // Cargar datos iniciales
+            await calculateUserBalances();
             loadDashboardData();
         });
+        
+        // Funciones para mostrar detalles (mantenidas igual)
+        const showUserDetails = async (userId) => {
+            try {
+                const user = usersData.find(u => u.id === userId);
+                if (!user) {
+                    showToast('Usuario no encontrado', 'error');
+                    return;
+                }
+                
+                const { data: userTransactions, error } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                const { data: userRecharges, error: rechargesError } = await supabase
+                    .from('recharges')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (rechargesError) throw rechargesError;
+                
+                const { data: userGameRecharges, error: gameRechargesError } = await supabase
+                    .from('game_recharges')
+                    .select('*')
+                    .eq('user_id', userId)
+                    .order('created_at', { ascending: false });
+                
+                if (gameRechargesError) throw gameRechargesError;
+                
+                const balance = userBalances[userId] || 0;
+                const balanceClass = balance > 0 ? 'balance-positive' : (balance < 0 ? 'balance-negative' : 'balance-zero');
+                
+                let detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value"><span class="user-id-badge">${user.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nombre:</div>
+                        <div class="detail-value">${user.full_name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Email:</div>
+                        <div class="detail-value">${user.email}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Teléfono:</div>
+                        <div class="detail-value">${user.phone || 'No especificado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge bg-success">Activo</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Balance:</div>
+                        <div class="detail-value ${balanceClass}">${formatCurrency(balance)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha de registro:</div>
+                        <div class="detail-value">${formatDate(user.created_at)}</div>
+                    </div>
+                    
+                    <div class="danger-zone">
+                        <h6><i class="fas fa-exclamation-triangle me-2"></i>Zona de Peligro</h6>
+                        <p class="small mb-3">Esta acción borrará todo el historial del usuario pero mantendrá su balance actual.</p>
+                        <button class="btn btn-sm btn-danger" id="delete-history-from-detail" data-id="${user.id}">
+                            <i class="fas fa-trash me-1"></i> Borrar Historial Completo
+                        </button>
+                    </div>
+                `;
+                
+                if (userTransactions && userTransactions.length > 0) {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">Últimas transacciones:</div>
+                            <div class="detail-value">
+                                <ul class="list-unstyled mb-0">
+                    `;
+                    
+                    userTransactions.slice(0, 5).forEach(transaction => {
+                        const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
+                        const sign = isPositive ? '+' : '-';
+                        const typeNames = {
+                            'deposit': 'Ingreso',
+                            'withdrawal': 'Retiro',
+                            'transfer_send': 'Transferencia Envío',
+                            'transfer_receive': 'Transferencia Recepción'
+                        };
+                        
+                        detailsHTML += `
+                            <li class="mb-1">
+                                <small>${formatDate(transaction.created_at)} - ${typeNames[transaction.type] || transaction.type}: ${sign}${formatCurrency(transaction.amount)}</small>
+                            </li>
+                        `;
+                    });
+                    
+                    detailsHTML += `
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                if (userRecharges && userRecharges.length > 0) {
+                    detailsHTML += `
+                        <div class="detail-item">
+                            <div class="detail-label">Últimas recargas:</div>
+                            <div class="detail-value">
+                                <ul class="list-unstyled mb-0">
+                    `;
+                    
+                    userRecharges.slice(0, 5).forEach(recharge => {
+                        detailsHTML += `
+                            <li class="mb-1">
+                                <small>${formatDate(recharge.created_at)} - ${recharge.operator}: ${formatCurrency(recharge.amount)}</small>
+                            </li>
+                        `;
+                    });
+                    
+                    detailsHTML += `
+                                </ul>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                showDetailModal(`Detalles del Usuario: ${user.full_name}`, detailsHTML);
+                
+                document.getElementById('delete-history-from-detail').addEventListener('click', function() {
+                    const userId = this.getAttribute('data-id');
+                    if (confirm(`¿Está seguro de borrar todo el historial del usuario ${user.full_name}? Esta acción es irreversible pero mantendrá su balance actual.`)) {
+                        deleteUserHistory(userId);
+                        closeDetailModal();
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error loading user details:', error);
+                showToast('Error al cargar los detalles del usuario', 'error');
+            }
+        };
+        
+        const showTransactionDetails = async (transactionId) => {
+            try {
+                const transaction = transactionsData.find(t => t.id === transactionId);
+                if (!transaction) {
+                    showToast('Transacción no encontrada', 'error');
+                    return;
+                }
+                
+                const { data: user, error: userError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', transaction.user_id)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const isPositive = transaction.type === 'deposit' || transaction.type === 'transfer_receive';
+                const textColor = isPositive ? 'text-success' : 'text-danger';
+                const sign = isPositive ? '+' : '-';
+                const typeNames = {
+                    'deposit': 'Ingreso',
+                    'withdrawal': 'Retiro',
+                    'transfer_send': 'Transferencia Enviada',
+                    'transfer_receive': 'Transferencia Recibida'
+                };
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID Transacción:</div>
+                        <div class="detail-value"><span class="user-id-badge">${transaction.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Usuario:</div>
+                        <div class="detail-value"><span class="user-id-badge">${transaction.user_id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tipo:</div>
+                        <div class="detail-value text-capitalize">${typeNames[transaction.type] || transaction.type}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Descripción:</div>
+                        <div class="detail-value">${transaction.description || 'Sin descripción'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(transaction.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles de Transacción`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading transaction details:', error);
+                showToast('Error al cargar los detalles de la transacción', 'error');
+            }
+        };
+        
+        const showRechargeDetails = async (rechargeId) => {
+            try {
+                const recharge = rechargesData.find(r => r.id === rechargeId);
+                if (!recharge) {
+                    showToast('Recarga no encontrada', 'error');
+                    return;
+                }
+                
+                const { data: user, error: userError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', recharge.user_id)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const operatorName = recharge.operator ? 
+                    recharge.operator.charAt(0).toUpperCase() + recharge.operator.slice(1) : 
+                    'Desconocida';
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID Recarga:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Usuario:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.user_id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Operadora:</div>
+                        <div class="detail-value">${operatorName}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Número:</div>
+                        <div class="detail-value">${recharge.phone_number}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge bg-success status-badge">Completado</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles de Recarga`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading recharge details:', error);
+                showToast('Error al cargar los detalles de la recarga', 'error');
+            }
+        };
+        
+        const showGameRechargeDetails = async (gameRechargeId) => {
+            try {
+                const recharge = gameRechargesData.find(r => r.id === gameRechargeId);
+                if (!recharge) {
+                    showToast('Recarga de juego no encontrada', 'error');
+                    return;
+                }
+                
+                const { data: user, error: userError } = await supabase
+                    .from('user_profiles')
+                    .select('*')
+                    .eq('id', recharge.user_id)
+                    .single();
+                
+                if (userError) throw userError;
+                
+                const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID Recarga:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID Usuario:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.user_id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Juego:</div>
+                        <div class="detail-value">${gameName}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">ID del Juego:</div>
+                        <div class="detail-value">${recharge.game_id}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Jugador:</div>
+                        <div class="detail-value">${recharge.player_name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Diamantes:</div>
+                        <div class="detail-value">${recharge.diamonds}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles de Recarga de Juego`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error loading game recharge details:', error);
+                showToast('Error al cargar los detalles de la recarga de juego', 'error');
+            }
+        };
+        
+        // Función para cargar datos del dashboard (mantenida igual)
+        const loadDashboardData = async () => {
+            try {
+                const { data: users, error: usersError } = await supabase
+                    .from('user_profiles')
+                    .select('*');
+                
+                if (usersError) throw usersError;
+                
+                await calculateUserBalances();
+                
+                const today = new Date().toISOString().split('T')[0];
+                
+                const { data: todayTransactions, error: todayTransactionsError } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .gte('created_at', today);
+                
+                if (todayTransactionsError) throw todayTransactionsError;
+                
+                const { data: todayRecharges, error: todayRechargesError } = await supabase
+                    .from('recharges')
+                    .select('*')
+                    .gte('created_at', today);
+                
+                if (todayRechargesError) throw todayRechargesError;
+                
+                const totalBalance = Object.values(userBalances).reduce((sum, balance) => sum + balance, 0);
+                
+                document.getElementById('total-users-count').textContent = users.length;
+                document.getElementById('today-transactions').textContent = todayTransactions.length;
+                document.getElementById('today-recharges').textContent = todayRecharges.length;
+                document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
+                
+                const { data: recentTransactions, error: recentTransactionsError } = await supabase
+                    .from('transactions')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                
+                if (recentTransactionsError) throw recentTransactionsError;
+                
+                renderRecentTransactions(recentTransactions, users);
+                
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showToast('Error al cargar los datos del dashboard', 'error');
+            }
+        };
     </script>
 </body>
 </html>
