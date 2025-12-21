@@ -1619,8 +1619,9 @@
         }
 
         function updateDashboardStats() {
-            // Total recargas
-            document.getElementById('totalRecharges').textContent = allRecharges.length.toLocaleString();
+            // Total recargas (NO contar los ERROR) - SOLO CAMBIO AQUÍ
+            const totalRecargas = allRecharges.filter(r => r.estado !== 'ERROR').length;
+            document.getElementById('totalRecharges').textContent = totalRecargas.toLocaleString();
             
             // Total usuarios
             document.getElementById('totalUsers').textContent = allUsers.length;
@@ -1668,10 +1669,12 @@
             try {
                 const tbody = document.getElementById('usersTableBody');
                 
-                // Contar recargas por usuario
+                // Contar recargas por usuario (NO contar los ERROR) - SOLO CAMBIO AQUÍ
                 const userRechargeCounts = {};
                 allRecharges.forEach(recharge => {
-                    userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
+                    if (recharge.estado !== 'ERROR') {
+                        userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
+                    }
                 });
 
                 tbody.innerHTML = allUsers.map(user => `
@@ -2345,10 +2348,10 @@
                 });
             }
             
-            // Contar recargas por usuario
+            // Contar recargas por usuario (NO contar los ERROR) - SOLO CAMBIO AQUÍ
             const userRechargeCounts = {};
             filteredData.forEach(recharge => {
-                if (recharge.user_id && recharge.user_name) {
+                if (recharge.estado !== 'ERROR' && recharge.user_id && recharge.user_name) {
                     userRechargeCounts[recharge.user_id] = {
                         name: recharge.user_name,
                         count: (userRechargeCounts[recharge.user_id]?.count || 0) + 1
@@ -2489,38 +2492,41 @@
                 });
             }
             
-            // Calcular estadísticas
-            const totalRecargas = filteredByUser.length;
+            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LOS ERROR - SOLO CAMBIO AQUÍ
+            const totalRecargas = filteredByUser.filter(recharge => recharge.estado !== 'ERROR').length;
             
             // Contar por estado
             const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
             const nuevoCount = filteredByUser.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
-            const errorCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
+            const corteCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
+            const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
             
-            // Calcular hora pico
+            // Calcular hora pico (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23)
+            // Preparar datos por hora (00-23) - solo para recargas que no sean ERROR - SOLO CAMBIO AQUÍ
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             filteredByUser.forEach(recharge => {
-                const timePart = recharge.timestamp.split(' ')[1];
-                if (timePart) {
-                    const hour = timePart.split(':')[0];
-                    hourlyData[hour] = (hourlyData[hour] || 0) + 1;
-                    
-                    // Actualizar conteo por hora para estadísticas
-                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-                    
-                    if (hourCounts[hour] > maxCount) {
-                        maxCount = hourCounts[hour];
-                        peakHour = hour + ':00';
+                // Solo contar para hora pico si NO es ERROR - SOLO CAMBIO AQUÍ
+                if (recharge.estado !== 'ERROR') {
+                    const timePart = recharge.timestamp.split(' ')[1];
+                    if (timePart) {
+                        const hour = timePart.split(':')[0];
+                        hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+                        
+                        // Actualizar conteo por hora para estadísticas
+                        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                        
+                        if (hourCounts[hour] > maxCount) {
+                            maxCount = hourCounts[hour];
+                            peakHour = hour + ':00';
+                        }
                     }
                 }
             });
@@ -2666,37 +2672,44 @@
             // Ocultar mensaje de no datos
             document.getElementById('noDataMessage').classList.add('d-none');
             
-            // Calcular estadísticas del día
-            const totalRecargas = dayRecharges.length;
+            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LOS ERROR - SOLO CAMBIO AQUÍ
+            const totalRecargas = dayRecharges.filter(recharge => recharge.estado !== 'ERROR').length;
             
-            // Usuarios únicos
+            // Usuarios únicos (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
             const uniqueUsers = new Set();
-            dayRecharges.forEach(recharge => uniqueUsers.add(recharge.user_id));
+            dayRecharges.forEach(recharge => {
+                if (recharge.estado !== 'ERROR') {
+                    uniqueUsers.add(recharge.user_id);
+                }
+            });
             const uniqueUsersCount = uniqueUsers.size;
             
-            // Hora pico
+            // Hora pico (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23)
+            // Preparar datos por hora (00-23) - solo para recargas que no sean ERROR - SOLO CAMBIO AQUÍ
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             dayRecharges.forEach(recharge => {
-                const timePart = recharge.timestamp.split(' ')[1];
-                if (timePart) {
-                    const hour = timePart.split(':')[0];
-                    hourlyData[hour] = (hourlyData[hour] || 0) + 1;
-                    
-                    // Actualizar conteo por hora para estadísticas
-                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-                    
-                    if (hourCounts[hour] > maxCount) {
-                        maxCount = hourCounts[hour];
-                        peakHour = hour + ':00';
+                // Solo contar para estadísticas si NO es ERROR - SOLO CAMBIO AQUÍ
+                if (recharge.estado !== 'ERROR') {
+                    const timePart = recharge.timestamp.split(' ')[1];
+                    if (timePart) {
+                        const hour = timePart.split(':')[0];
+                        hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+                        
+                        // Actualizar conteo por hora para estadísticas
+                        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                        
+                        if (hourCounts[hour] > maxCount) {
+                            maxCount = hourCounts[hour];
+                            peakHour = hour + ':00';
+                        }
                     }
                 }
             });
