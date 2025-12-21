@@ -1,0 +1,1198 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Caja Balance</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --verde-oscuro: #0a3d2f;
+            --verde: #046c4e;
+            --verde-claro: #0e9f6e;
+            --verde-brillante: #10b981;
+            --blanco: #ffffff;
+            --gris-claro: #f8faf9;
+            --gris: #e7efed;
+            --gris-oscuro: #2d453f;
+            --negro: #0d1f1a;
+            --exito: #059669;
+            --error: #dc2626;
+            --sombra: 0 2px 4px rgba(0, 0, 0, 0.05);
+            --sombra-fuerte: 0 4px 8px rgba(0, 0, 0, 0.08);
+            --radio: 10px;
+            --radio-grande: 16px;
+        }
+
+        html {
+            font-size: 13px;
+        }
+
+        body {
+            background: var(--gris-claro);
+            color: var(--negro);
+            line-height: 1.4;
+            min-height: 100vh;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app-container {
+            max-width: 100%;
+            width: 100%;
+            margin: 0 auto;
+            background: var(--blanco);
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Header */
+        .app-header {
+            background: var(--verde-oscuro);
+            color: var(--blanco);
+            padding: 0.8rem 1rem 0.6rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: var(--sombra-fuerte);
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.8rem;
+        }
+
+        .app-title {
+            font-size: 1.2rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--blanco);
+        }
+
+        .app-title i {
+            color: var(--verde-brillante);
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 0.4rem;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            color: var(--blanco);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Selector */
+        .sucursal-selector {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: var(--radio);
+            padding: 0.6rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .sucursal-label {
+            font-size: 0.7rem;
+            opacity: 0.9;
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            font-weight: 600;
+        }
+
+        .sucursal-select {
+            width: 100%;
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: var(--blanco);
+            padding: 0.5rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.5rem center;
+            background-size: 1rem;
+            padding-right: 2rem;
+        }
+
+        /* Ventana Principal */
+        .main-window {
+            padding: 1rem;
+        }
+
+        /* Saldo */
+        .balance-card {
+            background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde) 100%);
+            color: var(--blanco);
+            padding: 1.2rem;
+            border-radius: var(--radio-grande);
+            margin-bottom: 1rem;
+            box-shadow: var(--sombra-fuerte);
+        }
+
+        .balance-label {
+            font-size: 0.75rem;
+            opacity: 0.9;
+            margin-bottom: 0.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .balance-amount {
+            font-size: 1.8rem;
+            font-weight: 800;
+            margin-bottom: 0.3rem;
+            letter-spacing: -0.5px;
+        }
+
+        .balance-sucursal {
+            font-size: 0.8rem;
+            opacity: 0.9;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Botones */
+        .action-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .action-btn {
+            background: var(--blanco);
+            border: 1.5px solid;
+            border-radius: var(--radio);
+            padding: 1rem 0.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--sombra);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-fuerte);
+        }
+
+        .action-btn i {
+            font-size: 1.4rem;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            color: var(--blanco);
+        }
+
+        .ingreso-btn {
+            color: var(--exito);
+            border-color: var(--exito);
+        }
+
+        .ingreso-btn i {
+            background: var(--exito);
+        }
+
+        .gasto-btn {
+            color: var(--error);
+            border-color: var(--error);
+        }
+
+        .gasto-btn i {
+            background: var(--error);
+        }
+
+        /* Botón historial */
+        .historial-btn-container {
+            margin: 1rem 0;
+            text-align: center;
+        }
+
+        .historial-btn {
+            background: var(--verde);
+            color: var(--blanco);
+            border: none;
+            border-radius: var(--radio);
+            padding: 0.8rem 1.5rem;
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            box-shadow: var(--sombra);
+        }
+
+        .historial-btn:hover {
+            background: var(--verde-claro);
+            transform: translateY(-1px);
+        }
+
+        /* Ventana Historial */
+        .historial-window {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--blanco);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .historial-window.active {
+            transform: translateX(0);
+        }
+
+        .historial-header {
+            background: var(--verde-oscuro);
+            color: var(--blanco);
+            padding: 0.8rem 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: var(--sombra);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--blanco);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem;
+        }
+
+        .historial-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            flex: 1;
+        }
+
+        .historial-count {
+            background: var(--verde-brillante);
+            color: var(--blanco);
+            padding: 0.2rem 0.6rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.8rem;
+        }
+
+        .historial-content {
+            padding: 1rem;
+        }
+
+        .historial-list {
+            background: var(--gris-claro);
+            border-radius: var(--radio);
+            overflow: hidden;
+            border: 1px solid var(--gris);
+        }
+
+        .movimiento-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.9rem;
+            border-bottom: 1px solid var(--gris);
+            background: var(--blanco);
+        }
+
+        .movimiento-item:last-child {
+            border-bottom: none;
+        }
+
+        .movimiento-info {
+            flex: 1;
+            min-width: 0;
+            padding-right: 0.5rem;
+        }
+
+        .movimiento-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            color: var(--negro);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-size: 0.9rem;
+        }
+
+        .movimiento-details {
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.75rem;
+            color: var(--gris-oscuro);
+        }
+
+        .movimiento-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.2rem;
+        }
+
+        .movimiento-monto {
+            font-weight: 700;
+            font-size: 1rem;
+            padding-left: 0.5rem;
+            min-width: 80px;
+            text-align: right;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 0.3rem;
+        }
+
+        .movimiento-monto.ingreso {
+            color: var(--exito);
+        }
+
+        .movimiento-monto.gasto {
+            color: var(--error);
+        }
+
+        /* Estados vacíos */
+        .empty-state {
+            text-align: center;
+            padding: 2rem 1rem;
+            color: var(--gris-oscuro);
+        }
+
+        .empty-state i {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+            color: var(--gris);
+        }
+
+        .empty-state h3 {
+            font-size: 1rem;
+            margin-bottom: 0.4rem;
+            color: var(--negro);
+            font-weight: 700;
+        }
+
+        .empty-state p {
+            font-size: 0.85rem;
+        }
+
+        /* Modales */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 61, 47, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--blanco);
+            border-radius: var(--radio-grande);
+            width: 100%;
+            max-width: 400px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: var(--sombra-fuerte);
+            transform: scale(0.95);
+            transition: transform 0.2s;
+        }
+
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            background: var(--verde-oscuro);
+            color: var(--blanco);
+            padding: 1rem 1.2rem;
+            border-radius: var(--radio-grande) var(--radio-grande) 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--blanco);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.2rem;
+        }
+
+        .modal-body {
+            padding: 1.2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--negro);
+            font-size: 0.85rem;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 0.7rem;
+            border: 1.5px solid var(--gris);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+            background: var(--blanco);
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--verde);
+        }
+
+        .modal-footer {
+            padding: 1rem 1.2rem;
+            display: flex;
+            gap: 0.6rem;
+            border-top: 1px solid var(--gris);
+        }
+
+        .btn {
+            flex: 1;
+            padding: 0.7rem;
+            border: none;
+            border-radius: var(--radio);
+            font-weight: 700;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.4rem;
+        }
+
+        .btn-primary {
+            background: var(--verde);
+            color: var(--blanco);
+        }
+
+        .btn-primary:hover {
+            background: var(--verde-claro);
+        }
+
+        .btn-secondary {
+            background: var(--gris-claro);
+            color: var(--negro);
+            border: 1px solid var(--gris);
+        }
+
+        .btn-secondary:hover {
+            background: var(--gris);
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 1rem;
+            color: var(--gris-oscuro);
+            font-size: 0.75rem;
+            background: var(--gris-claro);
+            border-top: 1px solid var(--gris);
+            margin-top: 1rem;
+        }
+
+        /* Mensajes */
+        .error-message {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 0.8rem;
+            border-radius: var(--radio);
+            margin: 1rem;
+            text-align: center;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        @media (max-width: 360px) {
+            html {
+                font-size: 12px;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --blanco: #0d1f1a;
+                --gris-claro: #132923;
+                --gris: #1a352e;
+                --negro: #ecf3f0;
+                --gris-oscuro: #a4bcb4;
+            }
+            
+            body {
+                background: #081712;
+            }
+            
+            .app-container {
+                background: var(--blanco);
+            }
+            
+            .form-input {
+                background: var(--gris);
+                color: var(--negro);
+            }
+            
+            .btn-secondary {
+                background: var(--gris);
+                color: var(--negro);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-top">
+                <h1 class="app-title">
+                    <i class="fas fa-wallet"></i>
+                    <span>Caja Balance</span>
+                </h1>
+                <div class="header-actions">
+                    <button class="icon-btn" id="btnNuevaSucursal" title="Nueva Sucursal">
+                        <i class="fas fa-store"></i>
+                    </button>
+                    <button class="icon-btn" id="btnRefresh" title="Actualizar">
+                        <i class="fas fa-sync-alt"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="sucursal-selector">
+                <label class="sucursal-label">
+                    <i class="fas fa-map-marker-alt"></i>
+                    Sucursal Actual
+                </label>
+                <select id="sucursalSelector" class="sucursal-select">
+                    <option value="">Cargando...</option>
+                </select>
+            </div>
+        </header>
+
+        <!-- Ventana Principal -->
+        <div class="main-window" id="mainWindow">
+            <!-- Saldo -->
+            <div class="balance-card">
+                <p class="balance-label">
+                    <i class="fas fa-chart-line"></i>
+                    SALDO ACTUAL
+                </p>
+                <h2 class="balance-amount" id="balanceTotal">Bs 0.00</h2>
+                <p class="balance-sucursal" id="sucursalNombre">
+                    <i class="fas fa-building"></i>
+                    <span>-</span>
+                </p>
+            </div>
+
+            <!-- Botones de acción -->
+            <div class="action-buttons">
+                <button class="action-btn ingreso-btn" id="btnIngreso">
+                    <i class="fas fa-plus"></i>
+                    <span>Nuevo Ingreso</span>
+                </button>
+                <button class="action-btn gasto-btn" id="btnGasto">
+                    <i class="fas fa-minus"></i>
+                    <span>Nuevo Gasto</span>
+                </button>
+            </div>
+
+            <!-- Botón para ver historial -->
+            <div class="historial-btn-container">
+                <button class="historial-btn" id="btnVerHistorial">
+                    <i class="fas fa-history"></i>
+                    Ver Historial Completo
+                </button>
+            </div>
+        </div>
+
+        <!-- Ventana Historial -->
+        <div class="historial-window" id="historialWindow">
+            <div class="historial-header">
+                <button class="back-btn" id="btnVolver">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="historial-title">Historial</h2>
+                <span class="historial-count" id="historialCount">0</span>
+            </div>
+            <div class="historial-content">
+                <div class="historial-list" id="historialList">
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h3>No hay movimientos</h3>
+                        <p>Registra tu primer ingreso o gasto</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Movimiento -->
+        <div class="modal-overlay" id="modalMovimiento">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title" id="modalMovimientoTitle">
+                        <i class="fas fa-plus-circle"></i>
+                        Nuevo Ingreso
+                    </h3>
+                    <button class="modal-close" id="btnCancelarMovimiento">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="monto">Monto (Bs)</label>
+                        <input type="number" id="monto" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" class="form-input" placeholder="Ej: Venta de productos" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="responsable">Responsable</label>
+                        <input type="text" id="responsable" class="form-input" placeholder="Nombre del responsable" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="fechaHora">Fecha y Hora</label>
+                        <input type="text" id="fechaHora" class="form-input" readonly>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btnCancelar">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="btn btn-primary" id="btnGuardar">
+                        <i class="fas fa-save"></i>
+                        Guardar
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Sucursal -->
+        <div class="modal-overlay" id="modalSucursal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 class="modal-title">
+                        <i class="fas fa-store"></i>
+                        Nueva Sucursal
+                    </h3>
+                    <button class="modal-close" id="btnCancelarSucursal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label class="form-label" for="nombreSucursal">Nombre</label>
+                        <input type="text" id="nombreSucursal" class="form-input" placeholder="Sucursal Central" required>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="direccionSucursal">Dirección</label>
+                        <input type="text" id="direccionSucursal" class="form-input" placeholder="(Opcional)">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label" for="telefonoSucursal">Teléfono</label>
+                        <input type="text" id="telefonoSucursal" class="form-input" placeholder="(Opcional)">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" id="btnCancelarSucursalForm">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="btn btn-primary" id="btnGuardarSucursal">
+                        <i class="fas fa-plus"></i>
+                        Crear
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // CONFIGURACIÓN SUPABASE - REEMPLAZA CON TUS DATOS
+        const SUPABASE_URL = 'https://psyltyecxeslpzdwfyda.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_fWysdoMmBbn2g02MZdP25w__Lnj8Kvg';
+        
+        let estadoApp = {
+            sucursalActual: null,
+            sucursales: [],
+            movimientos: [],
+            tipoMovimientoActual: 'ingreso',
+            saldoTotal: 0,
+            cargando: true
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            if (SUPABASE_URL.includes('TU_URL') || SUPABASE_KEY.includes('TU_API_KEY')) {
+                mostrarError('⚠️ Reemplaza SUPABASE_URL y SUPABASE_KEY con tus credenciales');
+                return;
+            }
+            
+            inicializarApp();
+        });
+
+        function inicializarApp() {
+            actualizarFechaHora();
+            configurarEventListeners();
+            cargarSucursales();
+        }
+
+        function configurarEventListeners() {
+            // Botones principales
+            document.getElementById('btnIngreso').addEventListener('click', () => abrirModalMovimiento('ingreso'));
+            document.getElementById('btnGasto').addEventListener('click', () => abrirModalMovimiento('gasto'));
+            
+            // Historial
+            document.getElementById('btnVerHistorial').addEventListener('click', abrirHistorial);
+            document.getElementById('btnVolver').addEventListener('click', cerrarHistorial);
+            
+            // Modal movimiento
+            document.getElementById('btnCancelarMovimiento').addEventListener('click', cerrarModalMovimiento);
+            document.getElementById('btnCancelar').addEventListener('click', cerrarModalMovimiento);
+            document.getElementById('btnGuardar').addEventListener('click', guardarMovimiento);
+            
+            // Modal sucursal
+            document.getElementById('btnNuevaSucursal').addEventListener('click', abrirModalSucursal);
+            document.getElementById('btnCancelarSucursal').addEventListener('click', cerrarModalSucursal);
+            document.getElementById('btnCancelarSucursalForm').addEventListener('click', cerrarModalSucursal);
+            document.getElementById('btnGuardarSucursal').addEventListener('click', guardarSucursal);
+            
+            // Selector de sucursal
+            document.getElementById('sucursalSelector').addEventListener('change', cambiarSucursal);
+            
+            // Refresh
+            document.getElementById('btnRefresh').addEventListener('click', () => {
+                if (estadoApp.sucursalActual) {
+                    cargarMovimientos();
+                }
+            });
+            
+            // Actualizar hora
+            setInterval(actualizarFechaHora, 1000);
+        }
+
+        function actualizarFechaHora() {
+            const now = new Date();
+            const fechaHora = now.toLocaleString('es-ES', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            document.getElementById('fechaHora').value = fechaHora;
+        }
+
+        // ========== FUNCIONES SUPABASE ==========
+
+        async function cargarSucursales() {
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/sucursales?select=*&order=nombre.asc`, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (!response.ok) throw new Error('Error al cargar sucursales');
+                
+                const sucursales = await response.json();
+                estadoApp.sucursales = sucursales;
+                actualizarSelectorSucursales();
+                
+                if (sucursales.length > 0) {
+                    estadoApp.sucursalActual = sucursales[0].id;
+                    document.getElementById('sucursalSelector').value = sucursales[0].id;
+                    document.getElementById('sucursalNombre').textContent = sucursales[0].nombre;
+                    cargarMovimientos();
+                } else {
+                    mostrarEstadoSinSucursales();
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarError('Error al cargar sucursales.');
+            }
+        }
+
+        async function cargarMovimientos() {
+            if (!estadoApp.sucursalActual) return;
+            
+            const historialList = document.getElementById('historialList');
+            historialList.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Cargando...</h3>
+                </div>
+            `;
+            
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/movimientos_caja?sucursal_id=eq.${estadoApp.sucursalActual}&order=fecha_registro.desc`, 
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Error al cargar movimientos');
+                
+                estadoApp.movimientos = await response.json();
+                calcularSaldo();
+                actualizarUI();
+                actualizarHistorialUI();
+                
+            } catch (error) {
+                console.error('Error:', error);
+                historialList.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        Error al cargar movimientos
+                    </div>
+                `;
+            }
+        }
+
+        async function guardarMovimiento() {
+            const monto = parseFloat(document.getElementById('monto').value);
+            const descripcion = document.getElementById('descripcion').value.trim();
+            const responsable = document.getElementById('responsable').value.trim();
+            const fechaHora = document.getElementById('fechaHora').value;
+            
+            if (!monto || monto <= 0) {
+                alert('Ingresa un monto válido');
+                return;
+            }
+            
+            if (!descripcion) {
+                alert('Ingresa una descripción');
+                return;
+            }
+            
+            if (!responsable) {
+                alert('Ingresa el responsable');
+                return;
+            }
+            
+            const movimiento = {
+                sucursal_id: estadoApp.sucursalActual,
+                tipo: estadoApp.tipoMovimientoActual,
+                monto: monto,
+                descripcion: descripcion,
+                responsable: responsable,
+                fecha_hora: fechaHora,
+                fecha_registro: new Date().toISOString()
+            };
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/movimientos_caja`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(movimiento)
+                });
+                
+                if (!response.ok) throw new Error('Error al guardar movimiento');
+                
+                cerrarModalMovimiento();
+                cargarMovimientos();
+                alert('✓ Movimiento guardado');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('✗ Error al guardar');
+            }
+        }
+
+        async function guardarSucursal() {
+            const nombre = document.getElementById('nombreSucursal').value.trim();
+            const direccion = document.getElementById('direccionSucursal').value.trim();
+            const telefono = document.getElementById('telefonoSucursal').value.trim();
+            
+            if (!nombre) {
+                alert('Ingresa el nombre de la sucursal');
+                return;
+            }
+            
+            const sucursal = {
+                nombre: nombre,
+                direccion: direccion || null,
+                telefono: telefono || null
+            };
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/sucursales`, {
+                    method: 'POST',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(sucursal)
+                });
+                
+                if (!response.ok) throw new Error('Error al crear sucursal');
+                
+                const nuevaSucursal = await response.json();
+                
+                cerrarModalSucursal();
+                estadoApp.sucursales.push(nuevaSucursal[0]);
+                actualizarSelectorSucursales();
+                
+                estadoApp.sucursalActual = nuevaSucursal[0].id;
+                document.getElementById('sucursalSelector').value = nuevaSucursal[0].id;
+                document.getElementById('sucursalNombre').textContent = nuevaSucursal[0].nombre;
+                
+                alert('✓ Sucursal creada');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                alert('✗ Error al crear sucursal');
+            }
+        }
+
+        // ========== FUNCIONES UI ==========
+
+        function actualizarSelectorSucursales() {
+            const selector = document.getElementById('sucursalSelector');
+            selector.innerHTML = '';
+            
+            estadoApp.sucursales.forEach(sucursal => {
+                const option = document.createElement('option');
+                option.value = sucursal.id;
+                option.textContent = sucursal.nombre;
+                selector.appendChild(option);
+            });
+        }
+
+        function cambiarSucursal() {
+            const selector = document.getElementById('sucursalSelector');
+            const sucursalId = parseInt(selector.value);
+            const sucursal = estadoApp.sucursales.find(s => s.id === sucursalId);
+            
+            if (sucursal) {
+                estadoApp.sucursalActual = sucursalId;
+                document.getElementById('sucursalNombre').textContent = sucursal.nombre;
+                cargarMovimientos();
+            }
+        }
+
+        function abrirHistorial() {
+            if (!estadoApp.sucursalActual) {
+                alert('Primero selecciona una sucursal');
+                return;
+            }
+            
+            actualizarHistorialUI();
+            document.getElementById('historialWindow').classList.add('active');
+        }
+
+        function cerrarHistorial() {
+            document.getElementById('historialWindow').classList.remove('active');
+        }
+
+        function abrirModalMovimiento(tipo) {
+            if (!estadoApp.sucursalActual) {
+                alert('Primero selecciona una sucursal');
+                return;
+            }
+            
+            estadoApp.tipoMovimientoActual = tipo;
+            
+            const modalTitle = document.getElementById('modalMovimientoTitle');
+            const icon = tipo === 'ingreso' ? 'fa-plus-circle' : 'fa-minus-circle';
+            const titulo = tipo === 'ingreso' ? 'Nuevo Ingreso' : 'Nuevo Gasto';
+            
+            modalTitle.innerHTML = `<i class="fas ${icon}"></i> ${titulo}`;
+            
+            document.getElementById('monto').value = '';
+            document.getElementById('descripcion').value = '';
+            document.getElementById('responsable').value = '';
+            actualizarFechaHora();
+            
+            document.getElementById('modalMovimiento').classList.add('active');
+            setTimeout(() => document.getElementById('monto').focus(), 100);
+        }
+
+        function cerrarModalMovimiento() {
+            document.getElementById('modalMovimiento').classList.remove('active');
+        }
+
+        function abrirModalSucursal() {
+            document.getElementById('nombreSucursal').value = '';
+            document.getElementById('direccionSucursal').value = '';
+            document.getElementById('telefonoSucursal').value = '';
+            
+            document.getElementById('modalSucursal').classList.add('active');
+        }
+
+        function cerrarModalSucursal() {
+            document.getElementById('modalSucursal').classList.remove('active');
+        }
+
+        function calcularSaldo() {
+            estadoApp.saldoTotal = estadoApp.movimientos.reduce((total, mov) => {
+                return mov.tipo === 'ingreso' ? total + parseFloat(mov.monto) : total - parseFloat(mov.monto);
+            }, 0);
+        }
+
+        function actualizarUI() {
+            const formatter = new Intl.NumberFormat('es-BO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            document.getElementById('balanceTotal').textContent = `Bs ${formatter.format(estadoApp.saldoTotal)}`;
+        }
+
+        function actualizarHistorialUI() {
+            const formatter = new Intl.NumberFormat('es-BO', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            });
+            
+            document.getElementById('historialCount').textContent = estadoApp.movimientos.length;
+            const historialList = document.getElementById('historialList');
+            
+            if (estadoApp.movimientos.length === 0) {
+                historialList.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-history"></i>
+                        <h3>No hay movimientos</h3>
+                        <p>Registra tu primer ingreso o gasto</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            let movimientosHTML = '';
+            
+            estadoApp.movimientos.forEach(mov => {
+                const icono = mov.tipo === 'ingreso' ? 'fa-arrow-down' : 'fa-arrow-up';
+                const claseMonto = mov.tipo === 'ingreso' ? 'ingreso' : 'gasto';
+                const signo = mov.tipo === 'ingreso' ? '+' : '-';
+                const montoFormateado = formatter.format(parseFloat(mov.monto));
+                
+                movimientosHTML += `
+                    <div class="movimiento-item">
+                        <div class="movimiento-info">
+                            <h4>${mov.descripcion}</h4>
+                            <div class="movimiento-details">
+                                <span><i class="fas fa-user"></i> ${mov.responsable}</span>
+                                <span><i class="fas fa-clock"></i> ${mov.fecha_hora}</span>
+                            </div>
+                        </div>
+                        <div class="movimiento-monto ${claseMonto}">
+                            <i class="fas ${icono}"></i> ${signo}Bs ${montoFormateado}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            historialList.innerHTML = movimientosHTML;
+        }
+
+        function mostrarEstadoSinSucursales() {
+            alert('No hay sucursales. Crea una para comenzar.');
+        }
+
+        function mostrarError(mensaje) {
+            const main = document.querySelector('.main-window');
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'error-message';
+            errorDiv.innerHTML = mensaje;
+            main.appendChild(errorDiv);
+        }
+    </script>
+</body>
+</html>
