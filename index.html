@@ -49,6 +49,8 @@
             --tienda: #f97316;
             --juegos: #8b5cf6;
             --inventario: #3b82f6;
+            --error: #ef4444;
+            --success: #10b981;
         }
         
         * {
@@ -79,6 +81,202 @@
                 radial-gradient(circle at 40% 40%, rgba(196, 181, 253, 0.05) 0%, transparent 50%);
             pointer-events: none;
             z-index: -1;
+        }
+        
+        /* Pantalla de bloqueo */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1000;
+            transition: opacity 0.5s ease;
+        }
+        
+        .login-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+        
+        .login-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 30px 25px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+        }
+        
+        .login-logo {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .login-logo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+            margin-bottom: 8px;
+        }
+        
+        .login-logo p {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+        
+        .login-form {
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-select {
+            width: 100%;
+            padding: 14px 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .password-input-container {
+            position: relative;
+        }
+        
+        .password-input {
+            width: 100%;
+            padding: 14px 45px 14px 16px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        
+        .login-button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .login-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+        }
+        
+        .login-button:active {
+            transform: translateY(0);
+        }
+        
+        .login-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: var(--error);
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+        
+        .error-message.show {
+            display: block;
+            animation: shake 0.5s ease;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+        
+        .admin-info {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+        
+        .admin-info p {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 5px;
+        }
+        
+        .admin-type {
+            font-size: 0.85rem;
+            color: var(--primary-light);
+            font-weight: 600;
+            margin-top: 10px;
+            padding: 8px 12px;
+            background: rgba(139, 92, 246, 0.1);
+            border-radius: 10px;
+            display: inline-block;
         }
         
         /* Header CEO */
@@ -121,6 +319,32 @@
             box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
         }
         
+        .current-admin {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 5px;
+            text-align: center;
+        }
+        
+        .logout-btn {
+            position: absolute;
+            top: 20px;
+            right: 16px;
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 8px;
+            padding: 6px 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .logout-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+        }
+        
         .header-stats {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -154,6 +378,17 @@
             padding-bottom: 80px;
             max-width: 800px;
             margin: 0 auto;
+            display: none;
+        }
+        
+        .main-content.show {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
         /* Sección rápida */
@@ -348,55 +583,6 @@
             color: var(--accent);
         }
         
-        /* Widgets CEO */
-        .widgets-section {
-            margin: 24px 0;
-        }
-        
-        .widget-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        
-        .widget-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
-            backdrop-filter: blur(10px);
-        }
-        
-        .widget-title {
-            font-size: 0.8rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        
-        .widget-title i {
-            color: var(--primary-light);
-        }
-        
-        .widget-data {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-        
-        .widget-change {
-            font-size: 0.7rem;
-            color: #10b981;
-            font-weight: 600;
-        }
-        
-        .widget-change.negative {
-            color: #ef4444;
-        }
-        
         /* Botón de instalación PWA */
         #installButton {
             position: fixed;
@@ -501,20 +687,6 @@
         .ceo-card:nth-child(7) { animation-delay: 0.4s; }
         .ceo-card:nth-child(8) { animation-delay: 0.45s; }
         
-        /* Scrollbar personalizado */
-        .main-content::-webkit-scrollbar {
-            width: 4px;
-        }
-        
-        .main-content::-webkit-scrollbar-track {
-            background: transparent;
-        }
-        
-        .main-content::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
-        
         /* Modo standalone */
         @media all and (display-mode: standalone) {
             body {
@@ -530,25 +702,80 @@
                 display: none !important;
             }
         }
+        
+        /* Estilos para tarjetas ocultas */
+        .ceo-card.hidden {
+            display: none;
+        }
     </style>
 </head>
 <body>
-    <!-- Header CEO -->
-    <header class="ceo-header">
+    <!-- Pantalla de login -->
+    <div class="login-screen" id="loginScreen">
+        <div class="login-container">
+            <div class="login-logo">
+                <h1>TOKTOK</h1>
+                <p>Panel de Control Ejecutivo</p>
+            </div>
+            
+            <div class="login-form">
+                <div class="form-group">
+                    <label class="form-label">Tipo de Administrador</label>
+                    <select class="form-select" id="adminType">
+                        <option value="">Seleccione tipo de admin</option>
+                        <option value="1">ADMIN1 - CEO Completo</option>
+                        <option value="2">ADMIN2 - TokTok Admin y Monitoreo</option>
+                        <option value="3">ADMIN3 - Operadoras, Tienda, Juegos, Asistencia, Cajas</option>
+                        <option value="4">ADMIN4 - Operadoras y Caja</option>
+                        <option value="5">ADMIN5 - Banco BCP, Tienda y Juegos</option>
+                        <option value="6">ADMIN6 - Solo Juegos</option>
+                        <option value="7">ADMIN7 - Incubadora</option>
+                        <option value="8">ADMIN8 - Solo Asistencia</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Contraseña</label>
+                    <div class="password-input-container">
+                        <input type="password" class="password-input" id="passwordInput" placeholder="Ingrese su contraseña">
+                        <button type="button" class="toggle-password" id="togglePassword">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button class="login-button" id="loginButton">Acceder</button>
+                
+                <div class="error-message" id="errorMessage">
+                    Contraseña incorrecta. Intente nuevamente.
+                </div>
+            </div>
+            
+            <div class="admin-info">
+                <p>Sistema de acceso seguro TOKTOK</p>
+                <div class="admin-type" id="currentAdminType">Seleccione un tipo de administrador</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Dashboard principal (oculto inicialmente) -->
+    <header class="ceo-header" id="dashboardHeader" style="display: none;">
         <div class="header-top">
             <h1 class="company-name">TOKTOK</h1>
             <div class="ceo-badge">
                 <i class="fas fa-crown"></i>
-                CEO
-            </div>
+                <span id="currentAdminBadge"></span>
+            </div><br>
+            <button class="logout-btn" id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
         </div>
-        
+        <div class="current-admin" id="currentAdminText">Admin1 - CEO Completo</div>
+    
     </header>
     
     <!-- Contenido principal -->
-    <main class="main-content">
-
-        
+    <main class="main-content" id="mainContent">
         <!-- Panel de Control Principal -->
         <div class="quick-section">
             <h2 class="section-title">
@@ -556,9 +783,8 @@
                 Panel de Control
             </h2>
             <div class="ceo-grid">
-
-                             <!-- Panel Admin TokTok -->
-                <a href="admin-toktok/index.html" class="ceo-card admin-card">
+                <!-- Panel Admin TokTok -->
+                <a href="admin-toktok/index.html" class="ceo-card admin-card" data-admin="1,2">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Admin">
@@ -569,9 +795,8 @@
                     <div class="card-desc">Panel administrativo principal</div>
                 </a>
 
-
                 <!-- Operadoras -->
-                <a href="EXTENCIONES/admin-entel.html" class="ceo-card entel-card">
+                <a href="EXTENCIONES/admin-entel.html" class="ceo-card entel-card" data-admin="1,3,4">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
@@ -579,10 +804,9 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Entel</div>
-                 
                 </a>
                 
-                <a href="EXTENCIONES/admin-tigo.html" class="ceo-card tigo-card">
+                <a href="EXTENCIONES/admin-tigo.html" class="ceo-card tigo-card" data-admin="1,3,4">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
@@ -590,10 +814,9 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Tigo</div>
-        
                 </a>
                 
-                <a href="EXTENCIONES/admin-viva.html" class="ceo-card viva-card">
+                <a href="EXTENCIONES/admin-viva.html" class="ceo-card viva-card" data-admin="1,3,4">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
@@ -601,11 +824,10 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Viva</div>
-           
                 </a>
                 
                 <!-- Banco -->
-                <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card">
+                <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card" data-admin="1,3,5">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
@@ -613,11 +835,10 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Banco BCP</div>
-     
                 </a>
                 
                 <!-- Tienda -->
-                <a href="EXTENCIONES/admin-tienda.html" class="ceo-card tienda-card">
+                <a href="EXTENCIONES/admin-tienda.html" class="ceo-card tienda-card" data-admin="1,3,5">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
@@ -625,11 +846,10 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Tienda</div>
-              
                 </a>
                 
                 <!-- Juegos -->
-                <a href="EXTENCIONES/juegos.html" class="ceo-card juegos-card">
+                <a href="EXTENCIONES/juegos.html" class="ceo-card juegos-card" data-admin="1,3,5,6">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
@@ -637,11 +857,10 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Juegos</div>
-          
                 </a>
                 
                 <!-- Inventario -->
-                <a href="EXTENCIONES/inventario-esc.html" class="ceo-card inventario-card">
+                <a href="EXTENCIONES/inventario-esc.html" class="ceo-card inventario-card" data-admin="1,7">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
@@ -649,11 +868,10 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Incubadora</div>
-        
                 </a>
                 
                 <!-- Asistencia -->
-                <a href="EXTENCIONES/asistencia.html" class="ceo-card asistencia-card">
+                <a href="EXTENCIONES/asistencia.html" class="ceo-card asistencia-card" data-admin="1,3,8">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://cdn-icons-png.flaticon.com/512/4854/4854344.png" alt="Asistencia">
@@ -661,37 +879,33 @@
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Asistencia</div>
-             
                 </a>
 
-                <a href="EXTENCIONES/monitoreo.html" class="ceo-card asistencia-card">
+                <!-- Monitoreo -->
+                <a href="EXTENCIONES/monitoreo.html" class="ceo-card asistencia-card" data-admin="1,2">
                     <div class="card-header">
                         <div class="card-icon">
-                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQM8VBzFM8e7GHKOoihF0vphpW6jg3v7GHpqw&s">
+                            <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQM8VBzFM8e7GHKOoihF0vphpW6jg3v7GHpqw&s" alt="Monitoreo">
                         </div>
                         <div class="card-badge">ADMIN</div>
                     </div>
                     <div class="card-title">Monitoreo toktok group</div>
-             
                 </a>
 
-                <a href="EXTENCIONES/caja.html" class="ceo-card asistencia-card">
+                <!-- Caja -->
+                <a href="EXTENCIONES/caja.html" class="ceo-card asistencia-card" data-admin="1,3,4">
                     <div class="card-header">
                         <div class="card-icon">
-                            <img src="https://thumbs.dreamstime.com/b/vector-de-icono-caja-bancaria-s%C3%ADmbolo-del-banco-dise%C3%B1o-web-aislado-en-color-fondo-blanco-plano-279221610.jpg">
+                            <img src="https://thumbs.dreamstime.com/b/vector-de-icono-caja-bancaria-s%C3%ADmbolo-del-banco-dise%C3%B1o-web-aislado-en-color-fondo-blanco-plano-279221610.jpg" alt="Caja">
                         </div>
                         <div class="card-badge">CAJA ADMIN</div>
                     </div>
                     <div class="card-title">CAJAS</div>
-             
                 </a>
-                
             </div>
         </div>
-
     </main>
     
-
     
     <!-- Botón de instalación PWA -->
     <button id="installButton" aria-label="Instalar aplicación">
@@ -699,6 +913,231 @@
     </button>
 
     <script>
+        // Contraseñas para cada tipo de admin
+        const adminPasswords = {
+            '1': 'CEO2024',      // ADMIN1 - CEO COMPLETO
+            '2': 'TOK2024',      // ADMIN2 - TOKTOK ADMIN Y MONITOREO
+            '3': 'OPERA2024',    // ADMIN3 - OPERADORAS, TIENDA, JUEGOS, ASISTENCIA, CAJAS
+            '4': 'CAJA2024',     // ADMIN4 - OPERADORAS Y CAJA
+            '5': 'BANCO2024',    // ADMIN5 - BANCO BCP, TIENDA Y JUEGOS
+            '6': 'JUEGOS2024',   // ADMIN6 - SOLO JUEGOS
+            '7': 'INCU2024',     // ADMIN7 - INCUBADORA
+            '8': 'ASIS2024'      // ADMIN8 - SOLO ASISTENCIA
+        };
+
+        // Nombres de cada tipo de admin
+        const adminNames = {
+            '1': 'CEO Completo',
+            '2': 'TokTok Admin y Monitoreo',
+            '3': 'Operadoras, Tienda, Juegos, Asistencia, Cajas',
+            '4': 'Operadoras y Caja',
+            '5': 'Banco BCP, Tienda y Juegos',
+            '6': 'Solo Juegos',
+            '7': 'Incubadora',
+            '8': 'Solo Asistencia'
+        };
+
+        // Variables globales
+        let currentAdminType = null;
+        let failedAttempts = 0;
+        const maxAttempts = 5;
+
+        // Elementos DOM
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboardHeader = document.getElementById('dashboardHeader');
+        const mainContent = document.getElementById('mainContent');
+        const navBar = document.getElementById('navBar');
+        const adminTypeSelect = document.getElementById('adminType');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePassword = document.getElementById('togglePassword');
+        const loginButton = document.getElementById('loginButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const currentAdminTypeText = document.getElementById('currentAdminType');
+        const currentAdminBadge = document.getElementById('currentAdminBadge');
+        const currentAdminText = document.getElementById('currentAdminText');
+        const logoutButton = document.getElementById('logoutButton');
+        const ceoCards = document.querySelectorAll('.ceo-card');
+
+        // Actualizar texto del tipo de admin seleccionado
+        adminTypeSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            if (selectedValue) {
+                currentAdminTypeText.textContent = `ADMIN${selectedValue} - ${adminNames[selectedValue]}`;
+                passwordInput.focus();
+            } else {
+                currentAdminTypeText.textContent = 'Seleccione un tipo de administrador';
+            }
+        });
+
+        // Mostrar/ocultar contraseña
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        });
+
+        // Función para filtrar tarjetas según el tipo de admin
+        function filterCardsByAdmin(adminType) {
+            ceoCards.forEach(card => {
+                const allowedAdmins = card.getAttribute('data-admin').split(',').map(num => num.trim());
+                if (allowedAdmins.includes(adminType.toString())) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
+                }
+            });
+        }
+
+        // Función de login
+        function login() {
+            const adminType = adminTypeSelect.value;
+            const password = passwordInput.value.trim();
+            
+            if (!adminType) {
+                errorMessage.textContent = 'Por favor seleccione un tipo de administrador';
+                errorMessage.classList.add('show');
+                adminTypeSelect.focus();
+                return;
+            }
+            
+            if (!password) {
+                errorMessage.textContent = 'Por favor ingrese la contraseña';
+                errorMessage.classList.add('show');
+                passwordInput.focus();
+                return;
+            }
+            
+            // Verificar contraseña
+            if (password === adminPasswords[adminType]) {
+                // Login exitoso
+                failedAttempts = 0;
+                currentAdminType = adminType;
+                
+                // Guardar sesión en localStorage
+                localStorage.setItem('toktokAdminSession', JSON.stringify({
+                    adminType: adminType,
+                    loginTime: Date.now()
+                }));
+                
+                // Filtrar tarjetas según el tipo de admin
+                filterCardsByAdmin(adminType);
+                
+                // Actualizar UI
+                currentAdminBadge.textContent = `ADMIN${adminType}`;
+                currentAdminText.textContent = `ADMIN${adminType} - ${adminNames[adminType]}`;
+                
+                // Mostrar dashboard y ocultar login
+                loginScreen.classList.add('hidden');
+                dashboardHeader.style.display = 'block';
+                mainContent.classList.add('show');
+                navBar.style.display = 'flex';
+                
+                // Cargar estadísticas
+                updateRealTimeStats();
+                
+                // Feedback visual
+                loginButton.innerHTML = '<i class="fas fa-check"></i> Acceso concedido';
+                loginButton.style.background = 'linear-gradient(135deg, var(--success), #059669)';
+                setTimeout(() => {
+                    loginButton.innerHTML = 'Acceder';
+                    loginButton.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+                }, 1500);
+                
+            } else {
+                // Login fallido
+                failedAttempts++;
+                errorMessage.textContent = `Contraseña incorrecta. Intentos restantes: ${maxAttempts - failedAttempts}`;
+                errorMessage.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
+                
+                // Efecto de vibración en input
+                passwordInput.style.animation = 'none';
+                setTimeout(() => {
+                    passwordInput.style.animation = 'shake 0.5s ease';
+                }, 10);
+                
+                // Bloquear después de máximo de intentos
+                if (failedAttempts >= maxAttempts) {
+                    loginButton.disabled = true;
+                    loginButton.innerHTML = 'BLOQUEADO';
+                    errorMessage.textContent = 'Demasiados intentos fallidos. El sistema ha sido bloqueado temporalmente.';
+                    setTimeout(() => {
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = 'Acceder';
+                        failedAttempts = 0;
+                        errorMessage.classList.remove('show');
+                    }, 30000); // Bloqueo por 30 segundos
+                }
+            }
+        }
+
+        // Evento de login
+        loginButton.addEventListener('click', login);
+
+        // Permitir login con Enter
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                login();
+            }
+        });
+
+        // Función de logout
+        logoutButton.addEventListener('click', function() {
+            // Limpiar sesión
+            localStorage.removeItem('toktokAdminSession');
+            
+            // Resetear UI
+            adminTypeSelect.value = '';
+            passwordInput.value = '';
+            passwordInput.type = 'password';
+            togglePassword.innerHTML = '<i class="far fa-eye"></i>';
+            errorMessage.classList.remove('show');
+            currentAdminTypeText.textContent = 'Seleccione un tipo de administrador';
+            
+            // Mostrar login y ocultar dashboard
+            loginScreen.classList.remove('hidden');
+            dashboardHeader.style.display = 'none';
+            mainContent.classList.remove('show');
+            navBar.style.display = 'none';
+            
+            // Mostrar todas las tarjetas nuevamente
+            ceoCards.forEach(card => card.classList.remove('hidden'));
+        });
+
+        // Verificar sesión al cargar la página
+        function checkSession() {
+            const session = localStorage.getItem('toktokAdminSession');
+            if (session) {
+                try {
+                    const sessionData = JSON.parse(session);
+                    const sessionTime = sessionData.loginTime;
+                    const currentTime = Date.now();
+                    const sessionAge = (currentTime - sessionTime) / (1000 * 60 * 60); // Horas
+                    
+                    // Si la sesión tiene menos de 8 horas, autologin
+                    if (sessionAge < 8) {
+                        currentAdminType = sessionData.adminType;
+                        filterCardsByAdmin(currentAdminType);
+                        currentAdminBadge.textContent = `ADMIN${currentAdminType}`;
+                        currentAdminText.textContent = `ADMIN${currentAdminType} - ${adminNames[currentAdminType]}`;
+                        
+                        loginScreen.classList.add('hidden');
+                        dashboardHeader.style.display = 'block';
+                        mainContent.classList.add('show');
+                        navBar.style.display = 'flex';
+                        updateRealTimeStats();
+                    } else {
+                        // Sesión expirada
+                        localStorage.removeItem('toktokAdminSession');
+                    }
+                } catch (e) {
+                    localStorage.removeItem('toktokAdminSession');
+                }
+            }
+        }
+
+        // Código existente para funcionalidades del dashboard
         // Precargar imágenes
         const logoImages = [
             'https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg',
@@ -718,7 +1157,7 @@
         });
         
         // Efecto táctil para tarjetas
-        document.querySelectorAll('.ceo-card').forEach(card => {
+        ceoCards.forEach(card => {
             card.addEventListener('touchstart', function() {
                 this.style.transform = 'translateY(-2px) scale(0.98)';
             });
@@ -749,20 +1188,6 @@
                 // Actualizar operatividad
                 const uptime = 95 + Math.random() * 5;
                 stats[2].textContent = `${uptime.toFixed(0)}%`;
-            }
-            
-            // Actualizar widgets
-            const widgetData = document.querySelectorAll('.widget-data');
-            if (widgetData.length >= 2) {
-                // Ingresos del día
-                const baseIncome = 24850;
-                const incomeVar = Math.floor(Math.random() * 300) - 150;
-                widgetData[0].textContent = `Bs ${(baseIncome + incomeVar).toLocaleString('es-ES')}`;
-                
-                // Transacciones
-                const baseTrans = 892;
-                const transVar = Math.floor(Math.random() * 50) - 25;
-                widgetData[1].textContent = (baseTrans + transVar).toLocaleString('es-ES');
             }
         }
         
@@ -835,11 +1260,9 @@
             console.log('Running in standalone mode');
             installButton.style.display = 'none';
         }
+
+        // Verificar sesión al cargar
+        window.addEventListener('load', checkSession);
     </script>
 </body>
 </html>
-
-
-
-
-
