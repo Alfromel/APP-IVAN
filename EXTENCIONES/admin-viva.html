@@ -2230,10 +2230,10 @@
                 });
             }
             
-            // CALCULAR ESTADÍSTICAS - MODIFICACIÓN SOLICITADA
-            // Total de recargas: NO contar los estados "ERROR" ni "FALTA"
+            // Calcular estadísticas - MODIFICACIÓN ESPECÍFICA
+            // Total de recargas: NO contar los estados "ERROR" - SOLO ESTO
             const totalRecargas = filteredByUser.filter(recharge => 
-                recharge.estado !== 'ERROR' && recharge.estado !== 'FALTA'
+                recharge.estado !== 'ERROR'
             ).length;
             
             // Contar por estado (estos se mantienen igual)
@@ -2241,20 +2241,20 @@
             const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
             const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
             
-            // Calcular hora pico - SOLO para recargas que NO sean "ERROR" ni "FALTA"
+            // Calcular hora pico - SOLO para recargas que NO sean "ERROR"
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que NO sean "ERROR" ni "FALTA"
+            // Preparar datos por hora (00-23) - solo para recargas que NO sean "ERROR"
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             filteredByUser.forEach(recharge => {
-                // Solo contar para hora pico si NO es "ERROR" ni "FALTA"
-                if (recharge.estado !== 'ERROR' && recharge.estado !== 'FALTA') {
+                // Solo contar para hora pico si NO es "ERROR"
+                if (recharge.estado !== 'ERROR') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
