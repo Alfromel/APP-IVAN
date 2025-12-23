@@ -2230,37 +2230,43 @@
                 });
             }
             
-            // Calcular estadísticas
-            const totalRecargas = filteredByUser.length;
+            // CALCULAR ESTADÍSTICAS - MODIFICACIÓN SOLICITADA
+            // Total de recargas: NO contar los estados "ERROR" ni "FALTA"
+            const totalRecargas = filteredByUser.filter(recharge => 
+                recharge.estado !== 'ERROR' && recharge.estado !== 'FALTA'
+            ).length;
             
-            // Contar por estado
+            // Contar por estado (estos se mantienen igual)
             const faltaCount = filteredByUser.filter(r => r.estado === 'FALTA').length;
             const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
             const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
             
-            // Calcular hora pico
+            // Calcular hora pico - SOLO para recargas que NO sean "ERROR" ni "FALTA"
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23)
+            // Preparar datos por hora (00-23) - solo para recargas que NO sean "ERROR" ni "FALTA"
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             filteredByUser.forEach(recharge => {
-                const timePart = recharge.timestamp.split(' ')[1];
-                if (timePart) {
-                    const hour = timePart.split(':')[0];
-                    hourlyData[hour] = (hourlyData[hour] || 0) + 1;
-                    
-                    // Actualizar conteo por hora para estadísticas
-                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-                    
-                    if (hourCounts[hour] > maxCount) {
-                        maxCount = hourCounts[hour];
-                        peakHour = hour + ':00';
+                // Solo contar para hora pico si NO es "ERROR" ni "FALTA"
+                if (recharge.estado !== 'ERROR' && recharge.estado !== 'FALTA') {
+                    const timePart = recharge.timestamp.split(' ')[1];
+                    if (timePart) {
+                        const hour = timePart.split(':')[0];
+                        hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+                        
+                        // Actualizar conteo por hora para estadísticas
+                        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                        
+                        if (hourCounts[hour] > maxCount) {
+                            maxCount = hourCounts[hour];
+                            peakHour = hour + ':00';
+                        }
                     }
                 }
             });
@@ -2704,4 +2710,3 @@
     </script>
 </body>
 </html>
-
