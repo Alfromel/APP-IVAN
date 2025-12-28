@@ -263,18 +263,18 @@
             color: white;
         }
         
-        .status-nuevo {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .status-corte {
+        .status-error {
             background-color: #dc3545;
             color: white;
         }
         
-        .status-error {
+        .status-corte {
             background-color: #ff6b00;
+            color: white;
+        }
+        
+        .status-novalido {
+            background-color: #6c757d;
             color: white;
         }
         
@@ -984,16 +984,16 @@
                         <div class="stat-label">Estado: Echo</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="nuevoCount">0</div>
-                        <div class="stat-label">Estado: Nuevo</div>
+                        <div class="stat-number" id="errorCount">0</div>
+                        <div class="stat-label">Estado: Error</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="corteCount">0</div>
                         <div class="stat-label">Estado: Corte</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="errorCount">0</div>
-                        <div class="stat-label">Estado: Error</div>
+                        <div class="stat-number" id="novalidoCount">0</div>
+                        <div class="stat-label">Estado: No Valido</div>
                     </div>
                 </div>
 
@@ -1100,7 +1100,7 @@
                                     </tr>
                                 </thead>
                                 <tbody id="rechargesTableBody">
-                                    <!-- Los datos se cargarán aquí -->
+                                    <!-- Los datos se cargará aquí -->
                                 </tbody>
                             </table>
                         </div>
@@ -1230,16 +1230,16 @@
                             <div class="user-stat-label">Estado: Echo</div>
                         </div>
                         <div class="user-stat-card">
-                            <div class="user-stat-number" id="userNuevoCount">0</div>
-                            <div class="user-stat-label">Estado: Nuevo</div>
+                            <div class="user-stat-number" id="userErrorCount">0</div>
+                            <div class="user-stat-label">Estado: Error</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userCorteCount">0</div>
                             <div class="user-stat-label">Estado: Corte</div>
                         </div>
                         <div class="user-stat-card">
-                            <div class="user-stat-number" id="userErrorCount">0</div>
-                            <div class="user-stat-label">Estado: Error</div>
+                            <div class="user-stat-number" id="userNovalidoCount">0</div>
+                            <div class="user-stat-label">Estado: No Valido</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userHourPeak">--:--</div>
@@ -1370,9 +1370,9 @@
                             <label for="editStatus" class="form-label">Estado</label>
                             <select class="form-select app-form-control" id="editStatus" required>
                                 <option value="ECHO">Echo</option>
-                                <option value="NUEVO">Nuevo</option>
-                                <option value="CORTE">Corte</option>
                                 <option value="ERROR">Error</option>
+                                <option value="CORTE">Corte</option>
+                                <option value="NO VALIDO">No Valido</option>
                             </select>
                         </div>
                     </form>
@@ -1430,8 +1430,8 @@
     
     <script>
         // Configuración de Supabase
-        const SUPABASE_URL = 'https://zrbhhiayfaedatwlzqch.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InpyYmhoaWF5ZmFlZGF0d2x6cWNoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjExMTcwMjgsImV4cCI6MjA3NjY5MzAyOH0.b97mGNErXGRuIorOPTf6m1awGlIyrXaAI4VS65aR-5o';
+        const SUPABASE_URL = 'https://iyowgljzuryeowyceaio.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_xr2MZ4YwV7zslfp9Wzs2WQ_aSfFX_87';
 
         let allRecharges = [];
         let allUsers = [];
@@ -1619,8 +1619,8 @@
         }
 
         function updateDashboardStats() {
-            // Total recargas (NO contar los ERROR) - SOLO CAMBIO AQUÍ
-            const totalRecargas = allRecharges.filter(r => r.estado !== 'ERROR').length;
+            // Total recargas (NO contar los NO VALIDO) - SOLO CAMBIO AQUÍ
+            const totalRecargas = allRecharges.filter(r => r.estado !== 'NO VALIDO').length;
             document.getElementById('totalRecharges').textContent = totalRecargas.toLocaleString();
             
             // Total usuarios
@@ -1628,14 +1628,14 @@
             
             // Contar por estado
             const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
-            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
             const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
+            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            const novalidoCount = allRecharges.filter(r => r.estado === 'NO VALIDO').length;
             
             document.getElementById('echoCount').textContent = echoCount.toLocaleString();
-            document.getElementById('nuevoCount').textContent = nuevoCount.toLocaleString();
-            document.getElementById('corteCount').textContent = corteCount.toLocaleString();
             document.getElementById('errorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('corteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('novalidoCount').textContent = novalidoCount.toLocaleString();
         }
 
         function updateRecentActivity() {
@@ -1646,9 +1646,9 @@
                 const dateTime = parseDateTime(recharge.timestamp);
                 let statusClass = '';
                 if (recharge.estado === 'ECHO') statusClass = 'status-echo';
-                else if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
-                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
                 else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+                else if (recharge.estado === 'NO VALIDO') statusClass = 'status-novalido';
                 
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
@@ -1669,10 +1669,10 @@
             try {
                 const tbody = document.getElementById('usersTableBody');
                 
-                // Contar recargas por usuario (NO contar los ERROR) - SOLO CAMBIO AQUÍ
+                // Contar recargas por usuario (NO contar los NO VALIDO) - SOLO CAMBIO AQUÍ
                 const userRechargeCounts = {};
                 allRecharges.forEach(recharge => {
-                    if (recharge.estado !== 'ERROR') {
+                    if (recharge.estado !== 'NO VALIDO') {
                         userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
                     }
                 });
@@ -1722,9 +1722,9 @@
                 const dateTime = parseDateTime(recharge.timestamp);
                 let statusClass = '';
                 if (recharge.estado === 'ECHO') statusClass = 'status-echo';
-                else if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
-                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
                 else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+                else if (recharge.estado === 'NO VALIDO') statusClass = 'status-novalido';
                 
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
@@ -1766,9 +1766,9 @@
             
             let statusClass = '';
             if (recharge.estado === 'ECHO') statusClass = 'status-echo';
-            else if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
-            else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
             else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+            else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+            else if (recharge.estado === 'NO VALIDO') statusClass = 'status-novalido';
             
             document.getElementById('rechargeDetailModalLabel').textContent = `Recarga #${recharge.id}`;
             
@@ -2058,6 +2058,8 @@
                 let command;
                 if (status === "CORTE") {
                     command = `*222*2*${phoneNumber}*19*1#`;
+                } else if (status === "NO VALIDO") {
+                    command = `*222*2*${phoneNumber}*21*1#`;
                 } else if (status === "ERROR") {
                     command = `*222*2*${phoneNumber}*21*1#`;
                 } else {
@@ -2348,10 +2350,10 @@
                 });
             }
             
-            // Contar recargas por usuario (NO contar los ERROR) - SOLO CAMBIO AQUÍ
+            // Contar recargas por usuario (NO contar los NO VALIDO) - SOLO CAMBIO AQUÍ
             const userRechargeCounts = {};
             filteredData.forEach(recharge => {
-                if (recharge.estado !== 'ERROR' && recharge.user_id && recharge.user_name) {
+                if (recharge.estado !== 'NO VALIDO' && recharge.user_id && recharge.user_name) {
                     userRechargeCounts[recharge.user_id] = {
                         name: recharge.user_name,
                         count: (userRechargeCounts[recharge.user_id]?.count || 0) + 1
@@ -2492,29 +2494,29 @@
                 });
             }
             
-            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LOS ERROR - SOLO CAMBIO AQUÍ
-            const totalRecargas = filteredByUser.filter(recharge => recharge.estado !== 'ERROR').length;
+            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LOS NO VALIDO - SOLO CAMBIO AQUÍ
+            const totalRecargas = filteredByUser.filter(recharge => recharge.estado !== 'NO VALIDO').length;
             
             // Contar por estado
             const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
-            const nuevoCount = filteredByUser.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
             const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
+            const corteCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
+            const novalidoCount = filteredByUser.filter(r => r.estado === 'NO VALIDO').length;
             
-            // Calcular hora pico (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
+            // Calcular hora pico (solo para recargas que no sean NO VALIDO) - SOLO CAMBIO AQUÍ
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que no sean ERROR - SOLO CAMBIO AQUÍ
+            // Preparar datos por hora (00-23) - solo para recargas que no sean NO VALIDO - SOLO CAMBIO AQUÍ
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             filteredByUser.forEach(recharge => {
-                // Solo contar para hora pico si NO es ERROR - SOLO CAMBIO AQUÍ
-                if (recharge.estado !== 'ERROR') {
+                // Solo contar para hora pico si NO es NO VALIDO - SOLO CAMBIO AQUÍ
+                if (recharge.estado !== 'NO VALIDO') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
@@ -2534,9 +2536,9 @@
             // Actualizar estadísticas en la interfaz
             document.getElementById('userTotalRecharges').textContent = totalRecargas.toLocaleString();
             document.getElementById('userEchoCount').textContent = echoCount.toLocaleString();
-            document.getElementById('userNuevoCount').textContent = nuevoCount.toLocaleString();
-            document.getElementById('userCorteCount').textContent = corteCount.toLocaleString();
             document.getElementById('userErrorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('userCorteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('userNovalidoCount').textContent = novalidoCount.toLocaleString();
             document.getElementById('userHourPeak').textContent = peakHour || '--:--';
             
             // Actualizar gráfico del usuario
@@ -2672,32 +2674,32 @@
             // Ocultar mensaje de no datos
             document.getElementById('noDataMessage').classList.add('d-none');
             
-            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LOS ERROR - SOLO CAMBIO AQUÍ
-            const totalRecargas = dayRecharges.filter(recharge => recharge.estado !== 'ERROR').length;
+            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LOS NO VALIDO - SOLO CAMBIO AQUÍ
+            const totalRecargas = dayRecharges.filter(recharge => recharge.estado !== 'NO VALIDO').length;
             
-            // Usuarios únicos (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
+            // Usuarios únicos (solo para recargas que no sean NO VALIDO) - SOLO CAMBIO AQUÍ
             const uniqueUsers = new Set();
             dayRecharges.forEach(recharge => {
-                if (recharge.estado !== 'ERROR') {
+                if (recharge.estado !== 'NO VALIDO') {
                     uniqueUsers.add(recharge.user_id);
                 }
             });
             const uniqueUsersCount = uniqueUsers.size;
             
-            // Hora pico (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
+            // Hora pico (solo para recargas que no sean NO VALIDO) - SOLO CAMBIO AQUÍ
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que no sean ERROR - SOLO CAMBIO AQUÍ
+            // Preparar datos por hora (00-23) - solo para recargas que no sean NO VALIDO - SOLO CAMBIO AQUÍ
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             dayRecharges.forEach(recharge => {
-                // Solo contar para estadísticas si NO es ERROR - SOLO CAMBIO AQUÍ
-                if (recharge.estado !== 'ERROR') {
+                // Solo contar para estadísticas si NO es NO VALIDO - SOLO CAMBIO AQUÍ
+                if (recharge.estado !== 'NO VALIDO') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
