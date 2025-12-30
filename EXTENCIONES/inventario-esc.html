@@ -628,7 +628,7 @@
                         </div>
                         <div class="stat-card">
                             <div class="stat-number text-warning" id="chipsPorVencer">0</div>
-                            <div class="stat-label">Por Vencer (30 días)</div>
+                            <div class="stat-label">Por Vencer (10 días)</div>
                         </div>
                         <div class="stat-card">
                             <div class="stat-number text-danger" id="chipsVencidos">0</div>
@@ -645,7 +645,7 @@
                         <div class="col-lg-6 mb-4">
                             <div class="app-card h-100">
                                 <div class="app-card-header d-flex justify-content-between align-items-center">
-                                    <span>Chips por Vencer (Próximos 30 días)</span>
+                                    <span>Chips por Vencer (Próximos 10 días)</span>
                                     <button class="btn btn-sm btn-outline-light" onclick="sistema.showSection('por-vencer')">
                                         Ver Todos
                                     </button>
@@ -731,9 +731,9 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="filter-section">
-                                    <div class="filter-section-title">Letra Categoría</div>
+                                    <div class="filter-section-title">Número de Casillero</div>
                                     <select class="form-select filter-change" id="filterLetraCategoria">
-                                        <option value="">Todas Letras</option>
+                                        <option value="">Todos Números</option>
                                     </select>
                                 </div>
                             </div>
@@ -774,7 +774,7 @@
                                             <th>Número</th>
                                             <th>Operadora</th>
                                             <th>ID Categoría</th>
-                                            <th>Letra Categoría</th>
+                                            <th>Número de Casillero</th>
                                             <th>Fecha Nac.</th>
                                             <th>Fecha Venc.</th>
                                             <th>Días Rest.</th>
@@ -834,9 +834,9 @@
                             </div>
                             <div class="col-md-3">
                                 <div class="filter-section">
-                                    <div class="filter-section-title">Letra Categoría</div>
+                                    <div class="filter-section-title">Número de Casillero</div>
                                     <select class="form-select filter-change-categoria" id="filterCategoriasLetra">
-                                        <option value="">Todas Letras</option>
+                                        <option value="">Todos Números</option>
                                     </select>
                                 </div>
                             </div>
@@ -872,7 +872,7 @@
                                     <thead>
                                         <tr>
                                             <th>ID Categoría</th>
-                                            <th>Letra</th>
+                                            <th>Número de Casillero</th>
                                             <th>Operadora</th>
                                             <th>Nombre</th>
                                             <th>Fecha Nac.</th>
@@ -1049,7 +1049,7 @@
                                 <input type="text" class="form-control" id="categoria_id" required>
                             </div>
                             <div class="col-md-6 mb-3">
-                                <label class="form-label">Letra *</label>
+                                <label class="form-label">Número de Casillero *</label>
                                 <input type="text" class="form-control" id="letra_categoria" maxlength="3" required>
                             </div>
                         </div>
@@ -1431,11 +1431,11 @@
                         chip.estado_display = this.determinarEstado(chip);
                     });
                     
-                    // Chips por vencer
+                    // Chips por vencer - CAMBIO: 10 días en lugar de 30
                     chipsPorVencer = allChips.filter(chip => 
                         chip.estado === 'ACTIVO' && 
                         chip.dias_restantes > 0 && 
-                        chip.dias_restantes <= 30
+                        chip.dias_restantes <= 10
                     ).sort((a, b) => a.dias_restantes - b.dias_restantes);
                     
                     return allChips;
@@ -1455,18 +1455,18 @@
                         <option value="${id}">${id}</option>
                     `).join('');
                 
-                // Filtro por letra de categoría (inventario)
+                // Filtro por número de casillero (inventario)
                 const filterLetraCategoria = document.getElementById('filterLetraCategoria');
                 const uniqueLetters = [...new Set(allCategories.map(cat => cat.letra_categoria))];
                 
-                filterLetraCategoria.innerHTML = '<option value="">Todas Letras</option>' +
+                filterLetraCategoria.innerHTML = '<option value="">Todos Números</option>' +
                     uniqueLetters.sort().map(letra => `
                         <option value="${letra}">${letra}</option>
                     `).join('');
                 
-                // Filtro por letra de categoría (categorías)
+                // Filtro por número de casillero (categorías)
                 const filterCategoriasLetra = document.getElementById('filterCategoriasLetra');
-                filterCategoriasLetra.innerHTML = '<option value="">Todas Letras</option>' +
+                filterCategoriasLetra.innerHTML = '<option value="">Todos Números</option>' +
                     uniqueLetters.sort().map(letra => `
                         <option value="${letra}">${letra}</option>
                     `).join('');
@@ -1626,7 +1626,7 @@
                 const dias = this.calcularDiasRestantes(chip.fecha_vencimiento);
                 if (dias <= 0) return 'VENCIDO';
                 if (dias <= 7) return 'CRITICO';
-                if (dias <= 30) return 'POR_VENCER';
+                if (dias <= 10) return 'POR_VENCER'; // CAMBIO: 10 días en lugar de 30
                 if (chip.designado_a) return 'DESIGNADO';
                 return 'ACTIVO';
             }
@@ -1832,7 +1832,7 @@
                     const estado = this.determinarEstado(chip);
                     const diasColor = chip.dias_restantes <= 0 ? 'text-danger' : 
                                    chip.dias_restantes <= 7 ? 'text-danger' : 
-                                   chip.dias_restantes <= 30 ? 'text-warning' : 'text-success';
+                                   chip.dias_restantes <= 10 ? 'text-warning' : 'text-success';
                     
                     return `
                     <tr>
@@ -1907,7 +1907,7 @@
                         if (!categoria || categoria.categoria_id !== categoriaId) return false;
                     }
                     
-                    // Filtro por letra de categoría
+                    // Filtro por número de casillero
                     if (letraCategoria) {
                         const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                         if (!categoria || categoria.letra_categoria !== letraCategoria) return false;
@@ -1966,6 +1966,9 @@
                                 <button class="btn btn-outline-primary" onclick="sistema.editCategory(${categoria.id})">
                                     <i class="bi bi-pencil"></i>
                                 </button>
+                                <button class="btn btn-outline-info" onclick="sistema.reactivarCategoria(${categoria.id})" title="Reactivar">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
                                 <button class="btn btn-outline-danger" onclick="sistema.deleteCategory(${categoria.id})" ${chipsCount > 0 ? 'disabled' : ''}>
                                     <i class="bi bi-trash"></i>
                                 </button>
@@ -1993,7 +1996,7 @@
                     // Filtro por ID de categoría
                     if (categoriaId && !categoria.categoria_id.toLowerCase().includes(categoriaId)) return false;
                     
-                    // Filtro por letra de categoría
+                    // Filtro por número de casillero
                     if (letraCategoria && categoria.letra_categoria !== letraCategoria) return false;
                     
                     // Filtro por búsqueda general
@@ -2011,6 +2014,117 @@
                     
                     return true;
                 });
+            }
+
+            // NUEVO MÉTODO: Reactivar categoría
+            async reactivarCategoria(categoryId) {
+                const categoria = allCategories.find(cat => cat.id === categoryId);
+                if (!categoria) return;
+                
+                const chipsEnCategoria = allChips.filter(chip => chip.categoria_id === categoryId);
+                const hoy = new Date();
+                const fechaActivacion = hoy.toISOString().split('T')[0];
+                
+                // Determinar días de vencimiento según operadora
+                let diasVencimiento;
+                if (categoria.operadora === 'VIVA') {
+                    diasVencimiento = 120;
+                } else {
+                    diasVencimiento = 90; // Para ENTEL y TIGO
+                }
+                
+                const fechaVencimiento = new Date(hoy);
+                fechaVencimiento.setDate(hoy.getDate() + diasVencimiento);
+                
+                const result = await Swal.fire({
+                    title: '¿Reactivar categoría?',
+                    html: `
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Información:</strong><br>
+                            • Operadora: ${categoria.operadora}<br>
+                            • Días de vencimiento: ${diasVencimiento} días<br>
+                            • Chips en esta categoría: ${chipsEnCategoria.length}<br>
+                            • Nueva fecha de vencimiento: ${fechaVencimiento.toLocaleDateString('es-ES')}
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Observaciones (opcional)</label>
+                            <textarea class="form-control" id="reactivarObservaciones" rows="2" placeholder="Ej: Categoría reactivada por renovación de contrato"></textarea>
+                        </div>
+                    `,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, reactivar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#3085d6'
+                });
+                
+                if (!result.isConfirmed) return;
+                
+                const observaciones = document.getElementById('reactivarObservaciones').value.trim();
+                
+                try {
+                    // Actualizar la categoría
+                    const updateCategoriaResponse = await fetch(
+                        `${SUPABASE_URL}/rest/v1/chip_categories?id=eq.${categoryId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                fecha_activacion: fechaActivacion,
+                                fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                                dias_vencimiento: diasVencimiento,
+                                observaciones: observaciones ? 
+                                    (categoria.observaciones ? `${categoria.observaciones}\n${new Date().toLocaleDateString()}: ${observaciones}` : 
+                                    `${new Date().toLocaleDateString()}: ${observaciones}`) : 
+                                    categoria.observaciones
+                            })
+                        }
+                    );
+                    
+                    if (!updateCategoriaResponse.ok) {
+                        throw new Error('Error actualizando categoría');
+                    }
+                    
+                    // Actualizar todos los chips de esta categoría
+                    if (chipsEnCategoria.length > 0) {
+                        const chipsUpdatePromises = chipsEnCategoria.map(chip => 
+                            fetch(
+                                `${SUPABASE_URL}/rest/v1/chip_inventory?id=eq.${chip.id}`,
+                                {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'apikey': SUPABASE_KEY,
+                                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                        'Prefer': 'return=minimal'
+                                    },
+                                    body: JSON.stringify({
+                                        fecha_activacion: fechaActivacion,
+                                        fecha_uso: fechaActivacion,
+                                        fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                                        estado: 'ACTIVO'
+                                    })
+                                }
+                            )
+                        );
+                        
+                        await Promise.all(chipsUpdatePromises);
+                    }
+                    
+                    // Recargar datos
+                    await this.loadAllData();
+                    
+                    this.showAlert('Éxito', `Categoría reactivada correctamente. ${chipsEnCategoria.length} chips actualizados.`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error reactivando categoría:', error);
+                    this.showAlert('Error', 'No se pudo reactivar la categoría', 'error');
+                }
             }
 
             clearFiltersInventario() {
@@ -2038,7 +2152,7 @@
                         <div class="text-center py-5">
                             <i class="bi bi-check-circle display-4 text-success mb-3"></i>
                             <h4>No hay chips por vencer</h4>
-                            <p class="text-muted">No hay chips que venzan en los próximos 30 días</p>
+                            <p class="text-muted">No hay chips que venzan en los próximos 10 días</p>
                         </div>
                     `;
                     return;
@@ -2640,7 +2754,7 @@
                         'Número Chip': chip.numero_chip,
                         'Operadora': chip.operadora,
                         'ID Categoría': categoria?.categoria_id || 'N/A',
-                        'Letra Categoría': categoria?.letra_categoria || 'N/A',
+                        'Número de Casillero': categoria?.letra_categoria || 'N/A',
                         'Categoría': categoria?.nombre || 'N/A',
                         'Fecha Nacimiento': chip.fecha_activacion,
                         'Fecha Vencimiento': chip.fecha_vencimiento,
@@ -2661,7 +2775,7 @@
                     {wch: 15}, // Número Chip
                     {wch: 10}, // Operadora
                     {wch: 15}, // ID Categoría
-                    {wch: 15}, // Letra Categoría
+                    {wch: 20}, // Número de Casillero
                     {wch: 20}, // Categoría
                     {wch: 15}, // Fecha Nacimiento
                     {wch: 15}, // Fecha Vencimiento
@@ -2689,7 +2803,7 @@
                     
                     return {
                         'ID Categoría': cat.categoria_id,
-                        'Letra': cat.letra_categoria,
+                        'Número de Casillero': cat.letra_categoria,
                         'Operadora': cat.operadora,
                         'Nombre Categoría': cat.nombre,
                         'Fecha Nacimiento': cat.fecha_activacion,
@@ -2706,7 +2820,7 @@
                 
                 // Ajustar anchos de columna
                 const wscols = [
-                    {wch: 15}, {wch: 10}, {wch: 10}, {wch: 25},
+                    {wch: 15}, {wch: 20}, {wch: 10}, {wch: 25},
                     {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
                     {wch: 30}
                 ];
@@ -2926,7 +3040,7 @@
                         'Número Chip': chip.numero_chip,
                         'Operadora': chip.operadora,
                         'ID Categoría': categoria?.categoria_id || 'N/A',
-                        'Letra Categoría': categoria?.letra_categoria || 'N/A',
+                        'Número de Casillero': categoria?.letra_categoria || 'N/A',
                         'Categoría': categoria?.nombre || 'N/A',
                         'Fecha Nacimiento': chip.fecha_activacion,
                         'Fecha Vencimiento': chip.fecha_vencimiento,
@@ -2946,7 +3060,7 @@
                     {wch: 15}, // Número Chip
                     {wch: 10}, // Operadora
                     {wch: 15}, // ID Categoría
-                    {wch: 15}, // Letra Categoría
+                    {wch: 20}, // Número de Casillero
                     {wch: 20}, // Categoría
                     {wch: 15}, // Fecha Nacimiento
                     {wch: 15}, // Fecha Vencimiento
@@ -2968,7 +3082,7 @@
 
             exportToCSV() {
                 const csvContent = [
-                    ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Letra Categoría', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
+                    ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Número de Casillero', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
                     ...allChips.map(chip => {
                         const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                         const estado = this.determinarEstado(chip);
@@ -3006,7 +3120,7 @@
                     
                     return {
                         'ID Categoría': cat.categoria_id,
-                        'Letra': cat.letra_categoria,
+                        'Número de Casillero': cat.letra_categoria,
                         'Operadora': cat.operadora,
                         'Nombre Categoría': cat.nombre,
                         'Fecha Nacimiento': cat.fecha_activacion,
@@ -3022,7 +3136,7 @@
                 XLSX.utils.book_append_sheet(workbook, worksheet, "Categorías");
                 
                 const wscols = [
-                    {wch: 15}, {wch: 10}, {wch: 10}, {wch: 25},
+                    {wch: 15}, {wch: 20}, {wch: 10}, {wch: 25},
                     {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
                     {wch: 30}
                 ];
@@ -3089,7 +3203,7 @@
                         'Número Chip': chip.numero_chip,
                         'Operadora': chip.operadora,
                         'ID Categoría': categoria?.categoria_id || 'N/A',
-                        'Letra Categoría': categoria?.letra_categoria || 'N/A',
+                        'Número de Casillero': categoria?.letra_categoria || 'N/A',
                         'Categoría': categoria?.nombre || 'N/A',
                         'Fecha Vencimiento': chip.fecha_vencimiento,
                         'Días Restantes': chip.dias_restantes,
@@ -3104,7 +3218,7 @@
                 
                 const wscols = [
                     {wch: 5}, {wch: 15}, {wch: 10}, {wch: 15},
-                    {wch: 15}, {wch: 20}, {wch: 15}, {wch: 15},
+                    {wch: 20}, {wch: 20}, {wch: 15}, {wch: 15},
                     {wch: 25}, {wch: 15}
                 ];
                 worksheet['!cols'] = wscols;
@@ -3172,7 +3286,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mensaje</label>
-                            <textarea class="form-control" id="alertMessage" rows="3">Hay ${chipsPorVencer.length} chips por vencer en los próximos 30 días. Por favor revisar el sistema de inventario.</textarea>
+                            <textarea class="form-control" id="alertMessage" rows="3">Hay ${chipsPorVencer.length} chips por vencer en los próximos 10 días. Por favor revisar el sistema de inventario.</textarea>
                         </div>
                     `,
                     showCancelButton: true,
@@ -3240,4 +3354,3 @@
     </script>
 </body>
 </html>
-
