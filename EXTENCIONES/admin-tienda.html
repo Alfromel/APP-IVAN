@@ -1183,6 +1183,9 @@
         let dailySalesChart = null;
         let topProductsChart = null;
 
+        // Mapa para almacenar usuarios por ID para búsquedas rápidas
+        let usersMap = new Map();
+
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminApp();
         });
@@ -1343,7 +1346,7 @@
                     allProducts = [];
                 }
                 
-                // Cargar ventas de la sucursal - MODIFICADO: ya no usamos created_at sino fecha_hora
+                // Cargar ventas de la sucursal
                 const salesResponse = await fetch(
                     `${SUPABASE_URL}/rest/v1/sales?branch_id=eq.${currentBranch.id}&order=fecha_hora.desc`,
                     {
@@ -1357,9 +1360,10 @@
                 if (!salesResponse.ok) throw new Error('Error al cargar ventas');
                 allSales = await salesResponse.json();
                 
-                // Cargar usuarios de esta sucursal
+                // Cargar TODOS los usuarios (no solo de esta sucursal) para poder relacionar con ventas
+                // Esto es importante porque user_id en sales puede referenciar usuarios de cualquier sucursal
                 const usersResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/users?branch_id=eq.${currentBranch.id}&order=nombre.asc`,
+                    `${SUPABASE_URL}/rest/v1/users?order=nombre.asc`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1371,14 +1375,36 @@
                 if (!usersResponse.ok) throw new Error('Error al cargar usuarios');
                 allUsers = await usersResponse.json();
                 
+                // Crear mapa de usuarios para búsquedas rápidas
+                usersMap.clear();
+                allUsers.forEach(user => {
+                    usersMap.set(user.id, user);
+                });
+                
+                // Cargar usuarios de esta sucursal específicamente (para filtros)
+                const branchUsersResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/users?branch_id=eq.${currentBranch.id}&order=nombre.asc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                let branchUsers = [];
+                if (branchUsersResponse.ok) {
+                    branchUsers = await branchUsersResponse.json();
+                }
+                
                 // Actualizar todas las vistas
                 updateDashboard();
                 displayProducts();
                 displaySales(allSales);
-                populateFilters();
+                populateFilters(branchUsers);
                 
                 // Actualizar filtro de vendedores en la sección de caja
-                updateCashUserFilter();
+                updateCashUserFilter(branchUsers);
                 
             } catch (error) {
                 console.error('Error al cargar datos de sucursal:', error);
@@ -1410,7 +1436,7 @@
             // Productos con stock bajo
             updateLowStockTable();
             
-            // Últimas ventas - MODIFICADO: usar fecha_hora en lugar de created_at
+            // Últimas ventas
             updateRecentSalesTable();
         }
 
@@ -1462,30 +1488,29 @@
             const recentSales = allSales.slice(0, 10);
             
             tbody.innerHTML = recentSales.map(sale => {
-                // Buscar vendedor
-                const seller = allUsers.find(u => u.id === sale.user_id);
-                const sellerName = seller ? seller.nombre : 'Desconocido';
+                // Buscar vendedor en el mapa de usuarios usando user_id
+                const seller = usersMap.get(sale.user_id);
+                const sellerName = seller ? seller.nombre : `Usuario ${sale.user_id}`;
+                const sellerDetails = seller ? `${seller.nombre} (${seller.username || 'Sin usuario'})` : `ID: ${sale.user_id}`;
                 
                 // Parsear productos
                 let total = 0;
-                let itemCount = 0;
                 try {
                     if (sale.products) {
                         const products = JSON.parse(sale.products);
                         total = products.reduce((sum, p) => sum + p.subtotal, 0);
-                        itemCount = products.reduce((sum, p) => sum + p.quantity, 0);
                     }
                 } catch (e) {
                     console.error('Error parsing sale:', e);
                 }
                 
-                // Formatear fecha - MODIFICADO: usar fecha_hora en lugar de created_at
+                // Formatear fecha
                 const fechaHora = sale.fecha_hora || sale.created_at || new Date().toLocaleString('es-ES');
                 
                 return `
                 <tr>
                     <td>#${sale.id}</td>
-                    <td>${sellerName}</td>
+                    <td title="${sellerDetails}">${sellerName}</td>
                     <td class="money">${total.toFixed(2)}</td>
                     <td>${fechaHora}</td>
                 </tr>
@@ -1600,9 +1625,11 @@
             }
             
             tbody.innerHTML = sales.map(sale => {
-                // Buscar vendedor
-                const seller = allUsers.find(u => u.id === sale.user_id);
-                const sellerName = seller ? seller.nombre : 'Desconocido';
+                // Buscar vendedor en el mapa de usuarios usando user_id
+                const seller = usersMap.get(sale.user_id);
+                const sellerName = seller ? seller.nombre : `Usuario ${sale.user_id}`;
+                const sellerUsername = seller ? seller.username : 'Sin usuario';
+                const sellerRole = seller ? seller.rol : 'Desconocido';
                 
                 // Parsear productos vendidos
                 let productsList = 'No hay productos';
@@ -1622,13 +1649,16 @@
                     console.error('Error parsing sale:', e);
                 }
                 
-                // Formatear fecha - MODIFICADO: usar fecha_hora en lugar de created_at
+                // Formatear fecha
                 const fechaHora = sale.fecha_hora || sale.created_at || new Date().toLocaleString('es-ES');
                 
                 return `
                 <tr>
                     <td>#${sale.id}</td>
-                    <td>${sellerName}</td>
+                    <td>
+                        <strong>${sellerName}</strong>
+                        <br><small class="text-muted">Usuario: ${sellerUsername} | Rol: ${sellerRole}</small>
+                    </td>
                     <td>${productsList}</td>
                     <td>${totalQuantity}</td>
                     <td class="money fw-bold">${totalAmount.toFixed(2)}</td>
@@ -1638,30 +1668,52 @@
             }).join('');
         }
 
-        function populateFilters() {
+        function populateFilters(branchUsers) {
             // Filtro de usuarios en ventas
             const userFilter = document.getElementById('salesUserFilter');
             userFilter.innerHTML = '<option value="">Todos los vendedores</option>';
             
-            allUsers.forEach(user => {
+            // Usar branchUsers (usuarios de esta sucursal) para el filtro
+            branchUsers.forEach(user => {
                 const option = document.createElement('option');
                 option.value = user.id;
                 option.textContent = user.nombre;
                 userFilter.appendChild(option);
             });
+            
+            // Si no hay usuarios en esta sucursal, mostrar usuarios generales
+            if (branchUsers.length === 0) {
+                allUsers.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.nombre;
+                    userFilter.appendChild(option);
+                });
+            }
         }
 
-        function updateCashUserFilter() {
+        function updateCashUserFilter(branchUsers) {
             // Filtro de usuarios en caja
             const cashUserFilter = document.getElementById('cashUserFilter');
             cashUserFilter.innerHTML = '<option value="">Todos los vendedores</option>';
             
-            allUsers.forEach(user => {
+            // Usar branchUsers (usuarios de esta sucursal) para el filtro
+            branchUsers.forEach(user => {
                 const option = document.createElement('option');
                 option.value = user.id;
                 option.textContent = user.nombre;
                 cashUserFilter.appendChild(option);
             });
+            
+            // Si no hay usuarios en esta sucursal, mostrar usuarios generales
+            if (branchUsers.length === 0) {
+                allUsers.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.nombre;
+                    cashUserFilter.appendChild(option);
+                });
+            }
         }
 
         function calculateCashByUser() {
@@ -1673,11 +1725,11 @@
                 return;
             }
             
-            // Filtrar ventas por fecha seleccionada - MEJORADO
+            // Filtrar ventas por fecha seleccionada
             const filteredSales = allSales.filter(sale => {
                 if (!sale.fecha_hora) return false;
                 
-                // Función mejorada para extraer la fecha de fecha_hora
+                // Extraer fecha de fecha_hora
                 const saleDateStr = extractDateFromFechaHora(sale.fecha_hora);
                 if (!saleDateStr) return false;
                 
@@ -1697,10 +1749,12 @@
                 const userId = sale.user_id;
                 
                 if (!salesByUser[userId]) {
-                    // Buscar información del usuario
-                    const user = allUsers.find(u => u.id === userId);
+                    // Buscar información del usuario en el mapa
+                    const user = usersMap.get(userId);
                     salesByUser[userId] = {
-                        userName: user ? user.nombre : 'Desconocido',
+                        userName: user ? user.nombre : `Usuario ${userId}`,
+                        username: user ? user.username : 'Sin usuario',
+                        rol: user ? user.rol : 'Desconocido',
                         totalSales: 0,
                         salesCount: 0,
                         productsSold: 0,
@@ -1791,7 +1845,7 @@
                 <tr>
                     <td>
                         <strong>${userData.userName}</strong>
-                        <br><small class="text-muted">ID: ${Object.keys(salesByUser).find(key => salesByUser[key] === userData)}</small>
+                        <br><small class="text-muted">Usuario: ${userData.username} | Rol: ${userData.rol}</small>
                     </td>
                     <td class="money fw-bold">${userData.totalSales.toFixed(2)}</td>
                     <td>${userData.salesCount} ventas</td>
@@ -1877,7 +1931,7 @@
             
             let filtered = allSales;
             
-            // Filtrar por fecha - MEJORADO
+            // Filtrar por fecha
             if (dateFilter) {
                 filtered = filtered.filter(sale => {
                     if (!sale.fecha_hora) return false;
@@ -1903,7 +1957,7 @@
                     message += '<br><small class="text-muted">';
                     if (dateFilter) message += `Fecha: ${dateFilter} `;
                     if (userFilter) {
-                        const user = allUsers.find(u => u.id == userFilter);
+                        const user = usersMap.get(parseInt(userFilter));
                         message += `Vendedor: ${user ? user.nombre : userFilter}`;
                     }
                     message += '</small>';
@@ -2632,7 +2686,6 @@
             } else if (section === 'caja') {
                 // Establecer fecha actual por defecto
                 document.getElementById('cashDateFilter').valueAsDate = new Date();
-                updateCashUserFilter();
             }
         }
 
@@ -2884,7 +2937,7 @@
         function createDailySalesChart() {
             const ctx = document.getElementById('dailySalesChart').getContext('2d');
             
-            // Agrupar ventas por día para la sucursal actual - MODIFICADO: usar fecha_hora
+            // Agrupar ventas por día para la sucursal actual
             const salesByDay = {};
             allSales.forEach(sale => {
                 if (!sale.fecha_hora) return;
@@ -3168,4 +3221,3 @@
     </script>
 </body>
 </html>
-
