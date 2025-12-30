@@ -973,7 +973,7 @@
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-number" id="totalRecharges">0</div>
-                        <div class="stat-label">Total Recargas</div>
+                        <div class="stat-label">Total Recargas (sin NO VALIDO)</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="totalUsers">0</div>
@@ -993,7 +993,7 @@
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="novalidoCount">0</div>
-                        <div class="stat-label">Estado: No Valido</div>
+                        <div class="stat-label">Estado: No Valido (no cuenta)</div>
                     </div>
                 </div>
 
@@ -1045,7 +1045,7 @@
                                     <tr>
                                         <th>Usuario</th>
                                         <th>Nombre</th>
-                                        <th>Recargas</th>
+                                        <th>Recargas (sin NO VALIDO)</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -1135,7 +1135,7 @@
                             <div class="day-stats-grid" id="dayStats">
                                 <div class="day-stat-card">
                                     <div class="day-stat-number" id="totalDayRecharges">0</div>
-                                    <div class="day-stat-label">Total Recargas</div>
+                                    <div class="day-stat-label">Total Recargas (sin NO VALIDO)</div>
                                 </div>
                                 <div class="day-stat-card">
                                     <div class="day-stat-number" id="uniqueUsersDay">0</div>
@@ -1153,7 +1153,7 @@
                 <!-- Gráfico principal de recargas por hora -->
                 <div class="app-card">
                     <div class="app-card-header">
-                        Recargas por Hora
+                        Recargas por Hora (sin NO VALIDO)
                     </div>
                     <div class="app-card-body">
                         <div class="chart-container-large">
@@ -1168,7 +1168,7 @@
 
                 <!-- Estadísticas por hora -->
                 <div class="hourly-stats" id="hourlyStats" style="display: none;">
-                    <h5>Detalle por Hora</h5>
+                    <h5>Detalle por Hora (sin NO VALIDO)</h5>
                     <div class="hour-list" id="hourList">
                         <!-- Las horas se cargarán aquí -->
                     </div>
@@ -1177,14 +1177,14 @@
                 <!-- NUEVO: Gráfico de usuarios por recargas -->
                 <div class="users-chart-container">
                     <div class="users-chart-header">
-                        <h5><i class="bi bi-people-fill me-2"></i>Recargas por Usuario</h5>
+                        <h5><i class="bi bi-people-fill me-2"></i>Recargas por Usuario (sin NO VALIDO)</h5>
                         <small class="text-muted" id="usersChartDate">Total general</small>
                     </div>
                     <div class="users-chart-body">
                         <canvas id="usersChart"></canvas>
                     </div>
                     <div class="users-chart-footer">
-                        <h6>Top 10 Usuarios</h6>
+                        <h6>Top 10 Usuarios (sin NO VALIDO)</h6>
                         <div class="top-users-list" id="topUsersList">
                             <!-- Top usuarios se cargarán aquí -->
                         </div>
@@ -1223,7 +1223,7 @@
                     <div class="user-stats-grid" id="userStatsGrid">
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userTotalRecharges">0</div>
-                            <div class="user-stat-label">Total Recargas</div>
+                            <div class="user-stat-label">Total Recargas (sin NO VALIDO)</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userEchoCount">0</div>
@@ -1239,7 +1239,7 @@
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userNovalidoCount">0</div>
-                            <div class="user-stat-label">Estado: No Valido</div>
+                            <div class="user-stat-label">Estado: No Valido (no cuenta)</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userHourPeak">--:--</div>
@@ -1250,7 +1250,7 @@
                     <!-- Gráfico del usuario -->
                     <div class="app-card mt-3">
                         <div class="app-card-header">
-                            Actividad por Hora del Usuario
+                            Actividad por Hora del Usuario (sin NO VALIDO)
                         </div>
                         <div class="app-card-body">
                             <div class="chart-container-large">
@@ -1265,7 +1265,7 @@
                     
                     <!-- Detalle por hora del usuario -->
                     <div class="user-stats-details mt-3" id="userHourlyDetails" style="display: none;">
-                        <h6>Detalle por Hora</h6>
+                        <h6>Detalle por Hora (sin NO VALIDO)</h6>
                         <div id="userHourList">
                             <!-- Las horas se cargarán aquí -->
                         </div>
@@ -1439,7 +1439,7 @@
         let autoRefreshInterval;
         let hourlyChart;
         let userHourlyChart;
-        let usersChart; // NUEVA: Gráfico de usuarios por recargas
+        let usersChart;
         let availableDays = [];
         let selectedDay = '';
         let selectedUserId = '';
@@ -1497,7 +1497,7 @@
             document.getElementById('dayFilter').addEventListener('change', function() {
                 selectedDay = this.value;
                 updateDayStatistics();
-                updateUsersChart(); // NUEVO: Actualizar gráfico de usuarios cuando cambia el día
+                updateUsersChart();
             });
 
             // Configurar filtros para estadísticas por usuario
@@ -1575,7 +1575,7 @@
         async function fetchAllRecharges() {
             let allRecharges = [];
             let page = 0;
-            const limit = 1000; // Máximo por página según Supabase
+            const limit = 1000;
             let hasMoreData = true;
             
             try {
@@ -1602,7 +1602,6 @@
                         allRecharges = allRecharges.concat(pageData);
                         page++;
                         
-                        // Si obtenemos menos de 'limit' registros, significa que hemos llegado al final
                         if (pageData.length < limit) {
                             hasMoreData = false;
                         }
@@ -1619,14 +1618,16 @@
         }
 
         function updateDashboardStats() {
-            // Total recargas (NO contar los NO VALIDO) - SOLO CAMBIO AQUÍ
-            const totalRecargas = allRecharges.filter(r => r.estado !== 'NO VALIDO').length;
+            // Total recargas - NO CONTAR LOS "NO VALIDO" - SOLO ECHO, ERROR Y CORTE
+            const totalRecargas = allRecharges.filter(r => 
+                r.estado === 'ECHO' || r.estado === 'ERROR' || r.estado === 'CORTE'
+            ).length;
             document.getElementById('totalRecharges').textContent = totalRecargas.toLocaleString();
             
             // Total usuarios
             document.getElementById('totalUsers').textContent = allUsers.length;
             
-            // Contar por estado
+            // Contar por estado - TODOS LOS ESTADOS
             const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
             const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
@@ -1669,10 +1670,10 @@
             try {
                 const tbody = document.getElementById('usersTableBody');
                 
-                // Contar recargas por usuario (NO contar los NO VALIDO) - SOLO CAMBIO AQUÍ
+                // Contar recargas por usuario - NO CONTAR LOS "NO VALIDO" - SOLO ECHO, ERROR Y CORTE
                 const userRechargeCounts = {};
                 allRecharges.forEach(recharge => {
-                    if (recharge.estado !== 'NO VALIDO') {
+                    if (recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE') {
                         userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
                     }
                 });
@@ -2242,7 +2243,7 @@
                 selectedDay = availableDays[0].value;
                 document.getElementById('dayFilter').value = selectedDay;
                 updateDayStatistics();
-                updateUsersChart(); // NUEVO: Actualizar gráfico de usuarios
+                updateUsersChart();
             } else {
                 // Mostrar mensaje de no datos
                 document.getElementById('noDataMessage').classList.remove('d-none');
@@ -2279,7 +2280,7 @@
             const uniqueDays = new Set();
             
             allRecharges.forEach(recharge => {
-                const datePart = recharge.timestamp.split(' ')[0]; // Obtener solo la fecha
+                const datePart = recharge.timestamp.split(' ')[0];
                 uniqueDays.add(datePart);
             });
             
@@ -2350,10 +2351,10 @@
                 });
             }
             
-            // Contar recargas por usuario (NO contar los NO VALIDO) - SOLO CAMBIO AQUÍ
+            // Contar recargas por usuario - NO CONTAR LOS "NO VALIDO" - SOLO ECHO, ERROR Y CORTE
             const userRechargeCounts = {};
             filteredData.forEach(recharge => {
-                if (recharge.estado !== 'NO VALIDO' && recharge.user_id && recharge.user_name) {
+                if ((recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE') && recharge.user_id && recharge.user_name) {
                     userRechargeCounts[recharge.user_id] = {
                         name: recharge.user_name,
                         count: (userRechargeCounts[recharge.user_id]?.count || 0) + 1
@@ -2494,29 +2495,31 @@
                 });
             }
             
-            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LOS NO VALIDO - SOLO CAMBIO AQUÍ
-            const totalRecargas = filteredByUser.filter(recharge => recharge.estado !== 'NO VALIDO').length;
+            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LOS "NO VALIDO" - SOLO ECHO, ERROR Y CORTE
+            const totalRecargas = filteredByUser.filter(recharge => 
+                recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE'
+            ).length;
             
-            // Contar por estado
+            // Contar por estado - TODOS LOS ESTADOS
             const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
             const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
             const corteCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
             const novalidoCount = filteredByUser.filter(r => r.estado === 'NO VALIDO').length;
             
-            // Calcular hora pico (solo para recargas que no sean NO VALIDO) - SOLO CAMBIO AQUÍ
+            // Calcular hora pico - solo para recargas que sean ECHO, ERROR o CORTE (NO NO VALIDO)
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que no sean NO VALIDO - SOLO CAMBIO AQUÍ
+            // Preparar datos por hora (00-23) - solo para recargas que sean ECHO, ERROR o CORTE
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             filteredByUser.forEach(recharge => {
-                // Solo contar para hora pico si NO es NO VALIDO - SOLO CAMBIO AQUÍ
-                if (recharge.estado !== 'NO VALIDO') {
+                // Solo contar para hora pico si es ECHO, ERROR o CORTE (NO NO VALIDO)
+                if (recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
@@ -2674,32 +2677,34 @@
             // Ocultar mensaje de no datos
             document.getElementById('noDataMessage').classList.add('d-none');
             
-            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LOS NO VALIDO - SOLO CAMBIO AQUÍ
-            const totalRecargas = dayRecharges.filter(recharge => recharge.estado !== 'NO VALIDO').length;
+            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LOS "NO VALIDO" - SOLO ECHO, ERROR Y CORTE
+            const totalRecargas = dayRecharges.filter(recharge => 
+                recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE'
+            ).length;
             
-            // Usuarios únicos (solo para recargas que no sean NO VALIDO) - SOLO CAMBIO AQUÍ
+            // Usuarios únicos - solo para recargas que sean ECHO, ERROR o CORTE (NO NO VALIDO)
             const uniqueUsers = new Set();
             dayRecharges.forEach(recharge => {
-                if (recharge.estado !== 'NO VALIDO') {
+                if (recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE') {
                     uniqueUsers.add(recharge.user_id);
                 }
             });
             const uniqueUsersCount = uniqueUsers.size;
             
-            // Hora pico (solo para recargas que no sean NO VALIDO) - SOLO CAMBIO AQUÍ
+            // Hora pico - solo para recargas que sean ECHO, ERROR o CORTE (NO NO VALIDO)
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que no sean NO VALIDO - SOLO CAMBIO AQUÍ
+            // Preparar datos por hora (00-23) - solo para recargas que sean ECHO, ERROR o CORTE
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             dayRecharges.forEach(recharge => {
-                // Solo contar para estadísticas si NO es NO VALIDO - SOLO CAMBIO AQUÍ
-                if (recharge.estado !== 'NO VALIDO') {
+                // Solo contar para estadísticas si es ECHO, ERROR o CORTE (NO NO VALIDO)
+                if (recharge.estado === 'ECHO' || recharge.estado === 'ERROR' || recharge.estado === 'CORTE') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
