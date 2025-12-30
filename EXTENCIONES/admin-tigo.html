@@ -258,17 +258,17 @@
             display: inline-block;
         }
         
-        .status-nuevo {
+        .status-echo {
             background-color: #28a745;
             color: white;
         }
         
-        .status-corte {
+        .status-error {
             background-color: #dc3545;
             color: white;
         }
         
-        .status-error {
+        .status-novalido {
             background-color: #ff6b00;
             color: white;
         }
@@ -965,16 +965,16 @@
                         <div class="stat-label">Total Usuarios</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-number" id="nuevoCount">0</div>
-                        <div class="stat-label">Estado: Nuevo</div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-number" id="corteCount">0</div>
-                        <div class="stat-label">Estado: Corte</div>
+                        <div class="stat-number" id="echoCount">0</div>
+                        <div class="stat-label">Estado: Echo</div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-number" id="errorCount">0</div>
                         <div class="stat-label">Estado: Error</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="novalidoCount">0</div>
+                        <div class="stat-label">Estado: No Valido</div>
                     </div>
                 </div>
 
@@ -1207,16 +1207,16 @@
                             <div class="user-stat-label">Total Recargas</div>
                         </div>
                         <div class="user-stat-card">
-                            <div class="user-stat-number" id="userNuevoCount">0</div>
-                            <div class="user-stat-label">Estado: Nuevo</div>
-                        </div>
-                        <div class="user-stat-card">
-                            <div class="user-stat-number" id="userCorteCount">0</div>
-                            <div class="user-stat-label">Estado: Corte</div>
+                            <div class="user-stat-number" id="userEchoCount">0</div>
+                            <div class="user-stat-label">Estado: Echo</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userErrorCount">0</div>
                             <div class="user-stat-label">Estado: Error</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userNovalidoCount">0</div>
+                            <div class="user-stat-label">Estado: No Valido</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userHourPeak">--:--</div>
@@ -1346,9 +1346,9 @@
                         <div class="mb-3">
                             <label for="editStatus" class="form-label">Estado</label>
                             <select class="form-select app-form-control" id="editStatus" required>
-                                <option value="NUEVO">Nuevo</option>
-                                <option value="CORTE">Corte</option>
+                                <option value="ECHO">Echo</option>
                                 <option value="ERROR">Error</option>
+                                <option value="NO VALIDO">No Valido</option>
                             </select>
                         </div>
                     </form>
@@ -1594,34 +1594,34 @@
         }
 
         function updateDashboardStats() {
-            // Total recargas (NO contar las recargas con estado ERROR) - SOLO CAMBIO AQUÍ
-            const totalRecargas = allRecharges.filter(r => r.estado !== 'ERROR').length;
+            // Total recargas (NO contar las recargas con estado NO VALIDO)
+            const totalRecargas = allRecharges.filter(r => r.estado !== 'NO VALIDO').length;
             document.getElementById('totalRecharges').textContent = totalRecargas.toLocaleString();
             
             // Total usuarios
             document.getElementById('totalUsers').textContent = allUsers.length;
             
             // Contar por estado
-            const nuevoCount = allRecharges.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = allRecharges.filter(r => r.estado === 'CORTE').length;
+            const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
+            const novalidoCount = allRecharges.filter(r => r.estado === 'NO VALIDO').length;
             
-            document.getElementById('nuevoCount').textContent = nuevoCount.toLocaleString();
-            document.getElementById('corteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('echoCount').textContent = echoCount.toLocaleString();
             document.getElementById('errorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('novalidoCount').textContent = novalidoCount.toLocaleString();
         }
 
         function updateRecentActivity() {
             const tbody = document.getElementById('recentActivityBody');
-            // Solo mostrar recargas que NO son ERROR - SOLO CAMBIO AQUÍ
-            const recentRecharges = allRecharges.filter(r => r.estado !== 'ERROR').slice(0, 5);
+            // Solo mostrar recargas que NO son NO VALIDO
+            const recentRecharges = allRecharges.filter(r => r.estado !== 'NO VALIDO').slice(0, 5);
             
             tbody.innerHTML = recentRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
                 let statusClass = '';
-                if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
-                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+                if (recharge.estado === 'ECHO') statusClass = 'status-echo';
                 else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+                else if (recharge.estado === 'NO VALIDO') statusClass = 'status-novalido';
                 
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
@@ -1642,10 +1642,10 @@
             try {
                 const tbody = document.getElementById('usersTableBody');
                 
-                // Contar recargas por usuario (NO contar las ERROR) - SOLO CAMBIO AQUÍ
+                // Contar recargas por usuario (NO contar las NO VALIDO)
                 const userRechargeCounts = {};
                 allRecharges.forEach(recharge => {
-                    if (recharge.estado !== 'ERROR') {
+                    if (recharge.estado !== 'NO VALIDO') {
                         userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
                     }
                 });
@@ -1692,9 +1692,9 @@
             tbody.innerHTML = filteredRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
                 let statusClass = '';
-                if (recharge.estado === 'NUEVO') statusClass = 'status-nuevo';
-                else if (recharge.estado === 'CORTE') statusClass = 'status-corte';
+                if (recharge.estado === 'ECHO') statusClass = 'status-echo';
                 else if (recharge.estado === 'ERROR') statusClass = 'status-error';
+                else if (recharge.estado === 'NO VALIDO') statusClass = 'status-novalido';
                 
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
@@ -1747,7 +1747,7 @@
                 <div class="recharge-detail-item">
                     <span class="recharge-detail-label">Estado:</span>
                     <span class="recharge-detail-value">
-                        <span class="status-badge ${recharge.estado === 'NUEVO' ? 'status-nuevo' : recharge.estado === 'CORTE' ? 'status-corte' : 'status-error'}">
+                        <span class="status-badge ${recharge.estado === 'ECHO' ? 'status-echo' : recharge.estado === 'ERROR' ? 'status-error' : 'status-novalido'}">
                             ${recharge.estado}
                         </span>
                     </span>
@@ -2259,10 +2259,10 @@
                 });
             }
             
-            // Contar recargas por usuario (NO contar las ERROR) - SOLO CAMBIO AQUÍ
+            // Contar recargas por usuario (NO contar las NO VALIDO)
             const userRechargeCounts = {};
             filteredData.forEach(recharge => {
-                if (recharge.estado !== 'ERROR' && recharge.user_id && recharge.user_name) {
+                if (recharge.estado !== 'NO VALIDO' && recharge.user_id && recharge.user_name) {
                     userRechargeCounts[recharge.user_id] = {
                         name: recharge.user_name,
                         count: (userRechargeCounts[recharge.user_id]?.count || 0) + 1
@@ -2403,28 +2403,28 @@
                 });
             }
             
-            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LAS ERROR - SOLO CAMBIO AQUÍ
-            const totalRecargas = filteredByUser.filter(recharge => recharge.estado !== 'ERROR').length;
+            // Calcular estadísticas - PARA EL TOTAL NO CONTAR LAS NO VALIDO
+            const totalRecargas = filteredByUser.filter(recharge => recharge.estado !== 'NO VALIDO').length;
             
             // Contar por estado
-            const nuevoCount = filteredByUser.filter(r => r.estado === 'NUEVO').length;
-            const corteCount = filteredByUser.filter(r => r.estado === 'CORTE').length;
+            const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
             const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
+            const novalidoCount = filteredByUser.filter(r => r.estado === 'NO VALIDO').length;
             
-            // Calcular hora pico (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
+            // Calcular hora pico (solo para recargas que no sean NO VALIDO)
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que no sean ERROR - SOLO CAMBIO AQUÍ
+            // Preparar datos por hora (00-23) - solo para recargas que no sean NO VALIDO
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             filteredByUser.forEach(recharge => {
-                // Solo contar para hora pico si NO es ERROR - SOLO CAMBIO AQUÍ
-                if (recharge.estado !== 'ERROR') {
+                // Solo contar para hora pico si NO es NO VALIDO
+                if (recharge.estado !== 'NO VALIDO') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
@@ -2443,9 +2443,9 @@
             
             // Actualizar estadísticas en la interfaz
             document.getElementById('userTotalRecharges').textContent = totalRecargas.toLocaleString();
-            document.getElementById('userNuevoCount').textContent = nuevoCount.toLocaleString();
-            document.getElementById('userCorteCount').textContent = corteCount.toLocaleString();
+            document.getElementById('userEchoCount').textContent = echoCount.toLocaleString();
             document.getElementById('userErrorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('userNovalidoCount').textContent = novalidoCount.toLocaleString();
             document.getElementById('userHourPeak').textContent = peakHour || '--:--';
             
             // Actualizar gráfico del usuario
@@ -2581,32 +2581,32 @@
             // Ocultar mensaje de no datos
             document.getElementById('noDataMessage').classList.add('d-none');
             
-            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LAS ERROR - SOLO CAMBIO AQUÍ
-            const totalRecargas = dayRecharges.filter(recharge => recharge.estado !== 'ERROR').length;
+            // Calcular estadísticas del día - PARA EL TOTAL NO CONTAR LAS NO VALIDO
+            const totalRecargas = dayRecharges.filter(recharge => recharge.estado !== 'NO VALIDO').length;
             
-            // Usuarios únicos (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
+            // Usuarios únicos (solo para recargas que no sean NO VALIDO)
             const uniqueUsers = new Set();
             dayRecharges.forEach(recharge => {
-                if (recharge.estado !== 'ERROR') {
+                if (recharge.estado !== 'NO VALIDO') {
                     uniqueUsers.add(recharge.user_id);
                 }
             });
             const uniqueUsersCount = uniqueUsers.size;
             
-            // Hora pico (solo para recargas que no sean ERROR) - SOLO CAMBIO AQUÍ
+            // Hora pico (solo para recargas que no sean NO VALIDO)
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23) - solo para recargas que no sean ERROR - SOLO CAMBIO AQUÍ
+            // Preparar datos por hora (00-23) - solo para recargas que no sean NO VALIDO
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
             dayRecharges.forEach(recharge => {
-                // Solo contar para estadísticas si NO es ERROR - SOLO CAMBIO AQUÍ
-                if (recharge.estado !== 'ERROR') {
+                // Solo contar para estadísticas si NO es NO VALIDO
+                if (recharge.estado !== 'NO VALIDO') {
                     const timePart = recharge.timestamp.split(' ')[1];
                     if (timePart) {
                         const hour = timePart.split(':')[0];
