@@ -1,1164 +1,975 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>TOKTOK · Registro de Asistencias</title>
-
-  <!-- TailwindCSS -->
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            tok: {
-              primary: '#10b981',
-              dark: '#0b1220',
-              light: '#ecfdf5',
-              accent: '#22d3ee',
-              warning: '#f59e0b',
-              danger: '#ef4444'
-            }
-          },
-          boxShadow: { soft: '0 10px 30px rgba(0,0,0,.15)' },
-          borderRadius: { '2xl': '1.25rem' }
-        }
-      }
-    }
-  </script>
-
-  <!-- Supabase JS v2 -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <!-- QR generator -->
-  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
-  <!-- jsPDF (generar PDF de reportes) -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <!-- jsPDF AutoTable -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
-  <!-- html2canvas para convertir a imagen -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-  <style>
-    html { scroll-behavior: smooth; }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TOKTOK · Admin Dashboard</title>
     
-    /* Diseño mejorado de la credencial con degradado azul */
-    .id-card { 
-      width: 85.6mm; 
-      height: 54mm; 
-      border-radius: 6mm; 
-      box-shadow: 0 0 0 1px rgba(0,0,0,.08) inset, 0 4px 12px rgba(0,0,0,0.1);
-      background: linear-gradient(135deg, #0c2d48 0%, #2b6ca3 50%, #6baed6 100%);
-      position: relative; 
-      overflow: hidden; 
-      color: white;
-    }
-    
-    .id-card-back {
-      background: linear-gradient(135deg, #0c2d48 0%, #2b6ca3 50%, #6baed6 100%);
-    }
-    
-    .id-grid { display: grid; grid-template-columns: 1fr 1.2fr; height: 100%; }
-    .id-photo { object-fit: cover; width: 100%; height: 100%; }
-    .id-brand { 
-      position: absolute; 
-      right: 6mm; 
-      top: 6mm; 
-      font-weight: 800; 
-      font-size: 10pt; 
-      color: white;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-    .id-qrs { 
-      position: absolute; 
-      right: 4mm; 
-      bottom: 4mm; 
-      width: 20mm; 
-      height: 20mm; 
-      background: white; 
-      padding: 1mm; 
-      border-radius: 2mm; 
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15); 
-    }
-    .id-field { 
-      font-size: 9pt; 
-      line-height: 1.1;
-      text-shadow: 0 1px 2px rgba(0,0,0,0.2);
-    }
-    
-    .photo-container {
-      background: linear-gradient(to bottom, #f0f8ff, #e1f5fe);
-      position: relative;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
-    .id-data {
-      padding: 3mm;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      height: 100%;
-    }
-    
-    .logo-mark {
-      position: absolute;
-      left: 4mm;
-      top: 4mm;
-      width: 12mm;
-      height: 12mm;
-      background: rgba(255, 255, 255, 0.2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: bold;
-      font-size: 14px;
-      color: white;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    @media print {
-      body * { visibility: hidden; }
-      #print-area, #print-area * { visibility: visible; }
-      #print-area { position: absolute; left: 0; top: 0; width: 100%; }
-      .print-page { 
-        page-break-after: always; 
-        width: 216mm; 
-        height: 279mm; 
-        padding: 10mm; 
-        box-sizing: border-box;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        justify-content: center;
-      }
-      .print-cards-container {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 20mm;
-        margin-bottom: 20mm;
-      }
-      .print-card-pair {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        margin-bottom: 15mm;
-      }
-      .id-card { 
-        box-shadow: 0 0 5px rgba(0,0,0,0.2);
-        margin-bottom: 5mm;
-      }
-      @page { 
-        size: letter; 
-        margin: 0;
-      }
-    }
-
-    @media (max-width: 1024px) {
-      .header-content { flex-direction: column; align-items: flex-start; gap: 1rem; }
-      .connection-form { flex-direction: column; width: 100%; }
-      .connection-form input { width: 100%; }
-    }
-    @media (max-width: 768px) {
-      .tabs-container { flex-wrap: wrap; }
-      .tab-btn { flex: 1; min-width: 120px; font-size: 0.8rem; padding: 0.5rem 0.75rem; }
-      .filter-form { grid-template-columns: 1fr; }
-    }
-    @media (max-width: 640px) {
-      .id-cards-container { flex-direction: column; align-items: center; }
-      .id-card { margin-bottom: 1.5rem; }
-      .worker-form-buttons { flex-direction: column; }
-      .worker-form-buttons button { width: 100%; }
-    }
-    
-    /* Estilos para celdas editables */
-    .editable-cell {
-      cursor: pointer;
-      position: relative;
-      transition: all 0.2s ease;
-    }
-    
-    .editable-cell:hover {
-      background-color: #f0f9ff;
-      box-shadow: inset 0 0 0 2px #3b82f6;
-    }
-    
-    .editable-cell:after {
-      content: '✏️';
-      position: absolute;
-      right: 5px;
-      top: 50%;
-      transform: translateY(-50%);
-      font-size: 12px;
-      opacity: 0.6;
-    }
-    
-    .editable-empty {
-      background-color: #fef3c7 !important;
-      color: #92400e;
-      font-style: italic;
-    }
-    
-    .editable-empty:hover {
-      background-color: #fef3c7 !important;
-      box-shadow: inset 0 0 0 2px #f59e0b;
-    }
-    
-    .editable-empty:after {
-      content: '➕';
-      color: #f59e0b;
-    }
-    
-    .edit-time-input {
-      width: 100%;
-      border: 2px solid #3b82f6;
-      border-radius: 6px;
-      padding: 4px 8px;
-      font-size: 0.9em;
-      background: white;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-    }
-    
-    .saving {
-      background: linear-gradient(90deg, #f0f9ff, #e0f2fe, #f0f9ff) !important;
-      background-size: 200% 100% !important;
-      animation: saving-pulse 1.5s ease-in-out infinite;
-    }
-    
-    @keyframes saving-pulse {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
-    }
-    
-    .saved {
-      background-color: #dcfce7 !important;
-      border: 1px solid #22c55e;
-    }
-    
-    .edit-mode {
-      background-color: #fef3c7 !important;
-      border: 2px solid #f59e0b;
-    }
-  </style>
-</head>
-<body class="min-h-screen bg-tok-light text-slate-900">
-  <header class="bg-gradient-to-r from-tok-primary to-tok-accent text-white shadow-soft">
-    <div class="max-w-6xl mx-auto px-4 py-6 flex items-center justify-between header-content">
-      <h1 class="text-2xl font-bold tracking-tight">TOKTOK · Sistema de Registro de Asistencias</h1>
-      <div class="text-sm opacity-90">RMGC X TOKTOK </div>
-    </div>
-  </header>
-
-  <main class="max-w-6xl mx-auto px-4 py-6">
-    <!-- Tabs -->
-    <div class="mb-6">
-      <div class="flex gap-2 bg-white rounded-2xl p-2 shadow-soft tabs-container">
-        <button data-tab="tab1" class="tab-btn px-4 py-2 rounded-xl bg-tok-primary text-white font-medium">1) Registro Trabajador</button>
-        <button data-tab="tab3" class="tab-btn px-4 py-2 rounded-xl hover:bg-slate-100">2) Reportes</button>
-        <div class="ml-auto flex items-center gap-2 connection-form">
-          <span id="conn-status" class="text-sm text-emerald-600 font-medium">Conectado a Supabase</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- TAB 1 -->
-    <section id="tab1" class="tab-view">
-      <div class="grid md:grid-cols-2 gap-6">
-        <div class="bg-white rounded-2xl p-5 shadow-soft">
-          <h2 class="text-xl font-semibold mb-4">Datos del trabajador</h2>
-          <form id="worker-form" class="grid gap-3">
-            <div class="grid md:grid-cols-2 gap-3">
-              <div>
-                <label class="text-sm">Nombres</label>
-                <input required id="w-name" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
-              </div>
-              <div>
-                <label class="text-sm">Apellidos</label>
-                <input required id="w-last" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
-              </div>
-            </div>
-            <div class="grid md:grid-cols-2 gap-3">
-              <div>
-                <label class="text-sm">Cédula de identidad</label>
-                <input required id="w-ci" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
-              </div>
-              <div>
-                <label class="text-sm">Cargo</label>
-                <input required id="w-role" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
-              </div>
-            </div>
-            <div>
-              <label class="text-sm">Foto del trabajador</label>
-              <input type="file" accept="image/*" id="w-photo" class="w-full px-3 py-2 rounded-xl bg-slate-100" />
-            </div>
-            <div class="flex gap-2 worker-form-buttons">
-              <button type="button" id="gen-qr" class="px-4 py-2 rounded-xl bg-tok-primary text-white font-medium">Generar Credencial + QR</button>
-              <button type="button" id="print-card" class="px-4 py-2 rounded-xl bg-slate-900 text-white">Imprimir credencial</button>
-              <button type="button" id="download-card" class="px-4 py-2 rounded-xl bg-tok-accent text-white">Descargar como imagen</button>
-              <button type="submit" class="px-4 py-2 rounded-xl bg-tok-warning text-white">Guardar en Supabase</button>
-            </div>
-            <p class="text-xs text-slate-500">Al guardar, se subirá la foto a <em>Storage</em> y se creará el trabajador con su <strong>qr_id</strong> único.</p>
-          </form>
-        </div>
-
-        <div class="bg-white rounded-2xl p-5 shadow-soft">
-          <h3 class="text-lg font-semibold mb-2">Vista previa de credencial (tamaño real)</h3>
-          <div class="flex gap-6 flex-wrap id-cards-container">
-            <div id="card-front" class="id-card mb-4">
-              <div class="id-brand"></div>
-              <div class="id-grid">
-                <div class="photo-container">
-                  <img id="card-photo" class="id-photo" alt="Foto" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%239ca3af'%3EFoto%3C/text%3E%3C/svg%3E" />
-                </div>
-                <div class="id-data">
-                  <div>
-                    <div class="id-field mt-6"><span class="font-semibold">Nombres: </span><span id="card-name">—</span></div>
-                    <div class="id-field"><span class="font-semibold">Apellidos: </span><span id="card-last">—</span></div>
-                    <div class="id-field"><span class="font-semibold">CI: </span><span id="card-ci">—</span></div>
-                    <div class="id-field"><span class="font-semibold">Cargo: </span><span id="card-role">—</span></div>
-                  </div>
-                  <div class="id-qrs" id="card-qr"></div>
-                </div>
-              </div>
-            </div>
-            <div>
-              <div id="card-back" class="id-card id-card-back">
-                <div class="h-full p-4 flex flex-col">
-                  <div class="text-sm font-semibold mb-2 text-white">TOKTOK</div>
-                  <p class="text-xs mt-1 leading-tight text-white">
-                    Este código QR es único de la tienda <b>TOKTOK</b> y sirve exclusivamente para el registro de asistencia.
-                  </p>
-                  <div class="mt-2 text-xs text-white opacity-80">Contacto: RMGC TOKTOK</div>
-                  <div class="mt-auto">
-                    <div class="text-xs mb-1 text-white">QR de respaldo</div>
-                    <div class="id-qrs" id="card-qr-back"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-      </div>
-      
-      <!-- Área de impresión (oculta hasta que se imprima) -->
-      <div id="print-area" class="hidden">
-        <div class="print-page">
-          <h2 class="text-xl font-bold mb-8">Credencial TOKTOK</h2>
-          <div class="print-cards-container">
-            <div class="print-card-pair">
-              <div class="id-card">
-                <div class="id-brand"></div>
-                <div class="id-grid">
-                  <div class="photo-container">
-                    <img id="print-card-photo" class="id-photo" alt="Foto" />
-                  </div>
-                  <div class="id-data">
-                    <div>
-                      <div class="id-field mt-6"><span class="font-semibold">Nombres: </span><span id="print-card-name">—</span></div>
-                      <div class="id-field"><span class="font-semibold">Apellidos: </span><span id="print-card-last">—</span></div>
-                      <div class="id-field"><span class="font-semibold">CI: </span><span id="print-card-ci">—</span></div>
-                      <div class="id-field"><span class="font-semibold">Cargo: </span><span id="print-card-role">—</span></div>
-                    </div>
-                    <div class="id-qrs" id="print-card-qr"></div>
-                  </div>
-                </div>
-              </div>
-              <div class="id-card id-card-back mt-4">
-                <div class="h-full p-4 flex flex-col">
-
-                  <div class="text-sm font-semibold mb-2 text-white">TOKTOK</div>
-                  <p class="text-xs mt-1 leading-tight text-white">
-                    Este código QR es único de la tienda <b>TOKTOK</b> y sirve exclusivamente para el registro de asistencia.
-                  </p>
-                  <div class="mt-2 text-xs text-white opacity-80">Contacto: RMGC TOKTOK</div>
-                  <div class="mt-auto">
-                    <div class="text-xs mb-1 text-white">QR de respaldo</div>
-                    <div class="id-qrs" id="print-card-qr-back"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- TAB 3 -->
-    <section id="tab3" class="tab-view hidden">
-      <div class="bg-white rounded-2xl p-5 shadow-soft">
-        <h2 class="text-xl font-semibold mb-4">Reporte de asistencias</h2>
-        <div class="grid md:grid-cols-6 gap-3 mb-3 filter-form">
-          <input id="filter-name" class="px-3 py-2 rounded-xl bg-slate-100" placeholder="Nombre" />
-          <input id="filter-last" class="px-3 py-2 rounded-xl bg-slate-100" placeholder="Apellido" />
-          <select id="filter-event" class="px-3 py-2 rounded-xl bg-slate-100">
-            <option value="">Todos los eventos</option>
-            <option value="entrada">Entrada</option>
-            <option value="salida">Salida</option>
-            <option value="extra">Extra</option>
-          </select>
-          <input id="filter-from" type="date" class="px-3 py-2 rounded-xl bg-slate-100" />
-          <input id="filter-to" type="date" class="px-3 py-2 rounded-xl bg-slate-100" />
-          <div class="flex gap-2">
-            <button id="apply-filters" class="px-4 py-2 rounded-xl bg-tok-primary text-white">Aplicar</button>
-            <button id="export-pdf" class="px-4 py-2 rounded-xl bg-slate-900 text-white">Descargar PDF</button>
-          </div>
-        </div>
-        <div class="overflow-auto rounded-xl border border-slate-200">
-          <table class="min-w-full text-sm" id="report-table">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-3 py-2 text-left">Fecha</th>
-                <th class="px-3 py-2 text-left">Trabajador</th>
-                <th class="px-3 py-2 text-left">CI</th>
-                <th class="px-3 py-2 text-left">Cargo</th>
-                <th class="px-3 py-2 text-left">Entrada</th>
-                <th class="px-3 py-2 text-left">Salida</th>
-                <th class="px-3 py-2 text-left">Horas trabajadas</th>
-                <th class="px-3 py-2 text-left">Notas</th>
-              </tr>
-            </thead>
-            <tbody id="report-body"></tbody>
-          </table>
-        </div>
-      </div>
-    </section>
-
-    <div id="toast" class="fixed bottom-4 right-4 hidden bg-slate-900 text-white px-4 py-2 rounded-xl shadow-soft z-50"></div>
-  </main>
-
-  <script>
-    // ========== Utilidades UI ==========
-    const $$ = s => document.querySelector(s);
-    const $$$ = s => Array.from(document.querySelectorAll(s));
-    function toast(msg, type='info'){ 
-      const t=$$('#toast'); 
-      t.textContent=msg; 
-      t.classList.remove('hidden'); 
-      t.style.background = type==='error'? '#ef4444' : (type==='warn'? '#f59e0b' : '#0f172a'); 
-      setTimeout(()=>t.classList.add('hidden'), 3000);
-      console[type==='error'?'error':'log'](msg);
-    }
-
-    // ========== Supabase ==========
-    const SUPABASE_URL = 'https://mqbxjlrjdkhuuyanvott.supabase.co';
-    const SUPABASE_KEY = 'sb_publishable_guaBmBfJqfuoUaFxl470RQ_5rsv0TWz';
-    
-    let supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    const state = { 
-      bucket:'fotos_trabajadores',
-      editingCell: null,
-      originalAttendanceData: [],
-      workerData: {},
-      attendanceCache: new Map()
-    };
-
-    // ========== Tabs ==========
-    $$$('.tab-btn').forEach(btn=>btn.addEventListener('click', async ()=>{
-      const id = btn.dataset.tab; 
-      $$$('.tab-view').forEach(v=>v.classList.add('hidden')); 
-      $$('#'+id).classList.remove('hidden');
-      $$$('.tab-btn').forEach(b=>b.classList.remove('bg-tok-primary','text-white'));
-      btn.classList.add('bg-tok-primary','text-white');
-
-      if (id === 'tab3') {
-        await loadWorkerData();
-        applyFilters();
-      }
-    }));
-
-    // ========== UUID ==========
-    function uuidv4(){ 
-      return ([1e7]+-1e3+-4e3+-8e3+-1e11).replace(/[018]/g,c=>
-        (c^crypto.getRandomValues(new Uint8Array(1))[0]&15>>c/4).toString(16)
-      ) 
-    }
-
-    // ========== Credencial + QR ==========
-    let currentQR = null;
-    let currentQRId = null;
-
-    $$('#gen-qr').addEventListener('click', () => {
-      const name = $$('#w-name').value.trim();
-      const last = $$('#w-last').value.trim();
-      const ci = $$('#w-ci').value.trim();
-      const role = $$('#w-role').value.trim();
-      if(!name || !last || !ci || !role){ toast('Completa todos los campos', 'warn'); return; }
-
-      $$('#card-name').textContent = name;
-      $$('#card-last').textContent = last;
-      $$('#card-ci').textContent = ci;
-      $$('#card-role').textContent = role;
-
-      $$('#print-card-name').textContent = name;
-      $$('#print-card-last').textContent = last;
-      $$('#print-card-ci').textContent = ci;
-      $$('#print-card-role').textContent = role;
-
-      const f = $$('#w-photo').files?.[0];
-      if (f){ 
-        const r = new FileReader(); 
-        r.onload = e => { 
-          $$('#card-photo').src = e.target.result; 
-          $$('#print-card-photo').src = e.target.result;
-        }; 
-        r.readAsDataURL(f); 
-      }
-
-      currentQRId = 'TOK-' + uuidv4();
-      if (currentQR) { 
-        $$('#card-qr').innerHTML=''; 
-        $$('#card-qr-back').innerHTML=''; 
-        $$('#print-card-qr').innerHTML='';
-        $$('#print-card-qr-back').innerHTML='';
-      }
-      currentQR = new QRCode(document.getElementById('card-qr'), { text: currentQRId, width: 160, height: 160 });
-      new QRCode(document.getElementById('card-qr-back'), { text: currentQRId, width: 160, height: 160 });
-      new QRCode(document.getElementById('print-card-qr'), { text: currentQRId, width: 160, height: 160 });
-      new QRCode(document.getElementById('print-card-qr-back'), { text: currentQRId, width: 160, height: 160 });
-
-      toast('Credencial generada con QR único');
-    });
-
-    $$('#print-card').addEventListener('click', ()=>{ 
-      if(!currentQRId){ toast('Genera la credencial primero','warn'); return; } 
-      
-      $$('#print-area').classList.remove('hidden');
-      
-      setTimeout(() => {
-        window.print();
-        setTimeout(() => {
-          $$('#print-area').classList.add('hidden');
-        }, 500);
-      }, 100);
-    });
-
-    // ========== Descargar como imagen ==========
-    $$('#download-card').addEventListener('click', async () => {
-      if(!currentQRId){ toast('Genera la credencial primero','warn'); return; }
-      
-      try {
-        const frontCanvas = await html2canvas($$('#card-front'), {
-          scale: 3,
-          backgroundColor: null
-        });
-        
-        const frontLink = document.createElement('a');
-        frontLink.href = frontCanvas.toDataURL('image/png');
-        frontLink.download = `credencial_anverso_${$$('#w-name').value.trim()}_${$$('#w-last').value.trim()}.png`;
-        document.body.appendChild(frontLink);
-        frontLink.click();
-        document.body.removeChild(frontLink);
-        
-        setTimeout(async () => {
-          const backCanvas = await html2canvas($$('#card-back'), {
-            scale: 3,
-            backgroundColor: null
-          });
-          
-          const backLink = document.createElement('a');
-          backLink.href = backCanvas.toDataURL('image/png');
-          backLink.download = `credencial_reverso_${$$('#w-name').value.trim()}_${$$('#w-last').value.trim()}.png`;
-          document.body.appendChild(backLink);
-          backLink.click();
-          document.body.removeChild(backLink);
-          
-          toast('Imágenes descargadas correctamente ✅');
-        }, 500);
-        
-      } catch (error) {
-        console.error('Error al descargar imágenes:', error);
-        toast('Error al descargar las imágenes', 'error');
-      }
-    });
-
-    // ========== Guardar en Supabase ==========
-    $$('#worker-form').addEventListener('submit', async (e)=>{
-      e.preventDefault();
-      try{
-        const name = $$('#w-name').value.trim();
-        const last = $$('#w-last').value.trim();
-        const ci = $$('#w-ci').value.trim();
-        const role = $$('#w-role').value.trim();
-        if(!currentQRId){ toast('Genera el QR primero', 'warn'); return; }
-
-        let foto_url = null;
-        const file = $$('#w-photo').files?.[0];
-        if(file){
-          const path = `${Date.now()}_${file.name}`;
-          const { data: up, error: upErr } = await supabase.storage.from(state.bucket).upload(path, file, {upsert:false});
-          if(upErr) throw upErr; 
-          foto_url = supabase.storage.from(state.bucket).getPublicUrl(path).data.publicUrl;
-        }
-
-        const { error } = await supabase.from('workers').insert({ 
-          nombres: name, apellidos: last, ci, cargo: role, foto_url, qr_id: currentQRId 
-        });
-        if(error) throw error;
-        toast('Trabajador guardado en Supabase ✅');
-        
-        $$('#worker-form').reset();
-        $$('#card-name').textContent = '—';
-        $$('#card-last').textContent = '—';
-        $$('#card-ci').textContent = '—';
-        $$('#card-role').textContent = '—';
-        $$('#card-photo').src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='sans-serif' font-size='12' fill='%239ca3af'%3EFoto%3C/text%3E%3C/svg%3E";
-        $$('#card-qr').innerHTML = '';
-        $$('#card-qr-back').innerHTML = '';
-        currentQRId = null;
-        
-      }catch(err){ console.error(err); toast('Error al guardar: '+(err.message||err), 'error'); }
-    });
-
-    // ========== Cargar datos de trabajadores ==========
-    async function loadWorkerData() {
-      try {
-        const { data, error } = await supabase
-          .from('workers')
-          .select('id, ci, nombres, apellidos, cargo');
-        
-        if (error) throw error;
-        
-        state.workerData = {};
-        data.forEach(worker => {
-          state.workerData[worker.ci] = worker;
-        });
-        
-      } catch (error) {
-        console.error('Error cargando datos de trabajadores:', error);
-        toast('Error cargando datos de trabajadores', 'error');
-      }
-    }
-
-    // ========== Reportes ==========
-    async function fetchReport(){
-      try {
-        state.attendanceCache.clear();
-        
-        const { data, error } = await supabase.from('attendance')
-          .select('id,event_type,notes,device_time,created_at,workers:worker_id(nombres,apellidos,ci,cargo)')
-          .order('created_at', { ascending: true });
-        
-        if(error) throw error;
-        
-        data.forEach(record => {
-          state.attendanceCache.set(record.id, record);
-        });
-        
-        return data;
-      } catch (error) {
-        toast('Error cargando reportes', 'error');
-        return [];
-      }
-    }
-
-    // ========== FUNCIÓN CORREGIDA - MANEJO CORRECTO DE FECHAS ==========
-    async function saveAttendanceChange(attendanceId, field, newValue) {
-      try {
-        if (!attendanceId) {
-          // CREAR NUEVO REGISTRO SI NO EXISTE
-          const rowData = state.editingRowData;
-          if (!rowData || !rowData.workerId) {
-            throw new Error('No se puede crear registro sin datos del trabajador');
-          }
-
-          const eventType = field === 'entrada' ? 'entrada' : 'salida';
-          
-          // Crear fecha correcta con la hora especificada
-          const currentDate = new Date(rowData.fecha);
-          const [hours, minutes] = newValue.split(':').map(Number);
-          currentDate.setHours(hours, minutes, 0, 0);
-          
-          const { data, error } = await supabase
-            .from('attendance')
-            .insert({
-              worker_id: rowData.workerId,
-              event_type: eventType,
-              device_time: currentDate.toISOString(),
-              notes: `Registro creado manualmente - ${eventType} a las ${newValue}`,
-              created_at: new Date().toISOString()
-            })
-            .select();
-
-          if (error) throw error;
-          
-          // Actualizar cache con el nuevo registro
-          if (data && data[0]) {
-            state.attendanceCache.set(data[0].id, data[0]);
-          }
-          
-          toast('Nuevo registro creado exitosamente ✅');
-          return true;
-        }
-
-        // ACTUALIZAR REGISTRO EXISTENTE
-        const currentRecord = state.attendanceCache.get(attendanceId);
-        if (!currentRecord) {
-          throw new Error('Registro no encontrado en cache');
-        }
-
-        const updateData = {};
-        
-        // Obtener la fecha actual y aplicar la nueva hora
-        const currentDate = new Date(currentRecord.device_time || currentRecord.created_at);
-        const [hours, minutes] = newValue.split(':').map(Number);
-        currentDate.setHours(hours, minutes, 0, 0);
-        
-        updateData.device_time = currentDate.toISOString();
-        updateData.notes = `Registro editado manualmente - ${field} ajustada a ${newValue}`;
-
-        console.log('Actualizando registro:', {
-          attendanceId,
-          currentDate: currentDate.toISOString(),
-          newValue
-        });
-
-        const { data, error } = await supabase
-          .from('attendance')
-          .update(updateData)
-          .eq('id', attendanceId)
-          .select();
-
-        if (error) {
-          console.error('Error de Supabase:', error);
-          throw error;
-        }
-
-        if (!data || data.length === 0) {
-          throw new Error('No se recibió confirmación de la actualización');
-        }
-
-        // Actualizar cache con los nuevos datos
-        const updatedRecord = { ...currentRecord, ...updateData };
-        state.attendanceCache.set(attendanceId, updatedRecord);
-
-        console.log('Registro actualizado exitosamente:', data[0]);
-        return true;
-
-      } catch (error) {
-        console.error('Error guardando cambio:', error);
-        throw error;
-      }
-    }
-
-    // ========== FUNCIÓN CORREGIDA PARA MOSTRAR HORAS ==========
-    function formatTime(date) {
-      if (!date || isNaN(date.getTime())) return '—';
-      
-      // Usar la hora local del registro
-      const hours = String(date.getHours()).padStart(2, '0');
-      const minutes = String(date.getMinutes()).padStart(2, '0');
-      
-      return `${hours}:${minutes}`;
-    }
-
-    // Función para obtener workerId desde CI
-    function getWorkerIdFromCI(ci) {
-      const worker = state.workerData[ci];
-      return worker ? worker.id : null;
-    }
-
-    // Función mejorada para parsear fechas
-    function parseDateFromNotes(notes){
-      if (!notes) return null;
-      
-      // Intentar diferentes formatos de fecha
-      try {
-        // Formato ISO
-        const isoDate = new Date(notes);
-        if (!isNaN(isoDate.getTime())) return isoDate;
-        
-        // Formato personalizado
-        const dateTimeMatch = notes.match(/(\d{4}-\d{2}-\d{2})[T\s](\d{2}:\d{2}:\d{2})/);
-        if (dateTimeMatch) {
-          const dateStr = `${dateTimeMatch[1]}T${dateTimeMatch[2]}`;
-          const parsedDate = new Date(dateStr);
-          if (!isNaN(parsedDate.getTime())) return parsedDate;
-        }
-      } catch (e) {
-        console.warn('Error parseando fecha:', e);
-      }
-      
-      return null;
-    }
-
-    function formatDate(date) {
-      if (!date || isNaN(date.getTime())) return '—';
-      return date.toLocaleDateString('es-ES', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit'
-      });
-    }
-
-    function timeToMinutes(timeStr) {
-      if (!timeStr || timeStr === '—') return 0;
-      const [hours, minutes] = timeStr.split(':').map(Number);
-      return hours * 60 + minutes;
-    }
-
-    function calculateWorkedHours(entradaStr, salidaStr) {
-      if (entradaStr === '—' || salidaStr === '—') return 0;
-      const entradaMins = timeToMinutes(entradaStr);
-      const salidaMins = timeToMinutes(salidaStr);
-      let diffMins = salidaMins - entradaMins;
-      if (diffMins < 0) diffMins += 24 * 60;
-      return diffMins / 60;
-    }
-
-    function formatHours(decimalHours) {
-      if (decimalHours <= 0) return '—';
-      const hours = Math.floor(decimalHours);
-      const minutes = Math.round((decimalHours - hours) * 60);
-      return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`;
-    }
-
-    // SISTEMA MEJORADO DE EDICIÓN
-    function setupCellEditing() {
-      $$$('.editable-cell').forEach(cell => {
-        cell.replaceWith(cell.cloneNode(true));
-      });
-      
-      $$$('.editable-cell').forEach(cell => {
-        cell.addEventListener('click', function() {
-          if (state.editingCell) return;
-          
-          const field = this.dataset.field;
-          const rowIndex = this.dataset.rowIndex;
-          const attendanceId = this.dataset.attendanceId;
-          const originalValue = this.textContent;
-          const isEmpty = originalValue === '—';
-          
-          // Guardar datos de la fila para crear nuevos registros
-          const row = $$(`tr[data-row-index="${rowIndex}"]`);
-          if (row) {
-            const ci = row.cells[2].textContent;
-            const fecha = row.cells[0].textContent;
-            const workerId = getWorkerIdFromCI(ci);
-            
-            state.editingRowData = {
-              workerId: workerId,
-              fecha: new Date(fecha.split('/').reverse().join('-')),
-              ci: ci
-            };
-          }
-
-          const input = document.createElement('input');
-          input.type = 'text';
-          input.value = isEmpty ? '' : originalValue;
-          input.className = 'edit-time-input';
-          input.placeholder = 'HH:MM';
-          
-          this.innerHTML = '';
-          this.appendChild(input);
-          input.focus();
-          input.select();
-          
-          this.classList.add('edit-mode');
-          state.editingCell = this;
-          state.editingAttendanceId = attendanceId;
-          state.editingField = field;
-          state.originalValue = originalValue;
-          
-          const saveEdit = async () => {
-            const newValue = input.value.trim();
-            
-            // Validación mejorada
-            const timeRegex = /^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/;
-            if (newValue && !timeRegex.test(newValue)) {
-              toast('Formato de hora inválido. Use HH:MM (24h)', 'error');
-              input.focus();
-              return;
-            }
-            
-            const displayValue = newValue || '—';
-            
-            // Actualizar UI inmediatamente
-            this.textContent = displayValue;
-            this.classList.remove('edit-mode');
-            this.classList.add('saving');
-            
-            // Actualizar clases según si está vacío o no
-            if (displayValue === '—') {
-              this.classList.add('editable-empty');
-            } else {
-              this.classList.remove('editable-empty');
-              this.classList.add('editable-cell');
-            }
-            
-            this.dataset.field = field;
-            this.dataset.rowIndex = rowIndex;
-            this.dataset.attendanceId = attendanceId;
-            
-            state.editingCell = null;
-            
-            if (newValue !== state.originalValue.replace('—', '')) {
-              try {
-                await saveAttendanceChange(attendanceId, field, newValue);
-                this.classList.remove('saving');
-                this.classList.add('saved');
-                updateWorkedHours(rowIndex);
-                toast('Cambio guardado exitosamente ✅');
-                
-                setTimeout(() => {
-                  this.classList.remove('saved');
-                }, 2000);
-                
-              } catch (error) {
-                this.classList.remove('saving');
-                this.textContent = state.originalValue;
-                if (state.originalValue === '—') {
-                  this.classList.add('editable-empty');
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        tok: {
+                            green: '#10b981',
+                            blue: '#3b82f6',
+                            red: '#ef4444',
+                            yellow: '#f59e0b',
+                            purple: '#8b5cf6'
+                        }
+                    }
                 }
-                toast('Error al guardar el cambio: ' + error.message, 'error');
-              }
+            }
+        }
+    </script>
+    
+    <!-- Supabase JS -->
+    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+    
+    <!-- QR Code Generator -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root {
+            --tok-green: #10b981;
+            --tok-blue: #3b82f6;
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .status-connected { background: #d1fae5; color: #065f46; }
+        .status-disconnected { background: #fee2e2; color: #991b1b; }
+        .status-pending { background: #fef3c7; color: #92400e; }
+        
+        .card {
+            background: white;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .card:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .id-card {
+            width: 85.6mm;
+            height: 54mm;
+            border-radius: 8mm;
+            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
+            color: white;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .qr-overlay {
+            position: absolute;
+            bottom: 8mm;
+            right: 8mm;
+            width: 25mm;
+            height: 25mm;
+            background: white;
+            padding: 2mm;
+            border-radius: 3mm;
+        }
+        
+        .loading-spinner {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid var(--tok-green);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: 0.75rem;
+            color: white;
+            z-index: 1000;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+        
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        
+        .toast-success { background: var(--tok-green); }
+        .toast-error { background: var(--tok-red); }
+        .toast-info { background: var(--tok-blue); }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+    
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <div class="flex-shrink-0 flex items-center">
+                        <div class="bg-tok-green text-white p-2 rounded-lg font-bold text-xl">
+                            TOK
+                        </div>
+                        <span class="ml-2 text-xl font-bold text-gray-800">TOKTOK Dashboard</span>
+                    </div>
+                </div>
+                
+                <div class="flex items-center space-x-4">
+                    <div id="connection-status" class="status-badge status-pending">
+                        <span class="flex items-center">
+                            <span class="animate-pulse">●</span>
+                            <span class="ml-2">Conectando...</span>
+                        </span>
+                    </div>
+                    <button onclick="testConnection()" class="px-3 py-1 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
+                        Probar Conexión
+                    </button>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <!-- Main Content -->
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="bg-tok-green bg-opacity-10 p-3 rounded-lg">
+                        <span class="text-tok-green text-2xl">👥</span>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Trabajadores</h3>
+                        <p id="stats-workers" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="bg-tok-blue bg-opacity-10 p-3 rounded-lg">
+                        <span class="text-tok-blue text-2xl">📊</span>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Asistencias Hoy</h3>
+                        <p id="stats-today" class="text-2xl font-bold text-gray-800">0</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="bg-tok-yellow bg-opacity-10 p-3 rounded-lg">
+                        <span class="text-tok-yellow text-2xl">⏱️</span>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Horas Extras</h3>
+                        <p id="stats-extras" class="text-2xl font-bold text-gray-800">0h</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card p-6">
+                <div class="flex items-center">
+                    <div class="bg-tok-purple bg-opacity-10 p-3 rounded-lg">
+                        <span class="text-tok-purple text-2xl">📈</span>
+                    </div>
+                    <div class="ml-4">
+                        <h3 class="text-sm font-medium text-gray-500">Prom. Diario</h3>
+                        <p id="stats-avg" class="text-2xl font-bold text-gray-800">0h</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tabs Navigation -->
+        <div class="mb-8">
+            <div class="border-b border-gray-200">
+                <nav class="-mb-px flex space-x-8">
+                    <button data-tab="workers" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-tok-green text-tok-green">
+                        👤 Trabajadores
+                    </button>
+                    <button data-tab="reports" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        📊 Reportes
+                    </button>
+                    <button data-tab="cards" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        🏷️ Credenciales
+                    </button>
+                </nav>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Workers -->
+        <div id="tab-workers" class="tab-content">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Formulario Registro -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Registrar Nuevo Trabajador</h2>
+                    
+                    <form id="worker-form" class="space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
+                                <input type="text" id="input-nombres" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
+                                <input type="text" id="input-apellidos" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cédula *</label>
+                                <input type="text" id="input-ci" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cargo *</label>
+                                <input type="text" id="input-cargo" required
+                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto (opcional)</label>
+                            <input type="file" id="input-foto" accept="image/*"
+                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
+                        </div>
+                        
+                        <div class="pt-4">
+                            <button type="submit" 
+                                    class="w-full bg-tok-green text-white py-3 px-4 rounded-lg font-medium hover:bg-emerald-600 transition-colors">
+                                💾 Guardar Trabajador
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Lista de Trabajadores -->
+                <div class="card p-6">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-gray-800">Lista de Trabajadores</h2>
+                        <button onclick="loadWorkers()" class="px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
+                            🔄 Actualizar
+                        </button>
+                    </div>
+                    
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead>
+                                <tr>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CI</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cargo</th>
+                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="workers-list" class="divide-y divide-gray-200">
+                                <!-- Datos cargados aquí -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Reports -->
+        <div id="tab-reports" class="tab-content hidden">
+            <div class="card p-6">
+                <h2 class="text-xl font-bold text-gray-800 mb-6">Reportes de Asistencia</h2>
+                
+                <!-- Filtros -->
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                    <input type="date" id="filter-fecha" class="px-3 py-2 border rounded-lg">
+                    <select id="filter-trabajador" class="px-3 py-2 border rounded-lg">
+                        <option value="">Todos los trabajadores</option>
+                    </select>
+                    <select id="filter-evento" class="px-3 py-2 border rounded-lg">
+                        <option value="">Todos los eventos</option>
+                        <option value="entrada">Entrada</option>
+                        <option value="salida">Salida</option>
+                        <option value="extra">Horas Extra</option>
+                    </select>
+                    <button onclick="loadReports()" class="bg-tok-blue text-white py-2 px-4 rounded-lg hover:bg-blue-600">
+                        🔍 Filtrar
+                    </button>
+                </div>
+                
+                <!-- Tabla de Reportes -->
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead>
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trabajador</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Evento</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horas</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notas</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reports-list" class="divide-y divide-gray-200">
+                            <!-- Datos cargados aquí -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <!-- Exportar -->
+                <div class="mt-6 flex justify-end">
+                    <button onclick="exportToPDF()" class="px-4 py-2 bg-tok-green text-white rounded-lg hover:bg-emerald-600">
+                        📄 Exportar PDF
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tab Content: Cards -->
+        <div id="tab-cards" class="tab-content hidden">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Generador de Credencial -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Generar Credencial</h2>
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Trabajador</label>
+                            <select id="select-worker" class="w-full px-3 py-2 border border-gray-300 rounded-lg"
+                                    onchange="loadWorkerForCard(this.value)">
+                                <option value="">Seleccione un trabajador</option>
+                            </select>
+                        </div>
+                        
+                        <div id="card-preview" class="hidden">
+                            <div class="flex justify-center mb-6">
+                                <div class="id-card">
+                                    <div class="absolute top-4 left-4 text-white font-bold">TOKTOK</div>
+                                    <div class="h-full flex">
+                                        <div class="w-1/3 bg-gray-200 flex items-center justify-center">
+                                            <img id="card-photo" class="w-full h-full object-cover">
+                                        </div>
+                                        <div class="w-2/3 p-4 flex flex-col justify-between">
+                                            <div class="text-white">
+                                                <div class="mb-2">
+                                                    <div class="text-xs opacity-80">Nombre:</div>
+                                                    <div id="card-name" class="font-bold"></div>
+                                                </div>
+                                                <div class="mb-2">
+                                                    <div class="text-xs opacity-80">CI:</div>
+                                                    <div id="card-ci" class="font-mono"></div>
+                                                </div>
+                                                <div>
+                                                    <div class="text-xs opacity-80">Cargo:</div>
+                                                    <div id="card-cargo"></div>
+                                                </div>
+                                            </div>
+                                            <div class="qr-overlay" id="qr-container"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="grid grid-cols-2 gap-3">
+                                <button onclick="printCard()" class="py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800">
+                                    🖨️ Imprimir
+                                </button>
+                                <button onclick="downloadCard()" class="py-3 bg-tok-blue text-white rounded-lg hover:bg-blue-600">
+                                    📥 Descargar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Lista de Credenciales -->
+                <div class="card p-6">
+                    <h2 class="text-xl font-bold text-gray-800 mb-6">Credenciales Generadas</h2>
+                    <div id="cards-list" class="space-y-4">
+                        <!-- Lista cargada aquí -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // ============================================
+        // CONFIGURACIÓN SUPABASE
+        // ============================================
+        const SUPABASE_URL = 'https://gqmkhqrsfnmrlunagjsx.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_cAAL7KuzDhu2zzsZeF7oLg__awJFxHQ';
+        
+        let supabase = null;
+        let currentWorkerData = null;
+        let qrCodeInstance = null;
+        
+        // ============================================
+        // INICIALIZACIÓN
+        // ============================================
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initializeApp();
+            setupEventListeners();
+            setupTabs();
+        });
+        
+        async function initializeApp() {
+            showToast('🔌 Conectando con Supabase...', 'info');
+            updateConnectionStatus('connecting');
+            
+            try {
+                // Inicializar Supabase
+                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+                    auth: { persistSession: false }
+                });
+                
+                // Verificar conexión
+                const { data, error } = await supabase
+                    .from('workers')
+                    .select('count', { count: 'exact', head: true });
+                
+                if (error) {
+                    throw new Error(`Error de conexión: ${error.message}`);
+                }
+                
+                // Conexión exitosa
+                updateConnectionStatus('connected');
+                showToast('✅ Conectado a Supabase exitosamente!', 'success');
+                
+                // Cargar datos iniciales
+                await loadInitialData();
+                
+            } catch (error) {
+                console.error('Error de inicialización:', error);
+                updateConnectionStatus('error');
+                showToast(`❌ Error: ${error.message}`, 'error');
+            }
+        }
+        
+        async function loadInitialData() {
+            try {
+                await Promise.all([
+                    loadWorkers(),
+                    loadStats(),
+                    loadReports()
+                ]);
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+            }
+        }
+        
+        // ============================================
+        // FUNCIONES DE CONEXIÓN
+        // ============================================
+        function updateConnectionStatus(status) {
+            const statusEl = document.getElementById('connection-status');
+            statusEl.className = 'status-badge ';
+            
+            switch(status) {
+                case 'connected':
+                    statusEl.classList.add('status-connected');
+                    statusEl.innerHTML = '<span class="flex items-center"><span class="text-green-500">●</span><span class="ml-2">Conectado</span></span>';
+                    break;
+                case 'connecting':
+                    statusEl.classList.add('status-pending');
+                    statusEl.innerHTML = '<span class="flex items-center"><span class="animate-pulse">●</span><span class="ml-2">Conectando...</span></span>';
+                    break;
+                case 'error':
+                    statusEl.classList.add('status-disconnected');
+                    statusEl.innerHTML = '<span class="flex items-center"><span class="text-red-500">●</span><span class="ml-2">Error</span></span>';
+                    break;
+            }
+        }
+        
+        async function testConnection() {
+            showToast('🔍 Probando conexión...', 'info');
+            
+            try {
+                const { data, error } = await supabase
+                    .from('workers')
+                    .select('*')
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                showToast('✅ Conexión exitosa!', 'success');
+                return true;
+            } catch (error) {
+                showToast(`❌ Error de conexión: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // ============================================
+        // FUNCIONES DE TRABAJADORES
+        // ============================================
+        async function loadWorkers() {
+            try {
+                const { data, error } = await supabase
+                    .from('workers')
+                    .select('*')
+                    .order('nombres');
+                
+                if (error) throw error;
+                
+                // Actualizar lista
+                const tbody = document.getElementById('workers-list');
+                const select = document.getElementById('select-worker');
+                const filterSelect = document.getElementById('filter-trabajador');
+                
+                tbody.innerHTML = '';
+                select.innerHTML = '<option value="">Seleccione un trabajador</option>';
+                filterSelect.innerHTML = '<option value="">Todos los trabajadores</option>';
+                
+                if (data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
+                                No hay trabajadores registrados
+                            </td>
+                        </tr>`;
+                    return;
+                }
+                
+                data.forEach(worker => {
+                    // Tabla
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-4 py-3">${worker.nombres} ${worker.apellidos}</td>
+                        <td class="px-4 py-3 font-mono">${worker.ci}</td>
+                        <td class="px-4 py-3">${worker.cargo}</td>
+                        <td class="px-4 py-3">
+                            <button onclick="deleteWorker('${worker.id}')" 
+                                    class="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200">
+                                Eliminar
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                    
+                    // Selectores
+                    const option = `<option value="${worker.id}">${worker.nombres} ${worker.apellidos} - ${worker.ci}</option>`;
+                    select.innerHTML += option;
+                    filterSelect.innerHTML += option;
+                });
+                
+            } catch (error) {
+                console.error('Error cargando trabajadores:', error);
+                showToast('❌ Error al cargar trabajadores', 'error');
+            }
+        }
+        
+        async function deleteWorker(id) {
+            if (!confirm('¿Está seguro de eliminar este trabajador?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('workers')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showToast('✅ Trabajador eliminado', 'success');
+                await loadWorkers();
+                await loadStats();
+                
+            } catch (error) {
+                console.error('Error eliminando trabajador:', error);
+                showToast('❌ Error al eliminar trabajador', 'error');
+            }
+        }
+        
+        // ============================================
+        // FORMULARIO DE TRABAJADOR
+        // ============================================
+        document.getElementById('worker-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const nombres = document.getElementById('input-nombres').value.trim();
+            const apellidos = document.getElementById('input-apellidos').value.trim();
+            const ci = document.getElementById('input-ci').value.trim();
+            const cargo = document.getElementById('input-cargo').value.trim();
+            const fotoFile = document.getElementById('input-foto').files[0];
+            
+            if (!nombres || !apellidos || !ci || !cargo) {
+                showToast('❌ Complete todos los campos obligatorios', 'error');
+                return;
             }
             
-            setupCellEditing();
-          };
-          
-          input.addEventListener('blur', saveEdit);
-          input.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter') {
-              saveEdit();
-            } else if (e.key === 'Escape') {
-              this.textContent = state.originalValue;
-              this.classList.remove('edit-mode');
-              if (state.originalValue === '—') {
-                this.classList.add('editable-empty');
-              } else {
-                this.classList.add('editable-cell');
-              }
-              this.dataset.field = field;
-              this.dataset.rowIndex = rowIndex;
-              this.dataset.attendanceId = attendanceId;
-              state.editingCell = null;
-              setupCellEditing();
+            try {
+                showToast('🔄 Guardando trabajador...', 'info');
+                
+                // Subir foto si existe
+                let fotoUrl = null;
+                if (fotoFile) {
+                    const fileExt = fotoFile.name.split('.').pop();
+                    const fileName = `${ci}_${Date.now()}.${fileExt}`;
+                    const filePath = `fotos/${fileName}`;
+                    
+                    const { error: uploadError } = await supabase.storage
+                        .from('fotos_trabajadores')
+                        .upload(filePath, fotoFile);
+                    
+                    if (!uploadError) {
+                        const { data: urlData } = supabase.storage
+                            .from('fotos_trabajadores')
+                            .getPublicUrl(filePath);
+                        fotoUrl = urlData.publicUrl;
+                    }
+                }
+                
+                // Generar QR único
+                const qrId = `TOK-${ci}-${Date.now().toString(36)}`;
+                
+                // Insertar en base de datos
+                const { error } = await supabase
+                    .from('workers')
+                    .insert([{
+                        nombres,
+                        apellidos,
+                        ci,
+                        cargo,
+                        foto_url: fotoUrl,
+                        qr_id: qrId
+                    }]);
+                
+                if (error) {
+                    if (error.code === '23505') {
+                        throw new Error('Ya existe un trabajador con esa cédula');
+                    }
+                    throw error;
+                }
+                
+                // Éxito
+                showToast('✅ Trabajador registrado exitosamente!', 'success');
+                
+                // Limpiar formulario
+                this.reset();
+                
+                // Actualizar datos
+                await Promise.all([
+                    loadWorkers(),
+                    loadStats()
+                ]);
+                
+            } catch (error) {
+                console.error('Error guardando trabajador:', error);
+                showToast(`❌ Error: ${error.message}`, 'error');
             }
-          });
-        });
-      });
-    }
-
-    function updateWorkedHours(rowIndex) {
-      const row = $$(`tr[data-row-index="${rowIndex}"]`);
-      if (!row) return;
-      
-      const entradaCell = row.querySelector('[data-field="entrada"]');
-      const salidaCell = row.querySelector('[data-field="salida"]');
-      const horasCell = row.querySelector('[data-field="horas"]');
-      
-      const entradaStr = entradaCell.textContent;
-      const salidaStr = salidaCell.textContent;
-      
-      const horasTrabajadas = calculateWorkedHours(entradaStr, salidaStr);
-      
-      horasCell.textContent = formatHours(horasTrabajadas);
-      horasCell.className = `px-3 py-2 font-semibold ${horasTrabajadas > 0 ? 'text-green-700' : ''}`;
-    }
-
-    function renderReport(rows){
-      const tbody = $$('#report-body');
-      tbody.innerHTML = '';
-      
-      state.originalAttendanceData = rows;
-      
-      const groupedByWorkerDay = {};
-      
-      rows.forEach(r => {
-        const w = r.workers || {}; 
-        const ci = w.ci || 'NA';
-        
-        let recordDate = parseDateFromNotes(r.notes) || 
-                       (r.device_time ? new Date(r.device_time) : null) || 
-                       new Date(r.created_at);
-        
-        if (!recordDate || isNaN(recordDate.getTime())) return;
-        
-        const localDateStr = recordDate.toLocaleDateString('es-ES');
-        const key = ci + '|' + localDateStr;
-        
-        if (!groupedByWorkerDay[key]) {
-          groupedByWorkerDay[key] = {
-            nombres: w.nombres || '',
-            apellidos: w.apellidos || '',
-            ci: ci,
-            cargo: w.cargo || '',
-            fecha: recordDate,
-            entradas: [],
-            salidas: [],
-            notas: r.notes || '',
-            horasTrabajadas: 0,
-            entradaIds: [],
-            salidaIds: [],
-            entradaDates: [],
-            salidaDates: []
-          };
-        }
-        
-        if (r.event_type === 'entrada') {
-          groupedByWorkerDay[key].entradas.push(recordDate);
-          groupedByWorkerDay[key].entradaIds.push(r.id);
-          groupedByWorkerDay[key].entradaDates.push(recordDate);
-        } else if (r.event_type === 'salida') {
-          groupedByWorkerDay[key].salidas.push(recordDate);
-          groupedByWorkerDay[key].salidaIds.push(r.id);
-          groupedByWorkerDay[key].salidaDates.push(recordDate);
-        }
-      });
-      
-      Object.values(groupedByWorkerDay).forEach(group => {
-        group.entradas.sort((a, b) => a - b);
-        group.salidas.sort((a, b) => a - b);
-        
-        let totalHoras = 0;
-        const minLength = Math.min(group.entradas.length, group.salidas.length);
-        
-        for (let i = 0; i < minLength; i++) {
-          const entrada = group.entradas[i];
-          const salida = group.salidas[i];
-          
-          if (salida > entrada) {
-            const diffMs = salida - entrada;
-            totalHoras += diffMs / (1000 * 60 * 60);
-          }
-        }
-        
-        group.horasTrabajadas = totalHoras;
-      });
-      
-      let rowIndex = 0;
-      Object.values(groupedByWorkerDay).forEach(group => {
-        const tr = document.createElement('tr');
-        tr.classList.add('hover:bg-slate-50');
-        tr.dataset.rowIndex = rowIndex;
-        
-        const entradaStr = group.entradas.length > 0 
-          ? formatTime(group.entradas[0])
-          : '—';
-          
-        const salidaStr = group.salidas.length > 0 
-          ? formatTime(group.salidas[group.salidas.length - 1])
-          : '—';
-        
-        const entradaId = group.entradaIds.length > 0 ? group.entradaIds[0] : '';
-        const salidaId = group.salidaIds.length > 0 ? group.salidaIds[group.salidaIds.length - 1] : '';
-        
-        const entradaClass = entradaStr === '—' ? 'editable-cell editable-empty' : 'editable-cell';
-        const salidaClass = salidaStr === '—' ? 'editable-cell editable-empty' : 'editable-cell';
-        
-        tr.innerHTML = `
-          <td class="px-3 py-2">${formatDate(group.fecha)}</td>
-          <td class="px-3 py-2">${group.nombres} ${group.apellidos}</td>
-          <td class="px-3 py-2">${group.ci}</td>
-          <td class="px-3 py-2">${group.cargo}</td>
-          <td class="px-3 py-2 ${entradaClass}" data-field="entrada" data-row-index="${rowIndex}" data-attendance-id="${entradaId}">${entradaStr}</td>
-          <td class="px-3 py-2 ${salidaClass}" data-field="salida" data-row-index="${rowIndex}" data-attendance-id="${salidaId}">${salidaStr}</td>
-          <td class="px-3 py-2 font-semibold ${group.horasTrabajadas > 0 ? 'text-green-700' : ''}" data-field="horas" data-row-index="${rowIndex}">
-            ${group.horasTrabajadas > 0 ? formatHours(group.horasTrabajadas) : '—'}
-          </td>
-          <td class="px-3 py-2 whitespace-pre-wrap max-w-xs truncate" title="${group.notas}">${group.notas}</td>
-        `;
-        
-        tbody.appendChild(tr);
-        rowIndex++;
-      });
-      
-      setupCellEditing();
-    }
-
-    async function applyFilters(){
-      let rows = await fetchReport();
-      const nameF = $$('#filter-name').value.trim().toLowerCase();
-      const lastF = $$('#filter-last').value.trim().toLowerCase();
-      const eventF = $$('#filter-event').value;
-      const from = $$('#filter-from').value ? new Date($$('#filter-from').value+'T00:00:00') : null;
-      const to = $$('#filter-to').value ? new Date($$('#filter-to').value+'T23:59:59') : null;
-
-      rows = rows.filter(r=>{
-        const w = r.workers || {}; 
-        const n = (w.nombres||'').toLowerCase(); 
-        const l = (w.apellidos||'').toLowerCase();
-        if(nameF && !n.includes(nameF)) return false;
-        if(lastF && !l.includes(lastF)) return false;
-        if(eventF && r.event_type !== eventF) return false;
-        
-        const recordDate = parseDateFromNotes(r.notes) || 
-                          (r.device_time ? new Date(r.device_time) : null) || 
-                          new Date(r.created_at);
-        
-        if(from && recordDate && recordDate < from) return false;
-        if(to && recordDate && recordDate > to) return false;
-        return true;
-      });
-      renderReport(rows);
-    }
-
-    $$('#apply-filters').addEventListener('click', applyFilters);
-
-    // Descargar PDF
-    $$('#export-pdf').addEventListener('click', async ()=>{
-      try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        doc.setFontSize(16);
-        doc.text('TOKTOK - Reporte de Asistencias', 14, 15);
-        
-        doc.setFontSize(10);
-        doc.text(`Generado el: ${new Date().toLocaleString('es-ES')}`, 14, 22);
-        
-        const tableRows = [];
-        const tableHeader = [
-          'Fecha', 
-          'Trabajador', 
-          'CI', 
-          'Cargo', 
-          'Entrada', 
-          'Salida', 
-          'Horas trabajadas', 
-          'Notas'
-        ];
-        
-        const rows = Array.from($$('#report-body').querySelectorAll('tr'));
-        rows.forEach(tr => {
-          const cols = Array.from(tr.querySelectorAll('td'));
-          const rowData = [
-            cols[0]?.textContent || '',
-            cols[1]?.textContent || '',
-            cols[2]?.textContent || '',
-            cols[3]?.textContent || '',
-            cols[4]?.textContent || '',
-            cols[5]?.textContent || '',
-            cols[6]?.textContent || '',
-            cols[7]?.textContent || ''
-          ];
-          tableRows.push(rowData);
         });
         
-        doc.autoTable({
-          head: [tableHeader],
-          body: tableRows,
-          startY: 30,
-          theme: 'grid',
-          styles: { fontSize: 8 },
-          headStyles: { fillColor: [16, 185, 129] }
-        });
+        // ============================================
+        // FUNCIONES DE CREDENCIALES
+        // ============================================
+        async function loadWorkerForCard(workerId) {
+            if (!workerId) {
+                document.getElementById('card-preview').classList.add('hidden');
+                return;
+            }
+            
+            try {
+                const { data, error } = await supabase
+                    .from('workers')
+                    .select('*')
+                    .eq('id', workerId)
+                    .single();
+                
+                if (error) throw error;
+                
+                currentWorkerData = data;
+                
+                // Actualizar vista
+                document.getElementById('card-name').textContent = `${data.nombres} ${data.apellidos}`;
+                document.getElementById('card-ci').textContent = data.ci;
+                document.getElementById('card-cargo').textContent = data.cargo;
+                document.getElementById('card-photo').src = data.foto_url || 'https://placehold.co/100x100?text=Foto';
+                
+                // Generar QR
+                const qrContainer = document.getElementById('qr-container');
+                qrContainer.innerHTML = '';
+                
+                if (qrCodeInstance) {
+                    qrCodeInstance.clear();
+                }
+                
+                qrCodeInstance = new QRCode(qrContainer, {
+                    text: data.qr_id,
+                    width: 80,
+                    height: 80,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff"
+                });
+                
+                document.getElementById('card-preview').classList.remove('hidden');
+                
+            } catch (error) {
+                console.error('Error cargando trabajador:', error);
+                showToast('❌ Error al cargar datos del trabajador', 'error');
+            }
+        }
         
-        doc.save('reporte-asistencias-toktok.pdf');
-        toast('PDF generado correctamente ✅');
-      } catch (error) {
-        console.error('Error al generar PDF:', error);
-        toast('Error al generar PDF', 'error');
-      }
-    });
-
-    // Inicializar conexión a Supabase
-    toast('Conectado a Supabase ✅');
-  </script>
+        function printCard() {
+            if (!currentWorkerData) {
+                showToast('❌ Seleccione un trabajador primero', 'error');
+                return;
+            }
+            
+            const printWindow = window.open('', '_blank');
+            printWindow.document.write(`
+                <html>
+                    <head>
+                        <title>Credencial TOKTOK - ${currentWorkerData.nombres}</title>
+                        <style>
+                            body { 
+                                margin: 0; 
+                                padding: 20px; 
+                                display: flex; 
+                                justify-content: center; 
+                                align-items: center; 
+                                min-height: 100vh; 
+                            }
+                            @media print {
+                                .id-card { 
+                                    box-shadow: none !important; 
+                                    border: 1px solid #ccc; 
+                                }
+                            }
+                        </style>
+                    </head>
+                    <body>
+                        ${document.getElementById('card-preview').innerHTML}
+                        <script>
+                            window.onload = () => window.print();
+                        <\/script>
+                    </body>
+                </html>
+            `);
+            printWindow.document.close();
+        }
+        
+        function downloadCard() {
+            showToast('⚠ Función en desarrollo', 'info');
+            // Implementar descarga de imagen
+        }
+        
+        // ============================================
+        // FUNCIONES DE REPORTES
+        // ============================================
+        async function loadReports() {
+            try {
+                const fecha = document.getElementById('filter-fecha').value;
+                const trabajadorId = document.getElementById('filter-trabajador').value;
+                const evento = document.getElementById('filter-evento').value;
+                
+                let query = supabase
+                    .from('attendance')
+                    .select(`
+                        *,
+                        workers (nombres, apellidos, ci, cargo)
+                    `)
+                    .order('created_at', { ascending: false })
+                    .limit(100);
+                
+                if (fecha) {
+                    const startDate = fecha + 'T00:00:00';
+                    const endDate = fecha + 'T23:59:59';
+                    query = query.gte('created_at', startDate).lte('created_at', endDate);
+                }
+                
+                if (trabajadorId) {
+                    query = query.eq('worker_id', trabajadorId);
+                }
+                
+                if (evento) {
+                    query = query.eq('event_type', evento);
+                }
+                
+                const { data, error } = await query;
+                
+                if (error) throw error;
+                
+                const tbody = document.getElementById('reports-list');
+                tbody.innerHTML = '';
+                
+                if (!data || data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
+                                No hay registros para mostrar
+                            </td>
+                        </tr>`;
+                    return;
+                }
+                
+                data.forEach(record => {
+                    const worker = record.workers || {};
+                    const date = new Date(record.created_at);
+                    
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="px-4 py-3">${date.toLocaleDateString('es-ES')}</td>
+                        <td class="px-4 py-3">${worker.nombres || ''} ${worker.apellidos || ''}</td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 rounded text-xs ${
+                                record.event_type === 'entrada' ? 'bg-green-100 text-green-800' :
+                                record.event_type === 'salida' ? 'bg-blue-100 text-blue-800' :
+                                'bg-yellow-100 text-yellow-800'
+                            }">
+                                ${record.event_type}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">${date.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</td>
+                        <td class="px-4 py-3">${record.horas_trabajadas || '0'}h</td>
+                        <td class="px-4 py-3 max-w-xs truncate">${record.notes || ''}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+                
+            } catch (error) {
+                console.error('Error cargando reportes:', error);
+                showToast('❌ Error al cargar reportes', 'error');
+            }
+        }
+        
+        async function loadStats() {
+            try {
+                // Total trabajadores
+                const { count: totalWorkers } = await supabase
+                    .from('workers')
+                    .select('*', { count: 'exact', head: true });
+                
+                document.getElementById('stats-workers').textContent = totalWorkers || 0;
+                
+                // Asistencias hoy
+                const today = new Date().toISOString().split('T')[0];
+                const { count: todayAttendances } = await supabase
+                    .from('attendance')
+                    .select('*', { count: 'exact', head: true })
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
+                
+                document.getElementById('stats-today').textContent = todayAttendances || 0;
+                
+                // Horas extras
+                const { data: extrasData } = await supabase
+                    .from('attendance')
+                    .select('horas_extras')
+                    .gte('created_at', today + 'T00:00:00')
+                    .lte('created_at', today + 'T23:59:59');
+                
+                const totalExtras = extrasData?.reduce((sum, item) => sum + (item.horas_extras || 0), 0) || 0;
+                document.getElementById('stats-extras').textContent = `${totalExtras.toFixed(1)}h`;
+                
+                // Promedio diario
+                const { data: weeklyData } = await supabase
+                    .from('attendance')
+                    .select('horas_trabajadas, created_at')
+                    .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
+                
+                const avgHours = weeklyData?.reduce((sum, item) => sum + (item.horas_trabajadas || 0), 0) / 7 || 0;
+                document.getElementById('stats-avg').textContent = `${avgHours.toFixed(1)}h`;
+                
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+            }
+        }
+        
+        function exportToPDF() {
+            showToast('⚠ Función PDF en desarrollo', 'info');
+        }
+        
+        // ============================================
+        // FUNCIONES DE UTILIDAD
+        // ============================================
+        function showToast(message, type = 'info') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast toast-${type}`;
+            
+            setTimeout(() => {
+                toast.classList.add('show');
+            }, 10);
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 4000);
+        }
+        
+        function setupTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const tabId = button.dataset.tab;
+                    
+                    // Actualizar botones
+                    tabButtons.forEach(btn => {
+                        btn.classList.remove('border-tok-green', 'text-tok-green');
+                        btn.classList.add('border-transparent', 'text-gray-500');
+                    });
+                    
+                    button.classList.remove('border-transparent', 'text-gray-500');
+                    button.classList.add('border-tok-green', 'text-tok-green');
+                    
+                    // Mostrar contenido
+                    tabContents.forEach(content => {
+                        content.classList.add('hidden');
+                    });
+                    
+                    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+                });
+            });
+        }
+        
+        function setupEventListeners() {
+            // Test connection button
+            window.testConnection = testConnection;
+            
+            // Reload workers
+            window.loadWorkers = loadWorkers;
+            
+            // Load reports
+            window.loadReports = loadReports;
+            
+            // Export PDF
+            window.exportToPDF = exportToPDF;
+            
+            // Print card
+            window.printCard = printCard;
+            
+            // Download card
+            window.downloadCard = downloadCard;
+            
+            // Delete worker
+            window.deleteWorker = deleteWorker;
+        }
+    </script>
 </body>
-
 </html>
