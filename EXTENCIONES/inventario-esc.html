@@ -1387,59 +1387,102 @@
                 });
             }
 
+            // MÉTODO MEJORADO: Cargar TODAS las categorías sin límite
             async loadCategories() {
                 try {
-                    const response = await fetch(
-                        `${SUPABASE_URL}/rest/v1/chip_categories?select=*&order=id.desc`,
-                        {
-                            headers: {
-                                'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                    let allCats = [];
+                    let currentPage = 0;
+                    const pageSize = 1000; // Máximo por página de Supabase
+                    let hasMore = true;
+
+                    while (hasMore) {
+                        const response = await fetch(
+                            `${SUPABASE_URL}/rest/v1/chip_categories?select=*&order=id.desc&limit=${pageSize}&offset=${currentPage * pageSize}`,
+                            {
+                                headers: {
+                                    'apikey': SUPABASE_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                                }
                             }
+                        );
+                        
+                        if (!response.ok) throw new Error('Error cargando categorías');
+                        
+                        const pageCats = await response.json();
+                        allCats = [...allCats, ...pageCats];
+                        
+                        // Si recibimos menos de pageSize, es la última página
+                        if (pageCats.length < pageSize) {
+                            hasMore = false;
+                        } else {
+                            currentPage++;
                         }
-                    );
+                    }
                     
-                    if (!response.ok) throw new Error('Error cargando categorías');
-                    
-                    allCategories = await response.json();
+                    allCategories = allCats;
                     this.populateFilterDropdowns();
                     return allCategories;
                 } catch (error) {
+                    console.error('Error en loadCategories:', error);
                     throw error;
                 }
             }
 
+            // MÉTODO MEJORADO: Cargar TODOS los chips sin límite
             async loadChips() {
                 try {
-                    const response = await fetch(
-                        `${SUPABASE_URL}/rest/v1/chip_inventory?select=*&order=id.desc`,
-                        {
-                            headers: {
-                                'apikey': SUPABASE_KEY,
-                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                    let allChipsData = [];
+                    let currentPage = 0;
+                    const pageSize = 1000; // Máximo por página de Supabase
+                    let hasMore = true;
+
+                    while (hasMore) {
+                        const response = await fetch(
+                            `${SUPABASE_URL}/rest/v1/chip_inventory?select=*&order=id.desc&limit=${pageSize}&offset=${currentPage * pageSize}`,
+                            {
+                                headers: {
+                                    'apikey': SUPABASE_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                                }
                             }
+                        );
+                        
+                        if (!response.ok) throw new Error('Error cargando chips');
+                        
+                        const pageChips = await response.json();
+                        allChipsData = [...allChipsData, ...pageChips];
+                        
+                        // Si recibimos menos de pageSize, es la última página
+                        if (pageChips.length < pageSize) {
+                            hasMore = false;
+                        } else {
+                            currentPage++;
                         }
-                    );
+                    }
                     
-                    if (!response.ok) throw new Error('Error cargando chips');
-                    
-                    allChips = await response.json();
+                    allChips = allChipsData;
                     
                     // Calcular días restantes y estado
                     allChips.forEach(chip => {
                         chip.dias_restantes = this.calcularDiasRestantes(chip.fecha_vencimiento);
                         chip.estado_display = this.determinarEstado(chip);
+                        
+                        // Actualizar estado en base de datos si está vencido pero no marcado como tal
+                        if (chip.dias_restantes <= 0 && chip.estado !== 'VENCIDO') {
+                            chip.estado = 'VENCIDO';
+                        }
                     });
                     
-                    // Chips por vencer - CAMBIO: 10 días en lugar de 30
+                    // Chips por vencer - Solo chips ACTIVOS que vencen en los próximos 10 días
                     chipsPorVencer = allChips.filter(chip => 
-                        chip.estado === 'ACTIVO' && 
+                        this.determinarEstado(chip) !== 'VENCIDO' && 
                         chip.dias_restantes > 0 && 
                         chip.dias_restantes <= 10
                     ).sort((a, b) => a.dias_restantes - b.dias_restantes);
                     
                     return allChips;
                 } catch (error) {
+                    console.error('Error en loadChips:', error);
                     throw error;
                 }
             }
@@ -1621,34 +1664,45 @@
                 return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             }
 
+            // MÉTODO CORREGIDO: Determinar estado correctamente
             determinarEstado(chip) {
                 if (chip.estado === 'VENCIDO') return 'VENCIDO';
+                
                 const dias = this.calcularDiasRestantes(chip.fecha_vencimiento);
+                
+                // Primero verificar si está vencido (días <= 0)
                 if (dias <= 0) return 'VENCIDO';
+                
+                // Luego verificar los otros estados
                 if (dias <= 7) return 'CRITICO';
-                if (dias <= 10) return 'POR_VENCER'; // CAMBIO: 10 días en lugar de 30
+                if (dias <= 10) return 'POR_VENCER';
                 if (chip.designado_a) return 'DESIGNADO';
+                
                 return 'ACTIVO';
             }
 
+            // MÉTODO CORREGIDO: Actualizar dashboard con conteos exactos
             updateDashboard() {
                 const entelCount = allChips.filter(chip => chip.operadora === 'ENTEL').length;
                 const tigoCount = allChips.filter(chip => chip.operadora === 'TIGO').length;
                 const vivaCount = allChips.filter(chip => chip.operadora === 'VIVA').length;
                 
-                document.getElementById('totalEntel').textContent = entelCount;
-                document.getElementById('totalTigo').textContent = tigoCount;
-                document.getElementById('totalViva').textContent = vivaCount;
-                document.getElementById('totalChips').textContent = allChips.length;
+                // Asegurar que se muestren números exactos
+                document.getElementById('totalEntel').textContent = entelCount.toLocaleString();
+                document.getElementById('totalTigo').textContent = tigoCount.toLocaleString();
+                document.getElementById('totalViva').textContent = vivaCount.toLocaleString();
+                document.getElementById('totalChips').textContent = allChips.length.toLocaleString();
                 
-                const activosCount = allChips.filter(chip => chip.estado === 'ACTIVO').length;
-                const vencidosCount = allChips.filter(chip => chip.estado === 'VENCIDO').length;
-                const designadosCount = allChips.filter(chip => chip.designado_a).length;
+                // CONTAR CORRECTAMENTE LOS ESTADOS usando determinarEstado
+                const activosCount = allChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
+                const vencidosCount = allChips.filter(chip => this.determinarEstado(chip) === 'VENCIDO').length;
+                const designadosCount = allChips.filter(chip => chip.designado_a && this.determinarEstado(chip) !== 'VENCIDO').length;
                 
-                document.getElementById('chipsActivos').textContent = activosCount;
-                document.getElementById('chipsPorVencer').textContent = chipsPorVencer.length;
-                document.getElementById('chipsVencidos').textContent = vencidosCount;
-                document.getElementById('chipsDesignados').textContent = designadosCount;
+                // Usar toLocaleString para números grandes
+                document.getElementById('chipsActivos').textContent = activosCount.toLocaleString();
+                document.getElementById('chipsPorVencer').textContent = chipsPorVencer.length.toLocaleString();
+                document.getElementById('chipsVencidos').textContent = vencidosCount.toLocaleString();
+                document.getElementById('chipsDesignados').textContent = designadosCount.toLocaleString();
                 
                 this.updateChipsPorVencerList();
                 this.updateChipsRecientesList();
@@ -1735,10 +1789,11 @@
             }
 
             updateSidebarCounts() {
-                document.getElementById('sidebarTotalChips').textContent = allChips.length;
-                document.getElementById('sidebarInventario').textContent = allChips.length;
-                document.getElementById('sidebarCategorias').textContent = allCategories.length;
-                document.getElementById('sidebarPorVencer').textContent = chipsPorVencer.length;
+                // Usar toLocaleString para mostrar números grandes
+                document.getElementById('sidebarTotalChips').textContent = allChips.length.toLocaleString();
+                document.getElementById('sidebarInventario').textContent = allChips.length.toLocaleString();
+                document.getElementById('sidebarCategorias').textContent = allCategories.length.toLocaleString();
+                document.getElementById('sidebarPorVencer').textContent = chipsPorVencer.length.toLocaleString();
             }
 
             showSection(section) {
@@ -1879,7 +1934,7 @@
                 }).join('');
                 
                 // Actualizar contador de filtros
-                document.getElementById('filterCount').textContent = `Mostrando ${filteredChips.length} chips de ${allChips.length} totales`;
+                document.getElementById('filterCount').textContent = `Mostrando ${filteredChips.length.toLocaleString()} chips de ${allChips.length.toLocaleString()} totales`;
             }
 
             // MÉTODO MEJORADO: Aplicar filtros de inventario (SIMPLIFICADO - SIN SECCIÓN MOSTRAR)
@@ -1896,8 +1951,9 @@
                     
                     // Filtro por estado
                     if (estado) {
-                        if (estado === 'VENCIDO' && this.determinarEstado(chip) !== 'VENCIDO') return false;
-                        if (estado === 'ACTIVO' && chip.estado !== 'ACTIVO') return false;
+                        const chipEstado = this.determinarEstado(chip);
+                        if (estado === 'VENCIDO' && chipEstado !== 'VENCIDO') return false;
+                        if (estado === 'ACTIVO' && chipEstado !== 'ACTIVO') return false;
                         if (estado === 'INACTIVO' && chip.estado !== 'INACTIVO') return false;
                     }
                     
@@ -1958,7 +2014,7 @@
                         <td>${categoria.dias_vencimiento} días</td>
                         <td>
                             <span class="badge ${chipsCount > 0 ? 'bg-primary' : 'bg-secondary'}">
-                                ${chipsCount} chips
+                                ${chipsCount.toLocaleString()} chips
                             </span>
                         </td>
                         <td>
@@ -1979,7 +2035,7 @@
                 }).join('');
                 
                 // Actualizar contador de filtros
-                document.getElementById('categoriasFilterCount').textContent = `Mostrando ${filteredCategories.length} categorías de ${allCategories.length} totales`;
+                document.getElementById('categoriasFilterCount').textContent = `Mostrando ${filteredCategories.length.toLocaleString()} categorías de ${allCategories.length.toLocaleString()} totales`;
             }
 
             // MÉTODO MEJORADO: Aplicar filtros de categorías
@@ -2044,7 +2100,7 @@
                             <strong>Información:</strong><br>
                             • Operadora: ${categoria.operadora}<br>
                             • Días de vencimiento: ${diasVencimiento} días<br>
-                            • Chips en esta categoría: ${chipsEnCategoria.length}<br>
+                            • Chips en esta categoría: ${chipsEnCategoria.length.toLocaleString()}<br>
                             • Nueva fecha de vencimiento: ${fechaVencimiento.toLocaleDateString('es-ES')}
                         </div>
                         <div class="mb-3">
@@ -2119,7 +2175,7 @@
                     // Recargar datos
                     await this.loadAllData();
                     
-                    this.showAlert('Éxito', `Categoría reactivada correctamente. ${chipsEnCategoria.length} chips actualizados.`, 'success');
+                    this.showAlert('Éxito', `Categoría reactivada correctamente. ${chipsEnCategoria.length.toLocaleString()} chips actualizados.`, 'success');
                     
                 } catch (error) {
                     console.error('Error reactivando categoría:', error);
@@ -2337,6 +2393,7 @@
                     `).join('');
             }
 
+            // MÉTODO MEJORADO: Guardar chips con manejo de grandes cantidades
             async saveChips() {
                 const form = document.getElementById('chipForm');
                 if (!form.checkValidity()) {
@@ -2407,7 +2464,7 @@
                 }));
                 
                 try {
-                    const batchSize = 50;
+                    const batchSize = 100; // Tamaño de lote más pequeño para mayor estabilidad
                     let successfulInserts = 0;
                     
                     for (let i = 0; i < chipsToInsert.length; i += batchSize) {
@@ -2432,20 +2489,26 @@
                         } else {
                             const error = await response.text();
                             console.error('Error insertando lote:', error);
+                            throw new Error(`Error en lote ${Math.floor(i/batchSize) + 1}: ${error}`);
+                        }
+                        
+                        // Pequeña pausa entre lotes para no sobrecargar
+                        if (i + batchSize < chipsToInsert.length) {
+                            await new Promise(resolve => setTimeout(resolve, 100));
                         }
                     }
                     
                     if (successfulInserts > 0) {
                         bootstrap.Modal.getInstance(document.getElementById('chipModal')).hide();
                         await this.loadAllData();
-                        this.showAlert('Éxito', `${successfulInserts} chips agregados correctamente`, 'success');
+                        this.showAlert('Éxito', `${successfulInserts.toLocaleString()} chips agregados correctamente`, 'success');
                     } else {
                         throw new Error('No se pudo insertar ningún chip');
                     }
                     
                 } catch (error) {
                     console.error('Error guardando chips:', error);
-                    this.showAlert('Error', 'No se pudieron guardar los chips', 'error');
+                    this.showAlert('Error', `No se pudieron guardar los chips: ${error.message}`, 'error');
                 }
             }
 
@@ -2788,7 +2851,7 @@
 
                 const fecha = new Date().toISOString().slice(0,10);
                 XLSX.writeFile(workbook, `inventario_filtrado_${fecha}.xlsx`);
-                this.showAlert('Éxito', `Inventario filtrado exportado a Excel (${filteredChips.length} registros)`, 'success');
+                this.showAlert('Éxito', `Inventario filtrado exportado a Excel (${filteredChips.length.toLocaleString()} registros)`, 'success');
             }
 
             // MÉTODO MEJORADO: Exportar categorías filtradas
@@ -2829,9 +2892,10 @@
                 const fecha = new Date().toISOString().slice(0,10);
                 XLSX.writeFile(workbook, `categorias_filtradas_${fecha}.xlsx`);
                 
-                this.showAlert('Éxito', `Categorías filtradas exportadas a Excel (${filteredCategories.length} registros)`, 'success');
+                this.showAlert('Éxito', `Categorías filtradas exportadas a Excel (${filteredCategories.length.toLocaleString()} registros)`, 'success');
             }
 
+            // MÉTODO MEJORADO: Cargar datos de reportes con conteos exactos
             loadReportsData() {
                 this.updateReportStatistics();
                 
@@ -2843,22 +2907,24 @@
                 this.createEstadoChart();
             }
 
+            // MÉTODO MEJORADO: Actualizar estadísticas de reportes con números exactos
             updateReportStatistics() {
                 const entelChips = allChips.filter(chip => chip.operadora === 'ENTEL');
                 const tigoChips = allChips.filter(chip => chip.operadora === 'TIGO');
                 const vivaChips = allChips.filter(chip => chip.operadora === 'VIVA');
                 
-                document.getElementById('reportEntelTotal').textContent = entelChips.length;
-                document.getElementById('reportEntelActivos').textContent = entelChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
-                document.getElementById('reportEntelPorVencer').textContent = entelChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length;
+                // Usar toLocaleString para mostrar números grandes
+                document.getElementById('reportEntelTotal').textContent = entelChips.length.toLocaleString();
+                document.getElementById('reportEntelActivos').textContent = entelChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length.toLocaleString();
+                document.getElementById('reportEntelPorVencer').textContent = entelChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length.toLocaleString();
                 
-                document.getElementById('reportTigoTotal').textContent = tigoChips.length;
-                document.getElementById('reportTigoActivos').textContent = tigoChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
-                document.getElementById('reportTigoPorVencer').textContent = tigoChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length;
+                document.getElementById('reportTigoTotal').textContent = tigoChips.length.toLocaleString();
+                document.getElementById('reportTigoActivos').textContent = tigoChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length.toLocaleString();
+                document.getElementById('reportTigoPorVencer').textContent = tigoChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length.toLocaleString();
                 
-                document.getElementById('reportVivaTotal').textContent = vivaChips.length;
-                document.getElementById('reportVivaActivos').textContent = vivaChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length;
-                document.getElementById('reportVivaPorVencer').textContent = vivaChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length;
+                document.getElementById('reportVivaTotal').textContent = vivaChips.length.toLocaleString();
+                document.getElementById('reportVivaActivos').textContent = vivaChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length.toLocaleString();
+                document.getElementById('reportVivaPorVencer').textContent = vivaChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER' || this.determinarEstado(chip) === 'CRITICO').length.toLocaleString();
             }
 
             createOperadoraChart() {
@@ -2900,7 +2966,7 @@
                                         const value = context.raw || 0;
                                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                                         const percentage = Math.round((value / total) * 100);
-                                        return `${label}: ${value} (${percentage}%)`;
+                                        return `${label}: ${value.toLocaleString()} (${percentage}%)`;
                                     }
                                 }
                             }
@@ -2912,15 +2978,15 @@
                 document.getElementById('operadoraStats').innerHTML = `
                     <div class="stats-detail-item">
                         <span>ENTEL:</span>
-                        <span>${operadoraData.ENTEL} (${Math.round((operadoraData.ENTEL/total)*100)}%)</span>
+                        <span>${operadoraData.ENTEL.toLocaleString()} (${Math.round((operadoraData.ENTEL/total)*100)}%)</span>
                     </div>
                     <div class="stats-detail-item">
                         <span>TIGO:</span>
-                        <span>${operadoraData.TIGO} (${Math.round((operadoraData.TIGO/total)*100)}%)</span>
+                        <span>${operadoraData.TIGO.toLocaleString()} (${Math.round((operadoraData.TIGO/total)*100)}%)</span>
                     </div>
                     <div class="stats-detail-item">
                         <span>VIVA:</span>
-                        <span>${operadoraData.VIVA} (${Math.round((operadoraData.VIVA/total)*100)}%)</span>
+                        <span>${operadoraData.VIVA.toLocaleString()} (${Math.round((operadoraData.VIVA/total)*100)}%)</span>
                     </div>
                 `;
             }
@@ -2972,7 +3038,7 @@
                             y: {
                                 beginAtZero: true,
                                 ticks: {
-                                    stepSize: 1
+                                    stepSize: Math.max(1, Math.ceil(Math.max(...Object.values(estadoData)) / 10))
                                 },
                                 grid: {
                                     drawBorder: false
@@ -2991,89 +3057,101 @@
                 document.getElementById('estadoStats').innerHTML = `
                     <div class="stats-detail-item">
                         <span>Total Activos:</span>
-                        <span>${estadoData.Activos} (${Math.round((estadoData.Activos/total)*100)}%)</span>
+                        <span>${estadoData.Activos.toLocaleString()} (${Math.round((estadoData.Activos/total)*100)}%)</span>
                     </div>
                     <div class="stats-detail-item">
                         <span>Por Vencer:</span>
-                        <span>${estadoData['Por Vencer']} (${Math.round((estadoData['Por Vencer']/total)*100)}%)</span>
+                        <span>${estadoData['Por Vencer'].toLocaleString()} (${Math.round((estadoData['Por Vencer']/total)*100)}%)</span>
                     </div>
                     <div class="stats-detail-item">
                         <span>Chips Críticos:</span>
-                        <span>${estadoData.Críticos} (${Math.round((estadoData.Críticos/total)*100)}%)</span>
+                        <span>${estadoData.Críticos.toLocaleString()} (${Math.round((estadoData.Críticos/total)*100)}%)</span>
                     </div>
                     <div class="stats-detail-item">
                         <span>Total Vencidos:</span>
-                        <span>${estadoData.Vencidos} (${Math.round((estadoData.Vencidos/total)*100)}%)</span>
+                        <span>${estadoData.Vencidos.toLocaleString()} (${Math.round((estadoData.Vencidos/total)*100)}%)</span>
                     </div>
                 `;
             }
 
+            // MÉTODO MEJORADO: Exportar a Excel con manejo de grandes cantidades
             async exportToExcel() {
-                // Aplicar numeración para exportación completa
-                const chipsToExport = [...allChips];
-                const groupedByCategory = {};
-                
-                chipsToExport.forEach(chip => {
-                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                    const categoryKey = categoria ? `${categoria.operadora}-${categoria.categoria_id}` : 'sin-categoria';
+                try {
+                    // Mostrar loading
+                    this.showLoading(true);
                     
-                    if (!groupedByCategory[categoryKey]) {
-                        groupedByCategory[categoryKey] = [];
-                    }
-                    groupedByCategory[categoryKey].push(chip);
-                });
-                
-                // Renumerar para exportación
-                Object.values(groupedByCategory).forEach(chipsInCategory => {
-                    chipsInCategory.sort((a, b) => a.id - b.id);
-                    chipsInCategory.forEach((chip, index) => {
-                        chip.numero_secuencia_export = index + 1;
+                    // Aplicar numeración para exportación completa
+                    const chipsToExport = [...allChips];
+                    const groupedByCategory = {};
+                    
+                    chipsToExport.forEach(chip => {
+                        const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                        const categoryKey = categoria ? `${categoria.operadora}-${categoria.categoria_id}` : 'sin-categoria';
+                        
+                        if (!groupedByCategory[categoryKey]) {
+                            groupedByCategory[categoryKey] = [];
+                        }
+                        groupedByCategory[categoryKey].push(chip);
                     });
-                });
-                
-                const data = chipsToExport.map(chip => {
-                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                    const estado = this.determinarEstado(chip);
                     
-                    return {
-                        '#': chip.numero_secuencia_export || '',
-                        'Número Chip': chip.numero_chip,
-                        'Operadora': chip.operadora,
-                        'ID Categoría': categoria?.categoria_id || 'N/A',
-                        'Número de Casillero': categoria?.letra_categoria || 'N/A',
-                        'Categoría': categoria?.nombre || 'N/A',
-                        'Fecha Nacimiento': chip.fecha_activacion,
-                        'Fecha Vencimiento': chip.fecha_vencimiento,
-                        'Días Restantes': chip.dias_restantes,
-                        'Estado': estado,
-                        'Designado a': chip.designado_a || '',
-                        'Observaciones Designación': chip.designado_observaciones || ''
-                    };
-                });
+                    // Renumerar para exportación
+                    Object.values(groupedByCategory).forEach(chipsInCategory => {
+                        chipsInCategory.sort((a, b) => a.id - b.id);
+                        chipsInCategory.forEach((chip, index) => {
+                            chip.numero_secuencia_export = index + 1;
+                        });
+                    });
+                    
+                    const data = chipsToExport.map(chip => {
+                        const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                        const estado = this.determinarEstado(chip);
+                        
+                        return {
+                            '#': chip.numero_secuencia_export || '',
+                            'Número Chip': chip.numero_chip,
+                            'Operadora': chip.operadora,
+                            'ID Categoría': categoria?.categoria_id || 'N/A',
+                            'Número de Casillero': categoria?.letra_categoria || 'N/A',
+                            'Categoría': categoria?.nombre || 'N/A',
+                            'Fecha Nacimiento': chip.fecha_activacion,
+                            'Fecha Vencimiento': chip.fecha_vencimiento,
+                            'Días Restantes': chip.dias_restantes,
+                            'Estado': estado,
+                            'Designado a': chip.designado_a || '',
+                            'Observaciones Designación': chip.designado_observaciones || ''
+                        };
+                    });
 
-                const worksheet = XLSX.utils.json_to_sheet(data);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario Completo");
-                
-                const wscols = [
-                    {wch: 5},  // #
-                    {wch: 15}, // Número Chip
-                    {wch: 10}, // Operadora
-                    {wch: 15}, // ID Categoría
-                    {wch: 20}, // Número de Casillero
-                    {wch: 20}, // Categoría
-                    {wch: 15}, // Fecha Nacimiento
-                    {wch: 15}, // Fecha Vencimiento
-                    {wch: 15}, // Días Restantes
-                    {wch: 15}, // Estado
-                    {wch: 25}, // Designado a
-                    {wch: 30}  // Observaciones
-                ];
-                worksheet['!cols'] = wscols;
+                    const worksheet = XLSX.utils.json_to_sheet(data);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Inventario Completo");
+                    
+                    const wscols = [
+                        {wch: 5},  // #
+                        {wch: 15}, // Número Chip
+                        {wch: 10}, // Operadora
+                        {wch: 15}, // ID Categoría
+                        {wch: 20}, // Número de Casillero
+                        {wch: 20}, // Categoría
+                        {wch: 15}, // Fecha Nacimiento
+                        {wch: 15}, // Fecha Vencimiento
+                        {wch: 15}, // Días Restantes
+                        {wch: 15}, // Estado
+                        {wch: 25}, // Designado a
+                        {wch: 30}  // Observaciones
+                    ];
+                    worksheet['!cols'] = wscols;
 
-                const fecha = new Date().toISOString().slice(0,10);
-                XLSX.writeFile(workbook, `inventario_completo_${fecha}.xlsx`);
-                this.showAlert('Éxito', `Archivo Excel generado (${allChips.length} registros)`, 'success');
+                    const fecha = new Date().toISOString().slice(0,10);
+                    XLSX.writeFile(workbook, `inventario_completo_${fecha}.xlsx`);
+                    this.showAlert('Éxito', `Archivo Excel generado (${allChips.length.toLocaleString()} registros)`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error exportando a Excel:', error);
+                    this.showAlert('Error', 'No se pudo exportar el archivo Excel', 'error');
+                } finally {
+                    this.showLoading(false);
+                }
             }
 
             exportToPDF() {
@@ -3081,152 +3159,172 @@
             }
 
             exportToCSV() {
-                const csvContent = [
-                    ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Número de Casillero', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
-                    ...allChips.map(chip => {
-                        const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                        const estado = this.determinarEstado(chip);
-                        
-                        return [
-                            chip.numero_secuencia || '',
-                            chip.numero_chip,
-                            chip.operadora,
-                            categoria?.categoria_id || 'N/A',
-                            categoria?.letra_categoria || 'N/A',
-                            `"${categoria?.nombre || 'N/A'}"`,
-                            chip.fecha_activacion,
-                            chip.fecha_vencimiento,
-                            chip.dias_restantes,
-                            estado,
-                            `"${chip.designado_a || ''}"`,
-                            `"${chip.designado_observaciones || ''}"`
-                        ].join(',');
-                    })
-                ].join('\n');
+                try {
+                    const csvContent = [
+                        ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Número de Casillero', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
+                        ...allChips.map(chip => {
+                            const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                            const estado = this.determinarEstado(chip);
+                            
+                            return [
+                                chip.numero_secuencia || '',
+                                chip.numero_chip,
+                                chip.operadora,
+                                categoria?.categoria_id || 'N/A',
+                                categoria?.letra_categoria || 'N/A',
+                                `"${categoria?.nombre || 'N/A'}"`,
+                                chip.fecha_activacion,
+                                chip.fecha_vencimiento,
+                                chip.dias_restantes,
+                                estado,
+                                `"${chip.designado_a || ''}"`,
+                                `"${chip.designado_observaciones || ''}"`
+                            ].join(',');
+                        })
+                    ].join('\n');
 
-                const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
-                const link = document.createElement('a');
-                link.href = URL.createObjectURL(blob);
-                const fecha = new Date().toISOString().slice(0,10);
-                link.download = `inventario_chips_${fecha}.csv`;
-                link.click();
-                
-                this.showAlert('Éxito', 'Archivo CSV generado', 'success');
+                    const blob = new Blob(['\uFEFF' + csvContent], { type: 'text/csv;charset=utf-8;' });
+                    const link = document.createElement('a');
+                    link.href = URL.createObjectURL(blob);
+                    const fecha = new Date().toISOString().slice(0,10);
+                    link.download = `inventario_chips_${fecha}.csv`;
+                    link.click();
+                    
+                    this.showAlert('Éxito', `Archivo CSV generado (${allChips.length.toLocaleString()} registros)`, 'success');
+                } catch (error) {
+                    console.error('Error exportando a CSV:', error);
+                    this.showAlert('Error', 'No se pudo exportar el archivo CSV', 'error');
+                }
             }
 
             exportCategories() {
-                const data = allCategories.map(cat => {
-                    const chipsCount = allChips.filter(chip => chip.categoria_id === cat.id).length;
-                    
-                    return {
-                        'ID Categoría': cat.categoria_id,
-                        'Número de Casillero': cat.letra_categoria,
-                        'Operadora': cat.operadora,
-                        'Nombre Categoría': cat.nombre,
-                        'Fecha Nacimiento': cat.fecha_activacion,
-                        'Fecha Vencimiento': cat.fecha_vencimiento,
-                        'Días Vencimiento': cat.dias_vencimiento,
-                        'Chips Asignados': chipsCount,
-                        'Observaciones': cat.observaciones || ''
-                    };
-                });
+                try {
+                    const data = allCategories.map(cat => {
+                        const chipsCount = allChips.filter(chip => chip.categoria_id === cat.id).length;
+                        
+                        return {
+                            'ID Categoría': cat.categoria_id,
+                            'Número de Casillero': cat.letra_categoria,
+                            'Operadora': cat.operadora,
+                            'Nombre Categoría': cat.nombre,
+                            'Fecha Nacimiento': cat.fecha_activacion,
+                            'Fecha Vencimiento': cat.fecha_vencimiento,
+                            'Días Vencimiento': cat.dias_vencimiento,
+                            'Chips Asignados': chipsCount,
+                            'Observaciones': cat.observaciones || ''
+                        };
+                    });
 
-                const worksheet = XLSX.utils.json_to_sheet(data);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Categorías");
-                
-                const wscols = [
-                    {wch: 15}, {wch: 20}, {wch: 10}, {wch: 25},
-                    {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
-                    {wch: 30}
-                ];
-                worksheet['!cols'] = wscols;
-                
-                const fecha = new Date().toISOString().slice(0,10);
-                XLSX.writeFile(workbook, `categorias_completas_${fecha}.xlsx`);
-                
-                this.showAlert('Éxito', `Categorías exportadas a Excel (${allCategories.length} registros)`, 'success');
+                    const worksheet = XLSX.utils.json_to_sheet(data);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Categorías");
+                    
+                    const wscols = [
+                        {wch: 15}, {wch: 20}, {wch: 10}, {wch: 25},
+                        {wch: 15}, {wch: 15}, {wch: 15}, {wch: 15},
+                        {wch: 30}
+                    ];
+                    worksheet['!cols'] = wscols;
+                    
+                    const fecha = new Date().toISOString().slice(0,10);
+                    XLSX.writeFile(workbook, `categorias_completas_${fecha}.xlsx`);
+                    
+                    this.showAlert('Éxito', `Categorías exportadas a Excel (${allCategories.length.toLocaleString()} registros)`, 'success');
+                } catch (error) {
+                    console.error('Error exportando categorías:', error);
+                    this.showAlert('Error', 'No se pudieron exportar las categorías', 'error');
+                }
             }
 
             exportReport() {
-                const reportData = {
-                    fecha: new Date().toISOString().slice(0,10),
-                    totalChips: allChips.length,
-                    estadisticas: {
-                        entel: allChips.filter(chip => chip.operadora === 'ENTEL').length,
-                        tigo: allChips.filter(chip => chip.operadora === 'TIGO').length,
-                        viva: allChips.filter(chip => chip.operadora === 'VIVA').length,
-                        activos: allChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length,
-                        porVencer: allChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER').length,
-                        criticos: allChips.filter(chip => this.determinarEstado(chip) === 'CRITICO').length,
-                        vencidos: allChips.filter(chip => this.determinarEstado(chip) === 'VENCIDO').length,
-                        designados: allChips.filter(chip => chip.designado_a).length
-                    }
-                };
+                try {
+                    const reportData = {
+                        fecha: new Date().toISOString().slice(0,10),
+                        totalChips: allChips.length,
+                        estadisticas: {
+                            entel: allChips.filter(chip => chip.operadora === 'ENTEL').length,
+                            tigo: allChips.filter(chip => chip.operadora === 'TIGO').length,
+                            viva: allChips.filter(chip => chip.operadora === 'VIVA').length,
+                            activos: allChips.filter(chip => this.determinarEstado(chip) === 'ACTIVO').length,
+                            porVencer: allChips.filter(chip => this.determinarEstado(chip) === 'POR_VENCER').length,
+                            criticos: allChips.filter(chip => this.determinarEstado(chip) === 'CRITICO').length,
+                            vencidos: allChips.filter(chip => this.determinarEstado(chip) === 'VENCIDO').length,
+                            designados: allChips.filter(chip => chip.designado_a).length
+                        }
+                    };
 
-                const worksheet = XLSX.utils.json_to_sheet([
-                    { 'Reporte': 'Inventario de Chips', 'Fecha': reportData.fecha },
-                    { 'Reporte': 'Total Chips', 'Valor': reportData.totalChips },
-                    {},
-                    { 'Reporte': 'Estadísticas por Operadora', 'Valor': '' },
-                    { 'Reporte': 'ENTEL', 'Valor': reportData.estadisticas.entel },
-                    { 'Reporte': 'TIGO', 'Valor': reportData.estadisticas.tigo },
-                    { 'Reporte': 'VIVA', 'Valor': reportData.estadisticas.viva },
-                    {},
-                    { 'Reporte': 'Estadísticas por Estado', 'Valor': '' },
-                    { 'Reporte': 'Activos', 'Valor': reportData.estadisticas.activos },
-                    { 'Reporte': 'Por Vencer', 'Valor': reportData.estadisticas.porVencer },
-                    { 'Reporte': 'Críticos', 'Valor': reportData.estadisticas.criticos },
-                    { 'Reporte': 'Vencidos', 'Valor': reportData.estadisticas.vencidos },
-                    { 'Reporte': 'Designados', 'Valor': reportData.estadisticas.designados }
-                ]);
-                
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
-                
-                const wscols = [
-                    {wch: 25}, {wch: 15}
-                ];
-                worksheet['!cols'] = wscols;
-                
-                XLSX.writeFile(workbook, `reporte_chips_${reportData.fecha}.xlsx`);
-                
-                this.showAlert('Éxito', 'Reporte exportado a Excel', 'success');
+                    const worksheet = XLSX.utils.json_to_sheet([
+                        { 'Reporte': 'Inventario de Chips', 'Fecha': reportData.fecha },
+                        { 'Reporte': 'Total Chips', 'Valor': reportData.totalChips.toLocaleString() },
+                        {},
+                        { 'Reporte': 'Estadísticas por Operadora', 'Valor': '' },
+                        { 'Reporte': 'ENTEL', 'Valor': reportData.estadisticas.entel.toLocaleString() },
+                        { 'Reporte': 'TIGO', 'Valor': reportData.estadisticas.tigo.toLocaleString() },
+                        { 'Reporte': 'VIVA', 'Valor': reportData.estadisticas.viva.toLocaleString() },
+                        {},
+                        { 'Reporte': 'Estadísticas por Estado', 'Valor': '' },
+                        { 'Reporte': 'Activos', 'Valor': reportData.estadisticas.activos.toLocaleString() },
+                        { 'Reporte': 'Por Vencer', 'Valor': reportData.estadisticas.porVencer.toLocaleString() },
+                        { 'Reporte': 'Críticos', 'Valor': reportData.estadisticas.criticos.toLocaleString() },
+                        { 'Reporte': 'Vencidos', 'Valor': reportData.estadisticas.vencidos.toLocaleString() },
+                        { 'Reporte': 'Designados', 'Valor': reportData.estadisticas.designados.toLocaleString() }
+                    ]);
+                    
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Reporte");
+                    
+                    const wscols = [
+                        {wch: 25}, {wch: 15}
+                    ];
+                    worksheet['!cols'] = wscols;
+                    
+                    XLSX.writeFile(workbook, `reporte_chips_${reportData.fecha}.xlsx`);
+                    
+                    this.showAlert('Éxito', 'Reporte exportado a Excel', 'success');
+                } catch (error) {
+                    console.error('Error exportando reporte:', error);
+                    this.showAlert('Error', 'No se pudo exportar el reporte', 'error');
+                }
             }
 
             exportPorVencer() {
-                const data = chipsPorVencer.map(chip => {
-                    const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                    
-                    return {
-                        '#': chip.numero_secuencia || chip.numero_chip,
-                        'Número Chip': chip.numero_chip,
-                        'Operadora': chip.operadora,
-                        'ID Categoría': categoria?.categoria_id || 'N/A',
-                        'Número de Casillero': categoria?.letra_categoria || 'N/A',
-                        'Categoría': categoria?.nombre || 'N/A',
-                        'Fecha Vencimiento': chip.fecha_vencimiento,
-                        'Días Restantes': chip.dias_restantes,
-                        'Designado a': chip.designado_a || '',
-                        'Estado': this.determinarEstado(chip)
-                    };
-                });
+                try {
+                    const data = chipsPorVencer.map(chip => {
+                        const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
+                        
+                        return {
+                            '#': chip.numero_secuencia || chip.numero_chip,
+                            'Número Chip': chip.numero_chip,
+                            'Operadora': chip.operadora,
+                            'ID Categoría': categoria?.categoria_id || 'N/A',
+                            'Número de Casillero': categoria?.letra_categoria || 'N/A',
+                            'Categoría': categoria?.nombre || 'N/A',
+                            'Fecha Vencimiento': chip.fecha_vencimiento,
+                            'Días Restantes': chip.dias_restantes,
+                            'Designado a': chip.designado_a || '',
+                            'Estado': this.determinarEstado(chip)
+                        };
+                    });
 
-                const worksheet = XLSX.utils.json_to_sheet(data);
-                const workbook = XLSX.utils.book_new();
-                XLSX.utils.book_append_sheet(workbook, worksheet, "Chips por Vencer");
-                
-                const wscols = [
-                    {wch: 5}, {wch: 15}, {wch: 10}, {wch: 15},
-                    {wch: 20}, {wch: 20}, {wch: 15}, {wch: 15},
-                    {wch: 25}, {wch: 15}
-                ];
-                worksheet['!cols'] = wscols;
-                
-                const fecha = new Date().toISOString().slice(0,10);
-                XLSX.writeFile(workbook, `chips_por_vencer_${fecha}.xlsx`);
-                
-                this.showAlert('Éxito', `Chips por vencer exportados a Excel (${chipsPorVencer.length} registros)`, 'success');
+                    const worksheet = XLSX.utils.json_to_sheet(data);
+                    const workbook = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(workbook, worksheet, "Chips por Vencer");
+                    
+                    const wscols = [
+                        {wch: 5}, {wch: 15}, {wch: 10}, {wch: 15},
+                        {wch: 20}, {wch: 20}, {wch: 15}, {wch: 15},
+                        {wch: 25}, {wch: 15}
+                    ];
+                    worksheet['!cols'] = wscols;
+                    
+                    const fecha = new Date().toISOString().slice(0,10);
+                    XLSX.writeFile(workbook, `chips_por_vencer_${fecha}.xlsx`);
+                    
+                    this.showAlert('Éxito', `Chips por vencer exportados a Excel (${chipsPorVencer.length.toLocaleString()} registros)`, 'success');
+                } catch (error) {
+                    console.error('Error exportando chips por vencer:', error);
+                    this.showAlert('Error', 'No se pudieron exportar los chips por vencer', 'error');
+                }
             }
 
             async refreshData() {
@@ -3282,11 +3380,11 @@
                     html: `
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            Se enviarán notificaciones para ${chipsPorVencer.length} chips por vencer.
+                            Se enviarán notificaciones para ${chipsPorVencer.length.toLocaleString()} chips por vencer.
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Mensaje</label>
-                            <textarea class="form-control" id="alertMessage" rows="3">Hay ${chipsPorVencer.length} chips por vencer en los próximos 10 días. Por favor revisar el sistema de inventario.</textarea>
+                            <textarea class="form-control" id="alertMessage" rows="3">Hay ${chipsPorVencer.length.toLocaleString()} chips por vencer en los próximos 10 días. Por favor revisar el sistema de inventario.</textarea>
                         </div>
                     `,
                     showCancelButton: true,
