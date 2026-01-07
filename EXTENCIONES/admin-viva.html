@@ -24,6 +24,7 @@
             --falta-color: #FFA500;
             --echo-color: #28a745;
             --error-color: #dc3545;
+            --no-valido-color: #6f42c1; /* Púrpura para NO_VALIDO */
         }
         
         * {
@@ -265,6 +266,11 @@
         
         .status-error {
             background-color: var(--error-color);
+            color: white;
+        }
+        
+        .status-no_valido {
+            background-color: var(--no-valido-color);
             color: white;
         }
         
@@ -587,7 +593,7 @@
         
         @media (min-width: 768px) {
             .user-stats-grid {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
             }
         }
         
@@ -800,6 +806,10 @@
                         <div class="stat-number" id="errorCount">0</div>
                         <div class="stat-label">Estado: Error</div>
                     </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="noValidoCount">0</div>
+                        <div class="stat-label">Estado: No Válido</div>
+                    </div>
                 </div>
 
                 <!-- Actividad Reciente -->
@@ -958,7 +968,7 @@
                 <!-- Gráfico principal de recargas por hora -->
                 <div class="app-card">
                     <div class="app-card-header">
-                        Recargas por Hora
+                        Recargas por Hora (sin No Válido)
                     </div>
                     <div class="app-card-body">
                         <div class="chart-container-large">
@@ -973,7 +983,7 @@
 
                 <!-- Estadísticas por hora -->
                 <div class="hourly-stats" id="hourlyStats" style="display: none;">
-                    <h5>Detalle por Hora</h5>
+                    <h5>Detalle por Hora (sin No Válido)</h5>
                     <div class="hour-list" id="hourList">
                         <!-- Las horas se cargarán aquí -->
                     </div>
@@ -1003,7 +1013,7 @@
                 <!-- Nueva sección: Estadísticas por Usuario -->
                 <div class="user-stats-container">
                     <h5 class="mb-3 text-viva">
-                        <i class="bi bi-person-circle me-2"></i>Estadísticas por Usuario
+                        <i class="bi bi-person-circle me-2"></i>Estadísticas por Usuario 
                     </h5>
                     
                     <!-- Filtros para usuario -->
@@ -1028,7 +1038,7 @@
                     <div class="user-stats-grid" id="userStatsGrid">
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userTotalRecharges">0</div>
-                            <div class="user-stat-label">Total Recargas</div>
+                            <div class="user-stat-label">Total Recargas (sin No Válido)</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userFaltaCount">0</div>
@@ -1041,6 +1051,10 @@
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userErrorCount">0</div>
                             <div class="user-stat-label">Estado: Error</div>
+                        </div>
+                        <div class="user-stat-card">
+                            <div class="user-stat-number" id="userNoValidoCount">0</div>
+                            <div class="user-stat-label">Estado: No Válido</div>
                         </div>
                         <div class="user-stat-card">
                             <div class="user-stat-number" id="userHourPeak">--:--</div>
@@ -1173,6 +1187,7 @@
                                 <option value="FALTA">Falta</option>
                                 <option value="ECHO">Echo</option>
                                 <option value="ERROR">Error</option>
+                                <option value="NO_VALIDO">No Válido</option>
                             </select>
                         </div>
                     </form>
@@ -1244,6 +1259,7 @@
         let selectedDay = '';
         let selectedUserId = '';
         let selectedUserDay = '';
+        let currentRechargeId = null;
 
         document.addEventListener('DOMContentLoaded', function() {
             initializeAdminPanel();
@@ -1418,8 +1434,9 @@
         }
 
         function updateDashboardStats() {
-            // Total recargas
-            document.getElementById('totalRecharges').textContent = allRecharges.length.toLocaleString();
+            // Total recargas SIN NO_VALIDO
+            const totalRechargesWithoutNoValido = allRecharges.filter(r => r.estado !== 'NO_VALIDO').length;
+            document.getElementById('totalRecharges').textContent = totalRechargesWithoutNoValido.toLocaleString();
             
             // Total usuarios
             document.getElementById('totalUsers').textContent = allUsers.length;
@@ -1428,10 +1445,12 @@
             const faltaCount = allRecharges.filter(r => r.estado === 'FALTA').length;
             const echoCount = allRecharges.filter(r => r.estado === 'ECHO').length;
             const errorCount = allRecharges.filter(r => r.estado === 'ERROR').length;
+            const noValidoCount = allRecharges.filter(r => r.estado === 'NO_VALIDO').length;
             
             document.getElementById('faltaCount').textContent = faltaCount.toLocaleString();
             document.getElementById('echoCount').textContent = echoCount.toLocaleString();
             document.getElementById('errorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('noValidoCount').textContent = noValidoCount.toLocaleString();
         }
 
         function updateRecentActivity() {
@@ -1440,8 +1459,7 @@
             
             tbody.innerHTML = recentRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
-                const statusClass = recharge.estado === 'FALTA' ? 'status-falta' : 
-                                   recharge.estado === 'ECHO' ? 'status-echo' : 'status-error';
+                const statusClass = getStatusClass(recharge.estado);
                 
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
@@ -1449,7 +1467,7 @@
                     <td>${recharge.phone_number}</td>
                     <td>
                         <span class="status-badge ${statusClass}">
-                            ${recharge.estado}
+                            ${recharge.estado === 'NO_VALIDO' ? 'No Válido' : recharge.estado}
                         </span>
                     </td>
                     <td>${dateTime.date}</td>
@@ -1457,15 +1475,27 @@
             `}).join('');
         }
 
+        function getStatusClass(estado) {
+            switch(estado) {
+                case 'FALTA': return 'status-falta';
+                case 'ECHO': return 'status-echo';
+                case 'ERROR': return 'status-error';
+                case 'NO_VALIDO': return 'status-no_valido';
+                default: return 'status-falta';
+            }
+        }
+
         async function loadUsersData() {
             showLoading('loadingUsers');
             try {
                 const tbody = document.getElementById('usersTableBody');
                 
-                // Contar recargas por usuario
+                // Contar recargas por usuario SIN NO_VALIDO
                 const userRechargeCounts = {};
                 allRecharges.forEach(recharge => {
-                    userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
+                    if (recharge.estado !== 'NO_VALIDO') {
+                        userRechargeCounts[recharge.user_id] = (userRechargeCounts[recharge.user_id] || 0) + 1;
+                    }
                 });
 
                 tbody.innerHTML = allUsers.map(user => `
@@ -1509,8 +1539,7 @@
             
             tbody.innerHTML = filteredRecharges.map(recharge => {
                 const dateTime = parseDateTime(recharge.timestamp);
-                const statusClass = recharge.estado === 'FALTA' ? 'status-falta' : 
-                                   recharge.estado === 'ECHO' ? 'status-echo' : 'status-error';
+                const statusClass = getStatusClass(recharge.estado);
                 
                 return `
                 <tr onclick="showRechargeDetail(${recharge.id})">
@@ -1518,7 +1547,7 @@
                     <td>${recharge.phone_number}</td>
                     <td>
                         <span class="status-badge ${statusClass}">
-                            ${recharge.estado}
+                            ${recharge.estado === 'NO_VALIDO' ? 'No Válido' : recharge.estado}
                         </span>
                     </td>
                     <td>${dateTime.date}</td>
@@ -1551,8 +1580,7 @@
             document.getElementById('rechargeDetailModalLabel').textContent = `Recarga VIVA #${recharge.id}`;
             
             const detailContent = document.getElementById('rechargeDetailContent');
-            const statusClass = recharge.estado === 'FALTA' ? 'status-falta' : 
-                               recharge.estado === 'ECHO' ? 'status-echo' : 'status-error';
+            const statusClass = getStatusClass(recharge.estado);
             
             detailContent.innerHTML = `
                 <div class="recharge-detail-item">
@@ -1567,7 +1595,7 @@
                     <span class="recharge-detail-label">Estado:</span>
                     <span class="recharge-detail-value">
                         <span class="status-badge ${statusClass}">
-                            ${recharge.estado}
+                            ${recharge.estado === 'NO_VALIDO' ? 'No Válido' : recharge.estado}
                         </span>
                     </span>
                 </div>
@@ -2086,6 +2114,9 @@
                 });
             }
             
+            // Filtrar recargas SIN NO_VALIDO para el gráfico de usuarios
+            filteredData = filteredData.filter(recharge => recharge.estado !== 'NO_VALIDO');
+            
             // Contar recargas por usuario
             const userRechargeCounts = {};
             filteredData.forEach(recharge => {
@@ -2145,7 +2176,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Recargas',
+                        label: 'Recargas (sin No Válido)',
                         data: data,
                         backgroundColor: backgroundColors,
                         borderColor: '#5A9E00',
@@ -2213,191 +2244,19 @@
             `).join('');
         }
 
-        function updateUserStatistics() {
-            // Filtrar recargas según los criterios seleccionados
-            let filteredByUser = allRecharges;
-            
-            // Filtrar por usuario si se seleccionó uno
-            if (selectedUserId) {
-                filteredByUser = filteredByUser.filter(recharge => recharge.user_id == selectedUserId);
-            }
-            
-            // Filtrar por día si se seleccionó uno
-            if (selectedUserDay) {
-                filteredByUser = filteredByUser.filter(recharge => {
-                    const datePart = recharge.timestamp.split(' ')[0];
-                    return datePart === selectedUserDay;
-                });
-            }
-            
-            // Calcular estadísticas - MODIFICACIÓN ESPECÍFICA
-            // Total de recargas: NO contar los estados "ERROR" - SOLO ESTO
-            const totalRecargas = filteredByUser.filter(recharge => 
-                recharge.estado !== 'ERROR'
-            ).length;
-            
-            // Contar por estado (estos se mantienen igual)
-            const faltaCount = filteredByUser.filter(r => r.estado === 'FALTA').length;
-            const echoCount = filteredByUser.filter(r => r.estado === 'ECHO').length;
-            const errorCount = filteredByUser.filter(r => r.estado === 'ERROR').length;
-            
-            // Calcular hora pico - SOLO para recargas que NO sean "ERROR"
-            const hourCounts = {};
-            let peakHour = '';
-            let maxCount = 0;
-            
-            // Preparar datos por hora (00-23) - solo para recargas que NO sean "ERROR"
-            const hourlyData = {};
-            for (let i = 0; i < 24; i++) {
-                hourlyData[i.toString().padStart(2, '0')] = 0;
-            }
-            
-            filteredByUser.forEach(recharge => {
-                // Solo contar para hora pico si NO es "ERROR"
-                if (recharge.estado !== 'ERROR') {
-                    const timePart = recharge.timestamp.split(' ')[1];
-                    if (timePart) {
-                        const hour = timePart.split(':')[0];
-                        hourlyData[hour] = (hourlyData[hour] || 0) + 1;
-                        
-                        // Actualizar conteo por hora para estadísticas
-                        hourCounts[hour] = (hourCounts[hour] || 0) + 1;
-                        
-                        if (hourCounts[hour] > maxCount) {
-                            maxCount = hourCounts[hour];
-                            peakHour = hour + ':00';
-                        }
-                    }
-                }
-            });
-            
-            // Actualizar estadísticas en la interfaz
-            document.getElementById('userTotalRecharges').textContent = totalRecargas.toLocaleString();
-            document.getElementById('userFaltaCount').textContent = faltaCount.toLocaleString();
-            document.getElementById('userEchoCount').textContent = echoCount.toLocaleString();
-            document.getElementById('userErrorCount').textContent = errorCount.toLocaleString();
-            document.getElementById('userHourPeak').textContent = peakHour || '--:--';
-            
-            // Actualizar gráfico del usuario
-            createUserHourlyChart(hourlyData);
-            
-            // Actualizar detalle por hora
-            updateUserHourlyDetails(hourCounts);
-        }
-
-        function createUserHourlyChart(hourlyData) {
-            const ctx = document.getElementById('userHourlyChart').getContext('2d');
-            
-            // Destruir gráfico existente si hay uno
-            if (userHourlyChart) {
-                userHourlyChart.destroy();
-            }
-            
-            // Verificar si hay datos
-            const hasData = Object.values(hourlyData).some(count => count > 0);
-            
-            if (!hasData) {
-                document.getElementById('userNoDataMessage').classList.remove('d-none');
-                return;
-            }
-            
-            document.getElementById('userNoDataMessage').classList.add('d-none');
-            
-            // Preparar etiquetas y datos
-            const labels = [];
-            const data = [];
-            
-            for (let i = 0; i < 24; i++) {
-                const hour = i.toString().padStart(2, '0');
-                labels.push(hour + ':00');
-                data.push(hourlyData[hour] || 0);
-            }
-            
-            // Crear nuevo gráfico
-            userHourlyChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Recargas por Hora',
-                        data: data,
-                        backgroundColor: '#FF6B00',
-                        borderColor: '#E55A00',
-                        borderWidth: 1,
-                        borderRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `Recargas: ${context.raw}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Número de Recargas'
-                            },
-                            ticks: {
-                                stepSize: 1
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Hora del Día'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function updateUserHourlyDetails(hourCounts) {
-            const userHourList = document.getElementById('userHourList');
-            const userHourlyDetails = document.getElementById('userHourlyDetails');
-            
-            if (Object.keys(hourCounts).length === 0) {
-                userHourList.innerHTML = '<div class="text-center text-muted py-3">No hay actividad por hora</div>';
-                userHourlyDetails.style.display = 'block';
-                return;
-            }
-            
-            // Ordenar horas por cantidad (de mayor a menor)
-            const sortedHours = Object.entries(hourCounts)
-                .sort((a, b) => b[1] - a[1]);
-            
-            userHourList.innerHTML = sortedHours.map(([hour, count]) => `
-                <div class="user-hour-item">
-                    <span class="user-hour-time">${hour}:00</span>
-                    <span class="user-hour-count">${count} recarga${count !== 1 ? 's' : ''}</span>
-                </div>
-            `).join('');
-            
-            userHourlyDetails.style.display = 'block';
-        }
-
         function updateDayStatistics() {
             if (!selectedDay) return;
             
             // Filtrar recargas del día seleccionado
-            const dayRecharges = allRecharges.filter(recharge => {
+            let dayRecharges = allRecharges.filter(recharge => {
                 const datePart = recharge.timestamp.split(' ')[0];
                 return datePart === selectedDay;
             });
             
-            if (dayRecharges.length === 0) {
+            // Filtrar recargas SIN NO_VALIDO para estadísticas del día
+            const dayRechargesWithoutNoValido = dayRecharges.filter(recharge => recharge.estado !== 'NO_VALIDO');
+            
+            if (dayRechargesWithoutNoValido.length === 0) {
                 // No hay datos para este día
                 document.getElementById('noDataMessage').classList.remove('d-none');
                 if (hourlyChart) hourlyChart.destroy();
@@ -2412,25 +2271,25 @@
             document.getElementById('noDataMessage').classList.add('d-none');
             
             // Calcular estadísticas del día
-            const totalRecargas = dayRecharges.length;
+            const totalRecargas = dayRechargesWithoutNoValido.length;
             
-            // Usuarios únicos
+            // Usuarios únicos (de las recargas sin NO_VALIDO)
             const uniqueUsers = new Set();
-            dayRecharges.forEach(recharge => uniqueUsers.add(recharge.user_id));
+            dayRechargesWithoutNoValido.forEach(recharge => uniqueUsers.add(recharge.user_id));
             const uniqueUsersCount = uniqueUsers.size;
             
-            // Hora pico
+            // Hora pico (de las recargas sin NO_VALIDO)
             const hourCounts = {};
             let peakHour = '';
             let maxCount = 0;
             
-            // Preparar datos por hora (00-23)
+            // Preparar datos por hora (00-23) para gráfico SIN NO_VALIDO
             const hourlyData = {};
             for (let i = 0; i < 24; i++) {
                 hourlyData[i.toString().padStart(2, '0')] = 0;
             }
             
-            dayRecharges.forEach(recharge => {
+            dayRechargesWithoutNoValido.forEach(recharge => {
                 const timePart = recharge.timestamp.split(' ')[1];
                 if (timePart) {
                     const hour = timePart.split(':')[0];
@@ -2482,7 +2341,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Recargas por Hora',
+                        label: 'Recargas por Hora (sin No Válido)',
                         data: data,
                         backgroundColor: '#78BE20',
                         borderColor: '#5A9E00',
@@ -2561,6 +2420,182 @@
             }
         }
 
+        function updateUserStatistics() {
+            // Filtrar recargas según los criterios seleccionados
+            let filteredByUser = allRecharges;
+            
+            // Filtrar por usuario si se seleccionó uno
+            if (selectedUserId) {
+                filteredByUser = filteredByUser.filter(recharge => recharge.user_id == selectedUserId);
+            }
+            
+            // Filtrar por día si se seleccionó uno
+            if (selectedUserDay) {
+                filteredByUser = filteredByUser.filter(recharge => {
+                    const datePart = recharge.timestamp.split(' ')[0];
+                    return datePart === selectedUserDay;
+                });
+            }
+            
+            // Filtrar recargas SIN NO_VALIDO para estadísticas del usuario (excepto para el contador de NO_VALIDO)
+            const filteredByUserWithoutNoValido = filteredByUser.filter(recharge => recharge.estado !== 'NO_VALIDO');
+            
+            // Calcular estadísticas SIN NO_VALIDO para el total
+            const totalRecargas = filteredByUserWithoutNoValido.length;
+            
+            // Contar por estado SIN NO_VALIDO
+            const faltaCount = filteredByUserWithoutNoValido.filter(r => r.estado === 'FALTA').length;
+            const echoCount = filteredByUserWithoutNoValido.filter(r => r.estado === 'ECHO').length;
+            const errorCount = filteredByUserWithoutNoValido.filter(r => r.estado === 'ERROR').length;
+            
+            // Contar NO_VALIDO por separado
+            const noValidoCount = filteredByUser.filter(r => r.estado === 'NO_VALIDO').length;
+            
+            // Calcular hora pico SIN NO_VALIDO
+            const hourCounts = {};
+            let peakHour = '';
+            let maxCount = 0;
+            
+            // Preparar datos por hora (00-23) para gráfico SIN NO_VALIDO
+            const hourlyData = {};
+            for (let i = 0; i < 24; i++) {
+                hourlyData[i.toString().padStart(2, '0')] = 0;
+            }
+            
+            filteredByUserWithoutNoValido.forEach(recharge => {
+                const timePart = recharge.timestamp.split(' ')[1];
+                if (timePart) {
+                    const hour = timePart.split(':')[0];
+                    hourlyData[hour] = (hourlyData[hour] || 0) + 1;
+                    
+                    // Actualizar conteo por hora para estadísticas
+                    hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+                    
+                    if (hourCounts[hour] > maxCount) {
+                        maxCount = hourCounts[hour];
+                        peakHour = hour + ':00';
+                    }
+                }
+            });
+            
+            // Actualizar estadísticas en la interfaz
+            document.getElementById('userTotalRecharges').textContent = totalRecargas.toLocaleString();
+            document.getElementById('userFaltaCount').textContent = faltaCount.toLocaleString();
+            document.getElementById('userEchoCount').textContent = echoCount.toLocaleString();
+            document.getElementById('userErrorCount').textContent = errorCount.toLocaleString();
+            document.getElementById('userNoValidoCount').textContent = noValidoCount.toLocaleString();
+            document.getElementById('userHourPeak').textContent = peakHour || '--:--';
+            
+            // Actualizar gráfico del usuario SIN NO_VALIDO
+            createUserHourlyChart(hourlyData);
+            
+            // Actualizar detalle por hora SIN NO_VALIDO
+            updateUserHourlyDetails(hourCounts);
+        }
+
+        function createUserHourlyChart(hourlyData) {
+            const ctx = document.getElementById('userHourlyChart').getContext('2d');
+            
+            // Destruir gráfico existente si hay uno
+            if (userHourlyChart) {
+                userHourlyChart.destroy();
+            }
+            
+            // Verificar si hay datos
+            const hasData = Object.values(hourlyData).some(count => count > 0);
+            
+            if (!hasData) {
+                document.getElementById('userNoDataMessage').classList.remove('d-none');
+                return;
+            }
+            
+            document.getElementById('userNoDataMessage').classList.add('d-none');
+            
+            // Preparar etiquetas y datos
+            const labels = [];
+            const data = [];
+            
+            for (let i = 0; i < 24; i++) {
+                const hour = i.toString().padStart(2, '0');
+                labels.push(hour + ':00');
+                data.push(hourlyData[hour] || 0);
+            }
+            
+            // Crear nuevo gráfico
+            userHourlyChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Recargas por Hora (sin No Válido)',
+                        data: data,
+                        backgroundColor: '#FF6B00',
+                        borderColor: '#E55A00',
+                        borderWidth: 1,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `Recargas: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Número de Recargas'
+                            },
+                            ticks: {
+                                stepSize: 1
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Hora del Día'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateUserHourlyDetails(hourCounts) {
+            const userHourList = document.getElementById('userHourList');
+            const userHourlyDetails = document.getElementById('userHourlyDetails');
+            
+            if (Object.keys(hourCounts).length === 0) {
+                userHourList.innerHTML = '<div class="text-center text-muted py-3">No hay actividad por hora</div>';
+                userHourlyDetails.style.display = 'block';
+                return;
+            }
+            
+            // Ordenar horas por cantidad (de mayor a menor)
+            const sortedHours = Object.entries(hourCounts)
+                .sort((a, b) => b[1] - a[1]);
+            
+            userHourList.innerHTML = sortedHours.map(([hour, count]) => `
+                <div class="user-hour-item">
+                    <span class="user-hour-time">${hour}:00</span>
+                    <span class="user-hour-count">${count} recarga${count !== 1 ? 's' : ''}</span>
+                </div>
+            `).join('');
+            
+            userHourlyDetails.style.display = 'block';
+        }
+
         function exportDashboard() {
             exportToPDF('Dashboard VIVA', allRecharges);
         }
@@ -2616,7 +2651,7 @@
                 const rowData = [
                     item.user_name,
                     item.phone_number,
-                    item.estado,
+                    item.estado === 'NO_VALIDO' ? 'No Válido' : item.estado,
                     item.timestamp
                 ];
                 tableRows.push(rowData);
@@ -2645,7 +2680,7 @@
             const excelData = data.map(item => ({
                 'Usuario': item.user_name,
                 'Teléfono': item.phone_number,
-                'Estado': item.estado,
+                'Estado': item.estado === 'NO_VALIDO' ? 'No Válido' : item.estado,
                 'Fecha': item.timestamp
             }));
             
