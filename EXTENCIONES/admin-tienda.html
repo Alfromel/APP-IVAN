@@ -18,6 +18,7 @@
             --success-color: #28a745;
             --warning-color: #ffc107;
             --danger-color: #dc3545;
+            --info-color: #17a2b8;
             --gray-light: #f8f9fa;
             --gray-dark: #343a40;
         }
@@ -435,6 +436,16 @@
             color: var(--white);
         }
         
+        .status-vencido {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: var(--white);
+        }
+        
+        .status-por-vencer {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: var(--gray-dark);
+        }
+        
         /* Dinero */
         .money {
             color: var(--primary-purple);
@@ -650,6 +661,58 @@
             font-size: 0.9rem;
         }
         
+        /* Gráficos en Dashboard */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .chart-card {
+            height: 100%;
+        }
+        
+        .chart-card .desktop-card-body {
+            padding: 15px;
+        }
+        
+        .dashboard-row {
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-row .col-md-6 {
+            margin-bottom: 20px;
+        }
+        
+        /* Indicadores de fecha */
+        .expiration-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .expiration-vencido {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        .expiration-proximo {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+        
+        .expiration-normal {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
         /* Responsive */
         @media (max-width: 768px) {
             .sidebar {
@@ -678,6 +741,24 @@
                 right: 20px;
                 width: 50px;
                 height: 50px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 200px;
             }
         }
     </style>
@@ -717,10 +798,6 @@
                 <a href="#" class="menu-item" data-section="sucursales">
                     <i class="bi bi-shop-window"></i>
                     <span>Sucursales</span>
-                </a>
-                <a href="#" class="menu-item" data-section="reportes">
-                    <i class="bi bi-graph-up"></i>
-                    <span>Reportes</span>
                 </a>
             </div>
             
@@ -771,7 +848,7 @@
             <div class="content-body">
                 <!-- Dashboard -->
                 <div id="dashboardSection" class="fade-in">
-                    <!-- Estadísticas -->
+                    <!-- Estadísticas principales -->
                     <div class="stats-grid">
                         <div class="stat-card">
                             <div class="stat-icon">
@@ -801,11 +878,55 @@
                             <div class="stat-number" id="totalValue">Bs. 0</div>
                             <div class="stat-label">Valor Inventario</div>
                         </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                            <div class="stat-number" id="expiredProducts">0</div>
+                            <div class="stat-label">Productos Vencidos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-week"></i>
+                            </div>
+                            <div class="stat-number" id="expiringProducts">0</div>
+                            <div class="stat-label">Por Vencer (7 días)</div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos y estadísticas -->
+                    <div class="dashboard-row">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="desktop-card chart-card">
+                                    <div class="desktop-card-header">
+                                        <span>Estado del Inventario</span>
+                                    </div>
+                                    <div class="desktop-card-body">
+                                        <div class="chart-container">
+                                            <canvas id="inventoryStatusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="desktop-card chart-card">
+                                    <div class="desktop-card-header">
+                                        <span>Productos por Vencer</span>
+                                    </div>
+                                    <div class="desktop-card-body">
+                                        <div class="chart-container">
+                                            <canvas id="expirationChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Productos con stock bajo -->
                     <div class="desktop-card">
-                        <div class="desktop-card-header">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
                             <span>Productos con Stock Bajo</span>
                             <small class="text-muted" id="lowStockCount">0 productos</small>
                         </div>
@@ -819,6 +940,7 @@
                                             <th>Stock Actual</th>
                                             <th>Stock Mínimo</th>
                                             <th>Estado</th>
+                                            <th>Vencimiento</th>
                                         </tr>
                                     </thead>
                                     <tbody id="lowStockTable">
@@ -829,9 +951,40 @@
                         </div>
                     </div>
 
+                    <!-- Productos vencidos y por vencer -->
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Productos Vencidos y por Vencer</span>
+                            <div class="d-flex gap-2">
+                                <span class="expiration-indicator expiration-vencido" id="expiredCount">0 vencidos</span>
+                                <span class="expiration-indicator expiration-proximo" id="expiringCount">0 por vencer</span>
+                            </div>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Producto</th>
+                                            <th>Stock</th>
+                                            <th>Precio Venta</th>
+                                            <th>Vencimiento</th>
+                                            <th>Estado</th>
+                                            <th>Días Restantes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expirationTable">
+                                        <!-- Productos vencidos y por vencer -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                     <!-- Últimas ventas -->
                     <div class="desktop-card">
-                        <div class="desktop-card-header">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
                             <span>Últimas Ventas</span>
                             <button class="desktop-btn desktop-btn-primary btn-sm" onclick="showSection('ventas')">
                                 Ver Todas
@@ -986,56 +1139,6 @@
                                     </thead>
                                     <tbody id="branchesTable">
                                         <!-- Sucursales -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Reportes -->
-                <div id="reportesSection" class="fade-in d-none">
-                    <div class="row g-3">
-                        <div class="col-md-6">
-                            <div class="desktop-card h-100">
-                                <div class="desktop-card-header">
-                                    <span>Ventas por Día - <span id="reportBranchTitle">Sucursal</span></span>
-                                </div>
-                                <div class="desktop-card-body">
-                                    <canvas id="dailySalesChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="desktop-card h-100">
-                                <div class="desktop-card-header">
-                                    <span>Productos Más Vendidos - <span id="reportBranchTitle2">Sucursal</span></span>
-                                </div>
-                                <div class="desktop-card-body">
-                                    <canvas id="topProductsChart"></canvas>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="desktop-card mt-3">
-                        <div class="desktop-card-header">
-                            <span>Reporte de Productos Más Vendidos - <span id="reportBranchTitle3">Sucursal</span></span>
-                        </div>
-                        <div class="desktop-card-body">
-                            <div class="table-responsive">
-                                <table class="desktop-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Producto</th>
-                                            <th>Código</th>
-                                            <th>Unidades Vendidas</th>
-                                            <th>Total Generado</th>
-                                            <th>Última Venta</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="topProductsTable">
-                                        <!-- Productos más vendidos -->
                                     </tbody>
                                 </table>
                             </div>
@@ -1268,8 +1371,8 @@
         let allUsers = [];
         let allBranches = [];
         let branchInventory = [];
-        let dailySalesChart = null;
-        let topProductsChart = null;
+        let inventoryStatusChart = null;
+        let expirationChart = null;
 
         // Mapa para almacenar usuarios por ID para búsquedas rápidas
         let usersMap = new Map();
@@ -1389,9 +1492,6 @@
             // Actualizar títulos en todas las secciones
             document.getElementById('branchInventoryTitle').textContent = currentBranch.name;
             document.getElementById('salesBranchTitle').textContent = currentBranch.name;
-            document.getElementById('reportBranchTitle').textContent = currentBranch.name;
-            document.getElementById('reportBranchTitle2').textContent = currentBranch.name;
-            document.getElementById('reportBranchTitle3').textContent = currentBranch.name;
             
             // Cargar datos de la sucursal
             await loadBranchData();
@@ -1499,13 +1599,14 @@
         function updateDashboard() {
             if (!currentBranch) return;
             
-            // Estadísticas generales de la sucursal
             const branchProducts = branchInventory.map(item => ({
                 ...item.products,
                 stock: item.stock,
-                minimum_stock: item.minimum_stock
+                minimum_stock: item.minimum_stock,
+                expiration_date: item.products.expiration_date
             }));
             
+            // Estadísticas básicas
             document.getElementById('totalProducts').textContent = branchProducts.length;
             
             const lowStock = branchProducts.filter(p => p.stock <= p.minimum_stock && p.stock > 0).length;
@@ -1517,11 +1618,208 @@
             const totalValue = branchProducts.reduce((sum, p) => sum + (p.stock * p.purchase_price), 0);
             document.getElementById('totalValue').textContent = `Bs. ${totalValue.toFixed(2)}`;
             
+            // Estadísticas de vencimientos
+            const today = new Date();
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(today.getDate() + 7);
+            
+            let expiredCount = 0;
+            let expiringCount = 0;
+            
+            branchProducts.forEach(product => {
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    if (expDate < today) {
+                        expiredCount++;
+                    } else if (expDate <= sevenDaysFromNow) {
+                        expiringCount++;
+                    }
+                }
+            });
+            
+            document.getElementById('expiredProducts').textContent = expiredCount;
+            document.getElementById('expiringProducts').textContent = expiringCount;
+            document.getElementById('expiredCount').textContent = `${expiredCount} vencidos`;
+            document.getElementById('expiringCount').textContent = `${expiringCount} por vencer`;
+            
             // Productos con stock bajo
             updateLowStockTable();
             
+            // Productos vencidos y por vencer
+            updateExpirationTable();
+            
             // Últimas ventas
             updateRecentSalesTable();
+            
+            // Actualizar gráficos
+            updateCharts();
+        }
+
+        function updateCharts() {
+            createInventoryStatusChart();
+            createExpirationChart();
+        }
+
+        function createInventoryStatusChart() {
+            const ctx = document.getElementById('inventoryStatusChart').getContext('2d');
+            
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                minimum_stock: item.minimum_stock
+            }));
+            
+            // Contar productos por estado
+            const normalStock = branchProducts.filter(p => p.stock > p.minimum_stock).length;
+            const lowStock = branchProducts.filter(p => p.stock <= p.minimum_stock && p.stock > 0).length;
+            const outOfStock = branchProducts.filter(p => p.stock === 0).length;
+            
+            if (inventoryStatusChart) {
+                inventoryStatusChart.destroy();
+            }
+            
+            inventoryStatusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Stock Normal', 'Stock Bajo', 'Agotado'],
+                    datasets: [{
+                        data: [normalStock, lowStock, outOfStock],
+                        backgroundColor: [
+                            '#28a745', // Verde para stock normal
+                            '#ffc107', // Amarillo para stock bajo
+                            '#dc3545'  // Rojo para agotado
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estado del Inventario - ' + currentBranch.name,
+                            font: {
+                                size: 14
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} productos (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createExpirationChart() {
+            const ctx = document.getElementById('expirationChart').getContext('2d');
+            
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                expiration_date: item.products.expiration_date
+            }));
+            
+            // Filtrar productos con fecha de vencimiento
+            const productsWithExpiration = branchProducts.filter(p => p.expiration_date);
+            
+            // Contar por categoría de vencimiento
+            const today = new Date();
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(today.getDate() + 7);
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(today.getDate() + 30);
+            
+            let expired = 0;
+            let expiringIn7Days = 0;
+            let expiringIn30Days = 0;
+            let expiringAfter30Days = 0;
+            let noExpirationDate = branchProducts.length - productsWithExpiration.length;
+            
+            productsWithExpiration.forEach(product => {
+                const expDate = new Date(product.expiration_date);
+                if (expDate < today) {
+                    expired++;
+                } else if (expDate <= sevenDaysFromNow) {
+                    expiringIn7Days++;
+                } else if (expDate <= thirtyDaysFromNow) {
+                    expiringIn30Days++;
+                } else {
+                    expiringAfter30Days++;
+                }
+            });
+            
+            if (expirationChart) {
+                expirationChart.destroy();
+            }
+            
+            expirationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Vencidos', 'Vence en 7 días', 'Vence en 30 días', 'Vence después', 'Sin fecha'],
+                    datasets: [{
+                        label: 'Cantidad de Productos',
+                        data: [expired, expiringIn7Days, expiringIn30Days, expiringAfter30Days, noExpirationDate],
+                        backgroundColor: [
+                            '#dc3545', // Rojo para vencidos
+                            '#ffc107', // Amarillo para vence en 7 días
+                            '#17a2b8', // Azul para vence en 30 días
+                            '#28a745', // Verde para vence después
+                            '#6c757d'  // Gris para sin fecha
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Productos por Estado de Vencimiento - ' + currentBranch.name,
+                            font: {
+                                size: 14
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} productos`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Cantidad'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         function updateLowStockTable() {
@@ -1529,7 +1827,8 @@
             const branchProducts = branchInventory.map(item => ({
                 ...item.products,
                 stock: item.stock,
-                minimum_stock: item.minimum_stock
+                minimum_stock: item.minimum_stock,
+                expiration_date: item.products.expiration_date
             }));
             
             const lowStockProducts = branchProducts.filter(p => p.stock <= p.minimum_stock);
@@ -1548,6 +1847,25 @@
                     statusText = 'Stock Bajo';
                 }
                 
+                // Información de vencimiento
+                let expirationInfo = 'Sin fecha';
+                let expirationClass = '';
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    const today = new Date();
+                    const daysDiff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    expirationInfo = expDate.toLocaleDateString('es-ES');
+                    
+                    if (expDate < today) {
+                        expirationClass = 'text-danger fw-bold';
+                        expirationInfo += ` (Vencido hace ${Math.abs(daysDiff)} días)`;
+                    } else if (daysDiff <= 7) {
+                        expirationClass = 'text-warning fw-bold';
+                        expirationInfo += ` (Vence en ${daysDiff} días)`;
+                    }
+                }
+                
                 return `
                 <tr onclick="editProduct(${product.id})" style="cursor: pointer;">
                     <td>${product.id}</td>
@@ -1562,9 +1880,102 @@
                     <td>
                         <span class="status-badge ${statusClass}">${statusText}</span>
                     </td>
+                    <td class="${expirationClass}">${expirationInfo}</td>
                 </tr>
                 `;
             }).join('');
+            
+            if (lowStockProducts.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="empty-state-text">¡Excelente! Todo el stock está en niveles normales</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }
+        }
+
+        function updateExpirationTable() {
+            const tbody = document.getElementById('expirationTable');
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                expiration_date: item.products.expiration_date
+            }));
+            
+            // Filtrar productos con fecha de vencimiento
+            const productsWithExpiration = branchProducts.filter(p => p.expiration_date);
+            
+            // Ordenar por fecha de vencimiento (más cercanos primero)
+            productsWithExpiration.sort((a, b) => {
+                const dateA = new Date(a.expiration_date);
+                const dateB = new Date(b.expiration_date);
+                return dateA - dateB;
+            });
+            
+            // Limitar a 20 productos para no saturar la vista
+            const displayProducts = productsWithExpiration.slice(0, 20);
+            
+            const today = new Date();
+            
+            tbody.innerHTML = displayProducts.map(product => {
+                const expDate = new Date(product.expiration_date);
+                const daysDiff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                
+                let statusClass = 'status-normal';
+                let statusText = 'Normal';
+                let daysText = `${daysDiff} días`;
+                
+                if (expDate < today) {
+                    statusClass = 'status-vencido';
+                    statusText = 'Vencido';
+                    daysText = `Hace ${Math.abs(daysDiff)} días`;
+                } else if (daysDiff <= 7) {
+                    statusClass = 'status-por-vencer';
+                    statusText = 'Por Vencer';
+                }
+                
+                return `
+                <tr onclick="editProduct(${product.id})" style="cursor: pointer;">
+                    <td>${product.id}</td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        <br><small class="text-muted">${product.code}</small>
+                    </td>
+                    <td>${product.stock}</td>
+                    <td class="money">${product.sale_price.toFixed(2)}</td>
+                    <td>${expDate.toLocaleDateString('es-ES')}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td class="${expDate < today ? 'text-danger' : daysDiff <= 7 ? 'text-warning' : ''}">
+                        ${daysText}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+            
+            if (productsWithExpiration.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="empty-state-text">No hay productos con fecha de vencimiento</div>
+                            <div class="empty-state-subtext">Todos los productos están sin fecha de vencimiento registrada</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }
         }
 
         function updateRecentSalesTable() {
@@ -2711,7 +3122,6 @@
             document.getElementById('inventarioSection').classList.add('d-none');
             document.getElementById('ventasSection').classList.add('d-none');
             document.getElementById('sucursalesSection').classList.add('d-none');
-            document.getElementById('reportesSection').classList.add('d-none');
             
             // Mostrar la sección seleccionada
             document.getElementById(section + 'Section').classList.remove('d-none');
@@ -2719,8 +3129,11 @@
             // Cargar datos específicos si es necesario
             if (section === 'sucursales') {
                 displayBranches();
-            } else if (section === 'reportes') {
-                loadReportsData();
+            } else if (section === 'dashboard') {
+                // Actualizar gráficos cuando se vuelve al dashboard
+                if (currentBranch) {
+                    updateCharts();
+                }
             }
         }
 
@@ -2956,173 +3369,6 @@
                 console.error('Error al eliminar sucursal:', error);
                 showNotification('Error al eliminar sucursal', 'error');
             }
-        }
-
-        function loadReportsData() {
-            if (!currentBranch) {
-                showNotification('Por favor seleccione una sucursal primero', 'error');
-                return;
-            }
-            
-            // Crear gráficos de reportes para la sucursal actual
-            createDailySalesChart();
-            createTopProductsChart();
-        }
-
-        function createDailySalesChart() {
-            const ctx = document.getElementById('dailySalesChart').getContext('2d');
-            
-            // Agrupar ventas por día para la sucursal actual
-            const salesByDay = {};
-            allSales.forEach(sale => {
-                if (!sale.fecha_hora) return;
-                
-                // Extraer fecha usando función mejorada
-                const saleDate = extractDateFromFechaHora(sale.fecha_hora);
-                if (!saleDate) return;
-                
-                let total = 0;
-                try {
-                    if (sale.products) {
-                        const products = JSON.parse(sale.products);
-                        total = products.reduce((sum, p) => sum + p.subtotal, 0);
-                    }
-                } catch (e) {
-                    console.error('Error parsing sale:', e);
-                }
-                
-                if (salesByDay[saleDate]) {
-                    salesByDay[saleDate] += total;
-                } else {
-                    salesByDay[saleDate] = total;
-                }
-            });
-            
-            // Ordenar fechas y tomar las últimas 7
-            const dates = Object.keys(salesByDay).sort().slice(-7);
-            const data = dates.map(date => salesByDay[date] || 0);
-            
-            if (dailySalesChart) {
-                dailySalesChart.destroy();
-            }
-            
-            dailySalesChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: dates,
-                    datasets: [{
-                        label: 'Ventas (Bs.)',
-                        data: data,
-                        borderColor: '#6A0DAD',
-                        backgroundColor: 'rgba(106, 13, 173, 0.1)',
-                        borderWidth: 2,
-                        tension: 0.4,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Ventas de los últimos días - ' + currentBranch.name
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Monto (Bs.)'
-                            }
-                        }
-                    }
-                }
-            });
-        }
-
-        function createTopProductsChart() {
-            const ctx = document.getElementById('topProductsChart').getContext('2d');
-            
-            // Agrupar ventas por producto para la sucursal actual
-            const productSales = {};
-            
-            allSales.forEach(sale => {
-                try {
-                    if (sale.products) {
-                        const products = JSON.parse(sale.products);
-                        products.forEach(p => {
-                            if (productSales[p.product_id]) {
-                                productSales[p.product_id].quantity += p.quantity;
-                                productSales[p.product_id].total += p.subtotal;
-                            } else {
-                                productSales[p.product_id] = {
-                                    name: p.name,
-                                    quantity: p.quantity,
-                                    total: p.subtotal
-                                };
-                            }
-                        });
-                    }
-                } catch (e) {
-                    console.error('Error parsing sale:', e);
-                }
-            });
-            
-            // Convertir a array y ordenar por cantidad vendida
-            const topProducts = Object.values(productSales)
-                .sort((a, b) => b.quantity - a.quantity)
-                .slice(0, 5);
-            
-            const productNames = topProducts.map(p => p.name);
-            const quantities = topProducts.map(p => p.quantity);
-            
-            if (topProductsChart) {
-                topProductsChart.destroy();
-            }
-            
-            topProductsChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: productNames,
-                    datasets: [{
-                        label: 'Unidades Vendidas',
-                        data: quantities,
-                        backgroundColor: [
-                            '#6A0DAD',
-                            '#8A2BE2',
-                            '#9370DB',
-                            '#BA55D3',
-                            '#DA70D6'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        title: {
-                            display: true,
-                            text: 'Top 5 Productos Más Vendidos - ' + currentBranch.name
-                        }
-                    },
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Cantidad Vendida'
-                            }
-                        }
-                    }
-                }
-            });
         }
 
         function globalSearch() {
