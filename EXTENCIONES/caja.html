@@ -3,283 +3,366 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Caja Balance</title>
+    <title>Caja Balance Pro</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display', sans-serif;
             -webkit-tap-highlight-color: transparent;
         }
 
         :root {
-            --verde-oscuro: #0a3d2f;
-            --verde: #046c4e;
-            --verde-claro: #0e9f6e;
-            --verde-brillante: #10b981;
-            --blanco: #ffffff;
-            --gris-claro: #f8faf9;
-            --gris: #e7efed;
-            --gris-oscuro: #2d453f;
-            --negro: #0d1f1a;
-            --exito: #059669;
-            --error: #dc2626;
-            --sombra: 0 2px 4px rgba(0, 0, 0, 0.05);
-            --sombra-fuerte: 0 4px 8px rgba(0, 0, 0, 0.08);
-            --radio: 10px;
-            --radio-grande: 16px;
+            --verde-ios: #30D158;
+            --verde-oscuro-ios: #0D5C31;
+            --verde-claro-ios: #34C759;
+            --verde-fondo: #F8FCF9;
+            --blanco-ios: #FFFFFF;
+            --gris-claro-ios: #F2F2F7;
+            --gris-ios: #C7C7CC;
+            --gris-oscuro-ios: #8E8E93;
+            --negro-ios: #1D1D1F;
+            --sombra-ios: 0 4px 20px rgba(0, 0, 0, 0.08);
+            --sombra-fuerte-ios: 0 8px 32px rgba(0, 0, 0, 0.12);
+            --radio-ios: 14px;
+            --radio-grande-ios: 20px;
+            --azul-ios: #007AFF;
+            --rojo-ios: #FF3B30;
+            --amarillo-ios: #FFCC00;
         }
 
         html {
-            font-size: 13px;
+            font-size: 15px;
         }
 
         body {
-            background: var(--gris-claro);
-            color: var(--negro);
-            line-height: 1.4;
+            background: linear-gradient(135deg, #F8FCF9 0%, #F2F7F4 100%);
+            color: var(--negro-ios);
+            line-height: 1.5;
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .app-container {
             max-width: 100%;
             width: 100%;
             margin: 0 auto;
-            background: var(--blanco);
+            background: var(--blanco-ios);
             min-height: 100vh;
             position: relative;
+            overflow-x: hidden;
+            box-shadow: var(--sombra-ios);
         }
 
-        /* Header */
+        /* Header iOS */
         .app-header {
-            background: var(--verde-oscuro);
-            color: var(--blanco);
-            padding: 0.8rem 1rem 0.6rem;
+            background: linear-gradient(135deg, var(--verde-oscuro-ios) 0%, #0D8A4C 100%);
+            color: var(--blanco-ios);
+            padding: 1.2rem 1.5rem 1.5rem;
             position: sticky;
             top: 0;
             z-index: 100;
-            box-shadow: var(--sombra-fuerte);
+            border-bottom-left-radius: var(--radio-grande-ios);
+            border-bottom-right-radius: var(--radio-grande-ios);
+            box-shadow: var(--sombra-fuerte-ios);
         }
 
         .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 0.8rem;
+            margin-bottom: 1.5rem;
         }
 
         .app-title {
-            font-size: 1.2rem;
+            font-size: 1.7rem;
             font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            color: var(--blanco);
+            gap: 0.8rem;
+            color: var(--blanco-ios);
+            letter-spacing: -0.5px;
         }
 
         .app-title i {
-            color: var(--verde-brillante);
+            color: var(--verde-ios);
+            background: rgba(255, 255, 255, 0.15);
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
         .header-actions {
             display: flex;
-            gap: 0.4rem;
+            gap: 0.8rem;
         }
 
-        .icon-btn {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            color: var(--blanco);
+        .ios-icon-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            color: var(--blanco-ios);
             display: flex;
             align-items: center;
             justify-content: center;
             cursor: pointer;
-            transition: all 0.2s;
-            font-size: 0.9rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 1.1rem;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .icon-btn:hover {
+        .ios-icon-btn:hover {
             background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.05);
         }
 
-        /* Selector */
+        /* Selector iOS */
         .sucursal-selector {
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: var(--radio);
-            padding: 0.6rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: var(--radio-ios);
+            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
         }
 
         .sucursal-label {
-            font-size: 0.7rem;
+            font-size: 0.85rem;
             opacity: 0.9;
-            margin-bottom: 0.3rem;
+            margin-bottom: 0.5rem;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.6rem;
             font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
-        .sucursal-select {
+        .ios-select {
             width: 100%;
-            background: transparent;
-            border: 1px solid rgba(255, 255, 255, 0.25);
-            color: var(--blanco);
-            padding: 0.5rem;
-            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            color: var(--negro-ios);
+            padding: 1rem 1.2rem;
+            border-radius: 14px;
             font-weight: 600;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2310b981' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%230D5C31' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
             background-repeat: no-repeat;
-            background-position: right 0.5rem center;
-            background-size: 1rem;
-            padding-right: 2rem;
+            background-position: right 1.2rem center;
+            background-size: 1.2rem;
+            padding-right: 3rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         }
 
-        /* Ventana Principal */
+        /* Ventana Principal iOS */
         .main-window {
-            padding: 1rem;
+            padding: 1.8rem 1.5rem;
         }
 
-        /* Saldo */
+        /* Saldo Card iOS */
         .balance-card {
-            background: linear-gradient(135deg, var(--verde-oscuro) 0%, var(--verde) 100%);
-            color: var(--blanco);
-            padding: 1.2rem;
-            border-radius: var(--radio-grande);
-            margin-bottom: 1rem;
-            box-shadow: var(--sombra-fuerte);
+            background: linear-gradient(145deg, #FFFFFF 0%, #F8FCF9 100%);
+            color: var(--negro-ios);
+            padding: 1.8rem;
+            border-radius: var(--radio-grande-ios);
+            margin-bottom: 2.5rem;
+            box-shadow: var(--sombra-ios);
+            border: 1px solid rgba(48, 209, 88, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .balance-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--verde-ios), var(--verde-claro-ios));
         }
 
         .balance-label {
-            font-size: 0.75rem;
-            opacity: 0.9;
-            margin-bottom: 0.4rem;
+            font-size: 0.9rem;
+            color: var(--gris-oscuro-ios);
+            margin-bottom: 0.6rem;
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
         }
 
         .balance-amount {
-            font-size: 1.8rem;
+            font-size: 2.8rem;
             font-weight: 800;
-            margin-bottom: 0.3rem;
-            letter-spacing: -0.5px;
+            margin-bottom: 0.8rem;
+            letter-spacing: -1px;
+            background: linear-gradient(135deg, var(--verde-oscuro-ios) 0%, var(--verde-ios) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            line-height: 1;
         }
 
         .balance-sucursal {
-            font-size: 0.8rem;
-            opacity: 0.9;
+            font-size: 0.9rem;
+            color: var(--gris-oscuro-ios);
             display: flex;
             align-items: center;
-            gap: 0.4rem;
+            gap: 0.6rem;
+            font-weight: 500;
         }
 
-        /* Botones */
+        /* Botones iOS */
         .action-buttons {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.8rem;
-            margin-bottom: 1.5rem;
+            gap: 1.2rem;
+            margin-bottom: 2.5rem;
         }
 
-        .action-btn {
-            background: var(--blanco);
-            border: 1.5px solid;
-            border-radius: var(--radio);
-            padding: 1rem 0.5rem;
+        .ios-action-btn {
+            background: var(--blanco-ios);
+            border: none;
+            border-radius: var(--radio-grande-ios);
+            padding: 1.5rem 1rem;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 1rem;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 0.5rem;
+            gap: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: var(--sombra);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--sombra-ios);
+            position: relative;
+            overflow: hidden;
         }
 
-        .action-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--sombra-fuerte);
+        .ios-action-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(rgba(255,255,255,0.1), rgba(255,255,255,0));
+            opacity: 0;
+            transition: opacity 0.3s;
         }
 
-        .action-btn i {
-            font-size: 1.4rem;
-            width: 40px;
-            height: 40px;
+        .ios-action-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--sombra-fuerte-ios);
+        }
+
+        .ios-action-btn:hover::after {
+            opacity: 1;
+        }
+
+        .ios-action-btn i {
+            font-size: 1.8rem;
+            width: 56px;
+            height: 56px;
             display: flex;
             align-items: center;
             justify-content: center;
-            border-radius: 50%;
-            color: var(--blanco);
+            border-radius: 16px;
+            color: var(--blanco-ios);
+            position: relative;
+            z-index: 1;
         }
 
         .ingreso-btn {
-            color: var(--exito);
-            border-color: var(--exito);
+            color: var(--verde-oscuro-ios);
         }
 
         .ingreso-btn i {
-            background: var(--exito);
+            background: linear-gradient(135deg, var(--verde-ios) 0%, #25B550 100%);
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.25);
         }
 
         .gasto-btn {
-            color: var(--error);
-            border-color: var(--error);
+            color: var(--rojo-ios);
         }
 
         .gasto-btn i {
-            background: var(--error);
+            background: linear-gradient(135deg, var(--rojo-ios) 0%, #E03A2D 100%);
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.25);
         }
 
-        /* Botón historial */
+        /* Botón historial iOS */
         .historial-btn-container {
-            margin: 1rem 0;
+            margin: 2.5rem 0;
             text-align: center;
         }
 
-        .historial-btn {
-            background: var(--verde);
-            color: var(--blanco);
+        .ios-historico-btn {
+            background: linear-gradient(135deg, var(--verde-ios) 0%, var(--verde-claro-ios) 100%);
+            color: var(--blanco-ios);
             border: none;
-            border-radius: var(--radio);
-            padding: 0.8rem 1.5rem;
+            border-radius: var(--radio-grande-ios);
+            padding: 1.2rem 2.5rem;
             font-weight: 700;
-            font-size: 0.9rem;
+            font-size: 1rem;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: inline-flex;
             align-items: center;
-            gap: 0.5rem;
-            box-shadow: var(--sombra);
+            gap: 1rem;
+            box-shadow: var(--sombra-ios);
+            position: relative;
+            overflow: hidden;
         }
 
-        .historial-btn:hover {
-            background: var(--verde-claro);
-            transform: translateY(-1px);
+        .ios-historico-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.7s;
         }
 
-        /* Ventana Historial */
+        .ios-historico-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-fuerte-ios);
+        }
+
+        .ios-historico-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Ventana Historial iOS - DISEÑO MEJORADO */
         .historial-window {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: var(--blanco);
+            background: var(--blanco-ios);
             z-index: 1000;
             transform: translateX(100%);
-            transition: transform 0.3s ease;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             overflow-y: auto;
+            display: flex;
+            flex-direction: column;
         }
 
         .historial-window.active {
@@ -287,336 +370,652 @@
         }
 
         .historial-header {
-            background: var(--verde-oscuro);
-            color: var(--blanco);
-            padding: 0.8rem 1rem;
+            background: var(--blanco-ios);
+            color: var(--negro-ios);
+            padding: 1.5rem;
             display: flex;
             align-items: center;
-            gap: 0.8rem;
+            gap: 1rem;
             position: sticky;
             top: 0;
             z-index: 10;
-            box-shadow: var(--sombra);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--gris-claro-ios);
         }
 
-        .back-btn {
-            background: none;
+        .ios-back-btn {
+            background: var(--gris-claro-ios);
             border: none;
-            color: var(--blanco);
-            font-size: 1.2rem;
+            color: var(--verde-oscuro-ios);
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
-            padding: 0.2rem;
+            transition: all 0.3s;
+            font-size: 1.2rem;
+        }
+
+        .ios-back-btn:hover {
+            background: var(--gris-ios);
         }
 
         .historial-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+            font-size: 1.5rem;
+            font-weight: 800;
             flex: 1;
+            color: var(--negro-ios);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
         }
 
-        .historial-count {
-            background: var(--verde-brillante);
-            color: var(--blanco);
-            padding: 0.2rem 0.6rem;
-            border-radius: 12px;
+        .historial-title i {
+            color: var(--verde-ios);
+        }
+
+        .ios-badge {
+            background: var(--verde-ios);
+            color: var(--blanco-ios);
+            padding: 0.4rem 1rem;
+            border-radius: 20px;
             font-weight: 700;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        /* Info de sucursal en historial */
+        .historial-sucursal-info {
+            padding: 1rem 1.5rem;
+            background: var(--gris-claro-ios);
+            border-bottom: 1px solid var(--gris-ios);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+            font-size: 0.9rem;
+            color: var(--gris-oscuro-ios);
+            font-weight: 600;
+        }
+
+        .historial-sucursal-info i {
+            color: var(--verde-ios);
+        }
+
+        /* Filtros por día */
+        .historial-filtros {
+            padding: 1.2rem 1.5rem;
+            background: var(--blanco-ios);
+            border-bottom: 1px solid var(--gris-claro-ios);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .filtros-container {
+            display: flex;
+            gap: 0.8rem;
+            overflow-x: auto;
+            padding-bottom: 0.5rem;
+            scrollbar-width: none;
+        }
+
+        .filtros-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .filtro-dia {
+            background: var(--gris-claro-ios);
+            border: 2px solid transparent;
+            border-radius: 12px;
+            padding: 0.7rem 1rem;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: var(--gris-oscuro-ios);
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .filtro-dia:hover {
+            background: var(--gris-ios);
+            color: var(--negro-ios);
+        }
+
+        .filtro-dia.active {
+            background: var(--verde-ios);
+            color: var(--blanco-ios);
+            border-color: var(--verde-ios);
         }
 
         .historial-content {
-            padding: 1rem;
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: var(--gris-claro-ios);
         }
 
-        .historial-list {
-            background: var(--gris-claro);
-            border-radius: var(--radio);
+        /* Lista de movimientos mejorada */
+        .historial-dia {
+            margin-bottom: 1.5rem;
+            background: var(--blanco-ios);
+            border-radius: var(--radio-grande-ios);
             overflow: hidden;
-            border: 1px solid var(--gris);
+            box-shadow: var(--sombra-ios);
+            border: 1px solid var(--gris-claro-ios);
         }
 
-        .movimiento-item {
+        .dia-header {
+            background: linear-gradient(135deg, var(--verde-claro-ios) 0%, var(--verde-ios) 100%);
+            padding: 1.2rem 1.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0.9rem;
-            border-bottom: 1px solid var(--gris);
-            background: var(--blanco);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
         }
 
-        .movimiento-item:last-child {
+        .dia-fecha {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--blanco-ios);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .dia-total {
+            font-weight: 800;
+            font-size: 1.1rem;
+            color: var(--blanco-ios);
+            background: rgba(0, 0, 0, 0.2);
+            padding: 0.4rem 0.8rem;
+            border-radius: 8px;
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .dia-movimientos {
+            max-height: none;
+        }
+
+        .ios-list-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 1.5rem;
+            border-bottom: 1px solid var(--gris-claro-ios);
+            background: var(--blanco-ios);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .ios-list-item:hover {
+            background: var(--gris-claro-ios);
+        }
+
+        .ios-list-item:last-child {
             border-bottom: none;
         }
 
         .movimiento-info {
             flex: 1;
             min-width: 0;
-            padding-right: 0.5rem;
+            padding-right: 1rem;
         }
 
         .movimiento-info h4 {
             font-weight: 600;
-            margin-bottom: 0.3rem;
-            color: var(--negro);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-size: 0.9rem;
+            margin-bottom: 0.4rem;
+            color: var(--negro-ios);
+            font-size: 1.05rem;
+            line-height: 1.3;
         }
 
         .movimiento-details {
             display: flex;
             align-items: center;
-            gap: 0.8rem;
-            font-size: 0.75rem;
-            color: var(--gris-oscuro);
+            gap: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--gris-oscuro-ios);
+            flex-wrap: wrap;
         }
 
         .movimiento-details span {
             display: flex;
             align-items: center;
-            gap: 0.2rem;
+            gap: 0.4rem;
         }
 
         .movimiento-monto {
-            font-weight: 700;
-            font-size: 1rem;
-            padding-left: 0.5rem;
-            min-width: 80px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            min-width: 110px;
             text-align: right;
             display: flex;
             align-items: center;
             justify-content: flex-end;
-            gap: 0.3rem;
+            gap: 0.5rem;
+            padding: 0.6rem 1rem;
+            border-radius: 10px;
         }
 
         .movimiento-monto.ingreso {
-            color: var(--exito);
+            color: var(--verde-ios);
+            background: rgba(48, 209, 88, 0.1);
+            border: 1px solid rgba(48, 209, 88, 0.2);
         }
 
         .movimiento-monto.gasto {
-            color: var(--error);
+            color: var(--rojo-ios);
+            background: rgba(255, 59, 48, 0.1);
+            border: 1px solid rgba(255, 59, 48, 0.2);
         }
 
-        /* Estados vacíos */
-        .empty-state {
-            text-align: center;
-            padding: 2rem 1rem;
-            color: var(--gris-oscuro);
+        .movimiento-icono {
+            width: 42px;
+            height: 42px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            font-size: 1.1rem;
         }
 
-        .empty-state i {
-            font-size: 2.5rem;
-            margin-bottom: 0.8rem;
-            color: var(--gris);
+        .movimiento-icono.ingreso {
+            background: rgba(48, 209, 88, 0.15);
+            color: var(--verde-ios);
         }
 
-        .empty-state h3 {
-            font-size: 1rem;
-            margin-bottom: 0.4rem;
-            color: var(--negro);
-            font-weight: 700;
+        .movimiento-icono.gasto {
+            background: rgba(255, 59, 48, 0.15);
+            color: var(--rojo-ios);
         }
 
-        .empty-state p {
-            font-size: 0.85rem;
-        }
-
-        /* Modales */
-        .modal-overlay {
+        /* Modal iOS */
+        .ios-modal-overlay {
             position: fixed;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            background: rgba(10, 61, 47, 0.9);
+            background: rgba(0, 0, 0, 0.5);
             display: flex;
             align-items: center;
             justify-content: center;
             padding: 1rem;
-            z-index: 1000;
+            z-index: 2000;
             opacity: 0;
             visibility: hidden;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
         }
 
-        .modal-overlay.active {
+        .ios-modal-overlay.active {
             opacity: 1;
             visibility: visible;
         }
 
-        .modal {
-            background: var(--blanco);
-            border-radius: var(--radio-grande);
+        .ios-modal {
+            background: var(--blanco-ios);
+            border-radius: var(--radio-grande-ios);
             width: 100%;
-            max-width: 400px;
+            max-width: 450px;
             max-height: 85vh;
             overflow-y: auto;
-            box-shadow: var(--sombra-fuerte);
-            transform: scale(0.95);
-            transition: transform 0.2s;
+            box-shadow: var(--sombra-fuerte-ios);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .modal-overlay.active .modal {
+        .ios-modal-overlay.active .ios-modal {
             transform: scale(1);
         }
 
-        .modal-header {
-            background: var(--verde-oscuro);
-            color: var(--blanco);
-            padding: 1rem 1.2rem;
-            border-radius: var(--radio-grande) var(--radio-grande) 0 0;
+        .ios-modal-header {
+            padding: 1.8rem 1.8rem 1.2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid var(--gris-claro-ios);
         }
 
-        .modal-title {
-            font-size: 1.1rem;
-            font-weight: 700;
+        .ios-modal-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--negro-ios);
             display: flex;
             align-items: center;
-            gap: 0.6rem;
+            gap: 0.8rem;
         }
 
-        .modal-close {
-            background: none;
+        .ios-modal-close {
+            background: var(--gris-claro-ios);
             border: none;
-            color: var(--blanco);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.2rem;
-        }
-
-        .modal-body {
-            padding: 1.2rem;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-        }
-
-        .form-label {
-            display: block;
-            font-weight: 600;
-            margin-bottom: 0.4rem;
-            color: var(--negro);
-            font-size: 0.85rem;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 0.7rem;
-            border: 1.5px solid var(--gris);
-            border-radius: 6px;
-            font-size: 0.9rem;
-            transition: all 0.2s;
-            background: var(--blanco);
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: var(--verde);
-        }
-
-        .modal-footer {
-            padding: 1rem 1.2rem;
-            display: flex;
-            gap: 0.6rem;
-            border-top: 1px solid var(--gris);
-        }
-
-        .btn {
-            flex: 1;
-            padding: 0.7rem;
-            border: none;
-            border-radius: var(--radio);
-            font-weight: 700;
-            font-size: 0.9rem;
-            cursor: pointer;
-            transition: all 0.2s;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            color: var(--negro-ios);
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 0.4rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1.1rem;
         }
 
-        .btn-primary {
-            background: var(--verde);
-            color: var(--blanco);
+        .ios-modal-close:hover {
+            background: var(--gris-ios);
         }
 
-        .btn-primary:hover {
-            background: var(--verde-claro);
+        .ios-modal-body {
+            padding: 1.8rem;
         }
 
-        .btn-secondary {
-            background: var(--gris-claro);
-            color: var(--negro);
-            border: 1px solid var(--gris);
+        .ios-form-group {
+            margin-bottom: 1.8rem;
         }
 
-        .btn-secondary:hover {
-            background: var(--gris);
+        .ios-form-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            color: var(--negro-ios);
+            font-size: 0.95rem;
+            padding-left: 0.2rem;
         }
 
-        /* Footer */
-        .app-footer {
-            text-align: center;
+        .ios-form-input {
+            width: 100%;
+            padding: 1rem 1.2rem;
+            border: 1.5px solid var(--gris-claro-ios);
+            border-radius: 14px;
+            font-size: 1rem;
+            transition: all 0.3s;
+            background: var(--blanco-ios);
+            color: var(--negro-ios);
+        }
+
+        .ios-form-input:focus {
+            outline: none;
+            border-color: var(--verde-ios);
+            box-shadow: 0 0 0 3px rgba(48, 209, 88, 0.15);
+        }
+
+        .ios-form-footer {
+            padding: 1.5rem 1.8rem 1.8rem;
+            display: flex;
+            gap: 1rem;
+            border-top: 1px solid var(--gris-claro-ios);
+        }
+
+        .ios-btn {
+            flex: 1;
             padding: 1rem;
-            color: var(--gris-oscuro);
-            font-size: 0.75rem;
-            background: var(--gris-claro);
-            border-top: 1px solid var(--gris);
-            margin-top: 1rem;
+            border: none;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
         }
 
-        /* Mensajes */
-        .error-message {
-            background: #fee2e2;
-            color: #991b1b;
-            padding: 0.8rem;
-            border-radius: var(--radio);
-            margin: 1rem;
+        .ios-btn-primary {
+            background: linear-gradient(135deg, var(--verde-ios) 0%, var(--verde-claro-ios) 100%);
+            color: var(--blanco-ios);
+        }
+
+        .ios-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(48, 209, 88, 0.3);
+        }
+
+        .ios-btn-secondary {
+            background: var(--gris-claro-ios);
+            color: var(--negro-ios);
+        }
+
+        .ios-btn-secondary:hover {
+            background: var(--gris-ios);
+            transform: translateY(-2px);
+        }
+
+        /* Modal de Contraseña */
+        .contrasena-input-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--gris-oscuro-ios);
+            cursor: pointer;
+            font-size: 1.1rem;
+            padding: 0.5rem;
+        }
+
+        /* Switch iOS */
+        .ios-switch-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1rem 0;
+        }
+
+        .ios-switch-label {
+            font-weight: 600;
+            color: var(--negro-ios);
+            font-size: 0.95rem;
+        }
+
+        .ios-switch {
+            position: relative;
+            width: 51px;
+            height: 31px;
+        }
+
+        .ios-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .ios-switch-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--gris-ios);
+            transition: .4s;
+            border-radius: 34px;
+        }
+
+        .ios-switch-slider:before {
+            position: absolute;
+            content: "";
+            height: 27px;
+            width: 27px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        input:checked + .ios-switch-slider {
+            background-color: var(--verde-ios);
+        }
+
+        input:checked + .ios-switch-slider:before {
+            transform: translateX(20px);
+        }
+
+        /* Estados */
+        .ios-empty-state {
+            text-align: center;
+            padding: 4rem 1.5rem;
+            color: var(--gris-oscuro-ios);
+            background: var(--blanco-ios);
+            border-radius: var(--radio-grande-ios);
+            box-shadow: var(--sombra-ios);
+            margin: 1rem 0;
+        }
+
+        .ios-empty-state i {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+            color: var(--gris-claro-ios);
+            opacity: 0.7;
+        }
+
+        .ios-empty-state h3 {
+            font-size: 1.3rem;
+            margin-bottom: 0.8rem;
+            color: var(--negro-ios);
+            font-weight: 700;
+        }
+
+        .ios-empty-state p {
+            font-size: 1rem;
+            max-width: 320px;
+            margin: 0 auto;
+            line-height: 1.5;
+        }
+
+        /* Mensaje de error */
+        .ios-alert {
+            background: #FFE5E5;
+            color: #D70015;
+            padding: 1.2rem;
+            border-radius: var(--radio-ios);
+            margin: 1.5rem;
             text-align: center;
             font-weight: 600;
-            font-size: 0.8rem;
+            font-size: 0.9rem;
+            border: 1px solid #FFCCCC;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.8rem;
         }
 
+        /* Animaciones */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .slide-in {
+            animation: slideIn 0.3s ease-out;
+        }
+
+        /* Responsive */
         @media (max-width: 360px) {
             html {
-                font-size: 12px;
+                font-size: 14px;
             }
             
             .action-buttons {
                 grid-template-columns: 1fr;
             }
+            
+            .ios-modal {
+                max-width: 95%;
+            }
+            
+            .movimiento-monto {
+                min-width: 90px;
+                font-size: 1.1rem;
+            }
         }
 
+        @media (min-width: 768px) {
+            .app-container {
+                max-width: 500px;
+                margin: 1rem auto;
+                border-radius: var(--radio-grande-ios);
+                overflow: hidden;
+            }
+            
+            .main-window {
+                padding: 2rem;
+            }
+        }
+
+        /* Modo oscuro */
         @media (prefers-color-scheme: dark) {
             :root {
-                --blanco: #0d1f1a;
-                --gris-claro: #132923;
-                --gris: #1a352e;
-                --negro: #ecf3f0;
-                --gris-oscuro: #a4bcb4;
+                --blanco-ios: #000000;
+                --gris-claro-ios: #1C1C1E;
+                --gris-ios: #2C2C2E;
+                --gris-oscuro-ios: #8E8E93;
+                --negro-ios: #FFFFFF;
+                --verde-fondo: #0C0C0C;
             }
             
             body {
-                background: #081712;
+                background: #000000;
             }
             
             .app-container {
-                background: var(--blanco);
+                background: var(--blanco-ios);
             }
             
-            .form-input {
-                background: var(--gris);
-                color: var(--negro);
+            .ios-form-input {
+                background: var(--gris-ios);
+                color: var(--negro-ios);
+                border-color: var(--gris-oscuro-ios);
             }
             
-            .btn-secondary {
-                background: var(--gris);
-                color: var(--negro);
+            .ios-btn-secondary {
+                background: var(--gris-ios);
+                color: var(--negro-ios);
+            }
+            
+            .balance-card {
+                background: linear-gradient(145deg, #1C1C1E 0%, #2C2C2E 100%);
+            }
+            
+            .historial-dia {
+                background: var(--gris-claro-ios);
+            }
+            
+            .dia-header {
+                background: linear-gradient(135deg, #0D5C31 0%, var(--verde-ios) 100%);
+            }
+            
+            .historial-content {
+                background: var(--blanco-ios);
+            }
+            
+            .ios-empty-state {
+                background: var(--gris-claro-ios);
             }
         }
     </style>
@@ -628,13 +1027,13 @@
             <div class="header-top">
                 <h1 class="app-title">
                     <i class="fas fa-wallet"></i>
-                    <span>Caja Balance</span>
+                    <span>Caja Pro</span>
                 </h1>
                 <div class="header-actions">
-                    <button class="icon-btn" id="btnNuevaSucursal" title="Nueva Sucursal">
+                    <button class="ios-icon-btn" id="btnNuevaSucursal" title="Nueva Sucursal">
                         <i class="fas fa-store"></i>
                     </button>
-                    <button class="icon-btn" id="btnRefresh" title="Actualizar">
+                    <button class="ios-icon-btn" id="btnRefresh" title="Actualizar">
                         <i class="fas fa-sync-alt"></i>
                     </button>
                 </div>
@@ -643,10 +1042,10 @@
             <div class="sucursal-selector">
                 <label class="sucursal-label">
                     <i class="fas fa-map-marker-alt"></i>
-                    Sucursal Actual
+                    SUCURSAL ACTUAL
                 </label>
-                <select id="sucursalSelector" class="sucursal-select">
-                    <option value="">Cargando...</option>
+                <select id="sucursalSelector" class="ios-select">
+                    <option value="">Cargando sucursales...</option>
                 </select>
             </div>
         </header>
@@ -654,7 +1053,7 @@
         <!-- Ventana Principal -->
         <div class="main-window" id="mainWindow">
             <!-- Saldo -->
-            <div class="balance-card">
+            <div class="balance-card fade-in">
                 <p class="balance-label">
                     <i class="fas fa-chart-line"></i>
                     SALDO ACTUAL
@@ -668,11 +1067,11 @@
 
             <!-- Botones de acción -->
             <div class="action-buttons">
-                <button class="action-btn ingreso-btn" id="btnIngreso">
+                <button class="ios-action-btn ingreso-btn" id="btnIngreso">
                     <i class="fas fa-plus"></i>
                     <span>Nuevo Ingreso</span>
                 </button>
-                <button class="action-btn gasto-btn" id="btnGasto">
+                <button class="ios-action-btn gasto-btn" id="btnGasto">
                     <i class="fas fa-minus"></i>
                     <span>Nuevo Gasto</span>
                 </button>
@@ -680,7 +1079,7 @@
 
             <!-- Botón para ver historial -->
             <div class="historial-btn-container">
-                <button class="historial-btn" id="btnVerHistorial">
+                <button class="ios-historico-btn" id="btnVerHistorial">
                     <i class="fas fa-history"></i>
                     Ver Historial Completo
                 </button>
@@ -690,59 +1089,86 @@
         <!-- Ventana Historial -->
         <div class="historial-window" id="historialWindow">
             <div class="historial-header">
-                <button class="back-btn" id="btnVolver">
+                <button class="ios-back-btn" id="btnVolver">
                     <i class="fas fa-arrow-left"></i>
                 </button>
-                <h2 class="historial-title">Historial</h2>
-                <span class="historial-count" id="historialCount">0</span>
+                <h2 class="historial-title">
+                    <i class="fas fa-history"></i>
+                    Historial
+                </h2>
+                <span class="ios-badge" id="historialCount">0</span>
             </div>
-            <div class="historial-content">
-                <div class="historial-list" id="historialList">
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
-                        <h3>No hay movimientos</h3>
-                        <p>Registra tu primer ingreso o gasto</p>
-                    </div>
+            
+            <div class="historial-sucursal-info">
+                <i class="fas fa-store"></i>
+                <span id="historialSucursalNombre">-</span>
+            </div>
+            
+            <div class="historial-filtros">
+                <div class="filtros-container" id="filtrosDias">
+                    <button class="filtro-dia active" data-dia="todos">
+                        <i class="fas fa-calendar-alt"></i>Todos
+                    </button>
+                    <button class="filtro-dia" data-dia="hoy">
+                        <i class="fas fa-sun"></i>Hoy
+                    </button>
+                    <button class="filtro-dia" data-dia="ayer">
+                        <i class="fas fa-calendar-day"></i>Ayer
+                    </button>
+                    <button class="filtro-dia" data-dia="semana">
+                        <i class="fas fa-calendar-week"></i>Esta Semana
+                    </button>
+                    <button class="filtro-dia" data-dia="mes">
+                        <i class="fas fa-calendar"></i>Este Mes
+                    </button>
+                </div>
+            </div>
+            
+            <div class="historial-content" id="historialContent">
+                <div class="ios-empty-state">
+                    <i class="fas fa-history"></i>
+                    <h3>No hay movimientos</h3>
+                    <p>Registra tu primer ingreso o gasto</p>
                 </div>
             </div>
         </div>
 
         <!-- Modal Movimiento -->
-        <div class="modal-overlay" id="modalMovimiento">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title" id="modalMovimientoTitle">
+        <div class="ios-modal-overlay" id="modalMovimiento">
+            <div class="ios-modal">
+                <div class="ios-modal-header">
+                    <h3 class="ios-modal-title" id="modalMovimientoTitle">
                         <i class="fas fa-plus-circle"></i>
                         Nuevo Ingreso
                     </h3>
-                    <button class="modal-close" id="btnCancelarMovimiento">
+                    <button class="ios-modal-close" id="btnCancelarMovimiento">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label" for="monto">Monto (Bs)</label>
-                        <input type="number" id="monto" class="form-input" placeholder="0.00" step="0.01" min="0" required>
+                <div class="ios-modal-body">
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="monto">Monto (Bs)</label>
+                        <input type="number" id="monto" class="ios-form-input" placeholder="0.00" step="0.01" min="0" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="descripcion">Descripción</label>
-                        <input type="text" id="descripcion" class="form-input" placeholder="Ej: Venta de productos" required>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="descripcion">Descripción</label>
+                        <input type="text" id="descripcion" class="ios-form-input" placeholder="Ej: Venta de productos" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="responsable">Responsable</label>
-                        <input type="text" id="responsable" class="form-input" placeholder="Nombre del responsable" required>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="responsable">Responsable</label>
+                        <input type="text" id="responsable" class="ios-form-input" placeholder="Nombre del responsable" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="fechaHora">Fecha y Hora</label>
-                        <input type="text" id="fechaHora" class="form-input" readonly>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="fechaHora">Fecha y Hora</label>
+                        <input type="text" id="fechaHora" class="ios-form-input" readonly>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="btnCancelar">
+                <div class="ios-form-footer">
+                    <button class="ios-btn ios-btn-secondary" id="btnCancelar">
                         <i class="fas fa-times"></i>
                         Cancelar
                     </button>
-                    <button class="btn btn-primary" id="btnGuardar">
+                    <button class="ios-btn ios-btn-primary" id="btnGuardar">
                         <i class="fas fa-save"></i>
                         Guardar
                     </button>
@@ -751,39 +1177,98 @@
         </div>
 
         <!-- Modal Sucursal -->
-        <div class="modal-overlay" id="modalSucursal">
-            <div class="modal">
-                <div class="modal-header">
-                    <h3 class="modal-title">
+        <div class="ios-modal-overlay" id="modalSucursal">
+            <div class="ios-modal">
+                <div class="ios-modal-header">
+                    <h3 class="ios-modal-title">
                         <i class="fas fa-store"></i>
                         Nueva Sucursal
                     </h3>
-                    <button class="modal-close" id="btnCancelarSucursal">
+                    <button class="ios-modal-close" id="btnCancelarSucursal">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div class="form-group">
-                        <label class="form-label" for="nombreSucursal">Nombre</label>
-                        <input type="text" id="nombreSucursal" class="form-input" placeholder="Sucursal Central" required>
+                <div class="ios-modal-body">
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="nombreSucursal">Nombre *</label>
+                        <input type="text" id="nombreSucursal" class="ios-form-input" placeholder="Sucursal Central" required>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="direccionSucursal">Dirección</label>
-                        <input type="text" id="direccionSucursal" class="form-input" placeholder="(Opcional)">
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="direccionSucursal">Dirección</label>
+                        <input type="text" id="direccionSucursal" class="ios-form-input" placeholder="(Opcional)">
                     </div>
-                    <div class="form-group">
-                        <label class="form-label" for="telefonoSucursal">Teléfono</label>
-                        <input type="text" id="telefonoSucursal" class="form-input" placeholder="(Opcional)">
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="telefonoSucursal">Teléfono</label>
+                        <input type="text" id="telefonoSucursal" class="ios-form-input" placeholder="(Opcional)">
+                    </div>
+                    <div class="ios-form-group">
+                        <div class="ios-switch-container">
+                            <span class="ios-switch-label">Sucursal Pública</span>
+                            <label class="ios-switch">
+                                <input type="checkbox" id="esPublica" checked>
+                                <span class="ios-switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="ios-form-group" id="contrasenaGroup" style="display: none;">
+                        <label class="ios-form-label" for="contrasenaSucursal">Contraseña</label>
+                        <div class="contrasena-input-container">
+                            <input type="password" id="contrasenaSucursal" class="ios-form-input" placeholder="Contraseña opcional">
+                            <button type="button" class="toggle-password" id="toggleContrasena">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small style="color: var(--gris-oscuro-ios); font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                            Deja en blanco si no deseas contraseña
+                        </small>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" id="btnCancelarSucursalForm">
+                <div class="ios-form-footer">
+                    <button class="ios-btn ios-btn-secondary" id="btnCancelarSucursalForm">
                         <i class="fas fa-times"></i>
                         Cancelar
                     </button>
-                    <button class="btn btn-primary" id="btnGuardarSucursal">
+                    <button class="ios-btn ios-btn-primary" id="btnGuardarSucursal">
                         <i class="fas fa-plus"></i>
-                        Crear
+                        Crear Sucursal
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Contraseña -->
+        <div class="ios-modal-overlay" id="modalContrasena">
+            <div class="ios-modal">
+                <div class="ios-modal-header">
+                    <h3 class="ios-modal-title">
+                        <i class="fas fa-lock"></i>
+                        Acceso Restringido
+                    </h3>
+                </div>
+                <div class="ios-modal-body">
+                    <div class="ios-empty-state">
+                        <i class="fas fa-lock fa-2x"></i>
+                        <h3>Sucursal Protegida</h3>
+                        <p id="contrasenaSucursalNombre">Esta sucursal requiere contraseña</p>
+                    </div>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="inputContrasena">Contraseña</label>
+                        <div class="contrasena-input-container">
+                            <input type="password" id="inputContrasena" class="ios-form-input" placeholder="Ingresa la contraseña">
+                            <button type="button" class="toggle-password" id="toggleInputContrasena">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="ios-form-footer">
+                    <button class="ios-btn ios-btn-secondary" id="btnCancelarAcceso">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="ios-btn ios-btn-primary" id="btnVerificarContrasena">
+                        <i class="fas fa-unlock"></i>
+                        Acceder
                     </button>
                 </div>
             </div>
@@ -797,11 +1282,14 @@
         
         let estadoApp = {
             sucursalActual: null,
+            sucursalActualNombre: '',
             sucursales: [],
+            sucursalesAcceso: {},
             movimientos: [],
             tipoMovimientoActual: 'ingreso',
             saldoTotal: 0,
-            cargando: true
+            cargando: true,
+            filtroDiaActual: 'todos'
         };
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -811,6 +1299,7 @@
             }
             
             inicializarApp();
+            configurarFiltrosDias();
         });
 
         function inicializarApp() {
@@ -820,37 +1309,87 @@
         }
 
         function configurarEventListeners() {
-            // Botones principales
             document.getElementById('btnIngreso').addEventListener('click', () => abrirModalMovimiento('ingreso'));
             document.getElementById('btnGasto').addEventListener('click', () => abrirModalMovimiento('gasto'));
             
-            // Historial
             document.getElementById('btnVerHistorial').addEventListener('click', abrirHistorial);
             document.getElementById('btnVolver').addEventListener('click', cerrarHistorial);
             
-            // Modal movimiento
             document.getElementById('btnCancelarMovimiento').addEventListener('click', cerrarModalMovimiento);
             document.getElementById('btnCancelar').addEventListener('click', cerrarModalMovimiento);
             document.getElementById('btnGuardar').addEventListener('click', guardarMovimiento);
             
-            // Modal sucursal
             document.getElementById('btnNuevaSucursal').addEventListener('click', abrirModalSucursal);
             document.getElementById('btnCancelarSucursal').addEventListener('click', cerrarModalSucursal);
             document.getElementById('btnCancelarSucursalForm').addEventListener('click', cerrarModalSucursal);
             document.getElementById('btnGuardarSucursal').addEventListener('click', guardarSucursal);
             
-            // Selector de sucursal
+            document.getElementById('esPublica').addEventListener('change', function() {
+                const contrasenaGroup = document.getElementById('contrasenaGroup');
+                contrasenaGroup.style.display = this.checked ? 'none' : 'block';
+            });
+            
+            document.getElementById('toggleContrasena').addEventListener('click', function() {
+                const input = document.getElementById('contrasenaSucursal');
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+            
+            document.getElementById('toggleInputContrasena').addEventListener('click', function() {
+                const input = document.getElementById('inputContrasena');
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+            
+            document.getElementById('btnCancelarAcceso').addEventListener('click', cerrarModalContrasena);
+            document.getElementById('btnVerificarContrasena').addEventListener('click', verificarContrasena);
+            
             document.getElementById('sucursalSelector').addEventListener('change', cambiarSucursal);
             
-            // Refresh
             document.getElementById('btnRefresh').addEventListener('click', () => {
                 if (estadoApp.sucursalActual) {
                     cargarMovimientos();
                 }
             });
             
-            // Actualizar hora
             setInterval(actualizarFechaHora, 1000);
+            
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cerrarModalMovimiento();
+                    cerrarModalSucursal();
+                    cerrarModalContrasena();
+                }
+            });
+        }
+
+        function configurarFiltrosDias() {
+            const filtros = document.querySelectorAll('.filtro-dia');
+            filtros.forEach(filtro => {
+                filtro.addEventListener('click', function() {
+                    filtros.forEach(f => f.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    estadoApp.filtroDiaActual = this.dataset.dia;
+                    actualizarHistorialUI();
+                });
+            });
         }
 
         function actualizarFechaHora() {
@@ -884,10 +1423,12 @@
                 actualizarSelectorSucursales();
                 
                 if (sucursales.length > 0) {
-                    estadoApp.sucursalActual = sucursales[0].id;
-                    document.getElementById('sucursalSelector').value = sucursales[0].id;
-                    document.getElementById('sucursalNombre').textContent = sucursales[0].nombre;
-                    cargarMovimientos();
+                    const sucursalPublica = sucursales.find(s => s.es_publica === true);
+                    if (sucursalPublica) {
+                        seleccionarSucursal(sucursalPublica.id, sucursalPublica.nombre);
+                    } else {
+                        mostrarEstadoSinSucursales();
+                    }
                 } else {
                     mostrarEstadoSinSucursales();
                 }
@@ -901,11 +1442,12 @@
         async function cargarMovimientos() {
             if (!estadoApp.sucursalActual) return;
             
-            const historialList = document.getElementById('historialList');
-            historialList.innerHTML = `
-                <div class="empty-state">
+            const historialContent = document.getElementById('historialContent');
+            historialContent.innerHTML = `
+                <div class="ios-empty-state">
                     <i class="fas fa-spinner fa-spin"></i>
-                    <h3>Cargando...</h3>
+                    <h3>Cargando movimientos...</h3>
+                    <p>Sucursal: ${estadoApp.sucursalActualNombre}</p>
                 </div>
             `;
             
@@ -929,10 +1471,10 @@
                 
             } catch (error) {
                 console.error('Error:', error);
-                historialList.innerHTML = `
-                    <div class="error-message">
+                historialContent.innerHTML = `
+                    <div class="ios-alert">
                         <i class="fas fa-exclamation-circle"></i>
-                        Error al cargar movimientos
+                        Error al cargar movimientos de la sucursal
                     </div>
                 `;
             }
@@ -985,11 +1527,11 @@
                 
                 cerrarModalMovimiento();
                 cargarMovimientos();
-                alert('✓ Movimiento guardado');
+                mostrarNotificacion('Movimiento guardado correctamente', 'exito');
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('✗ Error al guardar');
+                mostrarNotificacion('Error al guardar movimiento', 'error');
             }
         }
 
@@ -997,16 +1539,20 @@
             const nombre = document.getElementById('nombreSucursal').value.trim();
             const direccion = document.getElementById('direccionSucursal').value.trim();
             const telefono = document.getElementById('telefonoSucursal').value.trim();
+            const esPublica = document.getElementById('esPublica').checked;
+            const contrasena = document.getElementById('contrasenaSucursal').value.trim();
             
             if (!nombre) {
-                alert('Ingresa el nombre de la sucursal');
+                mostrarNotificacion('Ingresa el nombre de la sucursal', 'error');
                 return;
             }
             
             const sucursal = {
                 nombre: nombre,
                 direccion: direccion || null,
-                telefono: telefono || null
+                telefono: telefono || null,
+                es_publica: esPublica,
+                contrasena: contrasena || null
             };
             
             try {
@@ -1029,15 +1575,13 @@
                 estadoApp.sucursales.push(nuevaSucursal[0]);
                 actualizarSelectorSucursales();
                 
-                estadoApp.sucursalActual = nuevaSucursal[0].id;
-                document.getElementById('sucursalSelector').value = nuevaSucursal[0].id;
-                document.getElementById('sucursalNombre').textContent = nuevaSucursal[0].nombre;
+                seleccionarSucursal(nuevaSucursal[0].id, nuevaSucursal[0].nombre);
                 
-                alert('✓ Sucursal creada');
+                mostrarNotificacion('Sucursal creada correctamente', 'exito');
                 
             } catch (error) {
                 console.error('Error:', error);
-                alert('✗ Error al crear sucursal');
+                mostrarNotificacion('Error al crear sucursal', 'error');
             }
         }
 
@@ -1050,7 +1594,7 @@
             estadoApp.sucursales.forEach(sucursal => {
                 const option = document.createElement('option');
                 option.value = sucursal.id;
-                option.textContent = sucursal.nombre;
+                option.textContent = sucursal.nombre + (sucursal.es_publica === false ? ' 🔒' : '');
                 selector.appendChild(option);
             });
         }
@@ -1058,21 +1602,82 @@
         function cambiarSucursal() {
             const selector = document.getElementById('sucursalSelector');
             const sucursalId = parseInt(selector.value);
+            
+            if (sucursalId) {
+                const sucursal = estadoApp.sucursales.find(s => s.id === sucursalId);
+                
+                if (sucursal) {
+                    if (estadoApp.sucursalesAcceso[sucursalId] || sucursal.es_publica === true) {
+                        seleccionarSucursal(sucursalId, sucursal.nombre);
+                    } else {
+                        mostrarModalContrasena(sucursal);
+                    }
+                }
+            }
+        }
+
+        function seleccionarSucursal(sucursalId, sucursalNombre) {
             const sucursal = estadoApp.sucursales.find(s => s.id === sucursalId);
             
             if (sucursal) {
                 estadoApp.sucursalActual = sucursalId;
-                document.getElementById('sucursalNombre').textContent = sucursal.nombre;
+                estadoApp.sucursalActualNombre = sucursalNombre;
+                
+                document.getElementById('sucursalSelector').value = sucursalId;
+                document.getElementById('sucursalNombre').innerHTML = `<i class="fas fa-building"></i> ${sucursalNombre}`;
+                document.getElementById('historialSucursalNombre').textContent = sucursalNombre;
+                
                 cargarMovimientos();
+                
+                estadoApp.sucursalesAcceso[sucursalId] = true;
             }
+        }
+
+        function mostrarModalContrasena(sucursal) {
+            document.getElementById('contrasenaSucursalNombre').textContent = `Sucursal: ${sucursal.nombre}`;
+            document.getElementById('inputContrasena').value = '';
+            document.getElementById('modalContrasena').classList.add('active');
+            document.getElementById('inputContrasena').focus();
+            
+            estadoApp.sucursalTemporal = sucursal;
+        }
+
+        function cerrarModalContrasena() {
+            document.getElementById('modalContrasena').classList.remove('active');
+            estadoApp.sucursalTemporal = null;
+            if (estadoApp.sucursalActual) {
+                document.getElementById('sucursalSelector').value = estadoApp.sucursalActual;
+            }
+        }
+
+        function verificarContrasena() {
+            const contrasenaIngresada = document.getElementById('inputContrasena').value;
+            const sucursal = estadoApp.sucursalTemporal;
+            
+            if (!sucursal) {
+                mostrarNotificacion('Error de verificación', 'error');
+                return;
+            }
+            
+            if (sucursal.contrasena && sucursal.contrasena !== contrasenaIngresada) {
+                mostrarNotificacion('Contraseña incorrecta', 'error');
+                document.getElementById('inputContrasena').value = '';
+                document.getElementById('inputContrasena').focus();
+                return;
+            }
+            
+            cerrarModalContrasena();
+            seleccionarSucursal(sucursal.id, sucursal.nombre);
+            mostrarNotificacion('Acceso concedido', 'exito');
         }
 
         function abrirHistorial() {
             if (!estadoApp.sucursalActual) {
-                alert('Primero selecciona una sucursal');
+                mostrarNotificacion('Primero selecciona una sucursal', 'error');
                 return;
             }
             
+            document.getElementById('historialSucursalNombre').textContent = estadoApp.sucursalActualNombre;
             actualizarHistorialUI();
             document.getElementById('historialWindow').classList.add('active');
         }
@@ -1083,7 +1688,7 @@
 
         function abrirModalMovimiento(tipo) {
             if (!estadoApp.sucursalActual) {
-                alert('Primero selecciona una sucursal');
+                mostrarNotificacion('Primero selecciona una sucursal', 'error');
                 return;
             }
             
@@ -1112,8 +1717,12 @@
             document.getElementById('nombreSucursal').value = '';
             document.getElementById('direccionSucursal').value = '';
             document.getElementById('telefonoSucursal').value = '';
+            document.getElementById('esPublica').checked = true;
+            document.getElementById('contrasenaSucursal').value = '';
+            document.getElementById('contrasenaGroup').style.display = 'none';
             
             document.getElementById('modalSucursal').classList.add('active');
+            setTimeout(() => document.getElementById('nombreSucursal').focus(), 100);
         }
 
         function cerrarModalSucursal() {
@@ -1132,7 +1741,77 @@
                 maximumFractionDigits: 2
             });
             
-            document.getElementById('balanceTotal').textContent = `Bs ${formatter.format(estadoApp.saldoTotal)}`;
+            const saldoElement = document.getElementById('balanceTotal');
+            saldoElement.textContent = `Bs ${formatter.format(estadoApp.saldoTotal)}`;
+            
+            saldoElement.style.animation = 'none';
+            setTimeout(() => {
+                saldoElement.style.animation = 'fadeIn 0.5s ease-out';
+            }, 10);
+        }
+
+        function filtrarMovimientosPorDia() {
+            const filtro = estadoApp.filtroDiaActual;
+            const ahora = new Date();
+            
+            if (filtro === 'todos') return estadoApp.movimientos;
+            
+            return estadoApp.movimientos.filter(movimiento => {
+                const fechaMov = new Date(movimiento.fecha_registro);
+                
+                switch (filtro) {
+                    case 'hoy':
+                        return fechaMov.toDateString() === ahora.toDateString();
+                    case 'ayer':
+                        const ayer = new Date(ahora);
+                        ayer.setDate(ahora.getDate() - 1);
+                        return fechaMov.toDateString() === ayer.toDateString();
+                    case 'semana':
+                        const inicioSemana = new Date(ahora);
+                        inicioSemana.setDate(ahora.getDate() - ahora.getDay());
+                        inicioSemana.setHours(0, 0, 0, 0);
+                        return fechaMov >= inicioSemana;
+                    case 'mes':
+                        return fechaMov.getMonth() === ahora.getMonth() && 
+                               fechaMov.getFullYear() === ahora.getFullYear();
+                    default:
+                        return true;
+                }
+            });
+        }
+
+        function agruparMovimientosPorDia(movimientos) {
+            const grupos = {};
+            
+            movimientos.forEach(mov => {
+                const fecha = new Date(mov.fecha_registro);
+                const fechaKey = fecha.toLocaleDateString('es-ES', {
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric'
+                });
+                
+                if (!grupos[fechaKey]) {
+                    grupos[fechaKey] = {
+                        fecha: fechaKey,
+                        movimientos: [],
+                        totalIngresos: 0,
+                        totalGastos: 0
+                    };
+                }
+                
+                const monto = parseFloat(mov.monto);
+                grupos[fechaKey].movimientos.push(mov);
+                
+                if (mov.tipo === 'ingreso') {
+                    grupos[fechaKey].totalIngresos += monto;
+                } else {
+                    grupos[fechaKey].totalGastos += monto;
+                }
+            });
+            
+            return Object.values(grupos);
         }
 
         function actualizarHistorialUI() {
@@ -1142,58 +1821,136 @@
             });
             
             document.getElementById('historialCount').textContent = estadoApp.movimientos.length;
-            const historialList = document.getElementById('historialList');
+            const historialContent = document.getElementById('historialContent');
             
-            if (estadoApp.movimientos.length === 0) {
-                historialList.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-history"></i>
+            const movimientosFiltrados = filtrarMovimientosPorDia();
+            
+            if (movimientosFiltrados.length === 0) {
+                historialContent.innerHTML = `
+                    <div class="ios-empty-state">
+                        <i class="fas fa-search"></i>
                         <h3>No hay movimientos</h3>
-                        <p>Registra tu primer ingreso o gasto</p>
+                        <p>${estadoApp.filtroDiaActual === 'todos' ? `Registra tu primer ingreso o gasto en ${estadoApp.sucursalActualNombre}` : 'No hay movimientos para este periodo'}</p>
                     </div>
                 `;
                 return;
             }
             
-            let movimientosHTML = '';
+            const diasAgrupados = agruparMovimientosPorDia(movimientosFiltrados);
             
-            estadoApp.movimientos.forEach(mov => {
-                const icono = mov.tipo === 'ingreso' ? 'fa-arrow-down' : 'fa-arrow-up';
-                const claseMonto = mov.tipo === 'ingreso' ? 'ingreso' : 'gasto';
-                const signo = mov.tipo === 'ingreso' ? '+' : '-';
-                const montoFormateado = formatter.format(parseFloat(mov.monto));
+            let historialHTML = '';
+            
+            diasAgrupados.forEach(dia => {
+                const diaTotal = dia.totalIngresos - dia.totalGastos;
+                const colorTotal = diaTotal >= 0 ? 'var(--verde-ios)' : 'var(--rojo-ios)';
                 
-                movimientosHTML += `
-                    <div class="movimiento-item">
-                        <div class="movimiento-info">
-                            <h4>${mov.descripcion}</h4>
-                            <div class="movimiento-details">
-                                <span><i class="fas fa-user"></i> ${mov.responsable}</span>
-                                <span><i class="fas fa-clock"></i> ${mov.fecha_hora}</span>
+                historialHTML += `
+                    <div class="historial-dia slide-in">
+                        <div class="dia-header">
+                            <div class="dia-fecha">
+                                <i class="fas fa-calendar-day"></i>
+                                ${dia.fecha}
+                            </div>
+                            <div class="dia-total" style="color: ${colorTotal}">
+                                Total: Bs ${formatter.format(diaTotal)}
                             </div>
                         </div>
-                        <div class="movimiento-monto ${claseMonto}">
-                            <i class="fas ${icono}"></i> ${signo}Bs ${montoFormateado}
+                        <div class="dia-movimientos">
+                `;
+                
+                dia.movimientos.forEach(mov => {
+                    const icono = mov.tipo === 'ingreso' ? 'fa-arrow-down' : 'fa-arrow-up';
+                    const claseMonto = mov.tipo === 'ingreso' ? 'ingreso' : 'gasto';
+                    const signo = mov.tipo === 'ingreso' ? '+' : '-';
+                    const montoFormateado = formatter.format(parseFloat(mov.monto));
+                    const iconoTipo = mov.tipo === 'ingreso' ? 'fa-plus-circle' : 'fa-minus-circle';
+                    
+                    historialHTML += `
+                        <div class="ios-list-item">
+                            <div class="movimiento-icono ${claseMonto}">
+                                <i class="fas ${iconoTipo}"></i>
+                            </div>
+                            <div class="movimiento-info">
+                                <h4>${mov.descripcion}</h4>
+                                <div class="movimiento-details">
+                                    <span><i class="fas fa-user"></i> ${mov.responsable}</span>
+                                    <span><i class="fas fa-clock"></i> ${mov.fecha_hora}</span>
+                                </div>
+                            </div>
+                            <div class="movimiento-monto ${claseMonto}">
+                                <i class="fas ${icono}"></i> ${signo}Bs ${montoFormateado}
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                historialHTML += `
                         </div>
                     </div>
                 `;
             });
             
-            historialList.innerHTML = movimientosHTML;
+            historialContent.innerHTML = historialHTML;
         }
 
         function mostrarEstadoSinSucursales() {
-            alert('No hay sucursales. Crea una para comenzar.');
+            const mainWindow = document.getElementById('mainWindow');
+            mainWindow.innerHTML = `
+                <div class="ios-empty-state" style="padding-top: 3rem;">
+                    <i class="fas fa-store fa-3x"></i>
+                    <h3>No hay sucursales</h3>
+                    <p>Crea tu primera sucursal para comenzar</p>
+                    <button class="ios-historico-btn" id="btnCrearPrimeraSucursal" style="margin-top: 1.5rem;">
+                        <i class="fas fa-plus"></i>
+                        Crear Primera Sucursal
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('btnCrearPrimeraSucursal').addEventListener('click', abrirModalSucursal);
         }
 
         function mostrarError(mensaje) {
             const main = document.querySelector('.main-window');
             const errorDiv = document.createElement('div');
-            errorDiv.className = 'error-message';
-            errorDiv.innerHTML = mensaje;
-            main.appendChild(errorDiv);
+            errorDiv.className = 'ios-alert';
+            errorDiv.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${mensaje}`;
+            main.prepend(errorDiv);
+            
+            setTimeout(() => {
+                errorDiv.remove();
+            }, 5000);
+        }
+
+        function mostrarNotificacion(mensaje, tipo) {
+            const notificacion = document.createElement('div');
+            notificacion.className = 'ios-alert';
+            notificacion.style.position = 'fixed';
+            notificacion.style.top = '100px';
+            notificacion.style.left = '50%';
+            notificacion.style.transform = 'translateX(-50%)';
+            notificacion.style.zIndex = '3000';
+            notificacion.style.maxWidth = '90%';
+            notificacion.style.boxShadow = 'var(--sombra-fuerte-ios)';
+            notificacion.style.borderRadius = 'var(--radio-grande-ios)';
+            
+            if (tipo === 'exito') {
+                notificacion.style.background = 'linear-gradient(135deg, var(--verde-ios) 0%, #25B550 100%)';
+                notificacion.style.color = 'white';
+                notificacion.style.border = 'none';
+                notificacion.innerHTML = `<i class="fas fa-check-circle"></i> ${mensaje}`;
+            } else {
+                notificacion.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${mensaje}`;
+            }
+            
+            document.body.appendChild(notificacion);
+            
+            setTimeout(() => {
+                notificacion.style.opacity = '0';
+                notificacion.style.transition = 'opacity 0.3s';
+                setTimeout(() => notificacion.remove(), 300);
+            }, 3000);
         }
     </script>
 </body>
-
 </html>
