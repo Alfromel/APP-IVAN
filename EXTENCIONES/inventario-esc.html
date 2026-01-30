@@ -775,6 +775,7 @@
                                             <th>Operadora</th>
                                             <th>ID Categoría</th>
                                             <th>Número de Casillero</th>
+                                            <th>Nombre Categoría</th>
                                             <th>Fecha Nac.</th>
                                             <th>Fecha Venc.</th>
                                             <th>Días Rest.</th>
@@ -1243,6 +1244,42 @@
         let filteredCategories = []; // Para almacenar categorías filtradas
         let existingChipNumbers = new Set(); // Para validar duplicados
         let filterTimeout; // Para el debounce en tiempo real
+        
+        // Función para ajustar fechas a UTC-4 (Bolivia)
+        function ajustarFechaBolivia(fecha) {
+            if (!fecha) return fecha;
+            
+            // Si es una cadena de fecha, crear objeto Date
+            const dateObj = typeof fecha === 'string' ? new Date(fecha) : fecha;
+            
+            // Ajustar a UTC-4 (Bolivia) - agregar 4 horas para compensar
+            dateObj.setHours(dateObj.getHours() + 4);
+            
+            return dateObj;
+        }
+        
+        // Función para formatear fecha en formato YYYY-MM-DD para inputs date
+        function formatDateForInput(date) {
+            const d = ajustarFechaBolivia(date);
+            const year = d.getFullYear();
+            const month = String(d.getMonth() + 1).padStart(2, '0');
+            const day = String(d.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+        
+        // Función para formatear fecha para mostrar en la interfaz
+        function formatDateForDisplay(dateString) {
+            if (!dateString) return 'N/A';
+            const date = ajustarFechaBolivia(new Date(dateString));
+            return date.toLocaleDateString('es-ES');
+        }
+        
+        // Función para calcular fecha de vencimiento desde una fecha base
+        function calcularFechaVencimiento(fechaBase, dias) {
+            const fecha = ajustarFechaBolivia(new Date(fechaBase));
+            fecha.setDate(fecha.getDate() + dias);
+            return fecha;
+        }
 
         class SistemaInventarioChips {
             constructor() {
@@ -1462,7 +1499,7 @@
                     
                     allChips = allChipsData;
                     
-                    // Calcular días restantes y estado
+                    // Calcular días restantes y estado CON AJUSTE DE ZONA HORARIA
                     allChips.forEach(chip => {
                         chip.dias_restantes = this.calcularDiasRestantes(chip.fecha_vencimiento);
                         chip.estado_display = this.determinarEstado(chip);
@@ -1656,10 +1693,18 @@
                 return [...new Set(numbers)];
             }
 
+            // MÉTODO CORREGIDO CON AJUSTE DE ZONA HORARIA
             calcularDiasRestantes(fechaVencimiento) {
                 if (!fechaVencimiento) return 0;
-                const hoy = new Date();
-                const vencimiento = new Date(fechaVencimiento);
+                
+                // Usar fecha ajustada a Bolivia
+                const hoy = ajustarFechaBolivia(new Date());
+                const vencimiento = ajustarFechaBolivia(new Date(fechaVencimiento));
+                
+                // Asegurarse de que ambas fechas estén al inicio del día (00:00:00)
+                hoy.setHours(0, 0, 0, 0);
+                vencimiento.setHours(0, 0, 0, 0);
+                
                 const diffTime = vencimiento - hoy;
                 return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
             }
@@ -1739,7 +1784,7 @@
                                 </div>
                                 <div class="text-muted small">
                                     ${categoria?.nombre || 'Sin categoría'} • 
-                                    Vence: ${this.formatDate(chip.fecha_vencimiento)}
+                                    Vence: ${formatDateForDisplay(chip.fecha_vencimiento)}
                                 </div>
                             </div>
                             <div class="d-flex align-items-center">
@@ -1776,7 +1821,7 @@
                                 </div>
                                 <div class="text-muted small">
                                     ${categoria?.nombre || 'Sin categoría'} • 
-                                    ${this.formatDate(chip.created_at)}
+                                    ${formatDateForDisplay(chip.created_at)}
                                 </div>
                             </div>
                             <span class="badge ${this.getEstadoBadgeClass(chip)}">
@@ -1835,7 +1880,7 @@
                 }
             }
 
-            // MÉTODO MEJORADO: Mostrar tabla de inventario con ENUMERACIÓN por categoría/filtro
+            // MÉTODO MEJORADO: Mostrar tabla de inventario con ENUMERACIÓN por categoría/filtro Y NOMBRE DE CATEGORÍA
             displayInventarioTable() {
                 const tbody = document.getElementById('inventarioTableBody');
                 filteredChips = this.applyFiltersInventario();
@@ -1900,8 +1945,9 @@
                         </td>
                         <td>${categoria?.categoria_id || 'N/A'}</td>
                         <td>${categoria?.letra_categoria || 'N/A'}</td>
-                        <td>${this.formatDate(chip.fecha_activacion)}</td>
-                        <td>${this.formatDate(chip.fecha_vencimiento)}</td>
+                        <td>${categoria?.nombre || 'N/A'}</td>
+                        <td>${formatDateForDisplay(chip.fecha_activacion)}</td>
+                        <td>${formatDateForDisplay(chip.fecha_vencimiento)}</td>
                         <td class="fw-bold ${diasColor}">
                             ${chip.dias_restantes > 0 ? chip.dias_restantes + ' días' : 'VENCIDO'}
                         </td>
@@ -2009,8 +2055,8 @@
                             </span>
                         </td>
                         <td>${categoria.nombre}</td>
-                        <td>${this.formatDate(categoria.fecha_activacion)}</td>
-                        <td>${this.formatDate(categoria.fecha_vencimiento)}</td>
+                        <td>${formatDateForDisplay(categoria.fecha_activacion)}</td>
+                        <td>${formatDateForDisplay(categoria.fecha_vencimiento)}</td>
                         <td>${categoria.dias_vencimiento} días</td>
                         <td>
                             <span class="badge ${chipsCount > 0 ? 'bg-primary' : 'bg-secondary'}">
@@ -2072,14 +2118,13 @@
                 });
             }
 
-            // NUEVO MÉTODO: Reactivar categoría
+            // MÉTODO CORREGIDO: Reactivar categoría SOLO actualizando fecha de vencimiento
             async reactivarCategoria(categoryId) {
                 const categoria = allCategories.find(cat => cat.id === categoryId);
                 if (!categoria) return;
                 
                 const chipsEnCategoria = allChips.filter(chip => chip.categoria_id === categoryId);
-                const hoy = new Date();
-                const fechaActivacion = hoy.toISOString().split('T')[0];
+                const hoy = ajustarFechaBolivia(new Date());
                 
                 // Determinar días de vencimiento según operadora
                 let diasVencimiento;
@@ -2089,8 +2134,10 @@
                     diasVencimiento = 90; // Para ENTEL y TIGO
                 }
                 
-                const fechaVencimiento = new Date(hoy);
-                fechaVencimiento.setDate(hoy.getDate() + diasVencimiento);
+                // Calcular nueva fecha de vencimiento desde HOY
+                const fechaVencimiento = calcularFechaVencimiento(hoy, diasVencimiento);
+                
+                // La fecha de nacimiento/activación NO se cambia - se mantiene la original
                 
                 const result = await Swal.fire({
                     title: '¿Reactivar categoría?',
@@ -2099,9 +2146,10 @@
                             <i class="bi bi-info-circle me-2"></i>
                             <strong>Información:</strong><br>
                             • Operadora: ${categoria.operadora}<br>
-                            • Días de vencimiento: ${diasVencimiento} días<br>
+                            • Nueva fecha de vencimiento: ${formatDateForDisplay(fechaVencimiento)}<br>
+                            • Días de vencimiento: ${diasVencimiento} días desde hoy<br>
                             • Chips en esta categoría: ${chipsEnCategoria.length.toLocaleString()}<br>
-                            • Nueva fecha de vencimiento: ${fechaVencimiento.toLocaleDateString('es-ES')}
+                            • <strong>IMPORTANTE:</strong> La fecha de nacimiento se mantiene igual
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Observaciones (opcional)</label>
@@ -2119,7 +2167,10 @@
                 const observaciones = document.getElementById('reactivarObservaciones').value.trim();
                 
                 try {
-                    // Actualizar la categoría
+                    // Formatear fecha para Supabase (YYYY-MM-DD)
+                    const fechaVencimientoStr = fechaVencimiento.toISOString().split('T')[0];
+                    
+                    // Actualizar SOLO la fecha de vencimiento y días de vencimiento de la categoría
                     const updateCategoriaResponse = await fetch(
                         `${SUPABASE_URL}/rest/v1/chip_categories?id=eq.${categoryId}`,
                         {
@@ -2131,8 +2182,7 @@
                                 'Prefer': 'return=minimal'
                             },
                             body: JSON.stringify({
-                                fecha_activacion: fechaActivacion,
-                                fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                                fecha_vencimiento: fechaVencimientoStr,
                                 dias_vencimiento: diasVencimiento,
                                 observaciones: observaciones ? 
                                     (categoria.observaciones ? `${categoria.observaciones}\n${new Date().toLocaleDateString()}: ${observaciones}` : 
@@ -2146,7 +2196,7 @@
                         throw new Error('Error actualizando categoría');
                     }
                     
-                    // Actualizar todos los chips de esta categoría
+                    // Actualizar SOLO la fecha de vencimiento de los chips de esta categoría
                     if (chipsEnCategoria.length > 0) {
                         const chipsUpdatePromises = chipsEnCategoria.map(chip => 
                             fetch(
@@ -2160,9 +2210,7 @@
                                         'Prefer': 'return=minimal'
                                     },
                                     body: JSON.stringify({
-                                        fecha_activacion: fechaActivacion,
-                                        fecha_uso: fechaActivacion,
-                                        fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                                        fecha_vencimiento: fechaVencimientoStr,
                                         estado: 'ACTIVO'
                                     })
                                 }
@@ -2238,7 +2286,7 @@
                             <div class="col-md-3">
                                 <div>${categoria?.nombre || 'Sin categoría'}</div>
                                 <div class="text-muted small">
-                                    Vence: ${this.formatDate(chip.fecha_vencimiento)}
+                                    Vence: ${formatDateForDisplay(chip.fecha_vencimiento)}
                                 </div>
                             </div>
                             <div class="col-md-3">
@@ -2268,14 +2316,14 @@
                         document.getElementById('letra_categoria').value = category.letra_categoria;
                         document.getElementById('operadora').value = category.operadora;
                         document.getElementById('nombre').value = category.nombre;
-                        document.getElementById('fecha_activacion').value = category.fecha_activacion;
+                        document.getElementById('fecha_activacion').value = formatDateForInput(category.fecha_activacion);
                         document.getElementById('dias_vencimiento').value = category.dias_vencimiento;
                         document.getElementById('observaciones').value = category.observaciones || '';
                     }
                 } else {
                     document.getElementById('categoryModalLabel').textContent = 'Nueva Categoría';
                     document.getElementById('categoryId').value = '';
-                    document.getElementById('fecha_activacion').value = new Date().toISOString().split('T')[0];
+                    document.getElementById('fecha_activacion').value = formatDateForInput(new Date());
                 }
                 
                 modal.show();
@@ -2297,17 +2345,21 @@
                 const dias_vencimiento = parseInt(document.getElementById('dias_vencimiento').value);
                 const observaciones = document.getElementById('observaciones').value.trim();
                 
-                const fechaActivacion = new Date(fecha_activacion);
-                const fechaVencimiento = new Date(fechaActivacion);
-                fechaVencimiento.setDate(fechaActivacion.getDate() + dias_vencimiento);
+                // Crear fecha ajustada a Bolivia
+                const fechaActivacion = ajustarFechaBolivia(new Date(fecha_activacion));
+                const fechaVencimiento = calcularFechaVencimiento(fechaActivacion, dias_vencimiento);
+                
+                // Formatear fechas para Supabase
+                const fechaActivacionStr = fechaActivacion.toISOString().split('T')[0];
+                const fechaVencimientoStr = fechaVencimiento.toISOString().split('T')[0];
                 
                 const categoryData = {
                     categoria_id: categoria_id,
                     letra_categoria: letra_categoria,
                     operadora: operadora,
                     nombre: nombre,
-                    fecha_activacion: fecha_activacion,
-                    fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                    fecha_activacion: fechaActivacionStr,
+                    fecha_vencimiento: fechaVencimientoStr,
                     dias_vencimiento: dias_vencimiento,
                     observaciones: observaciones || null
                 };
@@ -2393,7 +2445,7 @@
                     `).join('');
             }
 
-            // MÉTODO MEJORADO: Guardar chips con manejo de grandes cantidades
+            // MÉTODO MEJORADO: Guardar chips con manejo de grandes cantidades Y AJUSTE DE ZONA HORARIA
             async saveChips() {
                 const form = document.getElementById('chipForm');
                 if (!form.checkValidity()) {
@@ -2446,18 +2498,21 @@
                     return;
                 }
                 
-                const fechaActivacion = categoria.fecha_activacion;
-                const fechaActivacionObj = new Date(fechaActivacion);
-                const fechaVencimiento = new Date(fechaActivacionObj);
-                fechaVencimiento.setDate(fechaActivacionObj.getDate() + categoria.dias_vencimiento);
+                // Usar fecha de activación ajustada a Bolivia
+                const fechaActivacion = ajustarFechaBolivia(new Date(categoria.fecha_activacion));
+                const fechaVencimiento = calcularFechaVencimiento(fechaActivacion, categoria.dias_vencimiento);
+                
+                // Formatear fechas para Supabase
+                const fechaActivacionStr = fechaActivacion.toISOString().split('T')[0];
+                const fechaVencimientoStr = fechaVencimiento.toISOString().split('T')[0];
                 
                 const chipsToInsert = validChips.map(numero_chip => ({
                     categoria_id: parseInt(categoriaId),
                     operadora: operadora,
                     numero_chip: numero_chip,
-                    fecha_activacion: fechaActivacion,
-                    fecha_uso: fechaActivacion,
-                    fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0],
+                    fecha_activacion: fechaActivacionStr,
+                    fecha_uso: fechaActivacionStr,
+                    fecha_vencimiento: fechaVencimientoStr,
                     designado_a: designadoA,
                     designado_observaciones: designadoObservaciones,
                     estado: 'ACTIVO'
@@ -2626,7 +2681,7 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Fecha de Nacimiento *</label>
-                            <input type="date" class="form-control" id="editFechaNacimiento" value="${chip.fecha_activacion}">
+                            <input type="date" class="form-control" id="editFechaNacimiento" value="${formatDateForInput(chip.fecha_activacion)}">
                         </div>
                     `,
                     showCancelButton: true,
@@ -2657,9 +2712,12 @@
                         const { numero_chip, fecha_activacion } = result.value;
                         
                         const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
-                        const fechaNacimiento = new Date(fecha_activacion);
-                        const fechaVencimiento = new Date(fechaNacimiento);
-                        fechaVencimiento.setDate(fechaNacimiento.getDate() + (categoria?.dias_vencimiento || 60));
+                        const fechaNacimiento = ajustarFechaBolivia(new Date(fecha_activacion));
+                        const fechaVencimiento = calcularFechaVencimiento(fechaNacimiento, categoria?.dias_vencimiento || 60);
+                        
+                        // Formatear fechas para Supabase
+                        const fechaActivacionStr = fechaNacimiento.toISOString().split('T')[0];
+                        const fechaVencimientoStr = fechaVencimiento.toISOString().split('T')[0];
                         
                         const response = await fetch(
                             `${SUPABASE_URL}/rest/v1/chip_inventory?id=eq.${chipId}`,
@@ -2673,9 +2731,9 @@
                                 },
                                 body: JSON.stringify({
                                     numero_chip: numero_chip,
-                                    fecha_activacion: fecha_activacion,
-                                    fecha_uso: fecha_activacion,
-                                    fecha_vencimiento: fechaVencimiento.toISOString().split('T')[0]
+                                    fecha_activacion: fechaActivacionStr,
+                                    fecha_uso: fechaActivacionStr,
+                                    fecha_vencimiento: fechaVencimientoStr
                                 })
                             }
                         );
@@ -2779,7 +2837,7 @@
                 }
             }
 
-            // MÉTODO MEJORADO: Exportar inventario filtrado con todas las columnas
+            // MÉTODO MEJORADO: Exportar inventario filtrado con todas las columnas INCLUYENDO NOMBRE DE CATEGORÍA
             exportFilteredInventario() {
                 if (filteredChips.length === 0) {
                     this.showAlert('Información', 'No hay datos filtrados para exportar', 'info');
@@ -2818,9 +2876,9 @@
                         'Operadora': chip.operadora,
                         'ID Categoría': categoria?.categoria_id || 'N/A',
                         'Número de Casillero': categoria?.letra_categoria || 'N/A',
-                        'Categoría': categoria?.nombre || 'N/A',
-                        'Fecha Nacimiento': chip.fecha_activacion,
-                        'Fecha Vencimiento': chip.fecha_vencimiento,
+                        'Nombre Categoría': categoria?.nombre || 'N/A',
+                        'Fecha Nacimiento': formatDateForDisplay(chip.fecha_activacion),
+                        'Fecha Vencimiento': formatDateForDisplay(chip.fecha_vencimiento),
                         'Días Restantes': chip.dias_restantes,
                         'Estado': estado,
                         'Designado a': chip.designado_a || '',
@@ -2839,7 +2897,7 @@
                     {wch: 10}, // Operadora
                     {wch: 15}, // ID Categoría
                     {wch: 20}, // Número de Casillero
-                    {wch: 20}, // Categoría
+                    {wch: 20}, // Nombre Categoría
                     {wch: 15}, // Fecha Nacimiento
                     {wch: 15}, // Fecha Vencimiento
                     {wch: 15}, // Días Restantes
@@ -2869,8 +2927,8 @@
                         'Número de Casillero': cat.letra_categoria,
                         'Operadora': cat.operadora,
                         'Nombre Categoría': cat.nombre,
-                        'Fecha Nacimiento': cat.fecha_activacion,
-                        'Fecha Vencimiento': cat.fecha_vencimiento,
+                        'Fecha Nacimiento': formatDateForDisplay(cat.fecha_activacion),
+                        'Fecha Vencimiento': formatDateForDisplay(cat.fecha_vencimiento),
                         'Días Vencimiento': cat.dias_vencimiento,
                         'Chips Asignados': chipsCount,
                         'Observaciones': cat.observaciones || ''
@@ -3074,7 +3132,7 @@
                 `;
             }
 
-            // MÉTODO MEJORADO: Exportar a Excel con manejo de grandes cantidades
+            // MÉTODO MEJORADO: Exportar a Excel con manejo de grandes cantidades INCLUYENDO NOMBRE DE CATEGORÍA
             async exportToExcel() {
                 try {
                     // Mostrar loading
@@ -3112,9 +3170,9 @@
                             'Operadora': chip.operadora,
                             'ID Categoría': categoria?.categoria_id || 'N/A',
                             'Número de Casillero': categoria?.letra_categoria || 'N/A',
-                            'Categoría': categoria?.nombre || 'N/A',
-                            'Fecha Nacimiento': chip.fecha_activacion,
-                            'Fecha Vencimiento': chip.fecha_vencimiento,
+                            'Nombre Categoría': categoria?.nombre || 'N/A',
+                            'Fecha Nacimiento': formatDateForDisplay(chip.fecha_activacion),
+                            'Fecha Vencimiento': formatDateForDisplay(chip.fecha_vencimiento),
                             'Días Restantes': chip.dias_restantes,
                             'Estado': estado,
                             'Designado a': chip.designado_a || '',
@@ -3132,7 +3190,7 @@
                         {wch: 10}, // Operadora
                         {wch: 15}, // ID Categoría
                         {wch: 20}, // Número de Casillero
-                        {wch: 20}, // Categoría
+                        {wch: 20}, // Nombre Categoría
                         {wch: 15}, // Fecha Nacimiento
                         {wch: 15}, // Fecha Vencimiento
                         {wch: 15}, // Días Restantes
@@ -3161,7 +3219,7 @@
             exportToCSV() {
                 try {
                     const csvContent = [
-                        ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Número de Casillero', 'Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
+                        ['#', 'Número Chip', 'Operadora', 'ID Categoría', 'Número de Casillero', 'Nombre Categoría', 'Fecha Nacimiento', 'Fecha Vencimiento', 'Días Restantes', 'Estado', 'Designado a', 'Observaciones'].join(','),
                         ...allChips.map(chip => {
                             const categoria = allCategories.find(cat => cat.id === chip.categoria_id);
                             const estado = this.determinarEstado(chip);
@@ -3173,8 +3231,8 @@
                                 categoria?.categoria_id || 'N/A',
                                 categoria?.letra_categoria || 'N/A',
                                 `"${categoria?.nombre || 'N/A'}"`,
-                                chip.fecha_activacion,
-                                chip.fecha_vencimiento,
+                                formatDateForDisplay(chip.fecha_activacion),
+                                formatDateForDisplay(chip.fecha_vencimiento),
                                 chip.dias_restantes,
                                 estado,
                                 `"${chip.designado_a || ''}"`,
@@ -3207,8 +3265,8 @@
                             'Número de Casillero': cat.letra_categoria,
                             'Operadora': cat.operadora,
                             'Nombre Categoría': cat.nombre,
-                            'Fecha Nacimiento': cat.fecha_activacion,
-                            'Fecha Vencimiento': cat.fecha_vencimiento,
+                            'Fecha Nacimiento': formatDateForDisplay(cat.fecha_activacion),
+                            'Fecha Vencimiento': formatDateForDisplay(cat.fecha_vencimiento),
                             'Días Vencimiento': cat.dias_vencimiento,
                             'Chips Asignados': chipsCount,
                             'Observaciones': cat.observaciones || ''
@@ -3298,8 +3356,8 @@
                             'Operadora': chip.operadora,
                             'ID Categoría': categoria?.categoria_id || 'N/A',
                             'Número de Casillero': categoria?.letra_categoria || 'N/A',
-                            'Categoría': categoria?.nombre || 'N/A',
-                            'Fecha Vencimiento': chip.fecha_vencimiento,
+                            'Nombre Categoría': categoria?.nombre || 'N/A',
+                            'Fecha Vencimiento': formatDateForDisplay(chip.fecha_vencimiento),
                             'Días Restantes': chip.dias_restantes,
                             'Designado a': chip.designado_a || '',
                             'Estado': this.determinarEstado(chip)
