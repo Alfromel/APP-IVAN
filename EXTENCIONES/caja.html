@@ -790,6 +790,16 @@
             transform: translateY(-2px);
         }
 
+        .ios-btn-danger {
+            background: linear-gradient(135deg, var(--rojo-ios) 0%, #E03A2D 100%);
+            color: var(--blanco-ios);
+        }
+
+        .ios-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 59, 48, 0.3);
+        }
+
         /* Modal de Contraseña */
         .contrasena-input-container {
             position: relative;
@@ -916,6 +926,136 @@
             gap: 0.8rem;
         }
 
+        /* Ventana de Ajustes */
+        .ajustes-window {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--blanco-ios);
+            z-index: 1000;
+            transform: translateX(100%);
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ajustes-window.active {
+            transform: translateX(0);
+        }
+
+        .ajustes-header {
+            background: var(--blanco-ios);
+            color: var(--negro-ios);
+            padding: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            border-bottom: 1px solid var(--gris-claro-ios);
+        }
+
+        .ajustes-title {
+            font-size: 1.5rem;
+            font-weight: 800;
+            flex: 1;
+            color: var(--negro-ios);
+            display: flex;
+            align-items: center;
+            gap: 0.8rem;
+        }
+
+        .ajustes-title i {
+            color: var(--azul-ios);
+        }
+
+        .ajustes-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+            background: var(--gris-claro-ios);
+        }
+
+        .sucursal-item {
+            background: var(--blanco-ios);
+            border-radius: var(--radio-grande-ios);
+            padding: 1.2rem 1.5rem;
+            margin-bottom: 1rem;
+            box-shadow: var(--sombra-ios);
+            border: 1px solid var(--gris-claro-ios);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .sucursal-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-fuerte-ios);
+        }
+
+        .sucursal-info {
+            flex: 1;
+            min-width: 0;
+            padding-right: 1rem;
+        }
+
+        .sucursal-info h4 {
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: var(--negro-ios);
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        .sucursal-info p {
+            font-size: 0.85rem;
+            color: var(--gris-oscuro-ios);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .sucursal-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .sucursal-action-btn {
+            background: var(--gris-claro-ios);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            color: var(--negro-ios);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 1rem;
+        }
+
+        .sucursal-action-btn.edit {
+            color: var(--azul-ios);
+        }
+
+        .sucursal-action-btn.delete {
+            color: var(--rojo-ios);
+        }
+
+        .sucursal-action-btn:hover {
+            background: var(--gris-ios);
+        }
+
         /* Animaciones */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(10px); }
@@ -953,6 +1093,10 @@
                 min-width: 90px;
                 font-size: 1.1rem;
             }
+            
+            .sucursal-actions {
+                flex-direction: column;
+            }
         }
 
         @media (min-width: 768px) {
@@ -968,56 +1112,7 @@
             }
         }
 
-        /* Modo oscuro */
-        @media (prefers-color-scheme: dark) {
-            :root {
-                --blanco-ios: #000000;
-                --gris-claro-ios: #1C1C1E;
-                --gris-ios: #2C2C2E;
-                --gris-oscuro-ios: #8E8E93;
-                --negro-ios: #FFFFFF;
-                --verde-fondo: #0C0C0C;
-            }
-            
-            body {
-                background: #000000;
-            }
-            
-            .app-container {
-                background: var(--blanco-ios);
-            }
-            
-            .ios-form-input {
-                background: var(--gris-ios);
-                color: var(--negro-ios);
-                border-color: var(--gris-oscuro-ios);
-            }
-            
-            .ios-btn-secondary {
-                background: var(--gris-ios);
-                color: var(--negro-ios);
-            }
-            
-            .balance-card {
-                background: linear-gradient(145deg, #1C1C1E 0%, #2C2C2E 100%);
-            }
-            
-            .historial-dia {
-                background: var(--gris-claro-ios);
-            }
-            
-            .dia-header {
-                background: linear-gradient(135deg, #0D5C31 0%, var(--verde-ios) 100%);
-            }
-            
-            .historial-content {
-                background: var(--blanco-ios);
-            }
-            
-            .ios-empty-state {
-                background: var(--gris-claro-ios);
-            }
-        }
+        /* NOTA: Se elimina el modo oscuro automático para mantener colores definidos */
     </style>
 </head>
 <body>
@@ -1030,6 +1125,9 @@
                     <span>Caja Pro</span>
                 </h1>
                 <div class="header-actions">
+                    <button class="ios-icon-btn" id="btnAjustes" title="Ajustes">
+                        <i class="fas fa-cog"></i>
+                    </button>
                     <button class="ios-icon-btn" id="btnNuevaSucursal" title="Nueva Sucursal">
                         <i class="fas fa-store"></i>
                     </button>
@@ -1129,6 +1227,27 @@
                     <i class="fas fa-history"></i>
                     <h3>No hay movimientos</h3>
                     <p>Registra tu primer ingreso o gasto</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Ventana Ajustes -->
+        <div class="ajustes-window" id="ajustesWindow">
+            <div class="ajustes-header">
+                <button class="ios-back-btn" id="btnVolverAjustes">
+                    <i class="fas fa-arrow-left"></i>
+                </button>
+                <h2 class="ajustes-title">
+                    <i class="fas fa-cog"></i>
+                    Ajustes de Sucursales
+                </h2>
+            </div>
+            
+            <div class="ajustes-content" id="ajustesContent">
+                <div class="ios-empty-state">
+                    <i class="fas fa-spinner fa-spin"></i>
+                    <h3>Cargando sucursales...</h3>
+                    <p>Gestiona tus sucursales aquí</p>
                 </div>
             </div>
         </div>
@@ -1236,6 +1355,103 @@
             </div>
         </div>
 
+        <!-- Modal Editar Sucursal -->
+        <div class="ios-modal-overlay" id="modalEditarSucursal">
+            <div class="ios-modal">
+                <div class="ios-modal-header">
+                    <h3 class="ios-modal-title">
+                        <i class="fas fa-edit"></i>
+                        Editar Sucursal
+                    </h3>
+                    <button class="ios-modal-close" id="btnCancelarEditarSucursal">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="ios-modal-body">
+                    <input type="hidden" id="editarSucursalId">
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="editarNombreSucursal">Nombre *</label>
+                        <input type="text" id="editarNombreSucursal" class="ios-form-input" placeholder="Sucursal Central" required>
+                    </div>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="editarDireccionSucursal">Dirección</label>
+                        <input type="text" id="editarDireccionSucursal" class="ios-form-input" placeholder="(Opcional)">
+                    </div>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="editarTelefonoSucursal">Teléfono</label>
+                        <input type="text" id="editarTelefonoSucursal" class="ios-form-input" placeholder="(Opcional)">
+                    </div>
+                    <div class="ios-form-group">
+                        <div class="ios-switch-container">
+                            <span class="ios-switch-label">Sucursal Pública</span>
+                            <label class="ios-switch">
+                                <input type="checkbox" id="editarEsPublica">
+                                <span class="ios-switch-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="ios-form-group" id="editarContrasenaGroup" style="display: none;">
+                        <label class="ios-form-label" for="editarContrasenaSucursal">Nueva Contraseña</label>
+                        <div class="contrasena-input-container">
+                            <input type="password" id="editarContrasenaSucursal" class="ios-form-input" placeholder="Dejar en blanco para no cambiar">
+                            <button type="button" class="toggle-password" id="toggleEditarContrasena">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                        <small style="color: var(--gris-oscuro-ios); font-size: 0.8rem; margin-top: 0.3rem; display: block;">
+                            Deja en blanco si no deseas cambiar la contraseña
+                        </small>
+                    </div>
+                </div>
+                <div class="ios-form-footer">
+                    <button class="ios-btn ios-btn-secondary" id="btnCancelarEditarSucursalForm">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="ios-btn ios-btn-primary" id="btnGuardarEditarSucursal">
+                        <i class="fas fa-save"></i>
+                        Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Confirmar Eliminar -->
+        <div class="ios-modal-overlay" id="modalConfirmarEliminar">
+            <div class="ios-modal">
+                <div class="ios-modal-header">
+                    <h3 class="ios-modal-title">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Confirmar Eliminación
+                    </h3>
+                    <button class="ios-modal-close" id="btnCancelarEliminar">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="ios-modal-body">
+                    <div class="ios-empty-state">
+                        <i class="fas fa-trash-alt fa-2x"></i>
+                        <h3 id="eliminarSucursalTitulo">¿Eliminar sucursal?</h3>
+                        <p id="eliminarSucursalDetalle">Esta acción eliminará permanentemente la sucursal y todos sus movimientos. ¡Esta acción no se puede deshacer!</p>
+                    </div>
+                    <div class="ios-form-group">
+                        <label class="ios-form-label" for="confirmarEliminarTexto">Escribe "ELIMINAR" para confirmar:</label>
+                        <input type="text" id="confirmarEliminarTexto" class="ios-form-input" placeholder="ELIMINAR">
+                    </div>
+                </div>
+                <div class="ios-form-footer">
+                    <button class="ios-btn ios-btn-secondary" id="btnCancelarEliminarForm">
+                        <i class="fas fa-times"></i>
+                        Cancelar
+                    </button>
+                    <button class="ios-btn ios-btn-danger" id="btnConfirmarEliminar" disabled>
+                        <i class="fas fa-trash-alt"></i>
+                        Eliminar Permanentemente
+                    </button>
+                </div>
+            </div>
+        </div>
+
         <!-- Modal Contraseña -->
         <div class="ios-modal-overlay" id="modalContrasena">
             <div class="ios-modal">
@@ -1289,7 +1505,8 @@
             tipoMovimientoActual: 'ingreso',
             saldoTotal: 0,
             cargando: true,
-            filtroDiaActual: 'todos'
+            filtroDiaActual: 'todos',
+            sucursalParaEliminar: null
         };
 
         document.addEventListener('DOMContentLoaded', function() {
@@ -1319,6 +1536,9 @@
             document.getElementById('btnCancelar').addEventListener('click', cerrarModalMovimiento);
             document.getElementById('btnGuardar').addEventListener('click', guardarMovimiento);
             
+            document.getElementById('btnAjustes').addEventListener('click', abrirAjustes);
+            document.getElementById('btnVolverAjustes').addEventListener('click', cerrarAjustes);
+            
             document.getElementById('btnNuevaSucursal').addEventListener('click', abrirModalSucursal);
             document.getElementById('btnCancelarSucursal').addEventListener('click', cerrarModalSucursal);
             document.getElementById('btnCancelarSucursalForm').addEventListener('click', cerrarModalSucursal);
@@ -1329,8 +1549,27 @@
                 contrasenaGroup.style.display = this.checked ? 'none' : 'block';
             });
             
+            document.getElementById('editarEsPublica').addEventListener('change', function() {
+                const contrasenaGroup = document.getElementById('editarContrasenaGroup');
+                contrasenaGroup.style.display = this.checked ? 'none' : 'block';
+            });
+            
             document.getElementById('toggleContrasena').addEventListener('click', function() {
                 const input = document.getElementById('contrasenaSucursal');
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                }
+            });
+            
+            document.getElementById('toggleEditarContrasena').addEventListener('click', function() {
+                const input = document.getElementById('editarContrasenaSucursal');
                 const icon = this.querySelector('i');
                 if (input.type === 'password') {
                     input.type = 'text';
@@ -1368,12 +1607,25 @@
                 }
             });
             
+            document.getElementById('btnCancelarEditarSucursal').addEventListener('click', cerrarModalEditarSucursal);
+            document.getElementById('btnCancelarEditarSucursalForm').addEventListener('click', cerrarModalEditarSucursal);
+            document.getElementById('btnGuardarEditarSucursal').addEventListener('click', guardarEditarSucursal);
+            
+            document.getElementById('btnCancelarEliminar').addEventListener('click', cerrarModalEliminar);
+            document.getElementById('btnCancelarEliminarForm').addEventListener('click', cerrarModalEliminar);
+            document.getElementById('confirmarEliminarTexto').addEventListener('input', function() {
+                document.getElementById('btnConfirmarEliminar').disabled = this.value !== 'ELIMINAR';
+            });
+            document.getElementById('btnConfirmarEliminar').addEventListener('click', eliminarSucursalConfirmada);
+            
             setInterval(actualizarFechaHora, 1000);
             
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     cerrarModalMovimiento();
                     cerrarModalSucursal();
+                    cerrarModalEditarSucursal();
+                    cerrarModalEliminar();
                     cerrarModalContrasena();
                 }
             });
@@ -1585,6 +1837,128 @@
             }
         }
 
+        async function guardarEditarSucursal() {
+            const sucursalId = document.getElementById('editarSucursalId').value;
+            const nombre = document.getElementById('editarNombreSucursal').value.trim();
+            const direccion = document.getElementById('editarDireccionSucursal').value.trim();
+            const telefono = document.getElementById('editarTelefonoSucursal').value.trim();
+            const esPublica = document.getElementById('editarEsPublica').checked;
+            const contrasena = document.getElementById('editarContrasenaSucursal').value.trim();
+            
+            if (!nombre) {
+                mostrarNotificacion('Ingresa el nombre de la sucursal', 'error');
+                return;
+            }
+            
+            const sucursal = {
+                nombre: nombre,
+                direccion: direccion || null,
+                telefono: telefono || null,
+                es_publica: esPublica
+            };
+            
+            if (contrasena) {
+                sucursal.contrasena = contrasena;
+            }
+            
+            try {
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/sucursales?id=eq.${sucursalId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Content-Type': 'application/json',
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(sucursal)
+                });
+                
+                if (!response.ok) throw new Error('Error al actualizar sucursal');
+                
+                cerrarModalEditarSucursal();
+                
+                const index = estadoApp.sucursales.findIndex(s => s.id == sucursalId);
+                if (index !== -1) {
+                    estadoApp.sucursales[index] = {
+                        ...estadoApp.sucursales[index],
+                        ...sucursal
+                    };
+                }
+                
+                actualizarSelectorSucursales();
+                actualizarAjustesUI();
+                
+                if (estadoApp.sucursalActual == sucursalId) {
+                    estadoApp.sucursalActualNombre = nombre;
+                    document.getElementById('sucursalNombre').innerHTML = `<i class="fas fa-building"></i> ${nombre}`;
+                    document.getElementById('historialSucursalNombre').textContent = nombre;
+                }
+                
+                mostrarNotificacion('Sucursal actualizada correctamente', 'exito');
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al actualizar sucursal', 'error');
+            }
+        }
+
+        async function eliminarSucursal(sucursalId) {
+            try {
+                // Primero eliminar todos los movimientos de la sucursal
+                const responseMovimientos = await fetch(`${SUPABASE_URL}/rest/v1/movimientos_caja?sucursal_id=eq.${sucursalId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    }
+                });
+                
+                if (!responseMovimientos.ok) throw new Error('Error al eliminar movimientos');
+                
+                // Luego eliminar la sucursal
+                const responseSucursal = await fetch(`${SUPABASE_URL}/rest/v1/sucursales?id=eq.${sucursalId}`, {
+                    method: 'DELETE',
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    }
+                });
+                
+                if (!responseSucursal.ok) throw new Error('Error al eliminar sucursal');
+                
+                // Actualizar estado local
+                estadoApp.sucursales = estadoApp.sucursales.filter(s => s.id != sucursalId);
+                delete estadoApp.sucursalesAcceso[sucursalId];
+                
+                if (estadoApp.sucursalActual == sucursalId) {
+                    estadoApp.sucursalActual = null;
+                    estadoApp.sucursalActualNombre = '';
+                    estadoApp.movimientos = [];
+                    estadoApp.saldoTotal = 0;
+                    
+                    document.getElementById('balanceTotal').textContent = 'Bs 0.00';
+                    document.getElementById('sucursalNombre').innerHTML = `<i class="fas fa-building"></i> -`;
+                }
+                
+                actualizarSelectorSucursales();
+                actualizarAjustesUI();
+                actualizarUI();
+                
+                cerrarModalEliminar();
+                mostrarNotificacion('Sucursal eliminada correctamente', 'exito');
+                
+                if (estadoApp.sucursales.length === 0) {
+                    mostrarEstadoSinSucursales();
+                }
+                
+            } catch (error) {
+                console.error('Error:', error);
+                mostrarNotificacion('Error al eliminar sucursal', 'error');
+            }
+        }
+
         // ========== FUNCIONES UI ==========
 
         function actualizarSelectorSucursales() {
@@ -1684,6 +2058,136 @@
 
         function cerrarHistorial() {
             document.getElementById('historialWindow').classList.remove('active');
+        }
+
+        function abrirAjustes() {
+            actualizarAjustesUI();
+            document.getElementById('ajustesWindow').classList.add('active');
+        }
+
+        function cerrarAjustes() {
+            document.getElementById('ajustesWindow').classList.remove('active');
+        }
+
+        function actualizarAjustesUI() {
+            const ajustesContent = document.getElementById('ajustesContent');
+            
+            if (estadoApp.sucursales.length === 0) {
+                ajustesContent.innerHTML = `
+                    <div class="ios-empty-state">
+                        <i class="fas fa-store fa-3x"></i>
+                        <h3>No hay sucursales</h3>
+                        <p>Crea tu primera sucursal para comenzar</p>
+                        <button class="ios-historico-btn" id="btnCrearSucursalDesdeAjustes" style="margin-top: 1.5rem;">
+                            <i class="fas fa-plus"></i>
+                            Crear Primera Sucursal
+                        </button>
+                    </div>
+                `;
+                
+                document.getElementById('btnCrearSucursalDesdeAjustes').addEventListener('click', () => {
+                    cerrarAjustes();
+                    abrirModalSucursal();
+                });
+                return;
+            }
+            
+            let ajustesHTML = '';
+            
+            estadoApp.sucursales.forEach(sucursal => {
+                const esActual = estadoApp.sucursalActual == sucursal.id;
+                const tieneAcceso = estadoApp.sucursalesAcceso[sucursal.id] || sucursal.es_publica === true;
+                
+                ajustesHTML += `
+                    <div class="sucursal-item slide-in">
+                        <div class="sucursal-info">
+                            <h4>
+                                ${sucursal.nombre}
+                                ${esActual ? '<span style="color: var(--verde-ios); font-size: 0.8rem;">(Actual)</span>' : ''}
+                                ${sucursal.es_publica === false ? '<i class="fas fa-lock" style="color: var(--gris-oscuro-ios);"></i>' : ''}
+                            </h4>
+                            <p><i class="fas fa-map-marker-alt"></i> ${sucursal.direccion || 'Sin dirección'}</p>
+                            <p><i class="fas fa-phone"></i> ${sucursal.telefono || 'Sin teléfono'}</p>
+                            <p><i class="fas fa-key"></i> ${sucursal.es_publica ? 'Pública' : 'Protegida'}</p>
+                            ${!tieneAcceso ? '<p style="color: var(--rojo-ios);"><i class="fas fa-exclamation-circle"></i> Sin acceso</p>' : ''}
+                        </div>
+                        <div class="sucursal-actions">
+                            <button class="sucursal-action-btn edit" data-id="${sucursal.id}" title="Editar">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="sucursal-action-btn delete" data-id="${sucursal.id}" title="Eliminar">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+            
+            ajustesContent.innerHTML = ajustesHTML;
+            
+            document.querySelectorAll('.sucursal-action-btn.edit').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sucursalId = this.getAttribute('data-id');
+                    abrirModalEditarSucursal(sucursalId);
+                });
+            });
+            
+            document.querySelectorAll('.sucursal-action-btn.delete').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sucursalId = this.getAttribute('data-id');
+                    abrirModalEliminar(sucursalId);
+                });
+            });
+        }
+
+        function abrirModalEditarSucursal(sucursalId) {
+            const sucursal = estadoApp.sucursales.find(s => s.id == sucursalId);
+            
+            if (!sucursal) return;
+            
+            document.getElementById('editarSucursalId').value = sucursal.id;
+            document.getElementById('editarNombreSucursal').value = sucursal.nombre;
+            document.getElementById('editarDireccionSucursal').value = sucursal.direccion || '';
+            document.getElementById('editarTelefonoSucursal').value = sucursal.telefono || '';
+            document.getElementById('editarEsPublica').checked = sucursal.es_publica === true;
+            document.getElementById('editarContrasenaSucursal').value = '';
+            
+            const contrasenaGroup = document.getElementById('editarContrasenaGroup');
+            contrasenaGroup.style.display = sucursal.es_publica ? 'none' : 'block';
+            
+            document.getElementById('modalEditarSucursal').classList.add('active');
+            setTimeout(() => document.getElementById('editarNombreSucursal').focus(), 100);
+        }
+
+        function cerrarModalEditarSucursal() {
+            document.getElementById('modalEditarSucursal').classList.remove('active');
+        }
+
+        function abrirModalEliminar(sucursalId) {
+            const sucursal = estadoApp.sucursales.find(s => s.id == sucursalId);
+            
+            if (!sucursal) return;
+            
+            estadoApp.sucursalParaEliminar = sucursalId;
+            
+            document.getElementById('eliminarSucursalTitulo').textContent = `¿Eliminar "${sucursal.nombre}"?`;
+            document.getElementById('eliminarSucursalDetalle').textContent = `Esta acción eliminará permanentemente la sucursal "${sucursal.nombre}" y todos sus ${estadoApp.movimientos.filter(m => m.sucursal_id == sucursalId).length} movimientos. ¡Esta acción no se puede deshacer!`;
+            document.getElementById('confirmarEliminarTexto').value = '';
+            document.getElementById('btnConfirmarEliminar').disabled = true;
+            
+            document.getElementById('modalConfirmarEliminar').classList.add('active');
+            setTimeout(() => document.getElementById('confirmarEliminarTexto').focus(), 100);
+        }
+
+        function cerrarModalEliminar() {
+            document.getElementById('modalConfirmarEliminar').classList.remove('active');
+            estadoApp.sucursalParaEliminar = null;
+        }
+
+        function eliminarSucursalConfirmada() {
+            if (estadoApp.sucursalParaEliminar) {
+                eliminarSucursal(estadoApp.sucursalParaEliminar);
+            }
         }
 
         function abrirModalMovimiento(tipo) {
