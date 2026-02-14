@@ -194,19 +194,6 @@
             font-weight: 500;
         }
         
-        .stat-change {
-            font-size: 12px;
-            margin-top: 8px;
-        }
-        
-        .stat-change.positive {
-            color: var(--success);
-        }
-        
-        .stat-change.negative {
-            color: var(--danger);
-        }
-        
         /* Tables */
         .app-table {
             width: 100%;
@@ -500,6 +487,22 @@
             gap: 16px;
         }
         
+        /* Historial */
+        .historial-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--gray-3);
+            font-size: 13px;
+        }
+        
+        .historial-item:last-child {
+            border-bottom: none;
+        }
+        
+        .historial-fecha {
+            color: var(--gray-1);
+            font-size: 11px;
+        }
+        
         /* Scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
@@ -579,6 +582,10 @@
                     <i class="bi bi-clipboard-data"></i>
                     <span>Reportes</span>
                 </a>
+                <a href="#" class="nav-item" data-section="historial">
+                    <i class="bi bi-clock-history"></i>
+                    <span>Historial Mayoristas</span>
+                </a>
             </div>
             
             <div class="nav-section">
@@ -631,30 +638,18 @@
                     <div class="stat-card">
                         <div class="stat-value" id="totalCategorias">0</div>
                         <div class="stat-label">Categorías</div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 12% vs mes pasado
-                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="totalChips">0</div>
                         <div class="stat-label">Chips Activos</div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 8% vs mes pasado
-                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="totalMayoristas">0</div>
                         <div class="stat-label">Mayoristas</div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 5% vs mes pasado
-                        </div>
                     </div>
                     <div class="stat-card">
                         <div class="stat-value" id="totalSobrantes">0</div>
                         <div class="stat-label">Chips Sobrantes</div>
-                        <div class="stat-change positive">
-                            <i class="bi bi-arrow-up"></i> 15% vs mes pasado
-                        </div>
                     </div>
                 </div>
                 
@@ -663,7 +658,7 @@
                     <div class="col-md-8">
                         <div class="app-card">
                             <div class="card-header">
-                                <h3 class="card-title">Actividad por Operadora</h3>
+                                <h3 class="card-title">Saldo por Operadora</h3>
                             </div>
                             <div class="card-body">
                                 <div class="chart-container">
@@ -722,9 +717,9 @@
                                         <th>Nombre</th>
                                         <th>Operadora</th>
                                         <th>Chips Totales</th>
-                                        <th>Recargas/Chip</th>
+                                        <th>Saldo por Chip (Bs)</th>
                                         <th>Chips Disponibles</th>
-                                        <th>Recargas Disponibles</th>
+                                        <th>Saldo Total (Bs)</th>
                                         <th>Chips Sobrantes</th>
                                         <th>Acciones</th>
                                     </tr>
@@ -762,10 +757,9 @@
                                     <tr>
                                         <th>ID</th>
                                         <th>Nombre</th>
-                                        <th>Operadora</th>
-                                        <th>Recargas Totales</th>
-                                        <th>Recargas Usadas</th>
-                                        <th>Recargas Disponibles</th>
+                                        <th>Saldo Total (Bs)</th>
+                                        <th>Saldo Usado (Bs)</th>
+                                        <th>Saldo Disponible (Bs)</th>
                                         <th>Acciones</th>
                                     </tr>
                                 </thead>
@@ -794,6 +788,9 @@
                             <option value="TIGO">TIGO</option>
                             <option value="VIVA">VIVA</option>
                         </select>
+                        <button class="btn-primary" id="exportReportesBtn">
+                            <i class="bi bi-download"></i> Exportar
+                        </button>
                     </div>
                 </div>
                 
@@ -810,6 +807,46 @@
                         <div id="emptyReportes" class="empty-state d-none">
                             <i class="bi bi-clipboard-data"></i>
                             <p>No hay reportes registrados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Historial Mayoristas -->
+            <div id="historialSection" class="section-content d-none">
+                <div class="content-header">
+                    <h1 class="content-title">Historial de Mayoristas</h1>
+                    <div class="d-flex gap-2">
+                        <select class="form-control" id="historialMayoristaFilter" style="width: 200px;">
+                            <option value="">Todos los mayoristas</option>
+                        </select>
+                        <input type="date" class="form-control" id="historialDateFilter" style="width: auto;">
+                    </div>
+                </div>
+                
+                <div class="app-card">
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="app-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Mayorista</th>
+                                        <th>Operadora</th>
+                                        <th>Reporte</th>
+                                        <th>Saldo Anterior (Bs)</th>
+                                        <th>Saldo Usado (Bs)</th>
+                                        <th>Saldo Nuevo (Bs)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="historialTableBody">
+                                    <!-- Historial se cargará aquí -->
+                                </tbody>
+                            </table>
+                        </div>
+                        <div id="emptyHistorial" class="empty-state d-none">
+                            <i class="bi bi-clock-history"></i>
+                            <p>No hay historial de mayoristas</p>
                         </div>
                     </div>
                 </div>
@@ -885,18 +922,19 @@
                                     </div>
                                     <div class="col-md-6">
                                         <div class="form-group">
-                                            <label class="form-label">Recargas por Chip (1-10)</label>
-                                            <input type="number" class="form-control" id="categoriaRecargas" min="1" max="10" required>
+                                            <label class="form-label">Saldo por Chip (Bs)</label>
+                                            <input type="number" class="form-control" id="categoriaSaldo" min="1" value="20" required>
+                                            <small class="text-muted">1 recarga = 20 Bs</small>
                                         </div>
                                     </div>
                                 </div>
                                 
                                 <div class="form-group">
-                                    <label class="form-label">Números de Chip</label>
+                                    <label class="form-label">Códigos de Chip</label>
                                     <textarea class="form-control" id="categoriaChipsInput" rows="5" 
-                                              placeholder="Ingrese los números de chip (8 dígitos cada uno) separados por comas, espacios o saltos de línea"></textarea>
+                                              placeholder="Ingrese los códigos de chip separados por comas, espacios o saltos de línea"></textarea>
                                     <div class="d-flex justify-content-between mt-2">
-                                        <small class="text-muted">Ingrese exactamente 8 dígitos por chip</small>
+                                        <small class="text-muted">Cada chip debe tener un código único</small>
                                         <small class="text-muted">Chips válidos: <span id="chipsCount">0</span></small>
                                     </div>
                                 </div>
@@ -915,7 +953,7 @@
                             
                             <div class="alert alert-info mt-3">
                                 <i class="bi bi-info-circle"></i>
-                                <strong>Información:</strong> Cada chip tendrá la cantidad de recargas especificada disponibles para uso.
+                                <strong>Información:</strong> Cada chip tendrá el saldo especificado disponible para uso.
                             </div>
                         </div>
                     </div>
@@ -969,16 +1007,16 @@
                                 <div class="row">
                                     <div class="col-md-8">
                                         <div class="form-group">
-                                            <label class="form-label">Números de Chip</label>
+                                            <label class="form-label">Códigos de Chip</label>
                                             <textarea class="form-control" id="nuevosChipsInput" rows="4" 
-                                                      placeholder="Ingrese los nuevos números de chip (8 dígitos cada uno) separados por comas, espacios o saltos de línea"></textarea>
+                                                      placeholder="Ingrese los nuevos códigos de chip separados por comas, espacios o saltos de línea"></textarea>
                                             <small class="text-muted">Chips válidos: <span id="nuevosChipsCount">0</span></small>
                                         </div>
                                     </div>
                                     <div class="col-md-4">
                                         <div class="form-group">
-                                            <label class="form-label">Recargas por Chip</label>
-                                            <input type="number" class="form-control" id="nuevasRecargasChip" min="1" max="10" value="1">
+                                            <label class="form-label">Saldo por Chip (Bs)</label>
+                                            <input type="number" class="form-control" id="nuevasRecargasChip" min="1" value="20">
                                         </div>
                                         <button class="btn btn-primary w-100" id="guardarNuevosChipsBtn">
                                             <i class="bi bi-save"></i> Guardar Chips
@@ -1018,16 +1056,8 @@
                             <input type="text" class="form-control" id="mayoristaNombre" required>
                         </div>
                         <div class="form-group">
-                            <label class="form-label">Operadora</label>
-                            <select class="form-control" id="mayoristaOperadora" required>
-                                <option value="ENTEL">ENTEL</option>
-                                <option value="TIGO">TIGO</option>
-                                <option value="VIVA">VIVA</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label">Recargas Disponibles</label>
-                            <input type="number" class="form-control" id="mayoristaRecargas" min="1" required>
+                            <label class="form-label">Saldo Inicial (Bs)</label>
+                            <input type="number" class="form-control" id="mayoristaSaldo" min="1" required>
                         </div>
                     </form>
                 </div>
@@ -1050,6 +1080,12 @@
                 <div class="modal-body">
                     <div id="detalleReporteContent"></div>
                 </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" id="eliminarReporteBtn">
+                        <i class="bi bi-trash"></i> Eliminar Reporte
+                    </button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1061,6 +1097,7 @@
         // Configuración de Supabase
         const SUPABASE_URL = 'https://iyowgljzuryeowyceaio.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_xr2MZ4YwV7zslfp9Wzs2WQ_aSfFX_87';
+        const VALOR_RECARGA = 20; // 1 recarga = 20 Bs
         
         // Variables globales
         let currentAdmin = null;
@@ -1115,13 +1152,17 @@
             document.getElementById('guardarMayoristaBtn').addEventListener('click', guardarMayorista);
             document.getElementById('logoutBtn').addEventListener('click', logout);
             document.getElementById('exportData').addEventListener('click', exportData);
+            document.getElementById('exportReportesBtn').addEventListener('click', exportReportes);
+            document.getElementById('eliminarReporteBtn').addEventListener('click', eliminarReporteActual);
             
             // Filtros
             document.getElementById('dateRange').addEventListener('change', loadDashboard);
             document.getElementById('reportDateFilter').addEventListener('change', loadReportes);
             document.getElementById('reportOperadoraFilter').addEventListener('change', loadReportes);
+            document.getElementById('historialMayoristaFilter').addEventListener('change', loadHistorial);
+            document.getElementById('historialDateFilter').addEventListener('change', loadHistorial);
             
-            // Validación de chips
+            // Validación de chips (sin límite de dígitos)
             document.getElementById('categoriaChipsInput').addEventListener('input', validarChips);
             document.getElementById('categoriaChips').addEventListener('input', validarCantidadChips);
             
@@ -1177,6 +1218,9 @@
                 case 'reportes':
                     loadReportes();
                     break;
+                case 'historial':
+                    loadHistorial();
+                    break;
                 case 'usuarios':
                     loadUsuarios();
                     break;
@@ -1185,9 +1229,9 @@
         
         async function loadDashboard() {
             try {
-                // Cargar categorías
+                // Cargar categorías con chips
                 const catResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/categorias?select=*,chips(count)`,
+                    `${SUPABASE_URL}/rest/v1/categorias?select=*,chips(*)`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1230,8 +1274,8 @@
                     reportes = await repResponse.json();
                 }
                 
-                // Cargar chips sobrantes de los reportes
-                await cargarChipsSobrantes();
+                // Calcular chips sobrantes
+                await calcularChipsSobrantes();
                 
                 // Actualizar estadísticas
                 updateDashboardStats();
@@ -1248,14 +1292,17 @@
             }
         }
         
-        async function cargarChipsSobrantes() {
+        async function calcularChipsSobrantes() {
             try {
-                // Reiniciar el objeto de chips sobrantes
-                chipsSobrantes = {};
+                chipsSobrantes = {
+                    ENTEL: [],
+                    TIGO: [],
+                    VIVA: []
+                };
                 
-                // Cargar todos los reportes con detalles
-                const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/reportes?select=id,detalles,operadora,created_at`,
+                // Cargar todos los chips
+                const chipsResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chips?select=*,categorias(operadora)`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1264,33 +1311,21 @@
                     }
                 );
                 
-                if (response.ok) {
-                    const reportesData = await response.json();
+                if (chipsResponse.ok) {
+                    const chips = await chipsResponse.json();
                     
-                    reportesData.forEach(reporte => {
-                        try {
-                            const detalles = JSON.parse(reporte.detalles || '{}');
-                            if (detalles.chips_sobrantes && Array.isArray(detalles.chips_sobrantes)) {
-                                detalles.chips_sobrantes.forEach(chip => {
-                                    if (!chipsSobrantes[reporte.operadora]) {
-                                        chipsSobrantes[reporte.operadora] = [];
-                                    }
-                                    // Agregar información adicional del chip
-                                    chipsSobrantes[reporte.operadora].push({
-                                        numero: chip.numero,
-                                        recargas_restantes: chip.recargas_restantes || 0,
-                                        fecha_reporte: reporte.created_at,
-                                        reporte_id: reporte.id
-                                    });
-                                });
+                    // Agrupar chips por operadora
+                    chips.forEach(chip => {
+                        if (chip.categorias && chip.categorias.operadora) {
+                            if (!chipsSobrantes[chip.categorias.operadora]) {
+                                chipsSobrantes[chip.categorias.operadora] = [];
                             }
-                        } catch (e) {
-                            console.error('Error al parsear detalles del reporte:', e);
+                            chipsSobrantes[chip.categorias.operadora].push(chip);
                         }
                     });
                 }
             } catch (error) {
-                console.error('Error al cargar chips sobrantes:', error);
+                console.error('Error al calcular chips sobrantes:', error);
             }
         }
         
@@ -1300,18 +1335,20 @@
             
             // Total chips
             let totalChips = 0;
-            let totalRecargas = 0;
             let totalSobrantes = 0;
             
             categorias.forEach(cat => {
-                const chipCount = cat.chips ? cat.chips[0]?.count || 0 : 0;
-                totalChips += chipCount;
-                totalRecargas += chipCount * cat.recargas_por_chip;
-            });
-            
-            // Calcular chips sobrantes totales
-            Object.values(chipsSobrantes).forEach(sobrantes => {
-                totalSobrantes += sobrantes.length;
+                if (cat.chips) {
+                    totalChips += cat.chips.length;
+                    
+                    // Calcular sobrantes por igualdad de saldo
+                    if (cat.chips.length > 0) {
+                        const saldos = cat.chips.map(chip => chip.saldo_actual);
+                        const saldoMinimo = Math.min(...saldos);
+                        const chipsConSaldoSuperior = cat.chips.filter(chip => chip.saldo_actual > saldoMinimo).length;
+                        totalSobrantes += chipsConSaldoSuperior;
+                    }
+                }
             });
             
             document.getElementById('totalChips').textContent = totalChips;
@@ -1324,22 +1361,21 @@
             const operadoraCtx = document.getElementById('operadoraChart').getContext('2d');
             
             const operadoraData = {
-                ENTEL: { chips: 0, recargas: 0, sobrantes: 0 },
-                TIGO: { chips: 0, recargas: 0, sobrantes: 0 },
-                VIVA: { chips: 0, recargas: 0, sobrantes: 0 }
+                ENTEL: { chips: 0, saldo: 0 },
+                TIGO: { chips: 0, saldo: 0 },
+                VIVA: { chips: 0, saldo: 0 }
             };
             
-            // Contar chips por operadora
+            // Contar chips y saldo por operadora
             categorias.forEach(cat => {
-                const chipCount = cat.chips ? cat.chips[0]?.count || 0 : 0;
-                operadoraData[cat.operadora].chips += chipCount;
-                operadoraData[cat.operadora].recargas += chipCount * cat.recargas_por_chip;
-            });
-            
-            // Agregar chips sobrantes
-            Object.keys(chipsSobrantes).forEach(operadora => {
-                if (operadoraData[operadora]) {
-                    operadoraData[operadora].sobrantes = chipsSobrantes[operadora].length;
+                if (cat.chips && cat.operadora) {
+                    const chipCount = cat.chips.length;
+                    operadoraData[cat.operadora].chips += chipCount;
+                    
+                    // Calcular saldo total
+                    cat.chips.forEach(chip => {
+                        operadoraData[cat.operadora].saldo += chip.saldo_actual;
+                    });
                 }
             });
             
@@ -1365,22 +1401,24 @@
                                 'rgb(13, 75, 211)',
                                 'rgb(19, 196, 34)'
                             ],
-                            borderWidth: 1
+                            borderWidth: 1,
+                            yAxisID: 'y'
                         },
                         {
-                            label: 'Chips Sobrantes',
-                            data: [operadoraData.ENTEL.sobrantes, operadoraData.TIGO.sobrantes, operadoraData.VIVA.sobrantes],
+                            label: 'Saldo Total (Bs)',
+                            data: [operadoraData.ENTEL.saldo, operadoraData.TIGO.saldo, operadoraData.VIVA.saldo],
                             backgroundColor: [
-                                'rgba(255, 99, 132, 0.8)',
-                                'rgba(255, 99, 132, 0.8)',
-                                'rgba(255, 99, 132, 0.8)'
+                                'rgba(255, 193, 7, 0.8)',
+                                'rgba(255, 193, 7, 0.8)',
+                                'rgba(255, 193, 7, 0.8)'
                             ],
                             borderColor: [
-                                'rgb(255, 99, 132)',
-                                'rgb(255, 99, 132)',
-                                'rgb(255, 99, 132)'
+                                'rgb(255, 193, 7)',
+                                'rgb(255, 193, 7)',
+                                'rgb(255, 193, 7)'
                             ],
-                            borderWidth: 1
+                            borderWidth: 1,
+                            yAxisID: 'y1'
                         }
                     ]
                 },
@@ -1398,7 +1436,19 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Cantidad'
+                                text: 'Cantidad de Chips'
+                            },
+                            position: 'left'
+                        },
+                        y1: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Saldo (Bs)'
+                            },
+                            position: 'right',
+                            grid: {
+                                drawOnChartArea: false
                             }
                         }
                     }
@@ -1415,19 +1465,17 @@
             distributionChart = new Chart(distCtx, {
                 type: 'doughnut',
                 data: {
-                    labels: ['ENTEL', 'TIGO', 'VIVA', 'Sobrantes'],
+                    labels: ['ENTEL', 'TIGO', 'VIVA'],
                     datasets: [{
                         data: [
-                            operadoraData.ENTEL.chips - operadoraData.ENTEL.sobrantes,
-                            operadoraData.TIGO.chips - operadoraData.TIGO.sobrantes,
-                            operadoraData.VIVA.chips - operadoraData.VIVA.sobrantes,
-                            operadoraData.ENTEL.sobrantes + operadoraData.TIGO.sobrantes + operadoraData.VIVA.sobrantes
+                            operadoraData.ENTEL.saldo,
+                            operadoraData.TIGO.saldo,
+                            operadoraData.VIVA.saldo
                         ],
                         backgroundColor: [
                             'rgba(0, 136, 204, 0.8)',
                             'rgba(13, 75, 211, 0.8)',
-                            'rgba(19, 196, 34, 0.8)',
-                            'rgba(255, 99, 132, 0.8)'
+                            'rgba(19, 196, 34, 0.8)'
                         ],
                         borderWidth: 1
                     }]
@@ -1438,6 +1486,13 @@
                     plugins: {
                         legend: {
                             position: 'bottom'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.label}: Bs ${context.raw.toFixed(2)}`;
+                                }
+                            }
                         }
                     }
                 }
@@ -1454,7 +1509,7 @@
             }
             
             reportes.slice(0, 6).forEach(reporte => {
-                const cardClass = `report-card-square ${reporte.operadora.toLowerCase()}`;
+                const cardClass = `report-card-square ${reporte.operadora ? reporte.operadora.toLowerCase() : ''}`;
                 
                 container.innerHTML += `
                 <div class="${cardClass}">
@@ -1463,24 +1518,24 @@
                             <div class="report-user">${reporte.usuario_nombre}</div>
                             <div class="report-date">${formatDate(reporte.created_at)}</div>
                         </div>
-                        <span class="badge badge-${reporte.operadora.toLowerCase()}">${reporte.operadora}</span>
+                        <span class="badge ${reporte.operadora ? 'badge-' + reporte.operadora.toLowerCase() : ''}">${reporte.operadora || 'Todas'}</span>
                     </div>
                     <div class="report-stats">
                         <div class="report-stat">
-                            <div class="report-stat-value">${reporte.total_recargas}</div>
-                            <div class="report-stat-label">Total Recargas</div>
+                            <div class="report-stat-value">Bs ${reporte.saldo_total}</div>
+                            <div class="report-stat-label">Saldo Total</div>
                         </div>
                         <div class="report-stat">
-                            <div class="report-stat-value">${reporte.recargas_usadas}</div>
-                            <div class="report-stat-label">Recargas Usadas</div>
+                            <div class="report-stat-value">Bs ${reporte.saldo_usado}</div>
+                            <div class="report-stat-label">Saldo Usado</div>
                         </div>
                         <div class="report-stat">
-                            <div class="report-stat-value">${reporte.chips_modificados}</div>
-                            <div class="report-stat-label">Chips Modificados</div>
+                            <div class="report-stat-value">${reporte.chips_modificados || 0}</div>
+                            <div class="report-stat-label">Chips</div>
                         </div>
                         <div class="report-stat">
                             <div class="report-stat-value">${reporte.sobrantes || 0}</div>
-                            <div class="report-stat-label">Chips Sobrantes</div>
+                            <div class="report-stat-label">Sobrantes</div>
                         </div>
                     </div>
                     <div class="d-flex justify-content-between align-items-center mt-3">
@@ -1503,7 +1558,7 @@
             try {
                 // Cargar categorías con chips
                 const response = await fetch(
-                    `${SUPABASE_URL}/rest/v1/categorias?select=*,chips(numero,recargas_restantes)`,
+                    `${SUPABASE_URL}/rest/v1/categorias?select=*,chips(*)`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1520,34 +1575,27 @@
                     } else {
                         empty.classList.add('d-none');
                         
-                        // Calcular chips sobrantes por categoría
-                        const sobrantesPorCategoria = {};
-                        
-                        // Agrupar chips sobrantes por categoría
-                        Object.keys(chipsSobrantes).forEach(operadora => {
-                            chipsSobrantes[operadora].forEach(chip => {
-                                // Buscar a qué categoría pertenece este chip
-                                data.forEach(categoria => {
-                                    if (categoria.operadora === operadora && 
-                                        categoria.chips && 
-                                        categoria.chips.some(c => c.numero === chip.numero)) {
-                                        
-                                        if (!sobrantesPorCategoria[categoria.id]) {
-                                            sobrantesPorCategoria[categoria.id] = 0;
-                                        }
-                                        sobrantesPorCategoria[categoria.id]++;
-                                    }
-                                });
-                            });
-                        });
-                        
                         data.forEach(categoria => {
                             const chipCount = categoria.chips ? categoria.chips.length : 0;
-                            const recargasDisponibles = categoria.chips ? 
-                                categoria.chips.reduce((sum, chip) => sum + chip.recargas_restantes, 0) : 0;
                             
-                            const sobrantesCategoria = sobrantesPorCategoria[categoria.id] || 0;
-                            const chipsDisponibles = chipCount - sobrantesCategoria;
+                            // Calcular saldo total
+                            let saldoTotal = 0;
+                            let chipsDisponibles = 0;
+                            
+                            if (categoria.chips) {
+                                categoria.chips.forEach(chip => {
+                                    saldoTotal += chip.saldo_actual;
+                                    if (chip.saldo_actual > 0) chipsDisponibles++;
+                                });
+                            }
+                            
+                            // Calcular chips sobrantes (los que tienen saldo superior al mínimo)
+                            let chipsSobrantes = 0;
+                            if (categoria.chips && categoria.chips.length > 0) {
+                                const saldos = categoria.chips.map(chip => chip.saldo_actual);
+                                const saldoMinimo = Math.min(...saldos);
+                                chipsSobrantes = categoria.chips.filter(chip => chip.saldo_actual > saldoMinimo).length;
+                            }
                             
                             tbody.innerHTML += `
                             <tr>
@@ -1555,10 +1603,10 @@
                                 <td><strong>${categoria.nombre}</strong></td>
                                 <td><span class="badge badge-${categoria.operadora.toLowerCase()}">${categoria.operadora}</span></td>
                                 <td>${chipCount}</td>
-                                <td>${categoria.recargas_por_chip}</td>
+                                <td>Bs ${categoria.saldo_por_chip || 0}</td>
                                 <td>${chipsDisponibles}</td>
-                                <td>${recargasDisponibles}</td>
-                                <td>${sobrantesCategoria}</td>
+                                <td>Bs ${saldoTotal}</td>
+                                <td>${chipsSobrantes}</td>
                                 <td>
                                     <button class="btn-icon" onclick="verChipsCategoria(${categoria.id}, '${categoria.nombre}')" title="Ver chips">
                                         <i class="bi bi-phone"></i>
@@ -1603,21 +1651,29 @@
                     // Actualizar contador
                     document.getElementById('totalChipsModal').textContent = chips.length;
                     
+                    // Calcular saldo mínimo para determinar sobrantes
+                    let saldoMinimo = Infinity;
+                    if (chips.length > 0) {
+                        saldoMinimo = Math.min(...chips.map(chip => chip.saldo_actual));
+                    }
+                    
                     // Mostrar chips
                     let chipsHTML = '';
                     chips.forEach(chip => {
+                        const esSobrante = chip.saldo_actual > saldoMinimo;
+                        
                         chipsHTML += `
                         <div class="col-md-3 mb-3">
-                            <div class="card ${chip.recargas_restantes > 0 ? 'border-success' : 'border-danger'}">
+                            <div class="card ${esSobrante ? 'border-warning' : 'border-success'}">
                                 <div class="card-body p-3">
                                     <div class="d-flex justify-content-between align-items-center mb-2">
-                                        <h6 class="card-title mb-0">${chip.numero}</h6>
-                                        <span class="badge ${chip.recargas_restantes > 0 ? 'badge-success' : 'badge-danger'}">
-                                            ${chip.recargas_restantes} recargas
+                                        <h6 class="card-title mb-0">${chip.codigo}</h6>
+                                        <span class="badge ${esSobrante ? 'badge-warning' : 'badge-success'}">
+                                            Bs ${chip.saldo_actual}
                                         </span>
                                     </div>
                                     <div class="d-flex justify-content-between">
-                                        <button class="btn btn-sm btn-outline-primary" onclick="editarChip(${chip.id}, '${chip.numero}')">
+                                        <button class="btn btn-sm btn-outline-primary" onclick="editarChip(${chip.id}, '${chip.codigo}')">
                                             <i class="bi bi-pencil"></i>
                                         </button>
                                         <button class="btn btn-sm btn-outline-danger" onclick="eliminarChip(${chip.id})">
@@ -1683,9 +1739,9 @@
         
         async function mostrarChipsSobrantes() {
             try {
-                // Cargar información de la categoría
-                const catResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/categorias?id=eq.${currentCategoriaId}`,
+                // Cargar chips de la categoría
+                const chipsResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/chips?categoria_id=eq.${currentCategoriaId}&select=*`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1694,76 +1750,64 @@
                     }
                 );
                 
-                if (catResponse.ok) {
-                    const categoria = (await catResponse.json())[0];
-                    const operadora = categoria.operadora;
+                if (chipsResponse.ok) {
+                    const chips = await chipsResponse.json();
                     
-                    let sobrantesHTML = '';
-                    
-                    if (chipsSobrantes[operadora] && chipsSobrantes[operadora].length > 0) {
-                        // Filtrar chips sobrantes que pertenezcan a esta categoría
-                        const chipsCategoriaResponse = await fetch(
-                            `${SUPABASE_URL}/rest/v1/chips?categoria_id=eq.${currentCategoriaId}&select=numero`,
-                            {
-                                headers: {
-                                    'apikey': SUPABASE_KEY,
-                                    'Authorization': `Bearer ${SUPABASE_KEY}`
-                                }
-                            }
-                        );
-                        
-                        if (chipsCategoriaResponse.ok) {
-                            const chipsCategoria = await chipsCategoriaResponse.json();
-                            const numerosCategoria = chipsCategoria.map(chip => chip.numero);
-                            
-                            const sobrantesCategoria = chipsSobrantes[operadora].filter(chip => 
-                                numerosCategoria.includes(chip.numero)
-                            );
-                            
-                            if (sobrantesCategoria.length > 0) {
-                                sobrantesCategoria.forEach(chip => {
-                                    sobrantesHTML += `
-                                    <div class="col-md-3 mb-3">
-                                        <div class="card border-warning">
-                                            <div class="card-body p-3">
-                                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                                    <h6 class="card-title mb-0">${chip.numero}</h6>
-                                                    <span class="badge badge-warning">
-                                                        ${chip.recargas_restantes} recargas
-                                                    </span>
-                                                </div>
-                                                <small class="text-muted">
-                                                    Reporte: ${formatDate(chip.fecha_reporte)}
-                                                </small>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    `;
-                                });
-                                
-                                document.getElementById('sobrantesContent').innerHTML = `
-                                    <h6>Chips Sobrantes (${sobrantesCategoria.length})</h6>
-                                    <div class="row mt-3">
-                                        ${sobrantesHTML}
-                                    </div>
-                                `;
-                            } else {
-                                document.getElementById('sobrantesContent').innerHTML = `
-                                    <div class="alert alert-info">
-                                        <i class="bi bi-info-circle"></i>
-                                        No hay chips sobrantes en esta categoría.
-                                    </div>
-                                `;
-                            }
-                        }
-                    } else {
+                    if (chips.length === 0) {
                         document.getElementById('sobrantesContent').innerHTML = `
                             <div class="alert alert-info">
                                 <i class="bi bi-info-circle"></i>
-                                No hay chips sobrantes en esta categoría.
+                                No hay chips en esta categoría.
                             </div>
                         `;
+                        return;
                     }
+                    
+                    // Calcular saldo mínimo
+                    const saldos = chips.map(chip => chip.saldo_actual);
+                    const saldoMinimo = Math.min(...saldos);
+                    
+                    // Filtrar chips sobrantes (los que tienen saldo superior al mínimo)
+                    const chipsSobrantes = chips.filter(chip => chip.saldo_actual > saldoMinimo);
+                    
+                    if (chipsSobrantes.length === 0) {
+                        document.getElementById('sobrantesContent').innerHTML = `
+                            <div class="alert alert-success">
+                                <i class="bi bi-check-circle"></i>
+                                No hay chips sobrantes. Todos los chips tienen Bs ${saldoMinimo}.
+                            </div>
+                        `;
+                        return;
+                    }
+                    
+                    let sobrantesHTML = '';
+                    chipsSobrantes.forEach(chip => {
+                        sobrantesHTML += `
+                        <div class="col-md-3 mb-3">
+                            <div class="card border-warning">
+                                <div class="card-body p-3">
+                                    <div class="d-flex justify-content-between align-items-center mb-2">
+                                        <h6 class="card-title mb-0">${chip.codigo}</h6>
+                                        <span class="badge badge-warning">
+                                            Bs ${chip.saldo_actual}
+                                        </span>
+                                    </div>
+                                    <small class="text-muted">
+                                        Sobrante: Bs ${chip.saldo_actual - saldoMinimo}
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        `;
+                    });
+                    
+                    document.getElementById('sobrantesContent').innerHTML = `
+                        <h6>Chips Sobrantes (${chipsSobrantes.length})</h6>
+                        <p class="text-muted">Saldo base mínimo: Bs ${saldoMinimo}</p>
+                        <div class="row mt-3">
+                            ${sobrantesHTML}
+                        </div>
+                    `;
                 }
             } catch (error) {
                 console.error('Error al mostrar chips sobrantes:', error);
@@ -1773,6 +1817,61 @@
                         Error al cargar chips sobrantes.
                     </div>
                 `;
+            }
+        }
+        
+        function validarCantidadChips() {
+            const cantidad = document.getElementById('categoriaChips').value;
+            const input = document.getElementById('categoriaChipsInput');
+            
+            if (cantidad) {
+                input.placeholder = `Ingrese exactamente ${cantidad} códigos de chip`;
+            }
+        }
+        
+        function validarChips() {
+            const input = document.getElementById('categoriaChipsInput').value;
+            const preview = document.getElementById('chipsPreview');
+            const counter = document.getElementById('chipsCount');
+            
+            // Separar por comas, espacios o saltos de línea
+            const chips = input.split(/[, \n]+/).filter(chip => chip.trim() !== '');
+            
+            let validos = 0;
+            let duplicados = new Set();
+            let chipsHTML = '';
+            
+            chips.forEach((chip, index) => {
+                const chipCode = chip.trim();
+                const esValido = chipCode.length > 0;
+                const esDuplicado = chips.indexOf(chipCode) !== index;
+                
+                if (esValido && !esDuplicado) {
+                    validos++;
+                    chipsHTML += `<span class="chip chip-available">${chipCode}</span>`;
+                } else if (esDuplicado) {
+                    duplicados.add(chipCode);
+                    chipsHTML += `<span class="chip chip-used" title="Código duplicado">${chipCode} <i class="bi bi-exclamation-triangle"></i></span>`;
+                } else {
+                    chipsHTML += `<span class="chip chip-used" title="Código inválido">${chipCode} <i class="bi bi-x-circle"></i></span>`;
+                }
+            });
+            
+            if (chipsHTML) {
+                preview.innerHTML = chipsHTML;
+            } else {
+                preview.innerHTML = `<div class="empty-state p-3"><i class="bi bi-phone"></i><p>Los chips aparecerán aquí</p></div>`;
+            }
+            
+            counter.textContent = validos;
+            
+            // Verificar si coincide con la cantidad especificada
+            const cantidadEsperada = document.getElementById('categoriaChips').value;
+            if (cantidadEsperada && validos != cantidadEsperada) {
+                preview.innerHTML += `<div class="alert alert-warning mt-2">
+                    <i class="bi bi-exclamation-triangle"></i>
+                    Se esperaban ${cantidadEsperada} chips, pero se encontraron ${validos} válidos
+                </div>`;
             }
         }
         
@@ -1789,18 +1888,18 @@
             let chipsHTML = '';
             
             chips.forEach((chip, index) => {
-                const chipNum = chip.trim();
-                const esValido = chipNum.length === 8 && /^\d+$/.test(chipNum);
-                const esDuplicado = chips.indexOf(chipNum) !== index;
+                const chipCode = chip.trim();
+                const esValido = chipCode.length > 0;
+                const esDuplicado = chips.indexOf(chipCode) !== index;
                 
                 if (esValido && !esDuplicado) {
                     validos++;
-                    chipsHTML += `<span class="chip chip-available">${chipNum}</span>`;
+                    chipsHTML += `<span class="chip chip-available">${chipCode}</span>`;
                 } else if (esDuplicado) {
-                    duplicados.add(chipNum);
-                    chipsHTML += `<span class="chip chip-used" title="Número duplicado">${chipNum} <i class="bi bi-exclamation-triangle"></i></span>`;
+                    duplicados.add(chipCode);
+                    chipsHTML += `<span class="chip chip-used" title="Código duplicado">${chipCode} <i class="bi bi-exclamation-triangle"></i></span>`;
                 } else {
-                    chipsHTML += `<span class="chip chip-used" title="Formato inválido (${chipNum.length} dígitos)">${chipNum} <i class="bi bi-x-circle"></i></span>`;
+                    chipsHTML += `<span class="chip chip-used" title="Código inválido">${chipCode} <i class="bi bi-x-circle"></i></span>`;
                 }
             });
             
@@ -1813,17 +1912,104 @@
             counter.textContent = validos;
         }
         
-        async function guardarNuevosChips() {
-            const chipsInput = document.getElementById('nuevosChipsInput').value;
-            const recargasPorChip = parseInt(document.getElementById('nuevasRecargasChip').value);
+        async function guardarCategoria() {
+            const nombre = document.getElementById('categoriaNombre').value;
+            const operadora = document.getElementById('categoriaOperadora').value;
+            const chipsTotales = parseInt(document.getElementById('categoriaChips').value);
+            const saldoPorChip = parseInt(document.getElementById('categoriaSaldo').value);
+            const chipsInput = document.getElementById('categoriaChipsInput').value;
             
-            if (!chipsInput.trim()) {
-                showNotification('Ingrese números de chip', 'error');
+            // Validaciones
+            if (!nombre || !operadora || !chipsTotales || !saldoPorChip) {
+                showNotification('Complete todos los campos', 'error');
                 return;
             }
             
-            if (recargasPorChip < 1 || recargasPorChip > 10) {
-                showNotification('Las recargas por chip deben ser entre 1 y 10', 'error');
+            // Validar chips (sin límite de dígitos)
+            const chips = chipsInput.split(/[, \n]+/)
+                .filter(chip => chip.trim() !== '')
+                .map(chip => chip.trim());
+            
+            const chipsUnicos = [...new Set(chips)];
+            
+            if (chipsUnicos.length !== chipsTotales) {
+                showNotification(`Debe ingresar exactamente ${chipsTotales} chips válidos únicos`, 'error');
+                return;
+            }
+            
+            try {
+                // Crear la categoría
+                const categoriaData = {
+                    nombre: nombre,
+                    operadora: operadora,
+                    chips_totales: chipsTotales,
+                    saldo_por_chip: saldoPorChip
+                };
+                
+                const catResponse = await fetch(`${SUPABASE_URL}/rest/v1/categorias`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=representation'
+                    },
+                    body: JSON.stringify(categoriaData)
+                });
+                
+                if (!catResponse.ok) throw new Error('Error al crear categoría');
+                
+                const categoriaCreada = await catResponse.json();
+                const categoriaId = categoriaCreada[0].id;
+                
+                // Crear los chips
+                const chipsData = chipsUnicos.map(chipCode => ({
+                    categoria_id: categoriaId,
+                    codigo: chipCode,
+                    saldo_actual: saldoPorChip
+                }));
+                
+                // Insertar chips en lotes
+                for (let i = 0; i < chipsData.length; i += 50) {
+                    const batch = chipsData.slice(i, i + 50);
+                    
+                    const chipsResponse = await fetch(`${SUPABASE_URL}/rest/v1/chips`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify(batch)
+                    });
+                    
+                    if (!chipsResponse.ok) throw new Error('Error al crear chips');
+                }
+                
+                // Cerrar modal y actualizar
+                bootstrap.Modal.getInstance(document.getElementById('categoriaModal')).hide();
+                showNotification('Categoría creada exitosamente', 'success');
+                loadCategorias();
+                loadDashboard();
+                
+            } catch (error) {
+                console.error('Error al guardar categoría:', error);
+                showNotification('Error al crear categoría', 'error');
+            }
+        }
+        
+        async function guardarNuevosChips() {
+            const chipsInput = document.getElementById('nuevosChipsInput').value;
+            const saldoPorChip = parseInt(document.getElementById('nuevasRecargasChip').value);
+            
+            if (!chipsInput.trim()) {
+                showNotification('Ingrese códigos de chip', 'error');
+                return;
+            }
+            
+            if (saldoPorChip < 1) {
+                showNotification('El saldo por chip debe ser positivo', 'error');
                 return;
             }
             
@@ -1832,8 +2018,7 @@
                 .filter(chip => chip.trim() !== '')
                 .map(chip => chip.trim());
             
-            const chipsValidos = chips.filter(chip => chip.length === 8 && /^\d+$/.test(chip));
-            const chipsUnicos = [...new Set(chipsValidos)];
+            const chipsUnicos = [...new Set(chips)];
             
             if (chipsUnicos.length === 0) {
                 showNotification('No hay chips válidos para agregar', 'error');
@@ -1843,7 +2028,7 @@
             try {
                 // Verificar si los chips ya existen
                 const chipsResponse = await fetch(
-                    `${SUPABASE_URL}/rest/v1/chips?numero=in.(${chipsUnicos.map(chip => `"${chip}"`).join(',')})`,
+                    `${SUPABASE_URL}/rest/v1/chips?categoria_id=eq.${currentCategoriaId}`,
                     {
                         headers: {
                             'apikey': SUPABASE_KEY,
@@ -1854,30 +2039,20 @@
                 
                 if (chipsResponse.ok) {
                     const chipsExistentes = await chipsResponse.json();
+                    const codigosExistentes = chipsExistentes.map(chip => chip.codigo);
                     
-                    if (chipsExistentes.length > 0) {
-                        const numerosExistentes = chipsExistentes.map(chip => chip.numero);
-                        const chipsNuevos = chipsUnicos.filter(chip => !numerosExistentes.includes(chip));
-                        
-                        if (chipsNuevos.length === 0) {
-                            showNotification('Todos los chips ya existen en el sistema', 'error');
-                            return;
-                        }
-                        
-                        // Agregar solo chips nuevos
-                        chipsUnicos = chipsNuevos;
+                    const chipsNuevos = chipsUnicos.filter(chip => !codigosExistentes.includes(chip));
+                    
+                    if (chipsNuevos.length === 0) {
+                        showNotification('Todos los chips ya existen en esta categoría', 'error');
+                        return;
                     }
                     
                     // Crear los chips
-                    const now = new Date();
-                    const timestamp = now.toISOString();
-                    
-                    const chipsData = chipsUnicos.map(chipNum => ({
+                    const chipsData = chipsNuevos.map(chipCode => ({
                         categoria_id: currentCategoriaId,
-                        numero: chipNum,
-                        recargas_restantes: recargasPorChip,
-                        created_at: timestamp,
-                        updated_at: timestamp
+                        codigo: chipCode,
+                        saldo_actual: saldoPorChip
                     }));
                     
                     // Insertar chips
@@ -1893,7 +2068,7 @@
                     });
                     
                     if (insertResponse.ok) {
-                        showNotification(`${chipsUnicos.length} chips agregados exitosamente`, 'success');
+                        showNotification(`${chipsNuevos.length} chips agregados exitosamente`, 'success');
                         
                         // Limpiar el formulario
                         document.getElementById('nuevosChipsInput').value = '';
@@ -1951,17 +2126,21 @@
                         empty.classList.add('d-none');
                         
                         data.forEach(mayorista => {
+                            const saldoDisponible = mayorista.saldo_total - (mayorista.saldo_usado || 0);
+                            
                             tbody.innerHTML += `
                             <tr>
                                 <td>${mayorista.id}</td>
                                 <td><strong>${mayorista.nombre}</strong></td>
-                                <td><span class="badge badge-${mayorista.operadora.toLowerCase()}">${mayorista.operadora}</span></td>
-                                <td>${mayorista.recargas}</td>
-                                <td>0</td>
-                                <td>${mayorista.recargas}</td>
+                                <td>Bs ${mayorista.saldo_total}</td>
+                                <td>Bs ${mayorista.saldo_usado || 0}</td>
+                                <td>Bs ${saldoDisponible}</td>
                                 <td>
                                     <button class="btn-icon" onclick="editarMayorista(${mayorista.id})" title="Editar">
                                         <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button class="btn-icon" onclick="verHistorialMayorista(${mayorista.id})" title="Ver Historial">
+                                        <i class="bi bi-clock-history"></i>
                                     </button>
                                     <button class="btn-icon" onclick="eliminarMayorista(${mayorista.id})" title="Eliminar">
                                         <i class="bi bi-trash"></i>
@@ -1975,6 +2154,66 @@
             } catch (error) {
                 console.error('Error al cargar mayoristas:', error);
                 showNotification('Error al cargar mayoristas', 'error');
+            }
+        }
+        
+        function showNuevaCategoria() {
+            document.getElementById('categoriaForm').reset();
+            document.getElementById('chipsPreview').innerHTML = `
+                <div class="empty-state p-3">
+                    <i class="bi bi-phone"></i>
+                    <p>Los chips aparecerán aquí</p>
+                </div>
+            `;
+            document.getElementById('chipsCount').textContent = '0';
+            
+            const modal = new bootstrap.Modal(document.getElementById('categoriaModal'));
+            modal.show();
+        }
+        
+        function showNuevoMayorista() {
+            document.getElementById('mayoristaForm').reset();
+            const modal = new bootstrap.Modal(document.getElementById('mayoristaModal'));
+            modal.show();
+        }
+        
+        async function guardarMayorista() {
+            const nombre = document.getElementById('mayoristaNombre').value;
+            const saldo = parseInt(document.getElementById('mayoristaSaldo').value);
+            
+            if (!nombre || !saldo) {
+                showNotification('Complete todos los campos', 'error');
+                return;
+            }
+            
+            try {
+                const mayoristaData = {
+                    nombre: nombre,
+                    saldo_total: saldo,
+                    saldo_usado: 0
+                };
+                
+                const response = await fetch(`${SUPABASE_URL}/rest/v1/mayoristas`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`,
+                        'Prefer': 'return=minimal'
+                    },
+                    body: JSON.stringify(mayoristaData)
+                });
+                
+                if (!response.ok) throw new Error('Error al crear mayorista');
+                
+                bootstrap.Modal.getInstance(document.getElementById('mayoristaModal')).hide();
+                showNotification('Mayorista creado exitosamente', 'success');
+                loadMayoristas();
+                loadDashboard();
+                
+            } catch (error) {
+                console.error('Error al guardar mayorista:', error);
+                showNotification('Error al crear mayorista', 'error');
             }
         }
         
@@ -1994,7 +2233,10 @@
                 const operadoraFilter = document.getElementById('reportOperadoraFilter').value;
                 
                 if (dateFilter) {
-                    url += `&created_at=gte.${dateFilter}`;
+                    const nextDay = new Date(dateFilter);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    const nextDayStr = nextDay.toISOString().split('T')[0];
+                    url += `&created_at=gte.${dateFilter}&created_at=lt.${nextDayStr}`;
                 }
                 
                 if (operadoraFilter) {
@@ -2018,7 +2260,7 @@
                         empty.classList.add('d-none');
                         
                         data.forEach(reporte => {
-                            const cardClass = `report-card-square ${reporte.operadora.toLowerCase()}`;
+                            const cardClass = `report-card-square ${reporte.operadora ? reporte.operadora.toLowerCase() : ''}`;
                             
                             container.innerHTML += `
                             <div class="${cardClass}">
@@ -2027,19 +2269,19 @@
                                         <div class="report-user">${reporte.usuario_nombre}</div>
                                         <div class="report-date">${formatDate(reporte.created_at)}</div>
                                     </div>
-                                    <span class="badge badge-${reporte.operadora.toLowerCase()}">${reporte.operadora}</span>
+                                    <span class="badge ${reporte.operadora ? 'badge-' + reporte.operadora.toLowerCase() : ''}">${reporte.operadora || 'Todas'}</span>
                                 </div>
                                 <div class="report-stats">
                                     <div class="report-stat">
-                                        <div class="report-stat-value">${reporte.total_recargas}</div>
+                                        <div class="report-stat-value">Bs ${reporte.saldo_total}</div>
                                         <div class="report-stat-label">Total</div>
                                     </div>
                                     <div class="report-stat">
-                                        <div class="report-stat-value">${reporte.recargas_usadas}</div>
-                                        <div class="report-stat-label">Usadas</div>
+                                        <div class="report-stat-value">Bs ${reporte.saldo_usado}</div>
+                                        <div class="report-stat-label">Usado</div>
                                     </div>
                                     <div class="report-stat">
-                                        <div class="report-stat-value">${reporte.chips_modificados}</div>
+                                        <div class="report-stat-value">${reporte.chips_modificados || 0}</div>
                                         <div class="report-stat-label">Chips</div>
                                     </div>
                                     <div class="report-stat">
@@ -2064,6 +2306,88 @@
                 console.error('Error al cargar reportes:', error);
                 container.innerHTML = '<div class="alert alert-danger">Error al cargar reportes</div>';
                 loading.classList.add('d-none');
+            }
+        }
+        
+        async function loadHistorial() {
+            const tbody = document.getElementById('historialTableBody');
+            const empty = document.getElementById('emptyHistorial');
+            const filterSelect = document.getElementById('historialMayoristaFilter');
+            
+            tbody.innerHTML = '<tr><td colspan="7" class="text-center">Cargando...</td></tr>';
+            
+            try {
+                // Cargar mayoristas para el filtro
+                const mayResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/mayoristas`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (mayResponse.ok) {
+                    const mayoristasData = await mayResponse.json();
+                    filterSelect.innerHTML = '<option value="">Todos los mayoristas</option>';
+                    mayoristasData.forEach(may => {
+                        filterSelect.innerHTML += `<option value="${may.id}">${may.nombre}</option>`;
+                    });
+                }
+                
+                // Cargar historial
+                let url = `${SUPABASE_URL}/rest/v1/historial_mayoristas?order=fecha.desc`;
+                
+                const mayoristaFilter = document.getElementById('historialMayoristaFilter').value;
+                const dateFilter = document.getElementById('historialDateFilter').value;
+                
+                if (mayoristaFilter) {
+                    url += `&mayorista_id=eq.${mayoristaFilter}`;
+                }
+                
+                if (dateFilter) {
+                    const nextDay = new Date(dateFilter);
+                    nextDay.setDate(nextDay.getDate() + 1);
+                    const nextDayStr = nextDay.toISOString().split('T')[0];
+                    url += `&fecha=gte.${dateFilter}&fecha=lt.${nextDayStr}`;
+                }
+                
+                const response = await fetch(url, {
+                    headers: {
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const historial = await response.json();
+                    
+                    if (historial.length === 0) {
+                        empty.classList.remove('d-none');
+                        tbody.innerHTML = '';
+                    } else {
+                        empty.classList.add('d-none');
+                        
+                        tbody.innerHTML = '';
+                        historial.forEach(item => {
+                            tbody.innerHTML += `
+                            <tr>
+                                <td>${formatDate(item.fecha)}</td>
+                                <td>${item.mayorista_nombre}</td>
+                                <td>${item.operadora}</td>
+                                <td>#${item.reporte_id}</td>
+                                <td>Bs ${item.saldo_anterior}</td>
+                                <td>Bs ${item.saldo_usado}</td>
+                                <td>Bs ${item.saldo_nuevo}</td>
+                            </tr>
+                            `;
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Error al cargar historial:', error);
+                showNotification('Error al cargar historial', 'error');
             }
         }
         
@@ -2110,228 +2434,11 @@
             }
         }
         
-        function showNuevaCategoria() {
-            document.getElementById('categoriaForm').reset();
-            document.getElementById('chipsPreview').innerHTML = `
-                <div class="empty-state p-3">
-                    <i class="bi bi-phone"></i>
-                    <p>Los chips aparecerán aquí</p>
-                </div>
-            `;
-            document.getElementById('chipsCount').textContent = '0';
-            
-            const modal = new bootstrap.Modal(document.getElementById('categoriaModal'));
-            modal.show();
-        }
-        
-        function showNuevoMayorista() {
-            document.getElementById('mayoristaForm').reset();
-            const modal = new bootstrap.Modal(document.getElementById('mayoristaModal'));
-            modal.show();
-        }
-        
-        function validarCantidadChips() {
-            const cantidad = document.getElementById('categoriaChips').value;
-            const input = document.getElementById('categoriaChipsInput');
-            
-            if (cantidad) {
-                input.placeholder = `Ingrese exactamente ${cantidad} números de chip (8 dígitos cada uno)`;
-            }
-        }
-        
-        function validarChips() {
-            const input = document.getElementById('categoriaChipsInput').value;
-            const preview = document.getElementById('chipsPreview');
-            const counter = document.getElementById('chipsCount');
-            
-            // Separar por comas, espacios o saltos de línea
-            const chips = input.split(/[, \n]+/).filter(chip => chip.trim() !== '');
-            
-            let validos = 0;
-            let duplicados = new Set();
-            let chipsHTML = '';
-            
-            chips.forEach((chip, index) => {
-                const chipNum = chip.trim();
-                const esValido = chipNum.length === 8 && /^\d+$/.test(chipNum);
-                const esDuplicado = chips.indexOf(chipNum) !== index;
-                
-                if (esValido && !esDuplicado) {
-                    validos++;
-                    chipsHTML += `<span class="chip chip-available">${chipNum}</span>`;
-                } else if (esDuplicado) {
-                    duplicados.add(chipNum);
-                    chipsHTML += `<span class="chip chip-used" title="Número duplicado">${chipNum} <i class="bi bi-exclamation-triangle"></i></span>`;
-                } else {
-                    chipsHTML += `<span class="chip chip-used" title="Formato inválido (${chipNum.length} dígitos)">${chipNum} <i class="bi bi-x-circle"></i></span>`;
-                }
-            });
-            
-            if (chipsHTML) {
-                preview.innerHTML = chipsHTML;
-            } else {
-                preview.innerHTML = `<div class="empty-state p-3"><i class="bi bi-phone"></i><p>Los chips aparecerán aquí</p></div>`;
-            }
-            
-            counter.textContent = validos;
-            
-            // Verificar si coincide con la cantidad especificada
-            const cantidadEsperada = document.getElementById('categoriaChips').value;
-            if (cantidadEsperada && validos != cantidadEsperada) {
-                preview.innerHTML += `<div class="alert alert-warning mt-2">
-                    <i class="bi bi-exclamation-triangle"></i>
-                    Se esperaban ${cantidadEsperada} chips, pero se encontraron ${validos} válidos
-                </div>`;
-            }
-        }
-        
-        async function guardarCategoria() {
-            const nombre = document.getElementById('categoriaNombre').value;
-            const operadora = document.getElementById('categoriaOperadora').value;
-            const chipsTotales = parseInt(document.getElementById('categoriaChips').value);
-            const recargasPorChip = parseInt(document.getElementById('categoriaRecargas').value);
-            const chipsInput = document.getElementById('categoriaChipsInput').value;
-            
-            // Validaciones
-            if (!nombre || !operadora || !chipsTotales || !recargasPorChip) {
-                showNotification('Complete todos los campos', 'error');
-                return;
-            }
-            
-            if (recargasPorChip < 1 || recargasPorChip > 10) {
-                showNotification('Las recargas por chip deben ser entre 1 y 10', 'error');
-                return;
-            }
-            
-            // Validar chips
-            const chips = chipsInput.split(/[, \n]+/)
-                .filter(chip => chip.trim() !== '')
-                .map(chip => chip.trim());
-            
-            const chipsValidos = chips.filter(chip => chip.length === 8 && /^\d+$/.test(chip));
-            const chipsUnicos = [...new Set(chipsValidos)];
-            
-            if (chipsUnicos.length !== chipsTotales) {
-                showNotification(`Debe ingresar exactamente ${chipsTotales} chips válidos únicos`, 'error');
-                return;
-            }
-            
-            try {
-                // Crear la categoría
-                const now = new Date();
-                const timestamp = now.toISOString();
-                
-                const categoriaData = {
-                    nombre: nombre,
-                    operadora: operadora,
-                    chips_totales: chipsTotales,
-                    recargas_por_chip: recargasPorChip,
-                    created_at: timestamp,
-                    updated_at: timestamp
-                };
-                
-                const catResponse = await fetch(`${SUPABASE_URL}/rest/v1/categorias`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=representation'
-                    },
-                    body: JSON.stringify(categoriaData)
-                });
-                
-                if (!catResponse.ok) throw new Error('Error al crear categoría');
-                
-                const categoriaCreada = await catResponse.json();
-                const categoriaId = categoriaCreada[0].id;
-                
-                // Crear los chips
-                const chipsData = chipsUnicos.map(chipNum => ({
-                    categoria_id: categoriaId,
-                    numero: chipNum,
-                    recargas_restantes: recargasPorChip,
-                    created_at: timestamp,
-                    updated_at: timestamp
-                }));
-                
-                // Insertar chips en lotes
-                for (let i = 0; i < chipsData.length; i += 50) {
-                    const batch = chipsData.slice(i, i + 50);
-                    
-                    const chipsResponse = await fetch(`${SUPABASE_URL}/rest/v1/chips`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'apikey': SUPABASE_KEY,
-                            'Authorization': `Bearer ${SUPABASE_KEY}`,
-                            'Prefer': 'return=minimal'
-                        },
-                        body: JSON.stringify(batch)
-                    });
-                    
-                    if (!chipsResponse.ok) throw new Error('Error al crear chips');
-                }
-                
-                // Cerrar modal y actualizar
-                bootstrap.Modal.getInstance(document.getElementById('categoriaModal')).hide();
-                showNotification('Categoría creada exitosamente', 'success');
-                loadCategorias();
-                loadDashboard();
-                
-            } catch (error) {
-                console.error('Error al guardar categoría:', error);
-                showNotification('Error al crear categoría', 'error');
-            }
-        }
-        
-        async function guardarMayorista() {
-            const nombre = document.getElementById('mayoristaNombre').value;
-            const operadora = document.getElementById('mayoristaOperadora').value;
-            const recargas = parseInt(document.getElementById('mayoristaRecargas').value);
-            
-            if (!nombre || !operadora || !recargas) {
-                showNotification('Complete todos los campos', 'error');
-                return;
-            }
-            
-            try {
-                const now = new Date();
-                const timestamp = now.toISOString();
-                
-                const mayoristaData = {
-                    nombre: nombre,
-                    operadora: operadora,
-                    recargas: recargas,
-                    created_at: timestamp,
-                    updated_at: timestamp
-                };
-                
-                const response = await fetch(`${SUPABASE_URL}/rest/v1/mayoristas`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'apikey': SUPABASE_KEY,
-                        'Authorization': `Bearer ${SUPABASE_KEY}`,
-                        'Prefer': 'return=minimal'
-                    },
-                    body: JSON.stringify(mayoristaData)
-                });
-                
-                if (!response.ok) throw new Error('Error al crear mayorista');
-                
-                bootstrap.Modal.getInstance(document.getElementById('mayoristaModal')).hide();
-                showNotification('Mayorista creado exitosamente', 'success');
-                loadMayoristas();
-                loadDashboard();
-                
-            } catch (error) {
-                console.error('Error al guardar mayorista:', error);
-                showNotification('Error al crear mayorista', 'error');
-            }
-        }
+        let currentReporteId = null;
         
         async function verReporteDetalle(id) {
+            currentReporteId = id;
+            
             try {
                 const response = await fetch(
                     `${SUPABASE_URL}/rest/v1/reportes?id=eq.${id}`,
@@ -2352,14 +2459,17 @@
                     <div class="mb-4">
                         <h4>Reporte de ${reporte.usuario_nombre}</h4>
                         <div class="row">
-                            <div class="col-md-6">
-                                <p><strong>Operadora:</strong> <span class="badge badge-${reporte.operadora.toLowerCase()}">${reporte.operadora}</span></p>
+                            <div class="col-md-4">
                                 <p><strong>Fecha:</strong> ${formatDate(reporte.created_at)}</p>
+                                <p><strong>Operadora:</strong> <span class="badge ${reporte.operadora ? 'badge-' + reporte.operadora.toLowerCase() : ''}">${reporte.operadora || 'Todas'}</span></p>
                             </div>
-                            <div class="col-md-6">
-                                <p><strong>Total Recargas:</strong> ${reporte.total_recargas}</p>
-                                <p><strong>Recargas Usadas:</strong> ${reporte.recargas_usadas}</p>
-                                <p><strong>Recargas Restantes:</strong> ${reporte.recargas_restantes}</p>
+                            <div class="col-md-4">
+                                <p><strong>Saldo Total:</strong> Bs ${reporte.saldo_total}</p>
+                                <p><strong>Saldo Usado:</strong> Bs ${reporte.saldo_usado}</p>
+                            </div>
+                            <div class="col-md-4">
+                                <p><strong>Saldo Restante:</strong> Bs ${reporte.saldo_restante}</p>
+                                <p><strong>Chips Modificados:</strong> ${reporte.chips_modificados || 0}</p>
                             </div>
                         </div>
                     </div>
@@ -2373,7 +2483,7 @@
                                         <tr>
                                             <th>Categoría</th>
                                             <th>Chips Usados</th>
-                                            <th>Recargas Usadas</th>
+                                            <th>Saldo Usado (Bs)</th>
                                         </tr>
                                     </thead>
                                     <tbody>`;
@@ -2384,7 +2494,7 @@
                             <tr>
                                 <td>${cat.nombre}</td>
                                 <td>${cat.chips_usados || 0}</td>
-                                <td>${cat.recargas_usadas || 0}</td>
+                                <td>Bs ${cat.saldo_usado || 0}</td>
                             </tr>`;
                         });
                     }
@@ -2402,7 +2512,7 @@
                                     <thead>
                                         <tr>
                                             <th>Mayorista</th>
-                                            <th>Recargas Asignadas</th>
+                                            <th>Saldo Asignado (Bs)</th>
                                         </tr>
                                     </thead>
                                     <tbody>`;
@@ -2412,7 +2522,7 @@
                             contenido += `
                             <tr>
                                 <td>${may.nombre}</td>
-                                <td>${may.recargas_asignadas || 0}</td>
+                                <td>Bs ${may.saldo_asignado || 0}</td>
                             </tr>`;
                         });
                     }
@@ -2425,12 +2535,28 @@
                     </div>
                     
                     <div class="mt-4">
+                        <h5>Chips Utilizados</h5>
+                        <div class="chips-container">`;
+                    
+                    if (detalles.chips_utilizados && detalles.chips_utilizados.length > 0) {
+                        detalles.chips_utilizados.forEach(chip => {
+                            contenido += `<span class="chip chip-available">${chip.codigo} (${chip.categoria})</span>`;
+                        });
+                    } else {
+                        contenido += '<p class="text-muted">No se utilizaron chips</p>';
+                    }
+                    
+                    contenido += `
+                        </div>
+                    </div>
+                    
+                    <div class="mt-4">
                         <h5>Chips Sobrantes</h5>
                         <div class="chips-container">`;
                     
                     if (detalles.chips_sobrantes && detalles.chips_sobrantes.length > 0) {
                         detalles.chips_sobrantes.forEach(chip => {
-                            contenido += `<span class="chip chip-used">${chip.numero} (${chip.recargas_restantes})</span>`;
+                            contenido += `<span class="chip chip-used">${chip.codigo} (Bs ${chip.saldo_actual})</span>`;
                         });
                     } else {
                         contenido += '<p class="text-muted">No hay chips sobrantes</p>';
@@ -2449,6 +2575,151 @@
                 console.error('Error al cargar reporte:', error);
                 showNotification('Error al cargar detalles del reporte', 'error');
             }
+        }
+        
+        async function eliminarReporteActual() {
+            if (!currentReporteId) return;
+            
+            if (!confirm('¿Está seguro de eliminar este reporte? Se restaurará el estado anterior de chips y mayoristas.')) {
+                return;
+            }
+            
+            try {
+                // Obtener el reporte
+                const reportResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/reportes?id=eq.${currentReporteId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!reportResponse.ok) throw new Error('Error al obtener reporte');
+                
+                const reporte = (await reportResponse.json())[0];
+                const detalles = JSON.parse(reporte.detalles || '{}');
+                
+                // Restaurar chips (devolver el saldo)
+                if (detalles.chips_utilizados) {
+                    for (let chip of detalles.chips_utilizados) {
+                        // Obtener el chip actual
+                        const chipResponse = await fetch(
+                            `${SUPABASE_URL}/rest/v1/chips?id=eq.${chip.id}`,
+                            {
+                                headers: {
+                                    'apikey': SUPABASE_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                                }
+                            }
+                        );
+                        
+                        if (chipResponse.ok) {
+                            const chipData = (await chipResponse.json())[0];
+                            
+                            // Restaurar 1 recarga (20 Bs)
+                            await fetch(
+                                `${SUPABASE_URL}/rest/v1/chips?id=eq.${chip.id}`,
+                                {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'apikey': SUPABASE_KEY,
+                                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                                    },
+                                    body: JSON.stringify({
+                                        saldo_actual: chipData.saldo_actual + VALOR_RECARGA
+                                    })
+                                }
+                            );
+                        }
+                    }
+                }
+                
+                // Restaurar mayoristas (devolver el saldo)
+                if (detalles.mayoristas) {
+                    for (let may of detalles.mayoristas) {
+                        // Obtener el mayorista actual
+                        const mayResponse = await fetch(
+                            `${SUPABASE_URL}/rest/v1/mayoristas?id=eq.${may.id}`,
+                            {
+                                headers: {
+                                    'apikey': SUPABASE_KEY,
+                                    'Authorization': `Bearer ${SUPABASE_KEY}`
+                                }
+                            }
+                        );
+                        
+                        if (mayResponse.ok) {
+                            const mayoristaData = (await mayResponse.json())[0];
+                            const saldoUsadoActual = mayoristaData.saldo_usado || 0;
+                            
+                            // Devolver el saldo
+                            await fetch(
+                                `${SUPABASE_URL}/rest/v1/mayoristas?id=eq.${may.id}`,
+                                {
+                                    method: 'PATCH',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                        'apikey': SUPABASE_KEY,
+                                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                                    },
+                                    body: JSON.stringify({
+                                        saldo_usado: saldoUsadoActual - may.saldo_asignado
+                                    })
+                                }
+                            );
+                            
+                            // Eliminar del historial
+                            await fetch(
+                                `${SUPABASE_URL}/rest/v1/historial_mayoristas?reporte_id=eq.${currentReporteId}&mayorista_id=eq.${may.id}`,
+                                {
+                                    method: 'DELETE',
+                                    headers: {
+                                        'apikey': SUPABASE_KEY,
+                                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                                    }
+                                }
+                            );
+                        }
+                    }
+                }
+                
+                // Eliminar el reporte
+                const deleteResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/reportes?id=eq.${currentReporteId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (deleteResponse.ok) {
+                    showNotification('Reporte eliminado y datos restaurados', 'success');
+                    
+                    // Cerrar modal
+                    bootstrap.Modal.getInstance(document.getElementById('detalleReporteModal')).hide();
+                    
+                    // Recargar datos
+                    loadDashboard();
+                    loadReportes();
+                    loadMayoristas();
+                    loadCategorias();
+                }
+            } catch (error) {
+                console.error('Error al eliminar reporte:', error);
+                showNotification('Error al eliminar reporte', 'error');
+            }
+        }
+        
+        function verHistorialMayorista(id) {
+            document.getElementById('historialMayoristaFilter').value = id;
+            showSection('historial');
+            loadHistorial();
         }
         
         function formatDate(dateString) {
@@ -2503,11 +2774,11 @@
         
         async function exportData() {
             try {
-                // Exportar datos a Excel (simplificado)
                 const data = {
                     categorias: categorias,
                     mayoristas: mayoristas,
-                    reportes: reportes
+                    reportes: reportes,
+                    fecha_exportacion: new Date().toISOString()
                 };
                 
                 const jsonString = JSON.stringify(data, null, 2);
@@ -2530,12 +2801,54 @@
             }
         }
         
+        function exportReportes() {
+            const reportesData = reportes.map(reporte => {
+                return {
+                    id: reporte.id,
+                    usuario: reporte.usuario_nombre,
+                    fecha: reporte.created_at,
+                    operadora: reporte.operadora || 'Todas',
+                    saldo_total: reporte.saldo_total,
+                    saldo_usado: reporte.saldo_usado,
+                    saldo_restante: reporte.saldo_restante,
+                    chips_modificados: reporte.chips_modificados || 0,
+                    sobrantes: reporte.sobrantes || 0
+                };
+            });
+            
+            const csv = convertToCSV(reportesData);
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `reportes-${new Date().toISOString().split('T')[0]}.csv`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            
+            URL.revokeObjectURL(url);
+            
+            showNotification('Reportes exportados', 'success');
+        }
+        
+        function convertToCSV(data) {
+            if (data.length === 0) return '';
+            
+            const headers = Object.keys(data[0]);
+            const rows = data.map(obj => headers.map(header => JSON.stringify(obj[header] || '')).join(','));
+            
+            return [headers.join(','), ...rows].join('\n');
+        }
+        
         // Hacer funciones accesibles globalmente
         window.verChipsCategoria = verChipsCategoria;
+        window.verHistorialMayorista = verHistorialMayorista;
+        window.verReporteDetalle = verReporteDetalle;
         
-        window.editarChip = function(id, numero) {
-            const nuevasRecargas = prompt(`Ingrese nuevas recargas para el chip ${numero}:`, "5");
-            if (nuevasRecargas && !isNaN(nuevasRecargas) && nuevasRecargas >= 0 && nuevasRecargas <= 10) {
+        window.editarChip = function(id, codigo) {
+            const nuevoSaldo = prompt(`Ingrese nuevo saldo para el chip ${codigo} en Bs:`, "20");
+            if (nuevoSaldo && !isNaN(nuevoSaldo) && nuevoSaldo >= 0) {
                 fetch(`${SUPABASE_URL}/rest/v1/chips?id=eq.${id}`, {
                     method: 'PATCH',
                     headers: {
@@ -2544,8 +2857,7 @@
                         'Authorization': `Bearer ${SUPABASE_KEY}`
                     },
                     body: JSON.stringify({
-                        recargas_restantes: parseInt(nuevasRecargas),
-                        updated_at: new Date().toISOString()
+                        saldo_actual: parseInt(nuevoSaldo)
                     })
                 })
                 .then(() => {
@@ -2589,10 +2901,6 @@
             }
         };
         
-        window.verCategoria = function(id) {
-            alert(`Ver categoría ${id} - Función por implementar`);
-        };
-        
         window.editarCategoria = function(id) {
             alert(`Editar categoría ${id} - Función por implementar`);
         };
@@ -2619,7 +2927,28 @@
         };
         
         window.editarMayorista = function(id) {
-            alert(`Editar mayorista ${id} - Función por implementar`);
+            const nuevoSaldo = prompt('Ingrese nuevo saldo total para el mayorista (Bs):');
+            if (nuevoSaldo && !isNaN(nuevoSaldo)) {
+                fetch(`${SUPABASE_URL}/rest/v1/mayoristas?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        saldo_total: parseInt(nuevoSaldo)
+                    })
+                })
+                .then(() => {
+                    showNotification('Mayorista actualizado', 'success');
+                    loadMayoristas();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al actualizar mayorista', 'error');
+                });
+            }
         };
         
         window.eliminarMayorista = function(id) {
@@ -2643,12 +2972,27 @@
             }
         };
         
-        window.verReporteDetalle = verReporteDetalle;
         window.resetPassword = function(id) {
             const newPass = prompt('Nueva contraseña para el usuario:');
             if (newPass) {
-                // Aquí iría la lógica para actualizar la contraseña
-                showNotification('Contraseña actualizada', 'success');
+                fetch(`${SUPABASE_URL}/rest/v1/users?id=eq.${id}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'apikey': SUPABASE_KEY,
+                        'Authorization': `Bearer ${SUPABASE_KEY}`
+                    },
+                    body: JSON.stringify({
+                        password: newPass
+                    })
+                })
+                .then(() => {
+                    showNotification('Contraseña actualizada', 'success');
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showNotification('Error al actualizar contraseña', 'error');
+                });
             }
         };
         
