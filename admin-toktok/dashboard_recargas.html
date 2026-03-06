@@ -1,0 +1,4348 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TokTok</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6d28d9;
+            --primary-dark: #5b21b6;
+            --secondary: #059669;
+            --secondary-dark: #047857;
+            --accent: #f59e0b;
+            --accent-dark: #d97706;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        
+        .sidebar {
+            background: linear-gradient(180deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+        }
+        
+        .sidebar .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            padding: 12px 20px;
+            margin: 4px 0;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+        
+        .sidebar .nav-link:hover, .sidebar .nav-link.active {
+            color: white;
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar .nav-link i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+        }
+        
+        .main-content {
+            margin-left: 250px;
+            padding: 20px;
+            transition: all 0.3s;
+        }
+        
+        .navbar {
+            background-color: white;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card {
+            border-left: 4px solid var(--primary);
+        }
+        
+        .stat-card.income {
+            border-left-color: var(--secondary);
+        }
+        
+        .stat-card.users {
+            border-left-color: var(--accent);
+        }
+        
+        .stat-card.recharges {
+            border-left-color: #3b82f6;
+        }
+        
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+            font-weight: 600;
+            color: #495057;
+        }
+        
+        .badge-success {
+            background-color: var(--secondary);
+        }
+        
+        .badge-warning {
+            background-color: var(--accent);
+        }
+        
+        .badge-danger {
+            background-color: #dc2626;
+        }
+        
+        .badge-info {
+            background-color: #3b82f6;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+        }
+        
+        .btn-success {
+            background-color: var(--secondary);
+            border-color: var(--secondary);
+        }
+        
+        .btn-success:hover {
+            background-color: var(--secondary-dark);
+            border-color: var(--secondary-dark);
+        }
+        
+        .chart-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            height: 100%;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #e9ecef;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        
+        .user-avatar img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        .action-buttons .btn {
+            padding: 4px 8px;
+            margin: 0 2px;
+        }
+        
+        .modal-header {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .search-box {
+            position: relative;
+        }
+        
+        .search-box input {
+            padding-left: 40px;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 12px;
+            color: #6c757d;
+        }
+        
+        .pagination .page-link {
+            color: var(--primary);
+        }
+        
+        .pagination .page-item.active .page-link {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .status-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+        
+        .operator-logo {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            margin-right: 8px;
+            object-fit: contain;
+        }
+        
+        .recharge-actions {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .recharge-actions .btn {
+            padding: 0.25rem 0.5rem;
+            font-size: 0.75rem;
+        }
+        
+        .transaction-highlight {
+            background-color: rgba(109, 40, 217, 0.05);
+            border-left: 3px solid var(--primary);
+        }
+        
+        .transaction-row:hover {
+            background-color: rgba(109, 40, 217, 0.08);
+        }
+        
+        /* Estilos para el modal de detalles */
+        .detail-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            z-index: 1050;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
+        }
+        
+        .detail-modal.show {
+            display: block;
+        }
+        
+        .detail-modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid #dee2e6;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .detail-modal-body {
+            padding: 1.5rem;
+        }
+        
+        .detail-modal-footer {
+            padding: 1rem 1.5rem;
+            border-top: 1px solid #dee2e6;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .modal-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .modal-backdrop.show {
+            display: block;
+        }
+        
+        .detail-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #f1f1f1;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            min-width: 150px;
+            color: #495057;
+        }
+        
+        .detail-value {
+            flex: 1;
+            color: #212529;
+        }
+        
+        .balance-positive {
+            color: var(--secondary);
+            font-weight: bold;
+        }
+        
+        .balance-negative {
+            color: #dc2626;
+            font-weight: bold;
+        }
+        
+        .balance-zero {
+            color: #6c757d;
+            font-weight: bold;
+        }
+        
+        .user-id-badge {
+            font-family: monospace;
+            background-color: #e9ecef;
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        
+        .search-type-selector {
+            margin-right: 10px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        
+        .stat-item {
+            background: white;
+            padding: 1rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin: 0.5rem 0;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.875rem;
+        }
+        
+        /* Barra de progreso para borrar historial */
+        .deletion-progress {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            width: 400px;
+            max-width: 90%;
+            display: none;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .deletion-progress.show {
+            display: block;
+        }
+        
+        .deletion-progress-backdrop {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1999;
+            display: none;
+        }
+        
+        .deletion-progress-backdrop.show {
+            display: block;
+        }
+        
+        .progress-steps {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .progress-steps li {
+            margin: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+        
+        .progress-steps .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 12px;
+            background-color: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .progress-steps .step-icon.completed {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .progress-steps .step-icon.current {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .progress-steps .step-text {
+            flex: 1;
+            color: #495057;
+        }
+        
+        .progress-steps .step-text.completed {
+            color: var(--secondary);
+            font-weight: 500;
+        }
+        
+        .progress-steps .step-text.current {
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .progress-bar-container {
+            height: 6px;
+            background-color: #e9ecef;
+            border-radius: 3px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-percentage {
+            font-size: 14px;
+            color: #6c757d;
+            margin-top: 5px;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            border-color: #dc3545;
+        }
+        
+        .btn-danger:hover {
+            background-color: #bb2d3b;
+            border-color: #b02a37;
+        }
+        
+        .danger-zone {
+            background-color: #fff5f5;
+            border: 1px solid #fed7d7;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        
+        .danger-zone h6 {
+            color: #dc2626;
+            margin-bottom: 10px;
+        }
+        
+        /* ===== MEJORAS PARA BÚSQUEDA Y FILTROS ===== */
+        .advanced-search-container {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .search-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .filter-group {
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .filter-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.875rem;
+        }
+        
+        .filter-select, .filter-input {
+            width: 100%;
+            padding: 0.5rem 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+        
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(109, 40, 217, 0.1);
+        }
+        
+        .date-range-group {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+        
+        .date-range-group .filter-input {
+            flex: 1;
+        }
+        
+        .search-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .search-toggle-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .search-toggle-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .search-toggle-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        .filter-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .filter-tag {
+            background: #e9ecef;
+            border-radius: 16px;
+            padding: 0.25rem 0.75rem;
+            font-size: 0.75rem;
+            color: #495057;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .filter-tag .remove-filter {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            padding: 0;
+            font-size: 0.875rem;
+        }
+        
+        .filter-tag .remove-filter:hover {
+            color: #dc3545;
+        }
+        
+        .quick-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .quick-filter-btn {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 20px;
+            padding: 0.375rem 0.75rem;
+            font-size: 0.75rem;
+            color: #495057;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .quick-filter-btn:hover {
+            background: #f8f9fa;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+        
+        .quick-filter-btn.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+        
+        /* ===== RESPONSIVIDAD PARA MÓVILES ===== */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                border-radius: 20px 20px 0 0;
+                padding: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+            }
+            
+            .sidebar .p-4 {
+                display: none;
+            }
+            
+            .sidebar .nav {
+                flex-direction: row;
+                padding: 0.5rem;
+                justify-content: space-around;
+            }
+            
+            .sidebar .nav-item {
+                flex: 1;
+                text-align: center;
+            }
+            
+            .sidebar .nav-link {
+                flex-direction: column;
+                padding: 0.5rem;
+                margin: 0;
+                font-size: 0.7rem;
+                border-radius: 8px;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                margin-bottom: 0.25rem;
+                font-size: 1rem;
+            }
+            
+            .main-content {
+                margin-left: 0;
+                margin-bottom: 80px;
+                padding: 1rem;
+            }
+            
+            .navbar {
+                padding: 0.5rem 1rem;
+            }
+            
+            .navbar .search-box {
+                display: none;
+            }
+            
+            .navbar .dropdown {
+                width: 100%;
+            }
+            
+            .navbar .dropdown-toggle {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+            
+            .stat-item {
+                padding: 0.75rem;
+            }
+            
+            .stat-value {
+                font-size: 1.25rem;
+            }
+            
+            .advanced-search-container {
+                padding: 1rem;
+                margin-bottom: 1rem;
+            }
+            
+            .search-filters {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+            
+            .filter-group {
+                min-width: 100%;
+            }
+            
+            .date-range-group {
+                flex-direction: column;
+            }
+            
+            .search-actions {
+                flex-direction: column;
+            }
+            
+            .search-toggle-btn {
+                justify-content: center;
+            }
+            
+            .quick-filters {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .quick-filter-btn {
+                white-space: nowrap;
+            }
+            
+            .table-container {
+                border-radius: 8px;
+            }
+            
+            .table-responsive {
+                margin: -0.5rem;
+                width: calc(100% + 1rem);
+            }
+            
+            .action-buttons {
+                display: flex;
+                flex-direction: column;
+                gap: 0.25rem;
+            }
+            
+            .action-buttons .btn {
+                width: 100%;
+                margin: 0;
+            }
+            
+            .recharge-actions {
+                flex-direction: column;
+            }
+            
+            .recharge-actions .btn {
+                width: 100%;
+            }
+            
+            .filter-tags {
+                overflow-x: auto;
+                padding-bottom: 0.5rem;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .filter-tag {
+                white-space: nowrap;
+            }
+            
+            .mobile-search-bar {
+                display: flex !important;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                background: white;
+                padding: 0.75rem 1rem;
+                box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+                z-index: 1000;
+            }
+            
+            .mobile-search-bar .search-box {
+                flex: 1;
+            }
+            
+            .mobile-search-bar .close-search {
+                background: none;
+                border: none;
+                color: #6c757d;
+                font-size: 1.25rem;
+                margin-left: 0.5rem;
+            }
+            
+            .mobile-fab {
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+                width: 56px;
+                height: 56px;
+                border-radius: 50%;
+                background: var(--primary);
+                color: white;
+                border: none;
+                box-shadow: 0 4px 12px rgba(109, 40, 217, 0.3);
+                z-index: 100;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.5rem;
+            }
+            
+            .section-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: stretch !important;
+            }
+            
+            .section-header h2 {
+                font-size: 1.5rem;
+            }
+            
+            .pagination {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+            
+            .page-link {
+                padding: 0.375rem 0.5rem;
+                font-size: 0.875rem;
+            }
+        }
+        
+        @media (min-width: 769px) and (max-width: 1024px) {
+            .sidebar {
+                width: 80px;
+            }
+            
+            .sidebar .p-4 h4 {
+                display: none;
+            }
+            
+            .sidebar .p-4 small {
+                display: none;
+            }
+            
+            .sidebar .nav-link span {
+                display: none;
+            }
+            
+            .sidebar .nav-link i {
+                margin-right: 0;
+                font-size: 1.25rem;
+            }
+            
+            .main-content {
+                margin-left: 80px;
+            }
+            
+            .search-filters {
+                flex-wrap: wrap;
+            }
+            
+            .filter-group {
+                min-width: calc(50% - 0.5rem);
+            }
+        }
+        
+        /* ===== MEJORAS PARA LA TABLA EN MÓVILES ===== */
+        .table-mobile-view {
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .table-desktop-view {
+                display: none;
+            }
+            
+            .table-mobile-view {
+                display: block;
+            }
+            
+            .mobile-card {
+                background: white;
+                border-radius: 8px;
+                padding: 1rem;
+                margin-bottom: 0.75rem;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            }
+            
+            .mobile-card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-start;
+                margin-bottom: 0.75rem;
+                padding-bottom: 0.75rem;
+                border-bottom: 1px solid #f1f1f1;
+            }
+            
+            .mobile-card-title {
+                font-weight: 600;
+                color: var(--primary);
+                font-size: 0.9rem;
+            }
+            
+            .mobile-card-status {
+                font-size: 0.7rem;
+                padding: 0.125rem 0.5rem;
+                border-radius: 10px;
+            }
+            
+            .mobile-card-body {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 0.75rem;
+                margin-bottom: 0.75rem;
+            }
+            
+            .mobile-card-field {
+                display: flex;
+                flex-direction: column;
+            }
+            
+            .mobile-card-label {
+                font-size: 0.7rem;
+                color: #6c757d;
+                margin-bottom: 0.25rem;
+            }
+            
+            .mobile-card-value {
+                font-size: 0.85rem;
+                color: #212529;
+                font-weight: 500;
+            }
+            
+            .mobile-card-actions {
+                display: flex;
+                gap: 0.5rem;
+                justify-content: flex-end;
+                padding-top: 0.75rem;
+                border-top: 1px solid #f1f1f1;
+            }
+        }
+        
+        /* ===== BÚSQUEDA AVANZADA RESPONSIVA ===== */
+        .search-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        
+        .search-title {
+            font-weight: 600;
+            color: #495057;
+            margin: 0;
+        }
+        
+        .search-toggle {
+            background: none;
+            border: none;
+            color: var(--primary);
+            font-size: 0.875rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .search-advanced-filters {
+            display: none;
+            animation: slideDown 0.3s ease;
+        }
+        
+        .search-advanced-filters.show {
+            display: block;
+        }
+        
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .mobile-search-trigger {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            left: 20px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+        }
+        
+        @media (max-width: 768px) {
+            .mobile-search-trigger {
+                display: flex;
+            }
+            
+            .search-toggle {
+                width: 100%;
+                justify-content: center;
+                padding: 0.5rem;
+                background: #f8f9fa;
+                border-radius: 8px;
+                margin-top: 0.5rem;
+            }
+        }
+        
+        /* ===== LOADING STATES ===== */
+        .loading-skeleton {
+            background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+            background-size: 200% 100%;
+            animation: loading 1.5s infinite;
+            border-radius: 4px;
+        }
+        
+        @keyframes loading {
+            0% {
+                background-position: 200% 0;
+            }
+            100% {
+                background-position: -200% 0;
+            }
+        }
+        
+        .search-loading {
+            text-align: center;
+            padding: 2rem;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: #6c757d;
+        }
+        
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            color: #dee2e6;
+        }
+        
+        /* ===== ESTILOS PARA OPERADORES MÓVILES ===== */
+        .operator-logo-large {
+            width: 60px;
+            height: 60px;
+            border-radius: 12px;
+            object-fit: contain;
+            background-color: #f8f9fa;
+            padding: 8px;
+        }
+        
+        .package-card {
+            border: 1px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .package-card:hover {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .package-name {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #212529;
+        }
+        
+        .package-operator {
+            font-size: 0.85rem;
+            color: var(--primary);
+            font-weight: 500;
+        }
+        
+        .package-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+        
+        .package-price {
+            font-size: 1.2rem;
+            color: var(--secondary);
+        }
+        
+        .package-detail {
+            font-size: 0.85rem;
+            color: #6c757d;
+            margin-bottom: 0.5rem;
+        }
+        
+        .package-detail i {
+            width: 20px;
+            color: var(--primary);
+        }
+        
+        .hot-badge {
+            background-color: var(--accent);
+            color: white;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 20px;
+            margin-left: 0.5rem;
+        }
+        
+        .recharge-status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+        
+        .status-pending {
+            background-color: #fef3c7;
+            color: #92400e;
+        }
+        
+        .status-processing {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+        
+        .status-completed {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+        
+        .status-failed {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+    </style>
+</head>
+<body>
+    <!-- Mobile Search Bar (hidden on desktop) -->
+    <div class="mobile-search-bar d-none">
+        <div class="search-box">
+            <i class="fas fa-search"></i>
+            <input type="text" class="form-control" placeholder="Buscar..." id="mobile-global-search">
+        </div>
+        <button class="close-search">
+            <i class="fas fa-times"></i>
+        </button>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-4">
+            <h4 class="text-white mb-0">TokTok Admin</h4>
+            <small class="text-white-50">Panel de Administración</small>
+        </div>
+        
+        <ul class="nav flex-column">
+            <!-- Nuevo: Operadores Móviles -->
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-section="mobile-operators">
+                    <i class="fas fa-sim-card"></i> <span>Operadores Móviles</span>
+                </a>
+            </li>
+            <!-- Nuevo: Tipos de Recarga -->
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="recharge-types">
+                    <i class="fas fa-tags"></i> <span>Tipos Recarga</span>
+                </a>
+            </li>
+            <!-- Nuevo: Paquetes Móviles -->
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="mobile-packages">
+                    <i class="fas fa-boxes"></i> <span>Paquetes Móviles</span>
+                </a>
+            </li>
+            <!-- Nuevo: Recargas Móviles -->
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="mobile-recharges">
+                    <i class="fas fa-phone-alt"></i> <span>Recargas Móviles</span>
+                </a>
+            </li>
+            <!-- Nuevo: Historial Recargas -->
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="recharge-history">
+                    <i class="fas fa-history"></i> <span>Historial Recargas</span>
+                </a>
+            </li>
+            <li class="nav-item mt-4 d-none d-md-block">
+                <a class="nav-link" href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <button class="navbar-toggler" type="button" id="sidebar-toggle">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                
+                <div class="d-flex align-items-center w-100">
+                    <div class="search-box me-3 d-none d-lg-flex">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="form-control" placeholder="Buscar..." id="desktop-global-search">
+                    </div>
+                    
+                    <div class="dropdown ms-auto">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i> <span class="d-none d-md-inline">Administrador</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="navbar-logout-btn"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Mobile Operators Section (NUEVO) -->
+        <section id="mobile-operators-section">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Operadores Móviles</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-operator-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Operador</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Lista de Operadores</h5>
+                </div>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Logo</th>
+                                    <th>Nombre</th>
+                                    <th>Código</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th>Creado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="operators-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="operators-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recharge Types Section (NUEVO) -->
+        <section id="recharge-types-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Tipos de Recarga</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-recharge-type-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Tipo</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Lista de Tipos de Recarga</h5>
+                </div>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Operador</th>
+                                    <th>Nombre</th>
+                                    <th>Código</th>
+                                    <th>Descripción</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recharge-types-table-body">
+                                <tr>
+                                    <td colspan="7" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="recharge-types-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Packages Section (NUEVO) -->
+        <section id="mobile-packages-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Paquetes Móviles</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-package-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Paquete</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row" id="packages-container">
+                <!-- Los paquetes se cargarán aquí -->
+            </div>
+            
+            <div class="p-3 text-center" id="packages-loading">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Cargando...</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Mobile Recharges Section (NUEVO) -->
+        <section id="mobile-recharges-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Recargas Móviles</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-mobile-recharge-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Nueva Recarga</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Advanced Search Container -->
+            <div class="advanced-search-container">
+                <div class="search-header">
+                    <h6 class="search-title">Búsqueda y Filtros</h6>
+                    <button class="search-toggle" id="toggle-mobile-recharges-filters">
+                        <i class="fas fa-filter"></i> Filtros Avanzados
+                    </button>
+                </div>
+                
+                <!-- Quick Filters -->
+                <div class="quick-filters" id="mobile-recharges-quick-filters">
+                    <button class="quick-filter-btn active" data-filter="all">Todas</button>
+                    <button class="quick-filter-btn" data-filter="pending">Pendientes</button>
+                    <button class="quick-filter-btn" data-filter="completed">Completadas</button>
+                    <button class="quick-filter-btn" data-filter="failed">Fallidas</button>
+                    <button class="quick-filter-btn" data-filter="today">Hoy</button>
+                </div>
+                
+                <!-- Search Input -->
+                <div class="search-box mb-3">
+                    <i class="fas fa-search"></i>
+                    <input type="text" class="form-control" placeholder="Buscar por teléfono, ID usuario o referencia..." id="mobile-recharge-search">
+                </div>
+                
+                <!-- Advanced Filters -->
+                <div class="search-advanced-filters" id="mobile-recharges-advanced-filters">
+                    <div class="search-filters">
+                        <div class="filter-group">
+                            <label for="mobile-recharge-operator">Operador</label>
+                            <select class="filter-select" id="mobile-recharge-operator">
+                                <option value="">Todos los operadores</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="mobile-recharge-status">Estado</label>
+                            <select class="filter-select" id="mobile-recharge-status">
+                                <option value="">Todos los estados</option>
+                                <option value="pending">Pendiente</option>
+                                <option value="processing">Procesando</option>
+                                <option value="completed">Completado</option>
+                                <option value="failed">Fallido</option>
+                            </select>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="mobile-recharge-amount-min">Monto Mínimo</label>
+                            <input type="number" class="filter-input" id="mobile-recharge-amount-min" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="mobile-recharge-amount-max">Monto Máximo</label>
+                            <input type="number" class="filter-input" id="mobile-recharge-amount-max" placeholder="Bs 0.00" step="0.01">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="mobile-recharge-date-from">Fecha Desde</label>
+                            <input type="date" class="filter-input" id="mobile-recharge-date-from">
+                        </div>
+                        
+                        <div class="filter-group">
+                            <label for="mobile-recharge-date-to">Fecha Hasta</label>
+                            <input type="date" class="filter-input" id="mobile-recharge-date-to">
+                        </div>
+                    </div>
+                    
+                    <div class="search-actions">
+                        <button class="btn btn-primary" id="apply-mobile-recharges-filters">
+                            <i class="fas fa-search me-2"></i> Aplicar Filtros
+                        </button>
+                        <button class="btn btn-outline-secondary" id="reset-mobile-recharges-filters">
+                            <i class="fas fa-redo me-2"></i> Limpiar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Active Filters -->
+                <div class="filter-tags" id="mobile-recharges-filter-tags">
+                    <!-- Los tags de filtros activos se mostrarán aquí -->
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Todas las Recargas Móviles</h5>
+                </div>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Usuario</th>
+                                    <th>Operador</th>
+                                    <th>Teléfono</th>
+                                    <th>Paquete</th>
+                                    <th>Monto</th>
+                                    <th>Precio</th>
+                                    <th>Estado</th>
+                                    <th>Fecha</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="mobile-recharges-table-body">
+                                <tr>
+                                    <td colspan="10" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="mobile-recharges-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="p-3 border-top">
+                    <nav>
+                        <ul class="pagination justify-content-center mb-0" id="mobile-recharges-pagination">
+                            <!-- Pagination will be generated here -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </section>
+
+        <!-- Recharge History Section (NUEVO) -->
+        <section id="recharge-history-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Historial de Recargas</h2>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Seguimiento de Recargas</h5>
+                </div>
+                
+                <!-- Desktop Table View -->
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Recarga ID</th>
+                                    <th>Estado</th>
+                                    <th>Mensaje</th>
+                                    <th>Creado Por</th>
+                                    <th>Fecha</th>
+                                </tr>
+                            </thead>
+                            <tbody id="recharge-history-table-body">
+                                <tr>
+                                    <td colspan="6" class="text-center py-4">
+                                        <div class="spinner-border text-primary" role="status">
+                                            <span class="visually-hidden">Cargando...</span>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <!-- Mobile Card View -->
+                <div class="table-mobile-view">
+                    <div id="recharge-history-mobile-list">
+                        <!-- Los cards para móvil se generarán aquí -->
+                        <div class="text-center py-4">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Cargando...</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Mobile FAB Button for Search -->
+    <button class="mobile-fab d-md-none" id="mobile-search-trigger">
+        <i class="fas fa-search"></i>
+    </button>
+
+    <!-- Modal de Confirmación con Contraseña -->
+    <div class="modal fade" id="passwordConfirmModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Confirmar Acción</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Por favor ingrese la contraseña de administrador para continuar:</p>
+                    <div class="mb-3">
+                        <label for="admin-password" class="form-label">Contraseña</label>
+                        <input type="password" class="form-control" id="admin-password" placeholder="Ingrese la contraseña">
+                    </div>
+                    <div class="alert alert-danger d-none" id="password-error">
+                        Contraseña incorrecta. Intente nuevamente.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="confirm-with-password">Confirmar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Borrar Historial -->
+    <div class="deletion-progress-backdrop" id="deletion-progress-backdrop"></div>
+    <div class="deletion-progress" id="deletion-progress">
+        <h5>Borrando Historial de Usuario</h5>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <div class="progress-percentage" id="progress-percentage">0%</div>
+        
+        <ul class="progress-steps" id="progress-steps">
+            <li>
+                <div class="step-icon" id="step-1-icon">1</div>
+                <div class="step-text" id="step-1-text">Buscando usuario...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-2-icon">2</div>
+                <div class="step-text" id="step-2-text">Eliminando recargas...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-3-icon">3</div>
+                <div class="step-text" id="step-3-text">Eliminando recargas de juegos...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-4-icon">4</div>
+                <div class="step-text" id="step-4-text">Eliminando transacciones...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-5-icon">5</div>
+                <div class="step-text" id="step-5-text">Eliminando compras...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-6-icon">6</div>
+                <div class="step-text" id="step-6-text">Actualizando balance...</div>
+            </li>
+            <li>
+                <div class="step-icon" id="step-7-icon">7</div>
+                <div class="step-text" id="step-7-text">Finalizando...</div>
+            </li>
+        </ul>
+        
+        <div class="mt-3" id="deletion-status">
+            Preparando para borrar historial...
+        </div>
+        
+        <div class="mt-4">
+            <button class="btn btn-secondary" id="cancel-deletion">Cancelar</button>
+        </div>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal-backdrop" id="detail-modal-backdrop"></div>
+    <div class="detail-modal" id="detail-modal">
+        <div class="detail-modal-header">
+            <h5 class="mb-0" id="detail-modal-title">Detalles</h5>
+            <button type="button" class="btn-close btn-close-white" id="close-detail-modal"></button>
+        </div>
+        <div class="detail-modal-body" id="detail-modal-body">
+            <!-- Los detalles se cargarán aquí dinámicamente -->
+        </div>
+        <div class="detail-modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-detail-modal-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- NUEVOS MODALES -->
+
+    <!-- Operator Modal -->
+    <div class="modal fade" id="operatorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="operatorModalTitle">Agregar Operador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="operatorForm">
+                        <input type="hidden" id="operator-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="operator-name" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="operator-name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="operator-code" class="form-label">Código</label>
+                                <input type="text" class="form-control" id="operator-code" required placeholder="entel, tigo, viva">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="operator-logo" class="form-label">URL del Logo</label>
+                                <input type="text" class="form-control" id="operator-logo" placeholder="https://ejemplo.com/logo.png">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="operator-display-order" class="form-label">Orden de Visualización</label>
+                                <input type="number" class="form-control" id="operator-display-order" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="operator-is-active" checked>
+                                <label class="form-check-label" for="operator-is-active">
+                                    Activo
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-operator">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recharge Type Modal -->
+    <div class="modal fade" id="rechargeTypeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="rechargeTypeModalTitle">Agregar Tipo de Recarga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="rechargeTypeForm">
+                        <input type="hidden" id="recharge-type-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-type-operator" class="form-label">Operador</label>
+                                <select class="form-select" id="recharge-type-operator" required>
+                                    <option value="">Seleccionar operador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-type-name" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="recharge-type-name" required placeholder="Prepago, Pospago, Internet">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-type-code" class="form-label">Código</label>
+                                <input type="text" class="form-control" id="recharge-type-code" required placeholder="prepago, pospago, internet">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="recharge-type-display-order" class="form-label">Orden de Visualización</label>
+                                <input type="number" class="form-control" id="recharge-type-display-order" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="recharge-type-description" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="recharge-type-description" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="recharge-type-is-active" checked>
+                                <label class="form-check-label" for="recharge-type-is-active">
+                                    Activo
+                                </label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-recharge-type">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Package Modal -->
+    <div class="modal fade" id="mobilePackageModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mobilePackageModalTitle">Agregar Paquete Móvil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="mobilePackageForm">
+                        <input type="hidden" id="package-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="package-operator" class="form-label">Operador</label>
+                                <select class="form-select" id="package-operator" required>
+                                    <option value="">Seleccionar operador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="package-recharge-type" class="form-label">Tipo de Recarga</label>
+                                <select class="form-select" id="package-recharge-type" required>
+                                    <option value="">Seleccionar tipo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="package-name" class="form-label">Nombre del Paquete</label>
+                                <input type="text" class="form-control" id="package-name" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="package-amount" class="form-label">Monto (Bs)</label>
+                                <input type="number" class="form-control" id="package-amount" step="0.01" min="0.01" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="package-price" class="form-label">Precio de Venta (Bs)</label>
+                                <input type="number" class="form-control" id="package-price" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="package-duration" class="form-label">Duración (días)</label>
+                                <input type="number" class="form-control" id="package-duration" min="0" value="30">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label for="package-minutes" class="form-label">Minutos</label>
+                                <input type="number" class="form-control" id="package-minutes" min="0" value="0">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="package-sms" class="form-label">SMS</label>
+                                <input type="number" class="form-control" id="package-sms" min="0" value="0">
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label for="package-data" class="form-label">Datos (MB)</label>
+                                <input type="number" class="form-control" id="package-data" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="package-social-data" class="form-label">Datos Redes Sociales (MB)</label>
+                                <input type="number" class="form-control" id="package-social-data" min="0" value="0">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="package-image-url" class="form-label">URL de Imagen</label>
+                                <input type="text" class="form-control" id="package-image-url" placeholder="https://ejemplo.com/imagen.jpg">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="package-description" class="form-label">Descripción</label>
+                            <textarea class="form-control" id="package-description" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="package-features" class="form-label">Características (JSON)</label>
+                            <input type="text" class="form-control" id="package-features" placeholder='{"beneficio": "llamadas ilimitadas"}'>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="package-is-unlimited">
+                                    <label class="form-check-label" for="package-is-unlimited">
+                                        Ilimitado
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="package-is-hot">
+                                    <label class="form-check-label" for="package-is-hot">
+                                        Destacado
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="package-is-active" checked>
+                                    <label class="form-check-label" for="package-is-active">
+                                        Activo
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-package">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Recharge Modal -->
+    <div class="modal fade" id="mobileRechargeModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="mobileRechargeModalTitle">Nueva Recarga Móvil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="mobileRechargeForm">
+                        <input type="hidden" id="mobile-recharge-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-user" class="form-label">Usuario</label>
+                                <select class="form-select" id="mobile-recharge-user" required>
+                                    <option value="">Seleccionar usuario</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-operator-select" class="form-label">Operador</label>
+                                <select class="form-select" id="mobile-recharge-operator-select" required>
+                                    <option value="">Seleccionar operador</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-package" class="form-label">Paquete (Opcional)</label>
+                                <select class="form-select" id="mobile-recharge-package">
+                                    <option value="">Sin paquete específico</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-phone" class="form-label">Número de Teléfono</label>
+                                <input type="text" class="form-control" id="mobile-recharge-phone" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-amount-input" class="form-label">Monto (Bs)</label>
+                                <input type="number" class="form-control" id="mobile-recharge-amount-input" step="0.01" min="0.01" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-price" class="form-label">Precio (Bs)</label>
+                                <input type="number" class="form-control" id="mobile-recharge-price" step="0.01" min="0.01" required>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-transaction" class="form-label">ID Transacción (Opcional)</label>
+                                <input type="text" class="form-control" id="mobile-recharge-transaction">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-status-select" class="form-label">Estado</label>
+                                <select class="form-select" id="mobile-recharge-status-select" required>
+                                    <option value="pending">Pendiente</option>
+                                    <option value="processing">Procesando</option>
+                                    <option value="completed">Completado</option>
+                                    <option value="failed">Fallido</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-external-ref" class="form-label">Referencia Externa</label>
+                                <input type="text" class="form-control" id="mobile-recharge-external-ref">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="mobile-recharge-recipient" class="form-label">Nombre del Destinatario</label>
+                                <input type="text" class="form-control" id="mobile-recharge-recipient">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mobile-recharge-notes" class="form-label">Notas</label>
+                            <textarea class="form-control" id="mobile-recharge-notes" rows="2"></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="mobile-recharge-metadata" class="form-label">Metadatos (JSON)</label>
+                            <input type="text" class="form-control" id="mobile-recharge-metadata" placeholder='{"origen": "web"}'>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-mobile-recharge">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // Configuración de Supabase
+        const supabaseUrl = 'https://aleadadisazocjovibeh.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E';
+        window.supabase = supabase.createClient(supabaseUrl, supabaseKey);
+        
+        // Variables globales
+        let currentAdmin = null;
+        let currentSection = 'mobile-operators';
+        
+        // Nuevas variables para las tablas de móviles
+        let operatorsData = [];
+        let rechargeTypesData = [];
+        let mobilePackagesData = [];
+        let mobileRechargesData = [];
+        let rechargeHistoryData = [];
+        
+        // Variables para acciones pendientes de confirmación
+        let pendingAction = null;
+        let pendingActionData = null;
+        
+        // Contraseña de administrador (deberías cambiarla)
+        const ADMIN_PASSWORD = 'admin123';
+        
+        // Variables para filtros (agregar nuevos)
+        let currentFilters = {
+            mobileRecharges: {
+                search: '',
+                operator: '',
+                status: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            }
+        };
+        
+        // Funciones de utilidad
+        const formatCurrency = (amount) => {
+            return 'Bs ' + parseFloat(amount).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+        
+        const formatDate = (dateString) => {
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        };
+        
+        const formatDateShort = (dateString) => {
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        };
+        
+        const showToast = (message, type = 'success') => {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center text-bg-${type === 'success' ? 'success' : 'danger'} border-0 position-fixed top-0 end-0 m-3`;
+            toast.setAttribute('role', 'alert');
+            toast.setAttribute('aria-live', 'assertive');
+            toast.setAttribute('aria-atomic', 'true');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">
+                        ${message}
+                    </div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast);
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => {
+                document.body.removeChild(toast);
+            });
+        };
+        
+        // Función para mostrar el modal de detalles
+        const showDetailModal = (title, details) => {
+            const modal = document.getElementById('detail-modal');
+            const backdrop = document.getElementById('detail-modal-backdrop');
+            const titleElement = document.getElementById('detail-modal-title');
+            const bodyElement = document.getElementById('detail-modal-body');
+            
+            titleElement.textContent = title;
+            bodyElement.innerHTML = details;
+            
+            modal.classList.add('show');
+            backdrop.classList.add('show');
+        };
+        
+        // Función para cerrar el modal de detalles
+        const closeDetailModal = () => {
+            const modal = document.getElementById('detail-modal');
+            const backdrop = document.getElementById('detail-modal-backdrop');
+            
+            modal.classList.remove('show');
+            backdrop.classList.remove('show');
+        };
+        
+        // Función para mostrar modal de confirmación con contraseña
+        const showPasswordConfirmModal = (action, actionData = null) => {
+            pendingAction = action;
+            pendingActionData = actionData;
+            
+            document.getElementById('admin-password').value = '';
+            document.getElementById('password-error').classList.add('d-none');
+            
+            const modal = new bootstrap.Modal(document.getElementById('passwordConfirmModal'));
+            modal.show();
+        };
+        
+        // Función para ejecutar acción pendiente después de confirmar contraseña
+        const executePendingAction = () => {
+            if (!pendingAction) return;
+            
+            const password = document.getElementById('admin-password').value;
+            if (password !== ADMIN_PASSWORD) {
+                document.getElementById('password-error').classList.remove('d-none');
+                return;
+            }
+            
+            // Cerrar modal
+            const modal = bootstrap.Modal.getInstance(document.getElementById('passwordConfirmModal'));
+            modal.hide();
+            
+            // Ejecutar acción según el tipo
+            switch(pendingAction) {
+                case 'editOperator':
+                    if (pendingActionData) {
+                        openOperatorModal(pendingActionData);
+                    }
+                    break;
+                case 'deleteOperator':
+                    if (pendingActionData) {
+                        deleteOperator(pendingActionData.id, pendingActionData.name);
+                    }
+                    break;
+                case 'editRechargeType':
+                    if (pendingActionData) {
+                        openRechargeTypeModal(pendingActionData);
+                    }
+                    break;
+                case 'deleteRechargeType':
+                    if (pendingActionData) {
+                        deleteRechargeType(pendingActionData.id, pendingActionData.name);
+                    }
+                    break;
+                case 'editPackage':
+                    if (pendingActionData) {
+                        openMobilePackageModal(pendingActionData);
+                    }
+                    break;
+                case 'deletePackage':
+                    if (pendingActionData) {
+                        deletePackage(pendingActionData.id, pendingActionData.name);
+                    }
+                    break;
+                case 'editMobileRecharge':
+                    if (pendingActionData) {
+                        openMobileRechargeModal(pendingActionData);
+                    }
+                    break;
+                case 'deleteMobileRecharge':
+                    if (pendingActionData) {
+                        deleteMobileRecharge(pendingActionData.id);
+                    }
+                    break;
+            }
+            
+            // Limpiar acción pendiente
+            pendingAction = null;
+            pendingActionData = null;
+        };
+        
+        // Funciones para cargar datos de las nuevas tablas
+        
+        // Cargar operadores
+        const loadOperators = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_operators')
+                    .select('*')
+                    .order('display_order', { ascending: true });
+                
+                if (error) throw error;
+                
+                operatorsData = data || [];
+                renderOperatorsTable(operatorsData);
+                renderOperatorsMobileList(operatorsData);
+            } catch (error) {
+                console.error('Error loading operators:', error);
+                showToast('Error al cargar los operadores', 'error');
+            }
+        };
+        
+        // Cargar tipos de recarga
+        const loadRechargeTypes = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('recharge_types')
+                    .select('*, mobile_operators(name)')
+                    .order('display_order', { ascending: true });
+                
+                if (error) throw error;
+                
+                rechargeTypesData = data || [];
+                renderRechargeTypesTable(rechargeTypesData);
+                renderRechargeTypesMobileList(rechargeTypesData);
+            } catch (error) {
+                console.error('Error loading recharge types:', error);
+                showToast('Error al cargar los tipos de recarga', 'error');
+            }
+        };
+        
+        // Cargar paquetes móviles
+        const loadMobilePackages = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_packages')
+                    .select('*, mobile_operators(name, code), recharge_types(name)')
+                    .order('amount', { ascending: true });
+                
+                if (error) throw error;
+                
+                mobilePackagesData = data || [];
+                renderMobilePackages(mobilePackagesData);
+            } catch (error) {
+                console.error('Error loading mobile packages:', error);
+                showToast('Error al cargar los paquetes móviles', 'error');
+            }
+        };
+        
+        // Cargar recargas móviles
+        const loadMobileRecharges = async (page = 1) => {
+            try {
+                let query = supabase
+                    .from('mobile_recharges')
+                    .select('*, mobile_operators(name), user_profiles(full_name)', { count: 'exact' });
+                
+                const filters = currentFilters.mobileRecharges;
+                
+                if (filters.search) {
+                    query = query.or(`phone_number.ilike.%${filters.search}%,external_reference.ilike.%${filters.search}%`);
+                }
+                
+                if (filters.operator) {
+                    query = query.eq('operator_id', filters.operator);
+                }
+                
+                if (filters.status) {
+                    query = query.eq('status', filters.status);
+                }
+                
+                if (filters.amountMin) {
+                    query = query.gte('amount', parseFloat(filters.amountMin));
+                }
+                
+                if (filters.amountMax) {
+                    query = query.lte('amount', parseFloat(filters.amountMax));
+                }
+                
+                if (filters.dateFrom) {
+                    query = query.gte('created_at', filters.dateFrom);
+                }
+                if (filters.dateTo) {
+                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                }
+                
+                if (filters.quickFilter !== 'all') {
+                    const now = new Date();
+                    switch(filters.quickFilter) {
+                        case 'today':
+                            const today = now.toISOString().split('T')[0];
+                            query = query.gte('created_at', today);
+                            break;
+                        case 'pending':
+                            query = query.eq('status', 'pending');
+                            break;
+                        case 'completed':
+                            query = query.eq('status', 'completed');
+                            break;
+                        case 'failed':
+                            query = query.eq('status', 'failed');
+                            break;
+                    }
+                }
+                
+                const { data, error, count } = await query
+                    .range((page - 1) * 10, page * 10 - 1)
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                mobileRechargesData = data || [];
+                renderMobileRechargesTable(mobileRechargesData);
+                renderMobileRechargesMobileList(mobileRechargesData);
+                renderMobileRechargesPagination(page, Math.ceil((count || 0) / 10));
+                updateFilterTags('mobileRecharges');
+                
+            } catch (error) {
+                console.error('Error loading mobile recharges:', error);
+                showToast('Error al cargar las recargas móviles', 'error');
+            }
+        };
+        
+        // Cargar historial de recargas
+        const loadRechargeHistory = async () => {
+            try {
+                const { data, error } = await supabase
+                    .from('recharge_history')
+                    .select('*, mobile_recharges(phone_number, amount), user_profiles(full_name)')
+                    .order('created_at', { ascending: false })
+                    .limit(50);
+                
+                if (error) throw error;
+                
+                rechargeHistoryData = data || [];
+                renderRechargeHistoryTable(rechargeHistoryData);
+                renderRechargeHistoryMobileList(rechargeHistoryData);
+            } catch (error) {
+                console.error('Error loading recharge history:', error);
+                showToast('Error al cargar el historial de recargas', 'error');
+            }
+        };
+        
+        // Funciones para renderizar las nuevas tablas
+        
+        const renderOperatorsTable = (operators) => {
+            const container = document.getElementById('operators-table-body');
+            
+            if (!operators || operators.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No se encontraron operadores
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = operators.map(operator => {
+                return `
+                    <tr>
+                        <td>
+                            ${operator.logo_url ? 
+                                `<img src="${operator.logo_url}" alt="${operator.name}" class="operator-logo">` : 
+                                `<div class="operator-logo d-flex align-items-center justify-content-center bg-light">
+                                    <i class="fas fa-sim-card text-muted"></i>
+                                </div>`
+                            }
+                        </td>
+                        <td class="fw-medium">${operator.name}</td>
+                        <td><span class="user-id-badge">${operator.code}</span></td>
+                        <td>${operator.display_order || 0}</td>
+                        <td><span class="badge ${operator.is_active ? 'bg-success' : 'bg-secondary'}">${operator.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                        <td>${formatDateShort(operator.created_at)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary view-operator" data-id="${operator.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-operator" data-id="${operator.id}" data-name="${operator.name}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-operator" data-id="${operator.id}" data-name="${operator.name}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderOperatorsMobileList = (operators) => {
+            const container = document.getElementById('operators-mobile-list');
+            
+            if (!operators || operators.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-sim-card"></i>
+                        <p>No se encontraron operadores</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = operators.map(operator => {
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">${operator.name}</div>
+                            <span class="badge ${operator.is_active ? 'bg-success' : 'bg-secondary'} mobile-card-status">${operator.is_active ? 'Activo' : 'Inactivo'}</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Código:</span>
+                                <span class="mobile-card-value">${operator.code}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Orden:</span>
+                                <span class="mobile-card-value">${operator.display_order || 0}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-operator" data-id="${operator.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-operator" data-id="${operator.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-operator" data-id="${operator.id}" data-name="${operator.name}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderRechargeTypesTable = (types) => {
+            const container = document.getElementById('recharge-types-table-body');
+            
+            if (!types || types.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="7" class="text-center py-4 text-muted">
+                            No se encontraron tipos de recarga
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = types.map(type => {
+                return `
+                    <tr>
+                        <td>${type.mobile_operators?.name || 'N/A'}</td>
+                        <td class="fw-medium">${type.name}</td>
+                        <td><span class="user-id-badge">${type.code}</span></td>
+                        <td>${type.description || '-'}</td>
+                        <td>${type.display_order || 0}</td>
+                        <td><span class="badge ${type.is_active ? 'bg-success' : 'bg-secondary'}">${type.is_active ? 'Activo' : 'Inactivo'}</span></td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary view-recharge-type" data-id="${type.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-recharge-type" data-id="${type.id}" data-name="${type.name}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-recharge-type" data-id="${type.id}" data-name="${type.name}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderRechargeTypesMobileList = (types) => {
+            const container = document.getElementById('recharge-types-mobile-list');
+            
+            if (!types || types.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-tags"></i>
+                        <p>No se encontraron tipos de recarga</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = types.map(type => {
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">${type.name}</div>
+                            <span class="badge ${type.is_active ? 'bg-success' : 'bg-secondary'} mobile-card-status">${type.is_active ? 'Activo' : 'Inactivo'}</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Operador:</span>
+                                <span class="mobile-card-value">${type.mobile_operators?.name || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Código:</span>
+                                <span class="mobile-card-value">${type.code}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Descripción:</span>
+                                <span class="mobile-card-value">${type.description || '-'}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-recharge-type" data-id="${type.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-recharge-type" data-id="${type.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-recharge-type" data-id="${type.id}" data-name="${type.name}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderMobilePackages = (packages) => {
+            const container = document.getElementById('packages-container');
+            const loading = document.getElementById('packages-loading');
+            
+            loading.style.display = 'none';
+            
+            if (!packages || packages.length === 0) {
+                container.innerHTML = `
+                    <div class="col-12">
+                        <div class="no-results">
+                            <i class="fas fa-boxes"></i>
+                            <p>No se encontraron paquetes móviles</p>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = packages.map(pkg => {
+                const operatorName = pkg.mobile_operators?.name || 'Desconocido';
+                const typeName = pkg.recharge_types?.name || 'General';
+                
+                return `
+                    <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="package-card">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <span class="package-operator">${operatorName} - ${typeName}</span>
+                                    <h5 class="package-name mt-1">
+                                        ${pkg.name}
+                                        ${pkg.is_hot ? '<span class="hot-badge">🔥 Destacado</span>' : ''}
+                                    </h5>
+                                </div>
+                                ${pkg.image_url ? 
+                                    `<img src="${pkg.image_url}" alt="${pkg.name}" class="operator-logo-large">` : 
+                                    `<div class="operator-logo-large d-flex align-items-center justify-content-center bg-light">
+                                        <i class="fas fa-sim-card fa-2x text-muted"></i>
+                                    </div>`
+                                }
+                            </div>
+                            
+                            <div class="row mb-3">
+                                <div class="col-6">
+                                    <div class="package-amount">${formatCurrency(pkg.amount)}</div>
+                                    <small class="text-muted">Monto</small>
+                                </div>
+                                <div class="col-6">
+                                    <div class="package-price">${formatCurrency(pkg.price)}</div>
+                                    <small class="text-muted">Precio</small>
+                                </div>
+                            </div>
+                            
+                            <div class="package-detail">
+                                <i class="fas fa-clock"></i> Duración: ${pkg.duration_days || 0} días
+                            </div>
+                            ${pkg.minutes ? `
+                                <div class="package-detail">
+                                    <i class="fas fa-phone"></i> Minutos: ${pkg.minutes} ${pkg.is_unlimited ? '(Ilimitados)' : ''}
+                                </div>
+                            ` : ''}
+                            ${pkg.sms ? `
+                                <div class="package-detail">
+                                    <i class="fas fa-envelope"></i> SMS: ${pkg.sms}
+                                </div>
+                            ` : ''}
+                            ${pkg.data_mb ? `
+                                <div class="package-detail">
+                                    <i class="fas fa-wifi"></i> Datos: ${pkg.data_mb} MB
+                                </div>
+                            ` : ''}
+                            ${pkg.social_data_mb ? `
+                                <div class="package-detail">
+                                    <i class="fas fa-users"></i> Redes Sociales: ${pkg.social_data_mb} MB
+                                </div>
+                            ` : ''}
+                            
+                            <p class="text-muted small mt-2">${pkg.description || ''}</p>
+                            
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <span class="badge ${pkg.is_active ? 'bg-success' : 'bg-secondary'}">${pkg.is_active ? 'Activo' : 'Inactivo'}</span>
+                                <div class="package-actions">
+                                    <button class="btn btn-sm btn-outline-primary view-package" data-id="${pkg.id}">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-success edit-package" data-id="${pkg.id}" data-name="${pkg.name}">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger delete-package" data-id="${pkg.id}" data-name="${pkg.name}">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderMobileRechargesTable = (recharges) => {
+            const container = document.getElementById('mobile-recharges-table-body');
+            
+            if (!recharges || recharges.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="10" class="text-center py-4 text-muted">
+                            No se encontraron recargas móviles
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = recharges.map(recharge => {
+                const statusClass = {
+                    'pending': 'status-pending',
+                    'processing': 'status-processing',
+                    'completed': 'status-completed',
+                    'failed': 'status-failed'
+                }[recharge.status] || 'bg-secondary';
+                
+                const statusText = {
+                    'pending': 'Pendiente',
+                    'processing': 'Procesando',
+                    'completed': 'Completado',
+                    'failed': 'Fallido'
+                }[recharge.status] || recharge.status;
+                
+                return `
+                    <tr>
+                        <td><span class="user-id-badge">${recharge.id.substring(0, 8)}...</span></td>
+                        <td>${recharge.user_profiles?.full_name || 'N/A'}</td>
+                        <td>${recharge.mobile_operators?.name || 'N/A'}</td>
+                        <td>${recharge.phone_number}</td>
+                        <td>${recharge.package_id ? 'Con paquete' : 'Simple'}</td>
+                        <td class="fw-medium">${formatCurrency(recharge.amount)}</td>
+                        <td class="fw-medium">${formatCurrency(recharge.price)}</td>
+                        <td><span class="recharge-status ${statusClass}">${statusText}</span></td>
+                        <td>${formatDateShort(recharge.created_at)}</td>
+                        <td>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary view-mobile-recharge" data-id="${recharge.id}">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-success edit-mobile-recharge" data-id="${recharge.id}">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger delete-mobile-recharge" data-id="${recharge.id}">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderMobileRechargesMobileList = (recharges) => {
+            const container = document.getElementById('mobile-recharges-mobile-list');
+            
+            if (!recharges || recharges.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-phone-alt"></i>
+                        <p>No se encontraron recargas móviles</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = recharges.map(recharge => {
+                const statusClass = {
+                    'pending': 'status-pending',
+                    'processing': 'status-processing',
+                    'completed': 'status-completed',
+                    'failed': 'status-failed'
+                }[recharge.status] || 'bg-secondary';
+                
+                const statusText = {
+                    'pending': 'Pendiente',
+                    'processing': 'Procesando',
+                    'completed': 'Completado',
+                    'failed': 'Fallido'
+                }[recharge.status] || recharge.status;
+                
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">Recarga a ${recharge.phone_number}</div>
+                            <span class="recharge-status ${statusClass}">${statusText}</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Usuario:</span>
+                                <span class="mobile-card-value">${recharge.user_profiles?.full_name || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Operador:</span>
+                                <span class="mobile-card-value">${recharge.mobile_operators?.name || 'N/A'}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Monto:</span>
+                                <span class="mobile-card-value">${formatCurrency(recharge.amount)}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Precio:</span>
+                                <span class="mobile-card-value">${formatCurrency(recharge.price)}</span>
+                            </div>
+                        </div>
+                        <div class="mobile-card-actions">
+                            <button class="btn btn-sm btn-outline-primary view-mobile-recharge" data-id="${recharge.id}">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-success edit-mobile-recharge" data-id="${recharge.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger delete-mobile-recharge" data-id="${recharge.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderRechargeHistoryTable = (history) => {
+            const container = document.getElementById('recharge-history-table-body');
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            No se encontró historial de recargas
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+            
+            const html = history.map(item => {
+                return `
+                    <tr>
+                        <td><span class="user-id-badge">${item.id.substring(0, 8)}...</span></td>
+                        <td><span class="user-id-badge">${item.recharge_id.substring(0, 8)}...</span></td>
+                        <td><span class="badge ${item.status === 'completed' ? 'bg-success' : item.status === 'pending' ? 'bg-warning' : item.status === 'failed' ? 'bg-danger' : 'bg-info'}">${item.status}</span></td>
+                        <td>${item.message || '-'}</td>
+                        <td>${item.user_profiles?.full_name || 'Sistema'}</td>
+                        <td>${formatDate(item.created_at)}</td>
+                    </tr>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        const renderRechargeHistoryMobileList = (history) => {
+            const container = document.getElementById('recharge-history-mobile-list');
+            
+            if (!history || history.length === 0) {
+                container.innerHTML = `
+                    <div class="no-results">
+                        <i class="fas fa-history"></i>
+                        <p>No se encontró historial de recargas</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            const html = history.map(item => {
+                return `
+                    <div class="mobile-card">
+                        <div class="mobile-card-header">
+                            <div class="mobile-card-title">Cambio de estado</div>
+                            <span class="badge ${item.status === 'completed' ? 'bg-success' : item.status === 'pending' ? 'bg-warning' : item.status === 'failed' ? 'bg-danger' : 'bg-info'}">${item.status}</span>
+                        </div>
+                        <div class="mobile-card-body">
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Recarga ID:</span>
+                                <span class="mobile-card-value">${item.recharge_id.substring(0, 8)}...</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Mensaje:</span>
+                                <span class="mobile-card-value">${item.message || '-'}</span>
+                            </div>
+                            <div class="mobile-card-field">
+                                <span class="mobile-card-label">Fecha:</span>
+                                <span class="mobile-card-value">${formatDate(item.created_at)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+            container.innerHTML = html;
+        };
+        
+        // Funciones de paginación para nuevas tablas
+        const renderMobileRechargesPagination = (currentPage, totalPages) => {
+            const container = document.getElementById('mobile-recharges-pagination');
+            renderPagination(container, currentPage, totalPages, 'mobile-recharges');
+        };
+        
+        // Funciones para abrir modales de nuevas tablas
+        
+        const openOperatorModal = (operator = null) => {
+            const modalTitle = document.getElementById('operatorModalTitle');
+            const form = document.getElementById('operatorForm');
+            
+            if (operator) {
+                modalTitle.textContent = 'Editar Operador';
+                document.getElementById('operator-id').value = operator.id;
+                document.getElementById('operator-name').value = operator.name || '';
+                document.getElementById('operator-code').value = operator.code || '';
+                document.getElementById('operator-logo').value = operator.logo_url || '';
+                document.getElementById('operator-display-order').value = operator.display_order || 0;
+                document.getElementById('operator-is-active').checked = operator.is_active !== false;
+            } else {
+                modalTitle.textContent = 'Agregar Operador';
+                form.reset();
+                document.getElementById('operator-id').value = '';
+                document.getElementById('operator-display-order').value = '0';
+                document.getElementById('operator-is-active').checked = true;
+            }
+            
+            const operatorModal = new bootstrap.Modal(document.getElementById('operatorModal'));
+            operatorModal.show();
+        };
+        
+        const openRechargeTypeModal = (type = null) => {
+            const modalTitle = document.getElementById('rechargeTypeModalTitle');
+            const form = document.getElementById('rechargeTypeForm');
+            
+            populateOperatorSelect('recharge-type-operator');
+            
+            if (type) {
+                modalTitle.textContent = 'Editar Tipo de Recarga';
+                document.getElementById('recharge-type-id').value = type.id;
+                document.getElementById('recharge-type-operator').value = type.operator_id || '';
+                document.getElementById('recharge-type-name').value = type.name || '';
+                document.getElementById('recharge-type-code').value = type.code || '';
+                document.getElementById('recharge-type-description').value = type.description || '';
+                document.getElementById('recharge-type-display-order').value = type.display_order || 0;
+                document.getElementById('recharge-type-is-active').checked = type.is_active !== false;
+            } else {
+                modalTitle.textContent = 'Agregar Tipo de Recarga';
+                form.reset();
+                document.getElementById('recharge-type-id').value = '';
+                document.getElementById('recharge-type-display-order').value = '0';
+                document.getElementById('recharge-type-is-active').checked = true;
+            }
+            
+            const rechargeTypeModal = new bootstrap.Modal(document.getElementById('rechargeTypeModal'));
+            rechargeTypeModal.show();
+        };
+        
+        const openMobilePackageModal = (pkg = null) => {
+            const modalTitle = document.getElementById('mobilePackageModalTitle');
+            const form = document.getElementById('mobilePackageForm');
+            
+            populateOperatorSelect('package-operator');
+            
+            if (pkg) {
+                modalTitle.textContent = 'Editar Paquete Móvil';
+                document.getElementById('package-id').value = pkg.id;
+                document.getElementById('package-operator').value = pkg.operator_id || '';
+                document.getElementById('package-recharge-type').value = pkg.recharge_type_id || '';
+                document.getElementById('package-name').value = pkg.name || '';
+                document.getElementById('package-amount').value = pkg.amount || '';
+                document.getElementById('package-price').value = pkg.price || '';
+                document.getElementById('package-duration').value = pkg.duration_days || 30;
+                document.getElementById('package-minutes').value = pkg.minutes || 0;
+                document.getElementById('package-sms').value = pkg.sms || 0;
+                document.getElementById('package-data').value = pkg.data_mb || 0;
+                document.getElementById('package-social-data').value = pkg.social_data_mb || 0;
+                document.getElementById('package-image-url').value = pkg.image_url || '';
+                document.getElementById('package-description').value = pkg.description || '';
+                document.getElementById('package-features').value = pkg.features ? JSON.stringify(pkg.features) : '';
+                document.getElementById('package-is-unlimited').checked = pkg.is_unlimited || false;
+                document.getElementById('package-is-hot').checked = pkg.is_hot || false;
+                document.getElementById('package-is-active').checked = pkg.is_active !== false;
+                
+                // Cargar tipos de recarga para este operador
+                if (pkg.operator_id) {
+                    loadRechargeTypesForOperator(pkg.operator_id, pkg.recharge_type_id);
+                }
+            } else {
+                modalTitle.textContent = 'Agregar Paquete Móvil';
+                form.reset();
+                document.getElementById('package-id').value = '';
+                document.getElementById('package-duration').value = '30';
+                document.getElementById('package-minutes').value = '0';
+                document.getElementById('package-sms').value = '0';
+                document.getElementById('package-data').value = '0';
+                document.getElementById('package-social-data').value = '0';
+                document.getElementById('package-is-active').checked = true;
+            }
+            
+            const packageModal = new bootstrap.Modal(document.getElementById('mobilePackageModal'));
+            packageModal.show();
+        };
+        
+        const openMobileRechargeModal = (recharge = null) => {
+            const modalTitle = document.getElementById('mobileRechargeModalTitle');
+            const form = document.getElementById('mobileRechargeForm');
+            
+            populateUserSelect('mobile-recharge-user');
+            populateOperatorSelect('mobile-recharge-operator-select');
+            
+            if (recharge) {
+                modalTitle.textContent = 'Editar Recarga Móvil';
+                document.getElementById('mobile-recharge-id').value = recharge.id;
+                document.getElementById('mobile-recharge-user').value = recharge.user_id || '';
+                document.getElementById('mobile-recharge-operator-select').value = recharge.operator_id || '';
+                document.getElementById('mobile-recharge-package').value = recharge.package_id || '';
+                document.getElementById('mobile-recharge-phone').value = recharge.phone_number || '';
+                document.getElementById('mobile-recharge-amount-input').value = recharge.amount || '';
+                document.getElementById('mobile-recharge-price').value = recharge.price || '';
+                document.getElementById('mobile-recharge-transaction').value = recharge.transaction_id || '';
+                document.getElementById('mobile-recharge-status-select').value = recharge.status || 'pending';
+                document.getElementById('mobile-recharge-external-ref').value = recharge.external_reference || '';
+                document.getElementById('mobile-recharge-recipient').value = recharge.recipient_name || '';
+                document.getElementById('mobile-recharge-notes').value = recharge.notes || '';
+                document.getElementById('mobile-recharge-metadata').value = recharge.metadata ? JSON.stringify(recharge.metadata) : '';
+                
+                // Cargar paquetes para este operador
+                if (recharge.operator_id) {
+                    loadPackagesForOperator(recharge.operator_id, recharge.package_id);
+                }
+            } else {
+                modalTitle.textContent = 'Nueva Recarga Móvil';
+                form.reset();
+                document.getElementById('mobile-recharge-id').value = '';
+                document.getElementById('mobile-recharge-status-select').value = 'pending';
+            }
+            
+            const mobileRechargeModal = new bootstrap.Modal(document.getElementById('mobileRechargeModal'));
+            mobileRechargeModal.show();
+        };
+        
+        // Funciones para llenar selects
+        
+        const populateOperatorSelect = async (selectId, selectedValue = null) => {
+            try {
+                const { data: operators, error } = await supabase
+                    .from('mobile_operators')
+                    .select('id, name')
+                    .eq('is_active', true)
+                    .order('display_order', { ascending: true });
+                
+                if (error) throw error;
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Seleccionar operador</option>';
+                
+                operators.forEach(operator => {
+                    const option = document.createElement('option');
+                    option.value = operator.id;
+                    option.textContent = operator.name;
+                    select.appendChild(option);
+                });
+                
+                if (selectedValue) {
+                    select.value = selectedValue;
+                }
+            } catch (error) {
+                console.error('Error loading operators for select:', error);
+            }
+        };
+        
+        const loadRechargeTypesForOperator = async (operatorId, selectedTypeId = null) => {
+            try {
+                const { data: types, error } = await supabase
+                    .from('recharge_types')
+                    .select('id, name')
+                    .eq('operator_id', operatorId)
+                    .eq('is_active', true)
+                    .order('display_order', { ascending: true });
+                
+                if (error) throw error;
+                
+                const select = document.getElementById('package-recharge-type');
+                select.innerHTML = '<option value="">Seleccionar tipo</option>';
+                
+                types.forEach(type => {
+                    const option = document.createElement('option');
+                    option.value = type.id;
+                    option.textContent = type.name;
+                    select.appendChild(option);
+                });
+                
+                if (selectedTypeId) {
+                    select.value = selectedTypeId;
+                }
+            } catch (error) {
+                console.error('Error loading recharge types for operator:', error);
+            }
+        };
+        
+        const loadPackagesForOperator = async (operatorId, selectedPackageId = null) => {
+            try {
+                const { data: packages, error } = await supabase
+                    .from('mobile_packages')
+                    .select('id, name, amount')
+                    .eq('operator_id', operatorId)
+                    .eq('is_active', true)
+                    .order('amount', { ascending: true });
+                
+                if (error) throw error;
+                
+                const select = document.getElementById('mobile-recharge-package');
+                select.innerHTML = '<option value="">Sin paquete específico</option>';
+                
+                packages.forEach(pkg => {
+                    const option = document.createElement('option');
+                    option.value = pkg.id;
+                    option.textContent = `${pkg.name} - ${formatCurrency(pkg.amount)}`;
+                    select.appendChild(option);
+                });
+                
+                if (selectedPackageId) {
+                    select.value = selectedPackageId;
+                }
+            } catch (error) {
+                console.error('Error loading packages for operator:', error);
+            }
+        };
+        
+        const populateUserSelect = async (selectId) => {
+            try {
+                const { data: users, error } = await supabase
+                    .from('user_profiles')
+                    .select('id, full_name')
+                    .order('full_name', { ascending: true });
+                
+                if (error) throw error;
+                
+                const select = document.getElementById(selectId);
+                select.innerHTML = '<option value="">Seleccionar usuario</option>';
+                
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.full_name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading users for select:', error);
+            }
+        };
+        
+        // Función auxiliar de paginación (simplificada)
+        const renderPagination = (container, currentPage, totalPages, type) => {
+            if (!container) return;
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '';
+                return;
+            }
+            
+            let html = '';
+            
+            // Botón anterior
+            html += `<li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage - 1}" data-type="${type}">Anterior</a>
+            </li>`;
+            
+            // Páginas
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+                    html += `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                        <a class="page-link" href="#" data-page="${i}" data-type="${type}">${i}</a>
+                    </li>`;
+                } else if (i === currentPage - 3 || i === currentPage + 3) {
+                    html += `<li class="page-item disabled"><span class="page-link">...</span></li>`;
+                }
+            }
+            
+            // Botón siguiente
+            html += `<li class="page-item ${currentPage === totalPages ? 'disabled' : ''}">
+                <a class="page-link" href="#" data-page="${currentPage + 1}" data-type="${type}">Siguiente</a>
+            </li>`;
+            
+            container.innerHTML = html;
+        };
+        
+        // Actualizar tags de filtros
+        const updateFilterTags = (section) => {
+            const filters = currentFilters[section];
+            const container = document.getElementById(`${section}-filter-tags`);
+            
+            if (!container) return;
+            
+            let tags = [];
+            
+            if (filters.search) {
+                tags.push(`<span class="filter-tag">Búsqueda: ${filters.search} <button class="remove-filter" data-type="search"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.quickFilter !== 'all') {
+                const quickFilterNames = {
+                    'all': 'Todos',
+                    'pending': 'Pendientes',
+                    'completed': 'Completadas',
+                    'failed': 'Fallidas',
+                    'today': 'Hoy'
+                };
+                tags.push(`<span class="filter-tag">${quickFilterNames[filters.quickFilter]} <button class="remove-filter" data-type="quickFilter"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.operator) {
+                const operatorName = operatorsData.find(o => o.id === filters.operator)?.name || filters.operator;
+                tags.push(`<span class="filter-tag">Operador: ${operatorName} <button class="remove-filter" data-type="operator"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.status) {
+                const statusNames = {
+                    'pending': 'Pendiente',
+                    'processing': 'Procesando',
+                    'completed': 'Completado',
+                    'failed': 'Fallido'
+                };
+                tags.push(`<span class="filter-tag">Estado: ${statusNames[filters.status] || filters.status} <button class="remove-filter" data-type="status"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.amountMin) {
+                tags.push(`<span class="filter-tag">Monto mínimo: ${formatCurrency(filters.amountMin)} <button class="remove-filter" data-type="amountMin"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.amountMax) {
+                tags.push(`<span class="filter-tag">Monto máximo: ${formatCurrency(filters.amountMax)} <button class="remove-filter" data-type="amountMax"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.dateFrom) {
+                tags.push(`<span class="filter-tag">Desde: ${filters.dateFrom} <button class="remove-filter" data-type="dateFrom"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (filters.dateTo) {
+                tags.push(`<span class="filter-tag">Hasta: ${filters.dateTo} <button class="remove-filter" data-type="dateTo"><i class="fas fa-times"></i></button></span>`);
+            }
+            
+            if (tags.length > 0) {
+                container.innerHTML = tags.join('');
+            } else {
+                container.innerHTML = '';
+            }
+        };
+        
+        // Event listeners para los nuevos selects
+        document.getElementById('package-operator')?.addEventListener('change', function() {
+            const operatorId = this.value;
+            if (operatorId) {
+                loadRechargeTypesForOperator(operatorId);
+            } else {
+                document.getElementById('package-recharge-type').innerHTML = '<option value="">Seleccionar tipo</option>';
+            }
+        });
+        
+        document.getElementById('mobile-recharge-operator-select')?.addEventListener('change', function() {
+            const operatorId = this.value;
+            if (operatorId) {
+                loadPackagesForOperator(operatorId);
+            } else {
+                document.getElementById('mobile-recharge-package').innerHTML = '<option value="">Sin paquete específico</option>';
+            }
+        });
+        
+        // Funciones CRUD para nuevas tablas
+        
+        const createOperator = async (operatorData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_operators')
+                    .insert([operatorData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Operador creado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating operator:', error);
+                showToast('Error al crear el operador', 'error');
+                return null;
+            }
+        };
+        
+        const updateOperator = async (id, operatorData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_operators')
+                    .update(operatorData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Operador actualizado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating operator:', error);
+                showToast('Error al actualizar el operador', 'error');
+                return null;
+            }
+        };
+        
+        const deleteOperator = async (id, name) => {
+            try {
+                // Verificar si hay tipos de recarga relacionados
+                const { data: types, error: typesError } = await supabase
+                    .from('recharge_types')
+                    .select('id')
+                    .eq('operator_id', id);
+                
+                if (typesError) throw typesError;
+                
+                if (types && types.length > 0) {
+                    showToast('No se puede eliminar el operador porque tiene tipos de recarga asociados', 'error');
+                    return;
+                }
+                
+                const { error } = await supabase
+                    .from('mobile_operators')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showToast(`Operador "${name}" eliminado exitosamente`);
+                loadOperators();
+                
+            } catch (error) {
+                console.error('Error deleting operator:', error);
+                showToast('Error al eliminar el operador: ' + error.message, 'error');
+            }
+        };
+        
+        const createRechargeType = async (typeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('recharge_types')
+                    .insert([typeData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Tipo de recarga creado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating recharge type:', error);
+                showToast('Error al crear el tipo de recarga', 'error');
+                return null;
+            }
+        };
+        
+        const updateRechargeType = async (id, typeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('recharge_types')
+                    .update(typeData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Tipo de recarga actualizado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating recharge type:', error);
+                showToast('Error al actualizar el tipo de recarga', 'error');
+                return null;
+            }
+        };
+        
+        const deleteRechargeType = async (id, name) => {
+            try {
+                // Verificar si hay paquetes relacionados
+                const { data: packages, error: packagesError } = await supabase
+                    .from('mobile_packages')
+                    .select('id')
+                    .eq('recharge_type_id', id);
+                
+                if (packagesError) throw packagesError;
+                
+                if (packages && packages.length > 0) {
+                    showToast('No se puede eliminar el tipo porque tiene paquetes asociados', 'error');
+                    return;
+                }
+                
+                const { error } = await supabase
+                    .from('recharge_types')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showToast(`Tipo de recarga "${name}" eliminado exitosamente`);
+                loadRechargeTypes();
+                
+            } catch (error) {
+                console.error('Error deleting recharge type:', error);
+                showToast('Error al eliminar el tipo de recarga: ' + error.message, 'error');
+            }
+        };
+        
+        const createMobilePackage = async (packageData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_packages')
+                    .insert([packageData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Paquete móvil creado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating mobile package:', error);
+                showToast('Error al crear el paquete móvil', 'error');
+                return null;
+            }
+        };
+        
+        const updateMobilePackage = async (id, packageData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_packages')
+                    .update(packageData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Paquete móvil actualizado exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating mobile package:', error);
+                showToast('Error al actualizar el paquete móvil', 'error');
+                return null;
+            }
+        };
+        
+        const deletePackage = async (id, name) => {
+            try {
+                // Verificar si hay recargas relacionadas
+                const { data: recharges, error: rechargesError } = await supabase
+                    .from('mobile_recharges')
+                    .select('id')
+                    .eq('package_id', id);
+                
+                if (rechargesError) throw rechargesError;
+                
+                if (recharges && recharges.length > 0) {
+                    showToast('No se puede eliminar el paquete porque tiene recargas asociadas', 'error');
+                    return;
+                }
+                
+                const { error } = await supabase
+                    .from('mobile_packages')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showToast(`Paquete "${name}" eliminado exitosamente`);
+                loadMobilePackages();
+                
+            } catch (error) {
+                console.error('Error deleting package:', error);
+                showToast('Error al eliminar el paquete: ' + error.message, 'error');
+            }
+        };
+        
+        const createMobileRecharge = async (rechargeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_recharges')
+                    .insert([rechargeData])
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Recarga móvil creada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error creating mobile recharge:', error);
+                showToast('Error al crear la recarga móvil', 'error');
+                return null;
+            }
+        };
+        
+        const updateMobileRecharge = async (id, rechargeData) => {
+            try {
+                const { data, error } = await supabase
+                    .from('mobile_recharges')
+                    .update(rechargeData)
+                    .eq('id', id)
+                    .select();
+                
+                if (error) throw error;
+                
+                showToast('Recarga móvil actualizada exitosamente');
+                return data[0];
+            } catch (error) {
+                console.error('Error updating mobile recharge:', error);
+                showToast('Error al actualizar la recarga móvil', 'error');
+                return null;
+            }
+        };
+        
+        const deleteMobileRecharge = async (id) => {
+            try {
+                const { error } = await supabase
+                    .from('mobile_recharges')
+                    .delete()
+                    .eq('id', id);
+                
+                if (error) throw error;
+                
+                showToast('Recarga móvil eliminada exitosamente');
+                loadMobileRecharges();
+                
+            } catch (error) {
+                console.error('Error deleting mobile recharge:', error);
+                showToast('Error al eliminar la recarga móvil: ' + error.message, 'error');
+            }
+        };
+        
+        // Funciones para mostrar detalles de las nuevas tablas
+        
+        const showOperatorDetails = async (operatorId) => {
+            try {
+                const operator = operatorsData.find(o => o.id === operatorId);
+                if (!operator) {
+                    showToast('Operador no encontrado', 'error');
+                    return;
+                }
+                
+                // Contar tipos de recarga
+                const { count: typesCount, error: typesError } = await supabase
+                    .from('recharge_types')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('operator_id', operatorId);
+                
+                // Contar paquetes
+                const { count: packagesCount, error: packagesError } = await supabase
+                    .from('mobile_packages')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('operator_id', operatorId);
+                
+                // Contar recargas
+                const { count: rechargesCount, error: rechargesError } = await supabase
+                    .from('mobile_recharges')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('operator_id', operatorId);
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value"><span class="user-id-badge">${operator.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nombre:</div>
+                        <div class="detail-value fw-medium">${operator.name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Código:</div>
+                        <div class="detail-value">${operator.code}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Logo:</div>
+                        <div class="detail-value">
+                            ${operator.logo_url ? 
+                                `<img src="${operator.logo_url}" alt="${operator.name}" style="max-height: 100px; max-width: 100px;">` : 
+                                'Sin logo'
+                            }
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Orden:</div>
+                        <div class="detail-value">${operator.display_order || 0}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge ${operator.is_active ? 'bg-success' : 'bg-secondary'}">${operator.is_active ? 'Activo' : 'Inactivo'}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estadísticas:</div>
+                        <div class="detail-value">
+                            <ul class="list-unstyled mb-0">
+                                <li>Tipos de recarga: ${typesCount || 0}</li>
+                                <li>Paquetes: ${packagesCount || 0}</li>
+                                <li>Recargas realizadas: ${rechargesCount || 0}</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Creado:</div>
+                        <div class="detail-value">${formatDate(operator.created_at)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Actualizado:</div>
+                        <div class="detail-value">${formatDate(operator.updated_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles del Operador: ${operator.name}`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error showing operator details:', error);
+                showToast('Error al cargar los detalles del operador', 'error');
+            }
+        };
+        
+        const showRechargeTypeDetails = async (typeId) => {
+            try {
+                const type = rechargeTypesData.find(t => t.id === typeId);
+                if (!type) {
+                    showToast('Tipo de recarga no encontrado', 'error');
+                    return;
+                }
+                
+                // Contar paquetes
+                const { count: packagesCount, error: packagesError } = await supabase
+                    .from('mobile_packages')
+                    .select('*', { count: 'exact', head: true })
+                    .eq('recharge_type_id', typeId);
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value"><span class="user-id-badge">${type.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Operador:</div>
+                        <div class="detail-value">${type.mobile_operators?.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nombre:</div>
+                        <div class="detail-value fw-medium">${type.name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Código:</div>
+                        <div class="detail-value">${type.code}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Descripción:</div>
+                        <div class="detail-value">${type.description || 'Sin descripción'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Orden:</div>
+                        <div class="detail-value">${type.display_order || 0}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge ${type.is_active ? 'bg-success' : 'bg-secondary'}">${type.is_active ? 'Activo' : 'Inactivo'}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Paquetes asociados:</div>
+                        <div class="detail-value">${packagesCount || 0}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Creado:</div>
+                        <div class="detail-value">${formatDate(type.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles del Tipo de Recarga: ${type.name}`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error showing recharge type details:', error);
+                showToast('Error al cargar los detalles del tipo de recarga', 'error');
+            }
+        };
+        
+        const showPackageDetails = async (packageId) => {
+            try {
+                const pkg = mobilePackagesData.find(p => p.id === packageId);
+                if (!pkg) {
+                    showToast('Paquete no encontrado', 'error');
+                    return;
+                }
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value"><span class="user-id-badge">${pkg.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Operador:</div>
+                        <div class="detail-value">${pkg.mobile_operators?.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Tipo:</div>
+                        <div class="detail-value">${pkg.recharge_types?.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Nombre:</div>
+                        <div class="detail-value fw-medium">${pkg.name}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Descripción:</div>
+                        <div class="detail-value">${pkg.description || 'Sin descripción'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value package-amount">${formatCurrency(pkg.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Precio:</div>
+                        <div class="detail-value package-price">${formatCurrency(pkg.price)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Duración:</div>
+                        <div class="detail-value">${pkg.duration_days || 0} días</div>
+                    </div>
+                    ${pkg.minutes ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Minutos:</div>
+                            <div class="detail-value">${pkg.minutes} ${pkg.is_unlimited ? '(Ilimitados)' : ''}</div>
+                        </div>
+                    ` : ''}
+                    ${pkg.sms ? `
+                        <div class="detail-item">
+                            <div class="detail-label">SMS:</div>
+                            <div class="detail-value">${pkg.sms}</div>
+                        </div>
+                    ` : ''}
+                    ${pkg.data_mb ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Datos:</div>
+                            <div class="detail-value">${pkg.data_mb} MB</div>
+                        </div>
+                    ` : ''}
+                    ${pkg.social_data_mb ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Datos Redes:</div>
+                            <div class="detail-value">${pkg.social_data_mb} MB</div>
+                        </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <div class="detail-label">Características:</div>
+                        <div class="detail-value">
+                            <ul class="list-unstyled mb-0">
+                                ${pkg.is_hot ? '<li><span class="hot-badge">🔥 Destacado</span></li>' : ''}
+                                ${pkg.is_unlimited ? '<li><i class="fas fa-infinity text-success"></i> Ilimitado</li>' : ''}
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="badge ${pkg.is_active ? 'bg-success' : 'bg-secondary'}">${pkg.is_active ? 'Activo' : 'Inactivo'}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Creado:</div>
+                        <div class="detail-value">${formatDate(pkg.created_at)}</div>
+                    </div>
+                `;
+                
+                showDetailModal(`Detalles del Paquete: ${pkg.name}`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error showing package details:', error);
+                showToast('Error al cargar los detalles del paquete', 'error');
+            }
+        };
+        
+        const showMobileRechargeDetails = async (rechargeId) => {
+            try {
+                const recharge = mobileRechargesData.find(r => r.id === rechargeId);
+                if (!recharge) {
+                    showToast('Recarga no encontrada', 'error');
+                    return;
+                }
+                
+                // Obtener historial de esta recarga
+                const { data: history, error: historyError } = await supabase
+                    .from('recharge_history')
+                    .select('*, user_profiles(full_name)')
+                    .eq('recharge_id', rechargeId)
+                    .order('created_at', { ascending: false });
+                
+                const statusClass = {
+                    'pending': 'status-pending',
+                    'processing': 'status-processing',
+                    'completed': 'status-completed',
+                    'failed': 'status-failed'
+                }[recharge.status] || '';
+                
+                let historyHTML = '';
+                if (history && history.length > 0) {
+                    historyHTML = '<div class="mt-3"><h6>Historial de cambios:</h6><ul class="list-unstyled">';
+                    history.forEach(item => {
+                        historyHTML += `
+                            <li class="mb-2 small">
+                                <span class="badge ${item.status === 'completed' ? 'bg-success' : item.status === 'pending' ? 'bg-warning' : item.status === 'failed' ? 'bg-danger' : 'bg-info'}">${item.status}</span>
+                                - ${item.message || 'Sin mensaje'} 
+                                <br><small class="text-muted">${formatDate(item.created_at)} por ${item.user_profiles?.full_name || 'Sistema'}</small>
+                            </li>
+                        `;
+                    });
+                    historyHTML += '</ul></div>';
+                }
+                
+                const detailsHTML = `
+                    <div class="detail-item">
+                        <div class="detail-label">ID:</div>
+                        <div class="detail-value"><span class="user-id-badge">${recharge.id}</span></div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Usuario:</div>
+                        <div class="detail-value">${recharge.user_profiles?.full_name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Operador:</div>
+                        <div class="detail-value">${recharge.mobile_operators?.name || 'N/A'}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Teléfono:</div>
+                        <div class="detail-value">${recharge.phone_number}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Monto:</div>
+                        <div class="detail-value fw-medium">${formatCurrency(recharge.amount)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Precio:</div>
+                        <div class="detail-value fw-medium">${formatCurrency(recharge.price)}</div>
+                    </div>
+                    <div class="detail-item">
+                        <div class="detail-label">Estado:</div>
+                        <div class="detail-value"><span class="recharge-status ${statusClass}">${recharge.status}</span></div>
+                    </div>
+                    ${recharge.external_reference ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Referencia Externa:</div>
+                            <div class="detail-value">${recharge.external_reference}</div>
+                        </div>
+                    ` : ''}
+                    ${recharge.recipient_name ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Destinatario:</div>
+                            <div class="detail-value">${recharge.recipient_name}</div>
+                        </div>
+                    ` : ''}
+                    ${recharge.notes ? `
+                        <div class="detail-item">
+                            <div class="detail-label">Notas:</div>
+                            <div class="detail-value">${recharge.notes}</div>
+                        </div>
+                    ` : ''}
+                    <div class="detail-item">
+                        <div class="detail-label">Fecha:</div>
+                        <div class="detail-value">${formatDate(recharge.created_at)}</div>
+                    </div>
+                    ${historyHTML}
+                `;
+                
+                showDetailModal(`Detalles de Recarga Móvil`, detailsHTML);
+                
+            } catch (error) {
+                console.error('Error showing mobile recharge details:', error);
+                showToast('Error al cargar los detalles de la recarga', 'error');
+            }
+        };
+        
+        // Funciones para aplicar filtros
+        
+        const applyMobileRechargesFilters = () => {
+            currentFilters.mobileRecharges.search = document.getElementById('mobile-recharge-search').value;
+            currentFilters.mobileRecharges.operator = document.getElementById('mobile-recharge-operator').value;
+            currentFilters.mobileRecharges.status = document.getElementById('mobile-recharge-status').value;
+            currentFilters.mobileRecharges.amountMin = document.getElementById('mobile-recharge-amount-min').value;
+            currentFilters.mobileRecharges.amountMax = document.getElementById('mobile-recharge-amount-max').value;
+            currentFilters.mobileRecharges.dateFrom = document.getElementById('mobile-recharge-date-from').value;
+            currentFilters.mobileRecharges.dateTo = document.getElementById('mobile-recharge-date-to').value;
+            loadMobileRecharges(1);
+        };
+        
+        const resetMobileRechargesFilters = () => {
+            document.getElementById('mobile-recharge-search').value = '';
+            document.getElementById('mobile-recharge-operator').value = '';
+            document.getElementById('mobile-recharge-status').value = '';
+            document.getElementById('mobile-recharge-amount-min').value = '';
+            document.getElementById('mobile-recharge-amount-max').value = '';
+            document.getElementById('mobile-recharge-date-from').value = '';
+            document.getElementById('mobile-recharge-date-to').value = '';
+            
+            document.querySelectorAll('#mobile-recharges-quick-filters .quick-filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector('#mobile-recharges-quick-filters .quick-filter-btn[data-filter="all"]').classList.add('active');
+            
+            currentFilters.mobileRecharges = {
+                search: '',
+                operator: '',
+                status: '',
+                amountMin: '',
+                amountMax: '',
+                dateFrom: '',
+                dateTo: '',
+                quickFilter: 'all'
+            };
+            
+            loadMobileRecharges(1);
+        };
+        
+        // Función para mostrar sección
+        const showSection = (sectionId) => {
+            document.querySelectorAll('section').forEach(section => {
+                section.classList.add('d-none');
+            });
+            
+            document.getElementById(sectionId).classList.remove('d-none');
+            
+            document.querySelectorAll('.sidebar .nav-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            
+            const sectionName = sectionId.replace('-section', '');
+            document.querySelector(`.sidebar .nav-link[data-section="${sectionName}"]`).classList.add('active');
+            
+            currentSection = sectionName;
+            
+            switch(currentSection) {
+                case 'mobile-operators':
+                    loadOperators();
+                    break;
+                case 'recharge-types':
+                    loadRechargeTypes();
+                    break;
+                case 'mobile-packages':
+                    document.getElementById('packages-loading').style.display = 'block';
+                    document.getElementById('packages-container').innerHTML = '';
+                    loadMobilePackages();
+                    break;
+                case 'mobile-recharges':
+                    loadMobileRecharges();
+                    break;
+                case 'recharge-history':
+                    loadRechargeHistory();
+                    break;
+            }
+        };
+        
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Verificar sesión de administrador
+            const { data: { session }, error } = await supabase.auth.getSession();
+            
+            if (!session) {
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            currentAdmin = session.user;
+            
+            // Configurar navegación
+            document.querySelectorAll('.sidebar .nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.target.closest('a').dataset.section;
+                    showSection(`${section}-section`);
+                });
+            });
+            
+            // Botón de logout
+            document.getElementById('logout-btn').addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            });
+            
+            document.getElementById('navbar-logout-btn').addEventListener('click', async () => {
+                await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            });
+            
+            // Cerrar modal de detalles
+            document.getElementById('close-detail-modal').addEventListener('click', closeDetailModal);
+            document.getElementById('close-detail-modal-btn').addEventListener('click', closeDetailModal);
+            document.getElementById('detail-modal-backdrop').addEventListener('click', closeDetailModal);
+            
+            // Confirmar con contraseña
+            document.getElementById('confirm-with-password').addEventListener('click', executePendingAction);
+            
+            // Toggle de filtros avanzados
+            document.getElementById('toggle-mobile-recharges-filters').addEventListener('click', () => {
+                document.getElementById('mobile-recharges-advanced-filters').classList.toggle('show');
+            });
+            
+            // Aplicar filtros
+            document.getElementById('apply-mobile-recharges-filters').addEventListener('click', applyMobileRechargesFilters);
+            
+            // Resetear filtros
+            document.getElementById('reset-mobile-recharges-filters').addEventListener('click', resetMobileRechargesFilters);
+            
+            // Búsqueda en tiempo real
+            document.getElementById('mobile-recharge-search').addEventListener('input', (e) => {
+                currentFilters.mobileRecharges.search = e.target.value;
+                loadMobileRecharges(1);
+            });
+            
+            // Filtros rápidos
+            document.addEventListener('click', (e) => {
+                if (e.target.closest('.quick-filter-btn')) {
+                    const button = e.target.closest('.quick-filter-btn');
+                    const filter = button.dataset.filter;
+                    const section = button.closest('.quick-filters').id.replace('-quick-filters', '');
+                    
+                    document.querySelectorAll(`#${section}-quick-filters .quick-filter-btn`).forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+                    
+                    button.classList.add('active');
+                    currentFilters[section].quickFilter = filter;
+                    
+                    if (section === 'mobileRecharges') {
+                        loadMobileRecharges(1);
+                    }
+                }
+            });
+            
+            // Remover filtros individuales
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('remove-filter')) {
+                    const filterType = e.target.dataset.type;
+                    const section = e.target.closest('.filter-tags').id.replace('-filter-tags', '');
+                    
+                    if (filterType === 'search') {
+                        document.getElementById(`${section}-search`).value = '';
+                        currentFilters[section].search = '';
+                    } else if (filterType === 'quickFilter') {
+                        document.querySelectorAll(`#${section}-quick-filters .quick-filter-btn`).forEach(btn => {
+                            btn.classList.remove('active');
+                        });
+                        document.querySelector(`#${section}-quick-filters .quick-filter-btn[data-filter="all"]`).classList.add('active');
+                        currentFilters[section].quickFilter = 'all';
+                    } else {
+                        const inputId = `${section}-${filterType}`;
+                        const inputElement = document.getElementById(inputId);
+                        if (inputElement) {
+                            inputElement.value = '';
+                        }
+                        currentFilters[section][filterType] = '';
+                    }
+                    
+                    if (section === 'mobileRecharges') {
+                        loadMobileRecharges(1);
+                    }
+                }
+            });
+            
+            // Mobile search
+            document.getElementById('mobile-search-trigger').addEventListener('click', () => {
+                document.querySelector('.mobile-search-bar').classList.remove('d-none');
+                document.getElementById('mobile-global-search').focus();
+            });
+            
+            document.querySelector('.close-search').addEventListener('click', () => {
+                document.querySelector('.mobile-search-bar').classList.add('d-none');
+            });
+            
+            document.getElementById('mobile-global-search').addEventListener('input', (e) => {
+                const searchTerm = e.target.value;
+                if (currentSection === 'mobile-recharges') {
+                    document.getElementById('mobile-recharge-search').value = searchTerm;
+                    currentFilters.mobileRecharges.search = searchTerm;
+                    loadMobileRecharges(1);
+                }
+            });
+            
+            // Global search (desktop)
+            document.getElementById('desktop-global-search').addEventListener('input', (e) => {
+                const searchTerm = e.target.value;
+                if (currentSection === 'mobile-recharges') {
+                    document.getElementById('mobile-recharge-search').value = searchTerm;
+                    currentFilters.mobileRecharges.search = searchTerm;
+                    loadMobileRecharges(1);
+                }
+            });
+            
+            // Paginación
+            document.addEventListener('click', (e) => {
+                if (e.target.classList.contains('page-link') && e.target.dataset.page) {
+                    e.preventDefault();
+                    const page = parseInt(e.target.dataset.page);
+                    const type = e.target.dataset.type;
+                    
+                    if (type === 'mobile-recharges') {
+                        loadMobileRecharges(page);
+                    }
+                }
+            });
+            
+            // Botones de agregar
+            document.getElementById('add-operator-btn').addEventListener('click', () => {
+                openOperatorModal();
+            });
+            
+            document.getElementById('add-recharge-type-btn').addEventListener('click', () => {
+                openRechargeTypeModal();
+            });
+            
+            document.getElementById('add-package-btn').addEventListener('click', () => {
+                openMobilePackageModal();
+            });
+            
+            document.getElementById('add-mobile-recharge-btn').addEventListener('click', () => {
+                populateUserSelect('mobile-recharge-user');
+                populateOperatorSelect('mobile-recharge-operator-select');
+                openMobileRechargeModal();
+            });
+            
+            // Guardar Operador
+            document.getElementById('save-operator').addEventListener('click', async () => {
+                const operatorId = document.getElementById('operator-id').value;
+                const operatorData = {
+                    name: document.getElementById('operator-name').value,
+                    code: document.getElementById('operator-code').value,
+                    logo_url: document.getElementById('operator-logo').value || null,
+                    display_order: parseInt(document.getElementById('operator-display-order').value) || 0,
+                    is_active: document.getElementById('operator-is-active').checked
+                };
+                
+                let result;
+                if (operatorId) {
+                    result = await updateOperator(operatorId, operatorData);
+                } else {
+                    result = await createOperator(operatorData);
+                }
+                
+                if (result) {
+                    const operatorModal = bootstrap.Modal.getInstance(document.getElementById('operatorModal'));
+                    operatorModal.hide();
+                    loadOperators();
+                }
+            });
+            
+            // Guardar Tipo de Recarga
+            document.getElementById('save-recharge-type').addEventListener('click', async () => {
+                const typeId = document.getElementById('recharge-type-id').value;
+                const typeData = {
+                    operator_id: document.getElementById('recharge-type-operator').value,
+                    name: document.getElementById('recharge-type-name').value,
+                    code: document.getElementById('recharge-type-code').value,
+                    description: document.getElementById('recharge-type-description').value || null,
+                    display_order: parseInt(document.getElementById('recharge-type-display-order').value) || 0,
+                    is_active: document.getElementById('recharge-type-is-active').checked
+                };
+                
+                if (!typeData.operator_id) {
+                    showToast('Debe seleccionar un operador', 'error');
+                    return;
+                }
+                
+                let result;
+                if (typeId) {
+                    result = await updateRechargeType(typeId, typeData);
+                } else {
+                    result = await createRechargeType(typeData);
+                }
+                
+                if (result) {
+                    const typeModal = bootstrap.Modal.getInstance(document.getElementById('rechargeTypeModal'));
+                    typeModal.hide();
+                    loadRechargeTypes();
+                }
+            });
+            
+            // Guardar Paquete Móvil
+            document.getElementById('save-package').addEventListener('click', async () => {
+                const packageId = document.getElementById('package-id').value;
+                
+                let features = {};
+                try {
+                    const featuresStr = document.getElementById('package-features').value;
+                    if (featuresStr) {
+                        features = JSON.parse(featuresStr);
+                    }
+                } catch (error) {
+                    showToast('Error en el formato de características. Debe ser JSON válido.', 'error');
+                    return;
+                }
+                
+                const packageData = {
+                    operator_id: document.getElementById('package-operator').value,
+                    recharge_type_id: document.getElementById('package-recharge-type').value,
+                    name: document.getElementById('package-name').value,
+                    description: document.getElementById('package-description').value || null,
+                    amount: parseFloat(document.getElementById('package-amount').value),
+                    price: parseFloat(document.getElementById('package-price').value),
+                    duration_days: parseInt(document.getElementById('package-duration').value) || 0,
+                    minutes: parseInt(document.getElementById('package-minutes').value) || 0,
+                    sms: parseInt(document.getElementById('package-sms').value) || 0,
+                    data_mb: parseInt(document.getElementById('package-data').value) || 0,
+                    social_data_mb: parseInt(document.getElementById('package-social-data').value) || 0,
+                    image_url: document.getElementById('package-image-url').value || null,
+                    is_unlimited: document.getElementById('package-is-unlimited').checked,
+                    is_hot: document.getElementById('package-is-hot').checked,
+                    is_active: document.getElementById('package-is-active').checked,
+                    features: features,
+                    currency: 'BOB'
+                };
+                
+                if (!packageData.operator_id) {
+                    showToast('Debe seleccionar un operador', 'error');
+                    return;
+                }
+                
+                if (!packageData.recharge_type_id) {
+                    showToast('Debe seleccionar un tipo de recarga', 'error');
+                    return;
+                }
+                
+                let result;
+                if (packageId) {
+                    result = await updateMobilePackage(packageId, packageData);
+                } else {
+                    result = await createMobilePackage(packageData);
+                }
+                
+                if (result) {
+                    const packageModal = bootstrap.Modal.getInstance(document.getElementById('mobilePackageModal'));
+                    packageModal.hide();
+                    loadMobilePackages();
+                }
+            });
+            
+            // Guardar Recarga Móvil
+            document.getElementById('save-mobile-recharge').addEventListener('click', async () => {
+                const rechargeId = document.getElementById('mobile-recharge-id').value;
+                
+                let metadata = {};
+                try {
+                    const metadataStr = document.getElementById('mobile-recharge-metadata').value;
+                    if (metadataStr) {
+                        metadata = JSON.parse(metadataStr);
+                    }
+                } catch (error) {
+                    showToast('Error en el formato de metadatos. Debe ser JSON válido.', 'error');
+                    return;
+                }
+                
+                const rechargeData = {
+                    user_id: document.getElementById('mobile-recharge-user').value,
+                    operator_id: document.getElementById('mobile-recharge-operator-select').value,
+                    package_id: document.getElementById('mobile-recharge-package').value || null,
+                    phone_number: document.getElementById('mobile-recharge-phone').value,
+                    amount: parseFloat(document.getElementById('mobile-recharge-amount-input').value),
+                    price: parseFloat(document.getElementById('mobile-recharge-price').value),
+                    status: document.getElementById('mobile-recharge-status-select').value,
+                    transaction_id: document.getElementById('mobile-recharge-transaction').value || null,
+                    external_reference: document.getElementById('mobile-recharge-external-ref').value || null,
+                    recipient_name: document.getElementById('mobile-recharge-recipient').value || null,
+                    notes: document.getElementById('mobile-recharge-notes').value || null,
+                    metadata: metadata
+                };
+                
+                if (!rechargeData.user_id) {
+                    showToast('Debe seleccionar un usuario', 'error');
+                    return;
+                }
+                
+                if (!rechargeData.operator_id) {
+                    showToast('Debe seleccionar un operador', 'error');
+                    return;
+                }
+                
+                let result;
+                if (rechargeId) {
+                    result = await updateMobileRecharge(rechargeId, rechargeData);
+                } else {
+                    result = await createMobileRecharge(rechargeData);
+                }
+                
+                if (result) {
+                    const rechargeModal = bootstrap.Modal.getInstance(document.getElementById('mobileRechargeModal'));
+                    rechargeModal.hide();
+                    loadMobileRecharges();
+                }
+            });
+            
+            // Manejar acciones de las tablas
+            document.addEventListener('click', (e) => {
+                // Operadores
+                if (e.target.closest('.view-operator')) {
+                    const operatorId = e.target.closest('.view-operator').dataset.id;
+                    showOperatorDetails(operatorId);
+                }
+                
+                if (e.target.closest('.edit-operator')) {
+                    const button = e.target.closest('.edit-operator');
+                    const operatorId = button.dataset.id;
+                    const operator = operatorsData.find(o => o.id === operatorId);
+                    
+                    if (operator) {
+                        showPasswordConfirmModal('editOperator', operator);
+                    }
+                }
+                
+                if (e.target.closest('.delete-operator')) {
+                    const button = e.target.closest('.delete-operator');
+                    const operatorId = button.dataset.id;
+                    const operatorName = button.dataset.name;
+                    
+                    if (confirm(`¿Está seguro de eliminar el operador "${operatorName}"?`)) {
+                        showPasswordConfirmModal('deleteOperator', { id: operatorId, name: operatorName });
+                    }
+                }
+                
+                // Tipos de Recarga
+                if (e.target.closest('.view-recharge-type')) {
+                    const typeId = e.target.closest('.view-recharge-type').dataset.id;
+                    showRechargeTypeDetails(typeId);
+                }
+                
+                if (e.target.closest('.edit-recharge-type')) {
+                    const button = e.target.closest('.edit-recharge-type');
+                    const typeId = button.dataset.id;
+                    const type = rechargeTypesData.find(t => t.id === typeId);
+                    
+                    if (type) {
+                        showPasswordConfirmModal('editRechargeType', type);
+                    }
+                }
+                
+                if (e.target.closest('.delete-recharge-type')) {
+                    const button = e.target.closest('.delete-recharge-type');
+                    const typeId = button.dataset.id;
+                    const typeName = button.dataset.name;
+                    
+                    if (confirm(`¿Está seguro de eliminar el tipo de recarga "${typeName}"?`)) {
+                        showPasswordConfirmModal('deleteRechargeType', { id: typeId, name: typeName });
+                    }
+                }
+                
+                // Paquetes Móviles
+                if (e.target.closest('.view-package')) {
+                    const packageId = e.target.closest('.view-package').dataset.id;
+                    showPackageDetails(packageId);
+                }
+                
+                if (e.target.closest('.edit-package')) {
+                    const button = e.target.closest('.edit-package');
+                    const packageId = button.dataset.id;
+                    const pkg = mobilePackagesData.find(p => p.id === packageId);
+                    
+                    if (pkg) {
+                        showPasswordConfirmModal('editPackage', pkg);
+                    }
+                }
+                
+                if (e.target.closest('.delete-package')) {
+                    const button = e.target.closest('.delete-package');
+                    const packageId = button.dataset.id;
+                    const packageName = button.dataset.name;
+                    
+                    if (confirm(`¿Está seguro de eliminar el paquete "${packageName}"?`)) {
+                        showPasswordConfirmModal('deletePackage', { id: packageId, name: packageName });
+                    }
+                }
+                
+                // Recargas Móviles
+                if (e.target.closest('.view-mobile-recharge')) {
+                    const rechargeId = e.target.closest('.view-mobile-recharge').dataset.id;
+                    showMobileRechargeDetails(rechargeId);
+                }
+                
+                if (e.target.closest('.edit-mobile-recharge')) {
+                    const button = e.target.closest('.edit-mobile-recharge');
+                    const rechargeId = button.dataset.id;
+                    const recharge = mobileRechargesData.find(r => r.id === rechargeId);
+                    
+                    if (recharge) {
+                        showPasswordConfirmModal('editMobileRecharge', recharge);
+                    }
+                }
+                
+                if (e.target.closest('.delete-mobile-recharge')) {
+                    const button = e.target.closest('.delete-mobile-recharge');
+                    const rechargeId = button.dataset.id;
+                    
+                    if (confirm('¿Está seguro de eliminar esta recarga móvil?')) {
+                        showPasswordConfirmModal('deleteMobileRecharge', { id: rechargeId });
+                    }
+                }
+            });
+            
+            // Mostrar la sección inicial (mobile-operators)
+            showSection('mobile-operators-section');
+        });
+    </script>
+</body>
+</html>
