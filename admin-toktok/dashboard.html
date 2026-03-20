@@ -1452,7 +1452,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
-                                <tr>
+                                32
                                     <th>ID Usuario</th>
                                     <th>Usuario</th>
                                     <th>Email</th>
@@ -1611,7 +1611,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
-                                <tr>
+                                32
                                     <th>ID Transacción</th>
                                     <th>ID Usuario</th>
                                     <th>Tipo</th>
@@ -1769,7 +1769,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
-                                <tr>
+                                32
                                     <th>ID Recarga</th>
                                     <th>ID Usuario</th>
                                     <th>Operadora</th>
@@ -1936,7 +1936,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
-                                <tr>
+                                32
                                     <th>ID Recarga</th>
                                     <th>ID Usuario</th>
                                     <th>Juego</th>
@@ -2100,7 +2100,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
-                                <tr>
+                                32
                                     <th>Imagen</th>
                                     <th>Nombre</th>
                                     <th>Categoría</th>
@@ -2263,7 +2263,7 @@
                     <div class="table-responsive">
                         <table class="table table-hover mb-0">
                             <thead>
-                                <tr>
+                                32
                                     <th>ID Compra</th>
                                     <th>Usuario</th>
                                     <th>Producto</th>
@@ -2792,7 +2792,7 @@
         let pendingAction = null;
         let pendingActionData = null;
         
-        // Contraseña de administrador (deberías cambiarla)
+        // Contraseña de administrador
         const ADMIN_PASSWORD = 'admin123';
         
         // Variables para filtros
@@ -2907,46 +2907,89 @@
             });
         };
         
-        // Función para calcular balances de usuarios - CORREGIDA
+        // Función para obtener todos los registros de una tabla (sin límite)
+        const fetchAllRecords = async (table, select = '*', filters = {}) => {
+            let allData = [];
+            let from = 0;
+            let batchSize = 1000;
+            let hasMore = true;
+            
+            while (hasMore) {
+                let query = supabase.from(table).select(select, { count: 'exact' }).range(from, from + batchSize - 1);
+                
+                // Aplicar filtros si existen
+                if (filters.eq) {
+                    for (const [key, value] of Object.entries(filters.eq)) {
+                        query = query.eq(key, value);
+                    }
+                }
+                if (filters.gte) {
+                    for (const [key, value] of Object.entries(filters.gte)) {
+                        query = query.gte(key, value);
+                    }
+                }
+                if (filters.lte) {
+                    for (const [key, value] of Object.entries(filters.lte)) {
+                        query = query.lte(key, value);
+                    }
+                }
+                if (filters.or) {
+                    query = query.or(filters.or);
+                }
+                
+                const { data, error, count } = await query;
+                
+                if (error) {
+                    console.error(`Error fetching ${table}:`, error);
+                    throw error;
+                }
+                
+                if (data && data.length > 0) {
+                    allData = allData.concat(data);
+                    from += batchSize;
+                    hasMore = data.length === batchSize;
+                } else {
+                    hasMore = false;
+                }
+            }
+            
+            return allData;
+        };
+        
+        // Función para calcular balances de usuarios (LEE TODAS LAS TRANSACCIONES)
         const calculateUserBalances = async () => {
             try {
                 userBalances = {};
                 
-                // Obtener todas las transacciones completadas
-                const { data: transactions, error: transactionsError } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .eq('status', 'completed');
+                // Obtener todas las transacciones sin límite
+                const transactions = await fetchAllRecords('transactions', '*');
                 
-                if (transactionsError) throw transactionsError;
+                // Obtener todos los usuarios
+                const allUsers = await fetchAllRecords('user_profiles', 'id');
                 
                 // Inicializar balances en 0 para todos los usuarios
-                const { data: allUsers, error: usersError } = await supabase
-                    .from('user_profiles')
-                    .select('id');
-                
-                if (usersError) throw usersError;
-                
                 allUsers.forEach(user => {
                     userBalances[user.id] = 0;
                 });
                 
-                // Calcular balances basados en transacciones completadas
+                // Calcular balances basados en todas las transacciones
                 transactions.forEach(transaction => {
-                    if (transaction.type === 'deposit') {
-                        userBalances[transaction.user_id] += parseFloat(transaction.amount);
-                    } else if (transaction.type === 'withdrawal') {
-                        userBalances[transaction.user_id] -= parseFloat(transaction.amount);
-                    } else if (transaction.type === 'transfer') {
-                        // Las transferencias tienen metadata con el usuario destino
-                        if (transaction.metadata && transaction.metadata.to_user_id) {
-                            // El usuario que envía pierde el monto
-                            userBalances[transaction.user_id] -= parseFloat(transaction.amount);
-                            // El usuario que recibe gana el monto
-                            userBalances[transaction.metadata.to_user_id] += parseFloat(transaction.amount);
-                        } else {
-                            // Si no hay metadata, tratarlo como retiro
-                            userBalances[transaction.user_id] -= parseFloat(transaction.amount);
+                    if (transaction.status === 'completed') {
+                        if (transaction.type === 'deposit') {
+                            userBalances[transaction.user_id] = (userBalances[transaction.user_id] || 0) + parseFloat(transaction.amount);
+                        } else if (transaction.type === 'withdrawal') {
+                            userBalances[transaction.user_id] = (userBalances[transaction.user_id] || 0) - parseFloat(transaction.amount);
+                        } else if (transaction.type === 'transfer') {
+                            // Las transferencias tienen metadata con el usuario destino
+                            if (transaction.metadata && transaction.metadata.to_user_id) {
+                                // El usuario que envía pierde el monto
+                                userBalances[transaction.user_id] = (userBalances[transaction.user_id] || 0) - parseFloat(transaction.amount);
+                                // El usuario que recibe gana el monto
+                                userBalances[transaction.metadata.to_user_id] = (userBalances[transaction.metadata.to_user_id] || 0) + parseFloat(transaction.amount);
+                            } else {
+                                // Si no hay metadata, tratarlo como retiro
+                                userBalances[transaction.user_id] = (userBalances[transaction.user_id] || 0) - parseFloat(transaction.amount);
+                            }
                         }
                     }
                 });
@@ -3100,7 +3143,7 @@
             }
         };
         
-        // Función para borrar historial de usuario - CORREGIDA
+        // Función para borrar historial de usuario
         const deleteUserHistory = async (userId, userName) => {
             if (!userId || deletionInProgress) return;
             
@@ -3115,61 +3158,25 @@
                 updateDeletionProgress(2, 15, 'Eliminando recargas...');
                 
                 // Eliminar recargas
-                const { error: rechargesError } = await supabase
-                    .from('recharges')
-                    .delete()
-                    .eq('user_id', userId);
-                
-                if (rechargesError) {
-                    console.error('Error deleting recharges:', rechargesError);
-                }
+                await supabase.from('recharges').delete().eq('user_id', userId);
                 
                 updateDeletionProgress(3, 30, 'Eliminando recargas de juegos...');
                 
                 // Eliminar recargas de juegos
-                const { error: gameRechargesError } = await supabase
-                    .from('game_recharges')
-                    .delete()
-                    .eq('user_id', userId);
-                
-                if (gameRechargesError) {
-                    console.error('Error deleting game recharges:', gameRechargesError);
-                }
+                await supabase.from('game_recharges').delete().eq('user_id', userId);
                 
                 updateDeletionProgress(4, 45, 'Eliminando transacciones...');
                 
-                // Eliminar transacciones del usuario (donde es el user_id)
-                const { error: transactionsError } = await supabase
-                    .from('transactions')
-                    .delete()
-                    .eq('user_id', userId);
+                // Eliminar transacciones del usuario
+                await supabase.from('transactions').delete().eq('user_id', userId);
                 
-                if (transactionsError) {
-                    console.error('Error deleting transactions:', transactionsError);
-                }
-                
-                // También eliminar transacciones donde el usuario es el destino en transferencias
-                const { error: transactionDestError } = await supabase
-                    .from('transactions')
-                    .delete()
-                    .eq('type', 'transfer')
-                    .contains('metadata', { to_user_id: userId });
-                
-                if (transactionDestError) {
-                    console.error('Error deleting destination transactions:', transactionDestError);
-                }
+                // También eliminar transacciones donde el usuario es el destino
+                await supabase.from('transactions').delete().contains('metadata', { to_user_id: userId });
                 
                 updateDeletionProgress(5, 60, 'Eliminando compras...');
                 
                 // Eliminar compras
-                const { error: purchasesError } = await supabase
-                    .from('product_purchases')
-                    .delete()
-                    .eq('user_id', userId);
-                
-                if (purchasesError) {
-                    console.error('Error deleting purchases:', purchasesError);
-                }
+                await supabase.from('product_purchases').delete().eq('user_id', userId);
                 
                 updateDeletionProgress(6, 75, 'Actualizando balance...');
                 
@@ -3183,13 +3190,7 @@
                         description: `Ajuste de balance después de borrar historial - Balance anterior: ${formatCurrency(currentBalance)}`
                     };
                     
-                    const { error: adjustmentError } = await supabase
-                        .from('transactions')
-                        .insert([adjustmentTransaction]);
-                    
-                    if (adjustmentError) {
-                        console.error('Error creating adjustment transaction:', adjustmentError);
-                    }
+                    await supabase.from('transactions').insert([adjustmentTransaction]);
                 }
                 
                 updateDeletionProgress(7, 90, 'Recalculando balances...');
@@ -3220,25 +3221,14 @@
         const deleteProduct = async (productId, productName) => {
             try {
                 // Verificar si hay compras relacionadas
-                const { data: purchases, error: purchasesError } = await supabase
-                    .from('product_purchases')
-                    .select('id')
-                    .eq('product_id', productId);
-                
-                if (purchasesError && purchasesError.code !== 'PGRST116') {
-                    throw purchasesError;
-                }
+                const purchases = await fetchAllRecords('product_purchases', 'id', { eq: { product_id: productId } });
                 
                 if (purchases && purchases.length > 0) {
                     showToast('No se puede eliminar el producto porque tiene compras asociadas', 'error');
                     return;
                 }
                 
-                const { error } = await supabase
-                    .from('products')
-                    .delete()
-                    .eq('id', productId);
-                
+                const { error } = await supabase.from('products').delete().eq('id', productId);
                 if (error) throw error;
                 
                 showToast(`Producto "${productName}" eliminado exitosamente`);
@@ -3251,67 +3241,52 @@
             }
         };
         
-        // Funciones para cargar datos con filtros
+        // Funciones para cargar datos con TODOS los registros
         const loadUsers = async (page = 1) => {
             try {
-                let query = supabase
-                    .from('user_profiles')
-                    .select('*', { count: 'exact' });
-                
                 const filters = currentFilters.users;
                 
+                // Construir filtros para la consulta
+                let queryFilters = {};
                 if (filters.search) {
-                    query = query.or(`full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,id.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`);
+                    queryFilters.or = `full_name.ilike.%${filters.search}%,email.ilike.%${filters.search}%,id.ilike.%${filters.search}%,phone.ilike.%${filters.search}%`;
                 }
-                
                 if (filters.status) {
-                    query = query.eq('status', filters.status);
+                    queryFilters.eq = { ...queryFilters.eq, status: filters.status };
                 }
-                
                 if (filters.dateFrom) {
-                    query = query.gte('created_at', filters.dateFrom);
+                    queryFilters.gte = { ...queryFilters.gte, created_at: filters.dateFrom };
                 }
                 if (filters.dateTo) {
-                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                    queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
-                const { data, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
-                    .order('created_at', { ascending: false });
+                const allUsers = await fetchAllRecords('user_profiles', '*', queryFilters);
                 
-                if (error) throw error;
+                // Aplicar filtros de balance
+                let filteredUsers = allUsers;
+                await calculateUserBalances();
                 
-                usersData = data || [];
-                
-                // Aplicar filtros de balance (requiere userBalances)
                 if (filters.balance || filters.quickFilter !== 'all') {
-                    await calculateUserBalances();
-                    
-                    usersData = usersData.filter(user => {
+                    filteredUsers = allUsers.filter(user => {
                         const balance = userBalances[user.id] || 0;
                         
-                        // Filtro de balance específico
                         if (filters.balance) {
                             if (filters.balance === 'positive' && balance <= 0) return false;
                             if (filters.balance === 'negative' && balance >= 0) return false;
                             if (filters.balance === 'zero' && balance !== 0) return false;
                         }
                         
-                        // Filtros rápidos
                         if (filters.quickFilter !== 'all') {
                             switch(filters.quickFilter) {
-                                case 'balance-positive':
-                                    return balance > 0;
-                                case 'balance-negative':
-                                    return balance < 0;
+                                case 'balance-positive': return balance > 0;
+                                case 'balance-negative': return balance < 0;
                                 case 'recent':
                                     const sevenDaysAgo = new Date();
                                     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
                                     return new Date(user.created_at) >= sevenDaysAgo;
-                                case 'active':
-                                    return user.status === 'active';
-                                default:
-                                    return true;
+                                case 'active': return user.status === 'active';
+                                default: return true;
                             }
                         }
                         
@@ -3319,9 +3294,14 @@
                     });
                 }
                 
-                renderUsersTable(usersData);
-                renderUsersMobileList(usersData);
-                renderUsersPagination(page, Math.ceil((count || 0) / 10));
+                usersData = filteredUsers;
+                const totalPages = Math.ceil(usersData.length / 10);
+                const start = (page - 1) * 10;
+                const paginatedUsers = usersData.slice(start, start + 10);
+                
+                renderUsersTable(paginatedUsers);
+                renderUsersMobileList(paginatedUsers);
+                renderUsersPagination(page, totalPages);
                 updateFilterTags('users');
                 
             } catch (error) {
@@ -3332,86 +3312,69 @@
         
         const loadTransactions = async (page = 1) => {
             try {
-                let query = supabase
-                    .from('transactions')
-                    .select('*', { count: 'exact' });
-                
                 const filters = currentFilters.transactions;
                 
+                let queryFilters = {};
                 if (filters.search) {
-                    query = query.or(`id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,description.ilike.%${filters.search}%`);
+                    queryFilters.or = `id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,description.ilike.%${filters.search}%`;
                 }
-                
                 if (filters.type) {
-                    if (filters.type === 'transfer_send') {
-                        query = query.eq('type', 'transfer').not('metadata->>to_user_id', 'is', null);
-                    } else if (filters.type === 'transfer_receive') {
-                        // Este filtro requiere búsqueda en metadata, no es trivial con Supabase directo, se manejará en frontend
-                        // Por simplicidad, filtramos después
-                    } else {
-                        query = query.eq('type', filters.type);
-                    }
+                    queryFilters.eq = { ...queryFilters.eq, type: filters.type };
                 }
-                
                 if (filters.status) {
-                    query = query.eq('status', filters.status);
+                    queryFilters.eq = { ...queryFilters.eq, status: filters.status };
                 }
-                
                 if (filters.amountMin) {
-                    query = query.gte('amount', parseFloat(filters.amountMin));
+                    queryFilters.gte = { ...queryFilters.gte, amount: parseFloat(filters.amountMin) };
                 }
-                
                 if (filters.amountMax) {
-                    query = query.lte('amount', parseFloat(filters.amountMax));
+                    queryFilters.lte = { ...queryFilters.lte, amount: parseFloat(filters.amountMax) };
                 }
-                
                 if (filters.dateFrom) {
-                    query = query.gte('created_at', filters.dateFrom);
+                    queryFilters.gte = { ...queryFilters.gte, created_at: filters.dateFrom };
                 }
                 if (filters.dateTo) {
-                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                    queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
+                let allTransactions = await fetchAllRecords('transactions', '*', queryFilters);
+                
+                // Filtros rápidos
                 if (filters.quickFilter !== 'all') {
                     const now = new Date();
                     switch(filters.quickFilter) {
                         case 'today':
                             const today = now.toISOString().split('T')[0];
-                            query = query.gte('created_at', today);
+                            allTransactions = allTransactions.filter(t => t.created_at >= today);
                             break;
                         case 'week':
                             const weekAgo = new Date(now);
                             weekAgo.setDate(weekAgo.getDate() - 7);
-                            query = query.gte('created_at', weekAgo.toISOString().split('T')[0]);
+                            allTransactions = allTransactions.filter(t => new Date(t.created_at) >= weekAgo);
                             break;
                         case 'deposit':
-                            query = query.eq('type', 'deposit');
+                            allTransactions = allTransactions.filter(t => t.type === 'deposit');
                             break;
                         case 'withdrawal':
-                            query = query.eq('type', 'withdrawal');
+                            allTransactions = allTransactions.filter(t => t.type === 'withdrawal');
                             break;
                         case 'transfer':
-                            query = query.eq('type', 'transfer');
+                            allTransactions = allTransactions.filter(t => t.type === 'transfer');
                             break;
                     }
                 }
                 
-                const { data, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
-                    .order('created_at', { ascending: false });
+                // Ordenar por fecha descendente
+                allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
-                if (error) throw error;
+                transactionsData = allTransactions;
+                const totalPages = Math.ceil(transactionsData.length / 10);
+                const start = (page - 1) * 10;
+                const paginatedTransactions = transactionsData.slice(start, start + 10);
                 
-                transactionsData = data || [];
-                
-                // Aplicar filtro adicional de transferencia recibida si es necesario
-                if (filters.type === 'transfer_receive') {
-                    transactionsData = transactionsData.filter(t => t.type === 'transfer' && t.metadata && t.metadata.to_user_id);
-                }
-                
-                renderTransactionsTable(transactionsData);
-                renderTransactionsMobileList(transactionsData);
-                renderTransactionsPagination(page, Math.ceil((count || 0) / 10));
+                renderTransactionsTable(paginatedTransactions);
+                renderTransactionsMobileList(paginatedTransactions);
+                renderTransactionsPagination(page, totalPages);
                 updateFilterTags('transactions');
                 
             } catch (error) {
@@ -3422,71 +3385,66 @@
         
         const loadRecharges = async (page = 1) => {
             try {
-                let query = supabase
-                    .from('recharges')
-                    .select('*', { count: 'exact' });
-                
                 const filters = currentFilters.recharges;
                 
+                let queryFilters = {};
                 if (filters.search) {
-                    query = query.or(`phone_number.ilike.%${filters.search}%,id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,operator.ilike.%${filters.search}%`);
+                    queryFilters.or = `phone_number.ilike.%${filters.search}%,id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,operator.ilike.%${filters.search}%`;
                 }
-                
                 if (filters.operator) {
-                    query = query.eq('operator', filters.operator);
+                    queryFilters.eq = { ...queryFilters.eq, operator: filters.operator };
                 }
-                
                 if (filters.status) {
-                    query = query.eq('status', filters.status);
+                    queryFilters.eq = { ...queryFilters.eq, status: filters.status };
                 }
-                
                 if (filters.amountMin) {
-                    query = query.gte('amount', parseFloat(filters.amountMin));
+                    queryFilters.gte = { ...queryFilters.gte, amount: parseFloat(filters.amountMin) };
                 }
-                
                 if (filters.amountMax) {
-                    query = query.lte('amount', parseFloat(filters.amountMax));
+                    queryFilters.lte = { ...queryFilters.lte, amount: parseFloat(filters.amountMax) };
                 }
-                
                 if (filters.dateFrom) {
-                    query = query.gte('created_at', filters.dateFrom);
+                    queryFilters.gte = { ...queryFilters.gte, created_at: filters.dateFrom };
                 }
                 if (filters.dateTo) {
-                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                    queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
+                let allRecharges = await fetchAllRecords('recharges', '*', queryFilters);
+                
+                // Filtros rápidos
                 if (filters.quickFilter !== 'all') {
                     const now = new Date();
                     switch(filters.quickFilter) {
                         case 'today':
                             const today = now.toISOString().split('T')[0];
-                            query = query.gte('created_at', today);
+                            allRecharges = allRecharges.filter(r => r.created_at >= today);
                             break;
                         case 'entel':
-                            query = query.eq('operator', 'entel');
+                            allRecharges = allRecharges.filter(r => r.operator === 'entel');
                             break;
                         case 'tigo':
-                            query = query.eq('operator', 'tigo');
+                            allRecharges = allRecharges.filter(r => r.operator === 'tigo');
                             break;
                         case 'viva':
-                            query = query.eq('operator', 'viva');
+                            allRecharges = allRecharges.filter(r => r.operator === 'viva');
                             break;
                         case 'completed':
-                            query = query.eq('status', 'completed');
+                            allRecharges = allRecharges.filter(r => r.status === 'completed');
                             break;
                     }
                 }
                 
-                const { data, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
-                    .order('created_at', { ascending: false });
+                allRecharges.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
-                if (error) throw error;
+                rechargesData = allRecharges;
+                const totalPages = Math.ceil(rechargesData.length / 10);
+                const start = (page - 1) * 10;
+                const paginatedRecharges = rechargesData.slice(start, start + 10);
                 
-                rechargesData = data || [];
-                renderRechargesTable(rechargesData);
-                renderRechargesMobileList(rechargesData);
-                renderRechargesPagination(page, Math.ceil((count || 0) / 10));
+                renderRechargesTable(paginatedRecharges);
+                renderRechargesMobileList(paginatedRecharges);
+                renderRechargesPagination(page, totalPages);
                 updateFilterTags('recharges');
                 
             } catch (error) {
@@ -3497,79 +3455,72 @@
         
         const loadGameRecharges = async (page = 1) => {
             try {
-                let query = supabase
-                    .from('game_recharges')
-                    .select('*', { count: 'exact' });
-                
                 const filters = currentFilters.gameRecharges;
                 
+                let queryFilters = {};
                 if (filters.search) {
-                    query = query.or(`game_id.ilike.%${filters.search}%,player_name.ilike.%${filters.search}%,id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%`);
+                    queryFilters.or = `game_id.ilike.%${filters.search}%,player_name.ilike.%${filters.search}%,id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%`;
                 }
-                
                 if (filters.game) {
-                    query = query.eq('game', filters.game);
+                    queryFilters.eq = { ...queryFilters.eq, game: filters.game };
                 }
-                
                 if (filters.status) {
-                    query = query.eq('status', filters.status);
+                    queryFilters.eq = { ...queryFilters.eq, status: filters.status };
                 }
-                
                 if (filters.diamondsMin) {
-                    query = query.gte('diamonds', parseInt(filters.diamondsMin));
+                    queryFilters.gte = { ...queryFilters.gte, diamonds: parseInt(filters.diamondsMin) };
                 }
-                
                 if (filters.diamondsMax) {
-                    query = query.lte('diamonds', parseInt(filters.diamondsMax));
+                    queryFilters.lte = { ...queryFilters.lte, diamonds: parseInt(filters.diamondsMax) };
                 }
-                
                 if (filters.amountMin) {
-                    query = query.gte('amount', parseFloat(filters.amountMin));
+                    queryFilters.gte = { ...queryFilters.gte, amount: parseFloat(filters.amountMin) };
                 }
-                
                 if (filters.amountMax) {
-                    query = query.lte('amount', parseFloat(filters.amountMax));
+                    queryFilters.lte = { ...queryFilters.lte, amount: parseFloat(filters.amountMax) };
                 }
-                
                 if (filters.dateFrom) {
-                    query = query.gte('created_at', filters.dateFrom);
+                    queryFilters.gte = { ...queryFilters.gte, created_at: filters.dateFrom };
                 }
                 if (filters.dateTo) {
-                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                    queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
+                let allGameRecharges = await fetchAllRecords('game_recharges', '*', queryFilters);
+                
+                // Filtros rápidos
                 if (filters.quickFilter !== 'all') {
                     const now = new Date();
                     switch(filters.quickFilter) {
                         case 'today':
                             const today = now.toISOString().split('T')[0];
-                            query = query.gte('created_at', today);
+                            allGameRecharges = allGameRecharges.filter(r => r.created_at >= today);
                             break;
                         case 'freefire':
-                            query = query.eq('game', 'freefire');
+                            allGameRecharges = allGameRecharges.filter(r => r.game === 'freefire');
                             break;
                         case 'mobilelegends':
-                            query = query.eq('game', 'mobilelegends');
+                            allGameRecharges = allGameRecharges.filter(r => r.game === 'mobilelegends');
                             break;
                         case 'high-diamonds':
-                            query = query.gte('diamonds', 100);
+                            allGameRecharges = allGameRecharges.filter(r => r.diamonds >= 100);
                             break;
                         case 'completed':
-                            query = query.eq('status', 'completed');
+                            allGameRecharges = allGameRecharges.filter(r => r.status === 'completed');
                             break;
                     }
                 }
                 
-                const { data, error, count } = await query
-                    .range((page - 1) * 10, (page * 10) - 1)
-                    .order('created_at', { ascending: false });
+                allGameRecharges.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
-                if (error) throw error;
+                gameRechargesData = allGameRecharges;
+                const totalPages = Math.ceil(gameRechargesData.length / 10);
+                const start = (page - 1) * 10;
+                const paginatedGameRecharges = gameRechargesData.slice(start, start + 10);
                 
-                gameRechargesData = data || [];
-                renderGameRechargesTable(gameRechargesData);
-                renderGameRechargesMobileList(gameRechargesData);
-                renderGameRechargesPagination(page, Math.ceil((count || 0) / 10));
+                renderGameRechargesTable(paginatedGameRecharges);
+                renderGameRechargesMobileList(paginatedGameRecharges);
+                renderGameRechargesPagination(page, totalPages);
                 updateFilterTags('gameRecharges');
                 
             } catch (error) {
@@ -3580,76 +3531,69 @@
         
         const loadProducts = async (page = 1) => {
             try {
-                let query = supabase
-                    .from('products')
-                    .select('*', { count: 'exact' });
-                
                 const filters = currentFilters.products;
                 
+                let queryFilters = {};
                 if (filters.search) {
-                    query = query.or(`name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,category.ilike.%${filters.search}%`);
+                    queryFilters.or = `name.ilike.%${filters.search}%,description.ilike.%${filters.search}%,category.ilike.%${filters.search}%`;
                 }
-                
                 if (filters.category) {
-                    query = query.eq('category', filters.category);
+                    queryFilters.eq = { ...queryFilters.eq, category: filters.category };
                 }
-                
                 if (filters.status) {
-                    query = query.eq('is_active', filters.status === 'active');
+                    queryFilters.eq = { ...queryFilters.eq, is_active: filters.status === 'active' };
                 }
-                
                 if (filters.priceMin) {
-                    query = query.gte('price', parseFloat(filters.priceMin));
+                    queryFilters.gte = { ...queryFilters.gte, price: parseFloat(filters.priceMin) };
                 }
-                
                 if (filters.priceMax) {
-                    query = query.lte('price', parseFloat(filters.priceMax));
+                    queryFilters.lte = { ...queryFilters.lte, price: parseFloat(filters.priceMax) };
                 }
-                
                 if (filters.stockMin) {
-                    query = query.gte('stock', parseInt(filters.stockMin));
+                    queryFilters.gte = { ...queryFilters.gte, stock: parseInt(filters.stockMin) };
                 }
-                
                 if (filters.stockMax) {
-                    query = query.lte('stock', parseInt(filters.stockMax));
+                    queryFilters.lte = { ...queryFilters.lte, stock: parseInt(filters.stockMax) };
                 }
-                
                 if (filters.dateFrom) {
-                    query = query.gte('created_at', filters.dateFrom);
+                    queryFilters.gte = { ...queryFilters.gte, created_at: filters.dateFrom };
                 }
                 if (filters.dateTo) {
-                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                    queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
+                let allProducts = await fetchAllRecords('products', '*', queryFilters);
+                
+                // Filtros rápidos
                 if (filters.quickFilter !== 'all') {
                     switch(filters.quickFilter) {
                         case 'active':
-                            query = query.eq('is_active', true);
+                            allProducts = allProducts.filter(p => p.is_active === true);
                             break;
                         case 'low-stock':
-                            query = query.lte('stock', 10).eq('is_active', true);
+                            allProducts = allProducts.filter(p => p.stock <= 10 && p.is_active === true);
                             break;
                         case 'out-of-stock':
-                            query = query.eq('stock', 0).eq('is_active', true);
+                            allProducts = allProducts.filter(p => p.stock === 0 && p.is_active === true);
                             break;
                         case 'recent':
                             const weekAgo = new Date();
                             weekAgo.setDate(weekAgo.getDate() - 7);
-                            query = query.gte('created_at', weekAgo.toISOString().split('T')[0]);
+                            allProducts = allProducts.filter(p => new Date(p.created_at) >= weekAgo);
                             break;
                     }
                 }
                 
-                const { data, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
-                    .order('created_at', { ascending: false });
+                allProducts.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
-                if (error) throw error;
+                productsData = allProducts;
+                const totalPages = Math.ceil(productsData.length / 10);
+                const start = (page - 1) * 10;
+                const paginatedProducts = productsData.slice(start, start + 10);
                 
-                productsData = data || [];
-                renderProductsTable(productsData);
-                renderProductsMobileList(productsData);
-                renderProductsPagination(page, Math.ceil((count || 0) / 10));
+                renderProductsTable(paginatedProducts);
+                renderProductsMobileList(paginatedProducts);
+                renderProductsPagination(page, totalPages);
                 updateFilterTags('products');
                 
             } catch (error) {
@@ -3660,114 +3604,88 @@
         
         const loadPurchases = async (page = 1) => {
             try {
-                let query = supabase
-                    .from('product_purchases')
-                    .select('*', { count: 'exact' });
-                
                 const filters = currentFilters.purchases;
                 
+                let queryFilters = {};
                 if (filters.search) {
-                    query = query.or(`id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,transaction_id.ilike.%${filters.search}%`);
+                    queryFilters.or = `id.ilike.%${filters.search}%,user_id.ilike.%${filters.search}%,transaction_id.ilike.%${filters.search}%`;
                 }
-                
                 if (filters.status) {
-                    query = query.eq('status', filters.status);
+                    queryFilters.eq = { ...queryFilters.eq, status: filters.status };
                 }
-                
                 if (filters.product) {
-                    query = query.eq('product_id', filters.product);
+                    queryFilters.eq = { ...queryFilters.eq, product_id: filters.product };
                 }
-                
                 if (filters.user) {
-                    query = query.eq('user_id', filters.user);
+                    queryFilters.eq = { ...queryFilters.eq, user_id: filters.user };
                 }
-                
                 if (filters.amountMin) {
-                    query = query.gte('total_price', parseFloat(filters.amountMin));
+                    queryFilters.gte = { ...queryFilters.gte, total_price: parseFloat(filters.amountMin) };
                 }
-                
                 if (filters.amountMax) {
-                    query = query.lte('total_price', parseFloat(filters.amountMax));
+                    queryFilters.lte = { ...queryFilters.lte, total_price: parseFloat(filters.amountMax) };
                 }
-                
                 if (filters.dateFrom) {
-                    query = query.gte('created_at', filters.dateFrom);
+                    queryFilters.gte = { ...queryFilters.gte, created_at: filters.dateFrom };
                 }
                 if (filters.dateTo) {
-                    query = query.lte('created_at', filters.dateTo + 'T23:59:59');
+                    queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
+                let allPurchases = await fetchAllRecords('product_purchases', '*', queryFilters);
+                
+                // Filtros rápidos
                 if (filters.quickFilter !== 'all') {
                     const now = new Date();
                     switch(filters.quickFilter) {
                         case 'today':
                             const today = now.toISOString().split('T')[0];
-                            query = query.gte('created_at', today);
+                            allPurchases = allPurchases.filter(p => p.created_at >= today);
                             break;
                         case 'completed':
-                            query = query.eq('status', 'completed');
+                            allPurchases = allPurchases.filter(p => p.status === 'completed');
                             break;
                         case 'pending':
-                            query = query.eq('status', 'pending');
+                            allPurchases = allPurchases.filter(p => p.status === 'pending');
                             break;
                         case 'delivered':
-                            query = query.eq('status', 'delivered');
+                            allPurchases = allPurchases.filter(p => p.status === 'delivered');
                             break;
                         case 'high-value':
-                            query = query.gte('total_price', 100);
+                            allPurchases = allPurchases.filter(p => p.total_price >= 100);
                             break;
                     }
                 }
                 
-                const { data: purchases, error, count } = await query
-                    .range((page - 1) * 10, page * 10 - 1)
-                    .order('created_at', { ascending: false });
+                allPurchases.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
-                if (error) throw error;
+                purchasesData = allPurchases;
                 
-                purchasesData = purchases || [];
-                
-                // Obtener información de usuarios
+                // Obtener información de usuarios y productos
                 if (purchasesData.length > 0) {
                     const userIds = [...new Set(purchasesData.map(p => p.user_id))];
-                    const { data: users, error: usersError } = await supabase
-                        .from('user_profiles')
-                        .select('id, full_name')
-                        .in('id', userIds);
+                    const users = await fetchAllRecords('user_profiles', 'id, full_name', { eq: { id: userIds } });
+                    const usersMap = {};
+                    users.forEach(user => { usersMap[user.id] = user; });
                     
-                    if (!usersError && users) {
-                        const usersMap = {};
-                        users.forEach(user => {
-                            usersMap[user.id] = user;
-                        });
-                        
-                        purchasesData.forEach(purchase => {
-                            purchase.user_profiles = usersMap[purchase.user_id] || { full_name: 'Usuario desconocido' };
-                        });
-                    }
-                    
-                    // Obtener información de productos
                     const productIds = [...new Set(purchasesData.map(p => p.product_id))];
-                    const { data: products, error: productsError } = await supabase
-                        .from('products')
-                        .select('id, name')
-                        .in('id', productIds);
+                    const products = await fetchAllRecords('products', 'id, name', { eq: { id: productIds } });
+                    const productsMap = {};
+                    products.forEach(product => { productsMap[product.id] = product; });
                     
-                    if (!productsError && products) {
-                        const productsMap = {};
-                        products.forEach(product => {
-                            productsMap[product.id] = product;
-                        });
-                        
-                        purchasesData.forEach(purchase => {
-                            purchase.products = productsMap[purchase.product_id] || { name: 'Producto desconocido' };
-                        });
-                    }
+                    purchasesData.forEach(purchase => {
+                        purchase.user_profiles = usersMap[purchase.user_id] || { full_name: 'Usuario desconocido' };
+                        purchase.products = productsMap[purchase.product_id] || { name: 'Producto desconocido' };
+                    });
                 }
                 
-                renderPurchasesTable(purchasesData);
-                renderPurchasesMobileList(purchasesData);
-                renderPurchasesPagination(page, Math.ceil((count || 0) / 10));
+                const totalPages = Math.ceil(purchasesData.length / 10);
+                const start = (page - 1) * 10;
+                const paginatedPurchases = purchasesData.slice(start, start + 10);
+                
+                renderPurchasesTable(paginatedPurchases);
+                renderPurchasesMobileList(paginatedPurchases);
+                renderPurchasesPagination(page, totalPages);
                 updateFilterTags('purchases');
                 
             } catch (error) {
@@ -3776,7 +3694,7 @@
             }
         };
         
-        // Funciones para renderizar datos en móvil
+        // Funciones para renderizar datos en móvil (mantienen el mismo código)
         const renderUsersMobileList = (users) => {
             const container = document.getElementById('users-mobile-list');
             
@@ -4141,7 +4059,7 @@
             
             if (!transactions || transactions.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="7" class="text-center py-4 text-muted">
                             No hay transacciones recientes
                         </td>
@@ -4150,7 +4068,7 @@
                 return;
             }
             
-            const html = transactions.map(transaction => {
+            const html = transactions.slice(0, 10).map(transaction => {
                 const user = users.find(u => u.id === transaction.user_id);
                 const isPositive = transaction.type === 'deposit' || (transaction.type === 'transfer' && transaction.metadata && transaction.metadata.to_user_id);
                 const textColor = isPositive ? 'text-success' : 'text-danger';
@@ -4191,7 +4109,7 @@
             
             if (!users || users.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="8" class="text-center py-4 text-muted">
                             No se encontraron usuarios
                         </td>
@@ -4248,7 +4166,7 @@
             
             if (!transactions || transactions.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="8" class="text-center py-4 text-muted">
                             No se encontraron transacciones
                         </td>
@@ -4303,7 +4221,7 @@
             
             if (!recharges || recharges.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="8" class="text-center py-4 text-muted">
                             No se encontraron recargas
                         </td>
@@ -4348,7 +4266,7 @@
             
             if (!gameRecharges || gameRecharges.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="9" class="text-center py-4 text-muted">
                             No se encontraron recargas de juegos
                         </td>
@@ -4392,7 +4310,7 @@
             
             if (!products || products.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="8" class="text-center py-4 text-muted">
                             No se encontraron productos
                         </td>
@@ -4447,7 +4365,7 @@
             
             if (!purchases || purchases.length === 0) {
                 container.innerHTML = `
-                    <tr>
+                    32
                         <td colspan="9" class="text-center py-4 text-muted">
                             No se encontraron compras
                         </td>
@@ -4522,8 +4440,7 @@
                 const typeNames = {
                     'deposit': 'Depósito',
                     'withdrawal': 'Retiro',
-                    'transfer_send': 'Transferencia Envío',
-                    'transfer_receive': 'Transferencia Recepción'
+                    'transfer': 'Transferencia'
                 };
                 tagsHTML += `
                     <div class="filter-tag">
@@ -5050,7 +4967,7 @@
             }
         };
         
-        // Funciones CRUD
+        // Funciones CRUD (simplificadas para mantener consistencia)
         const createUser = async (userData) => {
             try {
                 const { data, error } = await supabase
@@ -5279,7 +5196,7 @@
             }
         };
         
-        // Funciones para abrir modales
+        // Funciones para abrir modales (mantienen el mismo código)
         const openUserModal = (user = null) => {
             const modalTitle = document.getElementById('userModalTitle');
             const form = document.getElementById('userForm');
@@ -5434,12 +5351,8 @@
         // Llenar select de usuarios
         const populateUserSelect = async (selectId, excludeUserId = null) => {
             try {
-                const { data: users, error } = await supabase
-                    .from('user_profiles')
-                    .select('id, full_name')
-                    .order('full_name');
-                
-                if (error) throw error;
+                const users = await fetchAllRecords('user_profiles', 'id, full_name');
+                users.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
                 
                 const select = document.getElementById(selectId);
                 select.innerHTML = '<option value="">Seleccionar usuario</option>';
@@ -5460,12 +5373,8 @@
         // Llenar select de productos
         const populateProductSelect = async (selectId) => {
             try {
-                const { data: products, error } = await supabase
-                    .from('products')
-                    .select('id, name')
-                    .order('name');
-                
-                if (error) throw error;
+                const products = await fetchAllRecords('products', 'id, name');
+                products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 
                 const select = document.getElementById(selectId);
                 select.innerHTML = '<option value="">Seleccionar producto</option>';
@@ -5484,12 +5393,7 @@
         // Llenar select de categorías
         const populateCategorySelect = async () => {
             try {
-                const { data: products, error } = await supabase
-                    .from('products')
-                    .select('category');
-                
-                if (error) throw error;
-                
+                const products = await fetchAllRecords('products', 'category');
                 const categories = [...new Set(products.map(p => p.category).filter(Boolean))];
                 const select = document.getElementById('product-category-filter');
                 select.innerHTML = '<option value="">Todas las categorías</option>';
@@ -5506,14 +5410,10 @@
         };
         
         // Llenar select de usuarios para filtro de compras
-        const populatePurchaseUserSelect = async () => {
+        const populateUserFilterSelect = async () => {
             try {
-                const { data: users, error } = await supabase
-                    .from('user_profiles')
-                    .select('id, full_name')
-                    .order('full_name');
-                
-                if (error) throw error;
+                const users = await fetchAllRecords('user_profiles', 'id, full_name');
+                users.sort((a, b) => (a.full_name || '').localeCompare(b.full_name || ''));
                 
                 const select = document.getElementById('purchase-user-filter');
                 select.innerHTML = '<option value="">Todos los usuarios</option>';
@@ -5530,14 +5430,10 @@
         };
         
         // Llenar select de productos para filtro de compras
-        const populatePurchaseProductFilterSelect = async () => {
+        const populateProductFilterSelect = async () => {
             try {
-                const { data: products, error } = await supabase
-                    .from('products')
-                    .select('id, name')
-                    .order('name');
-                
-                if (error) throw error;
+                const products = await fetchAllRecords('products', 'id, name');
+                products.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
                 
                 const select = document.getElementById('purchase-product-filter');
                 select.innerHTML = '<option value="">Todos los productos</option>';
@@ -5968,7 +5864,6 @@
                         return;
                     }
                     
-                    // Crear transacción de transferencia con metadata
                     const transactionData = {
                         user_id: document.getElementById('transaction-user').value,
                         type: 'transfer',
@@ -6278,8 +6173,8 @@
             // Cargar datos iniciales
             await calculateUserBalances();
             await populateCategorySelect();
-            await populatePurchaseUserSelect();
-            await populatePurchaseProductFilterSelect();
+            await populateUserFilterSelect();
+            await populateProductFilterSelect();
             loadDashboardData();
         });
         
@@ -6292,53 +6187,15 @@
                     return;
                 }
                 
-                const { data: userTransactions, error } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(5);
+                const userTransactions = await fetchAllRecords('transactions', '*', { eq: { user_id: userId } });
+                const userRecharges = await fetchAllRecords('recharges', '*', { eq: { user_id: userId } });
+                const userGameRecharges = await fetchAllRecords('game_recharges', '*', { eq: { user_id: userId } });
+                const userPurchases = await fetchAllRecords('product_purchases', '*', { eq: { user_id: userId } });
                 
-                if (error) {
-                    console.error('Error loading user transactions:', error);
-                    userTransactions = [];
-                }
-                
-                const { data: userRecharges, error: rechargesError } = await supabase
-                    .from('recharges')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(5);
-                
-                if (rechargesError) {
-                    console.error('Error loading user recharges:', rechargesError);
-                    userRecharges = [];
-                }
-                
-                const { data: userGameRecharges, error: gameRechargesError } = await supabase
-                    .from('game_recharges')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(5);
-                
-                if (gameRechargesError) {
-                    console.error('Error loading user game recharges:', gameRechargesError);
-                    userGameRecharges = [];
-                }
-                
-                const { data: userPurchases, error: purchasesError } = await supabase
-                    .from('product_purchases')
-                    .select('*')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(5);
-                
-                if (purchasesError) {
-                    console.error('Error loading user purchases:', purchasesError);
-                    userPurchases = [];
-                }
+                userTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                userRecharges.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                userGameRecharges.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                userPurchases.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
                 const balance = userBalances[userId] || 0;
                 const balanceClass = balance > 0 ? 'balance-positive' : (balance < 0 ? 'balance-negative' : 'balance-zero');
@@ -6390,7 +6247,7 @@
                                 <ul class="list-unstyled mb-0">
                     `;
                     
-                    userTransactions.forEach(transaction => {
+                    userTransactions.slice(0, 5).forEach(transaction => {
                         const isPositive = transaction.type === 'deposit' || (transaction.type === 'transfer' && transaction.metadata && transaction.metadata.to_user_id);
                         const sign = isPositive ? '+' : '-';
                         const typeNames = {
@@ -6398,11 +6255,6 @@
                             'withdrawal': 'Retiro',
                             'transfer': 'Transferencia'
                         };
-                        
-                        let description = transaction.description || 'Sin descripción';
-                        if (transaction.type === 'transfer' && transaction.metadata && transaction.metadata.to_user_id) {
-                            description = `Transferencia a usuario ${transaction.metadata.to_user_id.substring(0, 8)}...`;
-                        }
                         
                         detailsHTML += `
                             <li class="mb-1">
@@ -6426,7 +6278,7 @@
                                 <ul class="list-unstyled mb-0">
                     `;
                     
-                    userRecharges.forEach(recharge => {
+                    userRecharges.slice(0, 5).forEach(recharge => {
                         detailsHTML += `
                             <li class="mb-1">
                                 <small>${formatDate(recharge.created_at)} - ${recharge.operator}: ${formatCurrency(recharge.amount)}</small>
@@ -6449,7 +6301,7 @@
                                 <ul class="list-unstyled mb-0">
                     `;
                     
-                    userGameRecharges.forEach(recharge => {
+                    userGameRecharges.slice(0, 5).forEach(recharge => {
                         const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
                         detailsHTML += `
                             <li class="mb-1">
@@ -6473,7 +6325,7 @@
                                 <ul class="list-unstyled mb-0">
                     `;
                     
-                    userPurchases.forEach(purchase => {
+                    userPurchases.slice(0, 5).forEach(purchase => {
                         detailsHTML += `
                             <li class="mb-1">
                                 <small>${formatDate(purchase.created_at)} - Compra #${purchase.id.substring(0, 8)}: ${formatCurrency(purchase.total_price)}</small>
@@ -6513,16 +6365,8 @@
                     return;
                 }
                 
-                const { data: user, error: userError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('id', transaction.user_id)
-                    .single();
-                
-                if (userError) {
-                    console.error('Error loading user for transaction:', userError);
-                    user = null;
-                }
+                const user = await fetchAllRecords('user_profiles', '*', { eq: { id: transaction.user_id } });
+                const userName = user[0]?.full_name || 'Usuario no encontrado';
                 
                 const isPositive = transaction.type === 'deposit' || (transaction.type === 'transfer' && transaction.metadata && transaction.metadata.to_user_id);
                 const textColor = isPositive ? 'text-success' : 'text-danger';
@@ -6544,7 +6388,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Usuario:</div>
-                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                        <div class="detail-value">${userName}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Tipo:</div>
@@ -6605,16 +6449,8 @@
                     return;
                 }
                 
-                const { data: user, error: userError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('id', recharge.user_id)
-                    .single();
-                
-                if (userError) {
-                    console.error('Error loading user for recharge:', userError);
-                    user = null;
-                }
+                const user = await fetchAllRecords('user_profiles', '*', { eq: { id: recharge.user_id } });
+                const userName = user[0]?.full_name || 'Usuario no encontrado';
                 
                 const operatorName = recharge.operator ? 
                     recharge.operator.charAt(0).toUpperCase() + recharge.operator.slice(1) : 
@@ -6631,7 +6467,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Usuario:</div>
-                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                        <div class="detail-value">${userName}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Operadora:</div>
@@ -6671,16 +6507,8 @@
                     return;
                 }
                 
-                const { data: user, error: userError } = await supabase
-                    .from('user_profiles')
-                    .select('*')
-                    .eq('id', recharge.user_id)
-                    .single();
-                
-                if (userError) {
-                    console.error('Error loading user for game recharge:', userError);
-                    user = null;
-                }
+                const user = await fetchAllRecords('user_profiles', '*', { eq: { id: recharge.user_id } });
+                const userName = user[0]?.full_name || 'Usuario no encontrado';
                 
                 const gameName = recharge.game === 'freefire' ? 'Free Fire' : 'Mobile Legends';
                 
@@ -6695,7 +6523,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Usuario:</div>
-                        <div class="detail-value">${user?.full_name || 'Usuario no encontrado'}</div>
+                        <div class="detail-value">${userName}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Juego:</div>
@@ -6875,54 +6703,28 @@
             }
         };
         
-        // Función para cargar datos del dashboard
+        // Función para cargar datos del dashboard con TODOS los registros
         const loadDashboardData = async () => {
             try {
-                const { data: users, error: usersError } = await supabase
-                    .from('user_profiles')
-                    .select('*');
-                
-                if (usersError) throw usersError;
+                const users = await fetchAllRecords('user_profiles', '*');
                 
                 await calculateUserBalances();
                 
                 const today = new Date().toISOString().split('T')[0];
                 
-                const { data: todayTransactions, error: todayTransactionsError } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .gte('created_at', today);
-                
-                if (todayTransactionsError) throw todayTransactionsError;
-                
-                const { data: todayRecharges, error: todayRechargesError } = await supabase
-                    .from('recharges')
-                    .select('*')
-                    .gte('created_at', today);
-                
-                if (todayRechargesError) throw todayRechargesError;
-                
-                const { data: products, error: productsError } = await supabase
-                    .from('products')
-                    .select('*')
-                    .eq('is_active', true);
-                
-                if (productsError) throw productsError;
+                const todayTransactions = await fetchAllRecords('transactions', '*', { gte: { created_at: today } });
+                const todayRecharges = await fetchAllRecords('recharges', '*', { gte: { created_at: today } });
+                const activeProducts = await fetchAllRecords('products', '*', { eq: { is_active: true } });
                 
                 document.getElementById('total-users-count').textContent = users.length;
                 document.getElementById('today-transactions').textContent = todayTransactions.length;
                 document.getElementById('today-recharges').textContent = todayRecharges.length;
-                document.getElementById('total-products').textContent = products.length;
+                document.getElementById('total-products').textContent = activeProducts.length;
                 
-                const { data: recentTransactions, error: recentTransactionsError } = await supabase
-                    .from('transactions')
-                    .select('*')
-                    .order('created_at', { ascending: false })
-                    .limit(10);
+                const allTransactions = await fetchAllRecords('transactions', '*');
+                allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
-                if (recentTransactionsError) throw recentTransactionsError;
-                
-                renderRecentTransactions(recentTransactions, users);
+                renderRecentTransactions(allTransactions, users);
                 
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
