@@ -2907,15 +2907,16 @@
             });
         };
         
-        // Función para calcular balances de usuarios - MEJORADA
+        // Función para calcular balances de usuarios - CORREGIDA
         const calculateUserBalances = async () => {
             try {
                 userBalances = {};
                 
-                // Obtener todas las transacciones
+                // Obtener todas las transacciones completadas
                 const { data: transactions, error: transactionsError } = await supabase
                     .from('transactions')
-                    .select('*');
+                    .select('*')
+                    .eq('status', 'completed');
                 
                 if (transactionsError) throw transactionsError;
                 
@@ -2930,24 +2931,22 @@
                     userBalances[user.id] = 0;
                 });
                 
-                // Calcular balances basados en transacciones
+                // Calcular balances basados en transacciones completadas
                 transactions.forEach(transaction => {
-                    if (transaction.status === 'completed') {
-                        if (transaction.type === 'deposit') {
-                            userBalances[transaction.user_id] += parseFloat(transaction.amount);
-                        } else if (transaction.type === 'withdrawal') {
+                    if (transaction.type === 'deposit') {
+                        userBalances[transaction.user_id] += parseFloat(transaction.amount);
+                    } else if (transaction.type === 'withdrawal') {
+                        userBalances[transaction.user_id] -= parseFloat(transaction.amount);
+                    } else if (transaction.type === 'transfer') {
+                        // Las transferencias tienen metadata con el usuario destino
+                        if (transaction.metadata && transaction.metadata.to_user_id) {
+                            // El usuario que envía pierde el monto
                             userBalances[transaction.user_id] -= parseFloat(transaction.amount);
-                        } else if (transaction.type === 'transfer') {
-                            // Las transferencias tienen metadata con el usuario destino
-                            if (transaction.metadata && transaction.metadata.to_user_id) {
-                                // El usuario que envía pierde el monto
-                                userBalances[transaction.user_id] -= parseFloat(transaction.amount);
-                                // El usuario que recibe gana el monto
-                                userBalances[transaction.metadata.to_user_id] += parseFloat(transaction.amount);
-                            } else {
-                                // Si no hay metadata, tratarlo como retiro
-                                userBalances[transaction.user_id] -= parseFloat(transaction.amount);
-                            }
+                            // El usuario que recibe gana el monto
+                            userBalances[transaction.metadata.to_user_id] += parseFloat(transaction.amount);
+                        } else {
+                            // Si no hay metadata, tratarlo como retiro
+                            userBalances[transaction.user_id] -= parseFloat(transaction.amount);
                         }
                     }
                 });
@@ -3123,7 +3122,6 @@
                 
                 if (rechargesError) {
                     console.error('Error deleting recharges:', rechargesError);
-                    // Continuar aunque haya error
                 }
                 
                 updateDeletionProgress(3, 30, 'Eliminando recargas de juegos...');
@@ -3136,12 +3134,11 @@
                 
                 if (gameRechargesError) {
                     console.error('Error deleting game recharges:', gameRechargesError);
-                    // Continuar aunque haya error
                 }
                 
                 updateDeletionProgress(4, 45, 'Eliminando transacciones...');
                 
-                // Eliminar transacciones del usuario
+                // Eliminar transacciones del usuario (donde es el user_id)
                 const { error: transactionsError } = await supabase
                     .from('transactions')
                     .delete()
@@ -3149,13 +3146,13 @@
                 
                 if (transactionsError) {
                     console.error('Error deleting transactions:', transactionsError);
-                    // Continuar aunque haya error
                 }
                 
-                // También eliminar transacciones donde el usuario es el destino
+                // También eliminar transacciones donde el usuario es el destino en transferencias
                 const { error: transactionDestError } = await supabase
                     .from('transactions')
                     .delete()
+                    .eq('type', 'transfer')
                     .contains('metadata', { to_user_id: userId });
                 
                 if (transactionDestError) {
@@ -3172,7 +3169,6 @@
                 
                 if (purchasesError) {
                     console.error('Error deleting purchases:', purchasesError);
-                    // Continuar aunque haya error
                 }
                 
                 updateDeletionProgress(6, 75, 'Actualizando balance...');
@@ -3287,7 +3283,7 @@
                 
                 usersData = data || [];
                 
-                // Aplicar filtros de balance
+                // Aplicar filtros de balance (requiere userBalances)
                 if (filters.balance || filters.quickFilter !== 'all') {
                     await calculateUserBalances();
                     
@@ -3347,7 +3343,14 @@
                 }
                 
                 if (filters.type) {
-                    query = query.eq('type', filters.type);
+                    if (filters.type === 'transfer_send') {
+                        query = query.eq('type', 'transfer').not('metadata->>to_user_id', 'is', null);
+                    } else if (filters.type === 'transfer_receive') {
+                        // Este filtro requiere búsqueda en metadata, no es trivial con Supabase directo, se manejará en frontend
+                        // Por simplicidad, filtramos después
+                    } else {
+                        query = query.eq('type', filters.type);
+                    }
                 }
                 
                 if (filters.status) {
@@ -3400,6 +3403,11 @@
                 if (error) throw error;
                 
                 transactionsData = data || [];
+                
+                // Aplicar filtro adicional de transferencia recibida si es necesario
+                if (filters.type === 'transfer_receive') {
+                    transactionsData = transactionsData.filter(t => t.type === 'transfer' && t.metadata && t.metadata.to_user_id);
+                }
                 
                 renderTransactionsTable(transactionsData);
                 renderTransactionsMobileList(transactionsData);
@@ -4514,7 +4522,8 @@
                 const typeNames = {
                     'deposit': 'Depósito',
                     'withdrawal': 'Retiro',
-                    'transfer': 'Transferencia'
+                    'transfer_send': 'Transferencia Envío',
+                    'transfer_receive': 'Transferencia Recepción'
                 };
                 tagsHTML += `
                     <div class="filter-tag">
@@ -5496,6 +5505,54 @@
             }
         };
         
+        // Llenar select de usuarios para filtro de compras
+        const populatePurchaseUserSelect = async () => {
+            try {
+                const { data: users, error } = await supabase
+                    .from('user_profiles')
+                    .select('id, full_name')
+                    .order('full_name');
+                
+                if (error) throw error;
+                
+                const select = document.getElementById('purchase-user-filter');
+                select.innerHTML = '<option value="">Todos los usuarios</option>';
+                
+                users.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.full_name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading users for filter:', error);
+            }
+        };
+        
+        // Llenar select de productos para filtro de compras
+        const populatePurchaseProductFilterSelect = async () => {
+            try {
+                const { data: products, error } = await supabase
+                    .from('products')
+                    .select('id, name')
+                    .order('name');
+                
+                if (error) throw error;
+                
+                const select = document.getElementById('purchase-product-filter');
+                select.innerHTML = '<option value="">Todos los productos</option>';
+                
+                products.forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product.id;
+                    option.textContent = product.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('Error loading products for filter:', error);
+            }
+        };
+        
         // Event Listeners
         document.addEventListener('DOMContentLoaded', async () => {
             // Verificar sesión de administrador
@@ -5896,7 +5953,7 @@
                 }
             });
             
-            // Guardar transacción - MEJORADA para transferencias
+            // Guardar transacción
             document.getElementById('save-transaction').addEventListener('click', async () => {
                 const transactionId = document.getElementById('transaction-id').value;
                 const transactionType = document.getElementById('transaction-type').value;
@@ -5937,7 +5994,6 @@
                         transactionModal.hide();
                         loadTransactions();
                         loadDashboardData();
-                        // Recalcular balances después de transferencia
                         await calculateUserBalances();
                         loadUsers();
                     }
@@ -5962,7 +6018,6 @@
                         transactionModal.hide();
                         loadTransactions();
                         loadDashboardData();
-                        // Recalcular balances
                         await calculateUserBalances();
                         loadUsers();
                     }
@@ -6223,6 +6278,8 @@
             // Cargar datos iniciales
             await calculateUserBalances();
             await populateCategorySelect();
+            await populatePurchaseUserSelect();
+            await populatePurchaseProductFilterSelect();
             loadDashboardData();
         });
         
@@ -6495,7 +6552,7 @@
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Monto:</div>
-                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
+                        <div class="detail-value ${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</div>
                     </div>
                     <div class="detail-item">
                         <div class="detail-label">Estado:</div>
