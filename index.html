@@ -2,16 +2,16 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOKTOK - CEO Dashboard</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>TOKTOK GC · CEO Dashboard</title>
     
     <!-- Meta tags PWA -->
-    <meta name="theme-color" content="#7c3aed">
+    <meta name="theme-color" content="#6d28d9">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TOKTOK CEO">
-    <meta name="description" content="Panel ejecutivo para CEO y dueños de TOKTOK">
-    <meta name="keywords" content="toktok, ceo, panel, ejecutivo, administración">
+    <meta name="description" content="Panel ejecutivo para CEO y dueños de TOKTOK GC">
+    <meta name="keywords" content="toktok, ceo, panel, ejecutivo, administración, GC2026">
     <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="shortcut icon" href="/favicon.ico" />
@@ -30,18 +30,22 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #8b5cf6;
-            --primary-dark: #7c3aed;
+            --primary: #7c3aed;
+            --primary-dark: #5b21b6;
             --primary-light: #a78bfa;
+            --primary-vivid: #8b5cf6;
             --accent: #c4b5fd;
-            --dark-bg: #0f0f23;
-            --card-bg: rgba(255, 255, 255, 0.05);
-            --card-hover: rgba(255, 255, 255, 0.08);
+            --accent-glow: #ddd6fe;
+            --dark-bg: #0f0f1a;
+            --card-bg: rgba(28, 25, 48, 0.85);
+            --card-hover: rgba(45, 40, 70, 0.95);
+            --glass-border: rgba(139, 92, 246, 0.25);
             --text-primary: #ffffff;
-            --text-secondary: #e2e8f0;
-            --text-muted: #94a3b8;
-            --border: rgba(255, 255, 255, 0.1);
-            --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            --text-secondary: #f3e8ff;
+            --text-muted: #cbd5e1;
+            --border: rgba(139, 92, 246, 0.15);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.6);
+            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.3);
             --entel: #ef4444;
             --tigo: #06d6a0;
             --viva: #fbbf24;
@@ -57,15 +61,17 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         }
         
         body {
-            background: linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%);
+            background: linear-gradient(145deg, #0a0a14 0%, #131126 50%, #1a1030 100%);
             color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         body::before {
@@ -76,28 +82,28 @@
             width: 100%;
             height: 100%;
             background: 
-                radial-gradient(circle at 20% 80%, rgba(139, 92, 246, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 40% 40%, rgba(196, 181, 253, 0.05) 0%, transparent 50%);
+                radial-gradient(circle at 20% 80%, rgba(124, 58, 237, 0.2) 0%, transparent 45%),
+                radial-gradient(circle at 80% 20%, rgba(107, 33, 168, 0.25) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(196, 181, 253, 0.08) 0%, transparent 60%);
             pointer-events: none;
             z-index: -1;
         }
         
-        /* Pantalla de bloqueo */
+        /* Pantalla de bloqueo - DISEÑO PREMIUM */
         .login-screen {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #0f0f23 0%, #1e1b4b 100%);
+            background: var(--dark-bg);
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
             z-index: 1000;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
         
         .login-screen.hidden {
@@ -106,67 +112,84 @@
         }
         
         .login-container {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 30px 25px;
+            background: rgba(20, 15, 40, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border: 1px solid var(--glass-border);
+            border-radius: 40px;
+            padding: 44px 36px;
             width: 100%;
-            max-width: 400px;
-            box-shadow: var(--shadow);
+            max-width: 440px;
+            box-shadow: var(--shadow), var(--shadow-glow);
+            animation: floatIn 0.6s ease-out;
+        }
+        
+        @keyframes floatIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         .login-logo {
             text-align: center;
-            margin-bottom: 25px;
+            margin-bottom: 36px;
         }
         
         .login-logo h1 {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            font-size: 2.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #fff 0%, #c4b5fd 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
-            letter-spacing: -0.5px;
+            letter-spacing: -1px;
             margin-bottom: 8px;
+            text-shadow: 0 0 40px rgba(124, 58, 237, 0.6);
         }
         
         .login-logo p {
             font-size: 0.9rem;
-            color: var(--text-muted);
+            color: var(--accent-glow);
+            letter-spacing: 3px;
+            font-weight: 600;
+            text-transform: uppercase;
         }
         
         .login-form {
-            margin-bottom: 20px;
+            margin-bottom: 28px;
         }
         
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 28px;
         }
         
         .form-label {
             display: block;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
-            margin-bottom: 8px;
-            font-weight: 500;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         
         .form-select {
             width: 100%;
-            padding: 14px 16px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            padding: 16px 18px;
+            background: rgba(10, 5, 25, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 20px;
             color: var(--text-primary);
             font-size: 0.95rem;
+            font-weight: 500;
             transition: all 0.3s ease;
+            cursor: pointer;
+            backdrop-filter: blur(10px);
         }
         
         .form-select:focus {
             outline: none;
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-vivid);
+            background: rgba(30, 20, 60, 0.8);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
         }
         
         .password-input-container {
@@ -175,54 +198,67 @@
         
         .password-input {
             width: 100%;
-            padding: 14px 45px 14px 16px;
-            background: rgba(255, 255, 255, 0.07);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            padding: 16px 52px 16px 18px;
+            background: rgba(10, 5, 25, 0.6);
+            border: 2px solid var(--glass-border);
+            border-radius: 20px;
             color: var(--text-primary);
             font-size: 0.95rem;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
         }
         
         .password-input:focus {
             outline: none;
-            border-color: var(--primary);
-            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--primary-vivid);
+            background: rgba(30, 20, 60, 0.8);
+            box-shadow: 0 0 0 4px rgba(139, 92, 246, 0.2);
         }
         
         .toggle-password {
             position: absolute;
-            right: 16px;
+            right: 18px;
             top: 50%;
             transform: translateY(-50%);
             background: none;
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 1rem;
+            font-size: 1.3rem;
+            padding: 5px;
+            transition: color 0.2s;
+        }
+        
+        .toggle-password:hover {
+            color: var(--primary-light);
         }
         
         .login-button {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 18px;
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
             color: white;
             border: none;
-            border-radius: 10px;
-            font-size: 0.95rem;
-            font-weight: 600;
+            border-radius: 20px;
+            font-size: 1rem;
+            font-weight: 800;
             cursor: pointer;
             transition: all 0.3s ease;
-            margin-top: 10px;
+            margin-top: 20px;
+            box-shadow: 0 15px 30px -5px rgba(124, 58, 237, 0.5);
+            letter-spacing: 1px;
+            border: 1px solid rgba(255,255,255,0.1);
+            text-transform: uppercase;
         }
         
         .login-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px -5px rgba(124, 58, 237, 0.6);
+            background: linear-gradient(135deg, #8b5cf6, #6d28d9);
         }
         
         .login-button:active {
-            transform: translateY(0);
+            transform: translateY(-1px);
         }
         
         .login-button:disabled {
@@ -233,15 +269,17 @@
         }
         
         .error-message {
-            background: rgba(239, 68, 68, 0.1);
-            border: 1px solid rgba(239, 68, 68, 0.3);
+            background: rgba(239, 68, 68, 0.15);
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
             color: var(--error);
-            padding: 12px;
-            border-radius: 10px;
+            padding: 16px;
+            border-radius: 20px;
             font-size: 0.85rem;
-            margin-top: 15px;
+            margin-top: 24px;
             display: none;
             text-align: center;
+            backdrop-filter: blur(10px);
+            font-weight: 600;
         }
         
         .error-message.show {
@@ -256,35 +294,40 @@
         }
         
         .admin-info {
-            margin-top: 20px;
-            padding-top: 20px;
+            margin-top: 28px;
+            padding-top: 28px;
             border-top: 1px solid var(--border);
             text-align: center;
         }
         
         .admin-info p {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            margin-bottom: 5px;
+            margin-bottom: 10px;
+            letter-spacing: 2px;
         }
         
         .admin-type {
-            font-size: 0.85rem;
-            color: var(--primary-light);
-            font-weight: 600;
-            margin-top: 10px;
-            padding: 8px 12px;
-            background: rgba(139, 92, 246, 0.1);
-            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--accent-glow);
+            font-weight: 800;
+            margin-top: 14px;
+            padding: 12px 20px;
+            background: rgba(124, 58, 237, 0.2);
+            border-radius: 50px;
             display: inline-block;
+            border: 1.5px solid var(--glass-border);
+            backdrop-filter: blur(10px);
+            letter-spacing: 0.5px;
         }
         
-        /* Header CEO */
+        /* Header CEO - DISEÑO LIMPIO Y EJECUTIVO */
         .ceo-header {
-            padding: 20px 16px 16px;
-            background: linear-gradient(180deg, rgba(15, 15, 35, 0.9) 0%, transparent 100%);
-            backdrop-filter: blur(20px);
-            border-bottom: 1px solid var(--border);
+            padding: 24px 24px 16px;
+            background: rgba(15, 10, 30, 0.75);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-bottom: 1px solid var(--glass-border);
             position: sticky;
             top: 0;
             z-index: 100;
@@ -294,89 +337,73 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 12px;
+            position: relative;
         }
         
         .company-name {
-            font-size: 1.3rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--primary-light));
+            font-size: 1.8rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, #ffffff, #c4b5fd);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             letter-spacing: -0.5px;
+            text-shadow: 0 0 30px rgba(139, 92, 246, 0.4);
         }
         
         .ceo-badge {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
             color: white;
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.7rem;
-            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 6px;
-            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+            gap: 10px;
+            box-shadow: 0 10px 25px rgba(124, 58, 237, 0.4);
+            border: 1px solid rgba(255,255,255,0.2);
+            letter-spacing: 1px;
         }
         
         .current-admin {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            margin-top: 5px;
+            font-size: 0.75rem;
+            color: var(--accent);
+            margin-top: 8px;
             text-align: center;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
         .logout-btn {
             position: absolute;
-            top: 20px;
-            right: 16px;
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error);
-            border: 1px solid rgba(239, 68, 68, 0.3);
-            border-radius: 8px;
-            padding: 6px 12px;
+            top: 0;
+            right: 0;
+            background: rgba(239, 68, 68, 0.2);
+            color: #fca5a5;
+            border: 1.5px solid rgba(239, 68, 68, 0.4);
+            border-radius: 40px;
+            padding: 8px 16px;
             font-size: 0.7rem;
-            font-weight: 500;
+            font-weight: 700;
             cursor: pointer;
             transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         
         .logout-btn:hover {
-            background: rgba(239, 68, 68, 0.2);
-        }
-        
-        .header-stats {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-top: 12px;
-        }
-        
-        .stat-item {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 10px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: var(--primary-light);
-            margin-bottom: 2px;
-        }
-        
-        .stat-label {
-            font-size: 0.65rem;
-            color: var(--text-muted);
+            background: rgba(239, 68, 68, 0.3);
+            transform: scale(1.05);
+            color: #fecaca;
         }
         
         /* Contenido principal */
         .main-content {
-            padding: 16px;
-            padding-bottom: 80px;
-            max-width: 800px;
+            padding: 28px 24px;
+            padding-bottom: 100px;
+            max-width: 1100px;
             margin: 0 auto;
             display: none;
         }
@@ -393,54 +420,64 @@
         
         /* Sección rápida */
         .quick-section {
-            margin-bottom: 24px;
+            margin-bottom: 32px;
         }
         
         .section-title {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 12px;
-            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--accent-glow);
+            margin-bottom: 24px;
+            font-weight: 800;
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding-left: 8px;
+            gap: 12px;
+            padding-left: 12px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
         }
         
         .section-title i {
-            color: var(--primary-light);
-            font-size: 0.9rem;
+            color: var(--primary-vivid);
+            font-size: 1.3rem;
         }
         
-        /* Grid CEO */
+        /* Grid CEO - DISEÑO PREMIUM MEJORADO */
         .ceo-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
+            gap: 20px;
         }
         
-        @media (min-width: 768px) {
+        @media (min-width: 640px) {
             .ceo-grid {
                 grid-template-columns: repeat(3, 1fr);
             }
         }
         
+        @media (min-width: 1024px) {
+            .ceo-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+        }
+        
         .ceo-card {
-            background: var(--card-bg);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 16px;
+            background: linear-gradient(145deg, rgba(40, 30, 70, 0.7), rgba(20, 15, 40, 0.8));
+            border: 1.5px solid var(--glass-border);
+            border-radius: 28px;
+            padding: 24px 18px;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
-            backdrop-filter: blur(10px);
-            min-height: 100px;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            min-height: 130px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
         }
         
         .ceo-card::before {
@@ -450,9 +487,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(139, 92, 246, 0.05), rgba(124, 58, 237, 0.03));
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.12), rgba(91, 33, 182, 0.06));
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
         
         .ceo-card:hover::before,
@@ -461,159 +498,126 @@
         }
         
         .ceo-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
-            border-color: rgba(139, 92, 246, 0.3);
+            transform: translateY(-6px);
+            box-shadow: 0 25px 40px -10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(139, 92, 246, 0.3);
+            border-color: rgba(139, 92, 246, 0.5);
         }
         
         .ceo-card:active {
-            transform: translateY(-1px);
+            transform: translateY(-3px);
         }
         
         .card-header {
             display: flex;
             align-items: flex-start;
             justify-content: space-between;
-            margin-bottom: 12px;
+            margin-bottom: 18px;
         }
         
         .card-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            background: rgba(139, 92, 246, 0.1);
+            width: 52px;
+            height: 52px;
+            border-radius: 20px;
+            background: rgba(124, 58, 237, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1rem;
+            font-size: 1.4rem;
             color: var(--primary-light);
             flex-shrink: 0;
+            border: 1.5px solid var(--glass-border);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
         
         .card-icon img {
-            width: 20px;
-            height: 20px;
+            width: 28px;
+            height: 28px;
             object-fit: contain;
-            border-radius: 4px;
+            border-radius: 10px;
         }
         
         .card-badge {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-secondary);
+            background: rgba(139, 92, 246, 0.3);
+            color: var(--accent-glow);
             font-size: 0.6rem;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-weight: 500;
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-weight: 800;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
         .card-title {
-            font-size: 0.9rem;
-            font-weight: 600;
+            font-size: 1.1rem;
+            font-weight: 800;
             color: var(--text-primary);
-            margin-bottom: 4px;
+            margin-bottom: 6px;
+            letter-spacing: -0.2px;
         }
         
         .card-desc {
             font-size: 0.75rem;
-            color: var(--text-muted);
-            line-height: 1.3;
-        }
-        
-        /* Colores específicos por categoría */
-        .entel-card .card-icon {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--entel);
-        }
-        .entel-card:hover {
-            border-color: rgba(239, 68, 68, 0.3);
-        }
-        
-        .tigo-card .card-icon {
-            background: rgba(6, 214, 160, 0.1);
-            color: var(--tigo);
-        }
-        .tigo-card:hover {
-            border-color: rgba(6, 214, 160, 0.3);
-        }
-        
-        .viva-card .card-icon {
-            background: rgba(251, 191, 36, 0.1);
-            color: var(--viva);
-        }
-        .viva-card:hover {
-            border-color: rgba(251, 191, 36, 0.3);
-        }
-        
-        .bcp-card .card-icon {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--bcp);
-        }
-        .bcp-card:hover {
-            border-color: rgba(16, 185, 129, 0.3);
-        }
-        
-        .tienda-card .card-icon {
-            background: rgba(249, 115, 22, 0.1);
-            color: var(--tienda);
-        }
-        .tienda-card:hover {
-            border-color: rgba(249, 115, 22, 0.3);
-        }
-        
-        .juegos-card .card-icon {
-            background: rgba(139, 92, 246, 0.1);
-            color: var(--juegos);
-        }
-        
-        .inventario-card .card-icon {
-            background: rgba(59, 130, 246, 0.1);
-            color: var(--inventario);
-        }
-        .inventario-card:hover {
-            border-color: rgba(59, 130, 246, 0.3);
-        }
-        
-        .admin-card .card-icon {
-            background: rgba(168, 85, 247, 0.1);
-            color: var(--primary);
-        }
-        
-        .asistencia-card .card-icon {
-            background: rgba(139, 92, 246, 0.1);
             color: var(--accent);
+            line-height: 1.4;
+            font-weight: 600;
+            opacity: 0.9;
         }
+        
+        /* Colores específicos por categoría - MÁS VIBRANTES */
+        .entel-card .card-icon { background: rgba(239, 68, 68, 0.2); color: #f87171; border-color: rgba(239, 68, 68, 0.4); }
+        .entel-card:hover { border-color: #ef4444; }
+        
+        .tigo-card .card-icon { background: rgba(6, 214, 160, 0.2); color: #34d399; border-color: rgba(6, 214, 160, 0.4); }
+        .tigo-card:hover { border-color: #06d6a0; }
+        
+        .viva-card .card-icon { background: rgba(251, 191, 36, 0.2); color: #fcd34d; border-color: rgba(251, 191, 36, 0.4); }
+        .viva-card:hover { border-color: #fbbf24; }
+        
+        .bcp-card .card-icon { background: rgba(16, 185, 129, 0.2); color: #34d399; border-color: rgba(16, 185, 129, 0.4); }
+        .bcp-card:hover { border-color: #10b981; }
+        
+        .tienda-card .card-icon { background: rgba(249, 115, 22, 0.2); color: #fb923c; border-color: rgba(249, 115, 22, 0.4); }
+        .tienda-card:hover { border-color: #f97316; }
+        
+        .juegos-card .card-icon { background: rgba(139, 92, 246, 0.25); color: #a78bfa; border-color: rgba(139, 92, 246, 0.5); }
+        
+        .inventario-card .card-icon { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border-color: rgba(59, 130, 246, 0.4); }
+        .inventario-card:hover { border-color: #3b82f6; }
+        
+        .admin-card .card-icon { background: rgba(168, 85, 247, 0.25); color: #c4b5fd; border-color: rgba(168, 85, 247, 0.5); }
+        
+        .asistencia-card .card-icon { background: rgba(139, 92, 246, 0.2); color: #c4b5fd; border-color: rgba(139, 92, 246, 0.5); }
         
         /* Botón de instalación PWA */
         #installButton {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            bottom: 28px;
+            right: 28px;
+            background: linear-gradient(135deg, #7c3aed, #5b21b6);
             color: white;
             border: none;
-            border-radius: 50px;
-            padding: 10px 16px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            box-shadow: 0 8px 20px rgba(139, 92, 246, 0.4);
+            border-radius: 60px;
+            padding: 16px 28px;
+            font-size: 0.9rem;
+            font-weight: 800;
+            box-shadow: 0 15px 35px rgba(124, 58, 237, 0.5);
             cursor: pointer;
             display: none;
             z-index: 1000;
             transition: all 0.3s ease;
-            display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 12px;
             backdrop-filter: blur(20px);
-            border: 1px solid rgba(139, 92, 246, 0.3);
+            border: 1.5px solid rgba(255,255,255,0.2);
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
         #installButton:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 12px 25px rgba(139, 92, 246, 0.5);
-        }
-        
-        #installButton:active {
-            transform: translateY(0);
+            transform: translateY(-4px);
+            box-shadow: 0 25px 45px rgba(124, 58, 237, 0.6);
         }
         
         /* Barra de navegación CEO */
@@ -622,12 +626,13 @@
             bottom: 0;
             left: 0;
             right: 0;
-            background: rgba(15, 15, 35, 0.9);
-            backdrop-filter: blur(20px);
-            border-top: 1px solid var(--border);
+            background: rgba(15, 10, 30, 0.9);
+            backdrop-filter: blur(30px);
+            -webkit-backdrop-filter: blur(30px);
+            border-top: 1.5px solid var(--glass-border);
             display: flex;
             justify-content: space-around;
-            padding: 12px 0;
+            padding: 14px 0;
             z-index: 100;
         }
         
@@ -638,13 +643,14 @@
             text-decoration: none;
             color: var(--text-muted);
             transition: all 0.3s ease;
-            padding: 6px 12px;
-            border-radius: 10px;
+            padding: 10px 20px;
+            border-radius: 50px;
         }
         
         .nav-item.active {
-            color: var(--primary-light);
-            background: rgba(139, 92, 246, 0.1);
+            color: var(--accent-glow);
+            background: rgba(124, 58, 237, 0.2);
+            border: 1px solid var(--glass-border);
         }
         
         .nav-item:active {
@@ -652,20 +658,22 @@
         }
         
         .nav-icon {
-            font-size: 1.2rem;
-            margin-bottom: 4px;
+            font-size: 1.5rem;
+            margin-bottom: 5px;
         }
         
         .nav-label {
-            font-size: 0.65rem;
-            font-weight: 500;
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
         
         /* Animaciones */
         @keyframes fadeInUp {
             from {
                 opacity: 0;
-                transform: translateY(10px);
+                transform: translateY(15px);
             }
             to {
                 opacity: 1;
@@ -674,18 +682,24 @@
         }
         
         .ceo-card {
-            animation: fadeInUp 0.4s ease forwards;
+            animation: fadeInUp 0.5s ease forwards;
             opacity: 0;
         }
         
-        .ceo-card:nth-child(1) { animation-delay: 0.1s; }
-        .ceo-card:nth-child(2) { animation-delay: 0.15s; }
-        .ceo-card:nth-child(3) { animation-delay: 0.2s; }
-        .ceo-card:nth-child(4) { animation-delay: 0.25s; }
-        .ceo-card:nth-child(5) { animation-delay: 0.3s; }
-        .ceo-card:nth-child(6) { animation-delay: 0.35s; }
-        .ceo-card:nth-child(7) { animation-delay: 0.4s; }
-        .ceo-card:nth-child(8) { animation-delay: 0.45s; }
+        .ceo-card:nth-child(1) { animation-delay: 0.05s; }
+        .ceo-card:nth-child(2) { animation-delay: 0.1s; }
+        .ceo-card:nth-child(3) { animation-delay: 0.15s; }
+        .ceo-card:nth-child(4) { animation-delay: 0.2s; }
+        .ceo-card:nth-child(5) { animation-delay: 0.25s; }
+        .ceo-card:nth-child(6) { animation-delay: 0.3s; }
+        .ceo-card:nth-child(7) { animation-delay: 0.35s; }
+        .ceo-card:nth-child(8) { animation-delay: 0.4s; }
+        .ceo-card:nth-child(9) { animation-delay: 0.45s; }
+        .ceo-card:nth-child(10) { animation-delay: 0.5s; }
+        .ceo-card:nth-child(11) { animation-delay: 0.55s; }
+        .ceo-card:nth-child(12) { animation-delay: 0.6s; }
+        .ceo-card:nth-child(13) { animation-delay: 0.65s; }
+        .ceo-card:nth-child(14) { animation-delay: 0.7s; }
         
         /* Modo standalone */
         @media all and (display-mode: standalone) {
@@ -695,7 +709,7 @@
             }
             
             .ceo-nav {
-                padding-bottom: max(12px, env(safe-area-inset-bottom));
+                padding-bottom: max(14px, env(safe-area-inset-bottom));
             }
             
             #installButton {
@@ -714,30 +728,30 @@
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
             <div class="login-logo">
-                <h1>TOKTOK</h1>
-                <p>Panel de Control Ejecutivo</p>
+                <h1>TOKTOK GC</h1>
+                <p>· E X E C U T I V E ·</p>
             </div>
             
             <div class="login-form">
                 <div class="form-group">
-                    <label class="form-label">Tipo de Administrador</label>
+                    <label class="form-label">Perfil de Acceso</label>
                     <select class="form-select" id="adminType">
-                        <option value="">Seleccione tipo de admin</option>
-                        <option value="1">ADMIN1 - CEO Completo</option>
-                        <option value="2">ADMIN2 - TokTok Admin y Monitoreo</option>
-                        <option value="3">ADMIN3 - Operadoras, Tienda, Juegos, Asistencia, Cajas</option>
-                        <option value="4">ADMIN4 - Operadoras y Caja</option>
-                        <option value="5">ADMIN5 - Banco BCP, Tienda y Juegos</option>
-                        <option value="6">ADMIN6 - Solo Juegos</option>
-                        <option value="7">ADMIN7 - Incubadora</option>
-                        <option value="8">ADMIN8 - Solo Asistencia</option>
+                        <option value="">Seleccionar perfil</option>
+                        <option value="1">ADMIN1 · CEO Completo</option>
+                        <option value="2">ADMIN2 · TokTok Admin y Monitoreo</option>
+                        <option value="3">ADMIN3 · Operadoras, Tienda, Juegos, Asistencia, Cajas</option>
+                        <option value="4">ADMIN4 · Operadoras y Caja</option>
+                        <option value="5">ADMIN5 · Banco BCP, Tienda y Juegos</option>
+                        <option value="6">ADMIN6 · Solo Juegos</option>
+                        <option value="7">ADMIN7 · Incubadora</option>
+                        <option value="8">ADMIN8 · Solo Asistencia</option>
                     </select>
                 </div>
                 
                 <div class="form-group">
                     <label class="form-label">Contraseña</label>
                     <div class="password-input-container">
-                        <input type="password" class="password-input" id="passwordInput" placeholder="Ingrese su contraseña">
+                        <input type="password" class="password-input" id="passwordInput" placeholder="Ingrese su clave">
                         <button type="button" class="toggle-password" id="togglePassword">
                             <i class="far fa-eye"></i>
                         </button>
@@ -747,13 +761,13 @@
                 <button class="login-button" id="loginButton">Acceder</button>
                 
                 <div class="error-message" id="errorMessage">
-                    Contraseña incorrecta. Intente nuevamente.
+                    Clave incorrecta. Verifique e intente nuevamente.
                 </div>
             </div>
             
             <div class="admin-info">
-                <p>Sistema de acceso seguro TOKTOK</p>
-                <div class="admin-type" id="currentAdminType">Seleccione un tipo de administrador</div>
+                <p>SISTEMA DE ACCESO RESTRINGIDO</p>
+                <div class="admin-type" id="currentAdminType">Seleccione un perfil</div>
             </div>
         </div>
     </div>
@@ -761,17 +775,16 @@
     <!-- Dashboard principal (oculto inicialmente) -->
     <header class="ceo-header" id="dashboardHeader" style="display: none;">
         <div class="header-top">
-            <h1 class="company-name">TOKTOK</h1>
+            <h1 class="company-name">TOKTOK GC</h1>
             <div class="ceo-badge">
                 <i class="fas fa-crown"></i>
                 <span id="currentAdminBadge"></span>
-            </div><br>
+            </div>
             <button class="logout-btn" id="logoutButton">
                 <i class="fas fa-sign-out-alt"></i> Salir
             </button>
         </div>
-        <div class="current-admin" id="currentAdminText">Admin1 - CEO Completo</div>
-    
+        <div class="current-admin" id="currentAdminText">Admin1 · CEO Completo</div>
     </header>
     
     <!-- Contenido principal -->
@@ -779,8 +792,8 @@
         <!-- Panel de Control Principal -->
         <div class="quick-section">
             <h2 class="section-title">
-                <i class="fas fa-tachometer-alt"></i>
-                Panel de Control
+                <i class="fas fa-grid-2"></i>
+                Panel de Control Ejecutivo
             </h2>
             <div class="ceo-grid">
                 <!-- Panel Admin TokTok -->
@@ -789,7 +802,7 @@
                         <div class="card-icon">
                             <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Admin">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">CORE</div>
                     </div>
                     <div class="card-title">TokTok Admin</div>
                     <div class="card-desc">Panel administrativo principal</div>
@@ -798,23 +811,23 @@
                 <a href="admin-toktok/dashboard_pro" class="ceo-card admin-card" data-admin="1,2">
                     <div class="card-header">
                         <div class="card-icon">
-                            <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Admin">
+                            <img src="https://thumbs.dreamstime.com/b/print-173512941.jpg" alt="Balance">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">BALANCE</div>
                     </div>
-                    <div class="card-title">TokTok Card balance</div>
-                    <div class="card-desc">Panel administrativo principal</div>
+                    <div class="card-title">TokTok Card Balance</div>
+                    <div class="card-desc">Gestión de saldos y tarjetas</div>
                 </a>
 
                 <a href="admin-toktok/dashboard_recargas" class="ceo-card admin-card" data-admin="1,2">
                     <div class="card-header">
                         <div class="card-icon">
-                            <img src="https://www.baccredomatic.com/sites/default/files/styles/large/public/2024-10/gtm-portada-recargas.png?itok=LTm9XJsO" alt="Admin">
+                            <img src="https://www.baccredomatic.com/sites/default/files/styles/large/public/2024-10/gtm-portada-recargas.png?itok=LTm9XJsO" alt="Recargas">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">RECARGAS</div>
                     </div>
-                    <div class="card-title">TokTok Card Recargas</div>
-                    <div class="card-desc">Panel admin recargas</div>
+                    <div class="card-title">TokTok Recargas</div>
+                    <div class="card-desc">Administración de recargas</div>
                 </a>
 
                 <!-- Operadoras -->
@@ -823,9 +836,10 @@
                         <div class="card-icon">
                             <img src="https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg" alt="Entel">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">TELCO</div>
                     </div>
                     <div class="card-title">Entel</div>
+                    <div class="card-desc">Gestión operadora Entel</div>
                 </a>
                 
                 <a href="EXTENCIONES/admin-tigo.html" class="ceo-card tigo-card" data-admin="1,3,4">
@@ -833,9 +847,10 @@
                         <div class="card-icon">
                             <img src="https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru" alt="Tigo">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">TELCO</div>
                     </div>
                     <div class="card-title">Tigo</div>
+                    <div class="card-desc">Gestión operadora Tigo</div>
                 </a>
                 
                 <a href="EXTENCIONES/admin-viva.html" class="ceo-card viva-card" data-admin="1,3,4">
@@ -843,9 +858,10 @@
                         <div class="card-icon">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s" alt="Viva">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">TELCO</div>
                     </div>
                     <div class="card-title">Viva</div>
+                    <div class="card-desc">Gestión operadora Viva</div>
                 </a>
 
                 <a href="EXTENCIONES/admin-reportes.html" class="ceo-card viva-card" data-admin="1,3,4">
@@ -853,19 +869,22 @@
                         <div class="card-icon">
                             <img src="https://cdn-icons-png.flaticon.com/512/5674/5674015.png" alt="Reportes">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">ANALYTICS</div>
                     </div>
                     <div class="card-title">Reportes</div>
+                    <div class="card-desc">Métricas y estadísticas</div>
                 </a>
+                
                 <!-- Banco -->
                 <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card" data-admin="1,3,5">
                     <div class="card-header">
                         <div class="card-icon">
                             <img src="https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg" alt="BCP">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">BANCA</div>
                     </div>
                     <div class="card-title">Banco BCP</div>
+                    <div class="card-desc">Operaciones bancarias</div>
                 </a>
                 
                 <!-- Tienda -->
@@ -874,9 +893,10 @@
                         <div class="card-icon">
                             <img src="https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg" alt="Tienda">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">E-COMMERCE</div>
                     </div>
                     <div class="card-title">Tienda</div>
+                    <div class="card-desc">Gestión de productos</div>
                 </a>
                 
                 <!-- Juegos -->
@@ -885,20 +905,22 @@
                         <div class="card-icon">
                             <img src="https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg" alt="Juegos">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">GAMING</div>
                     </div>
                     <div class="card-title">Juegos</div>
+                    <div class="card-desc">Plataforma de juegos</div>
                 </a>
                 
-                <!-- Inventario -->
+                <!-- Inventario / Incubadora -->
                 <a href="EXTENCIONES/inventario-esc.html" class="ceo-card inventario-card" data-admin="1,7">
                     <div class="card-header">
                         <div class="card-icon">
-                            <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Inventario">
+                            <img src="https://play-lh.googleusercontent.com/7POD8J4S2fgVkvyJ4535SF6matleS-a3etBqxcWGpSHRyVgDDsZQZMkTGspyXEo7xnM" alt="Incubadora">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">LAB</div>
                     </div>
                     <div class="card-title">Incubadora</div>
+                    <div class="card-desc">Gestión de inventario</div>
                 </a>
                 
                 <!-- Asistencia -->
@@ -907,9 +929,10 @@
                         <div class="card-icon">
                             <img src="https://cdn-icons-png.flaticon.com/512/4854/4854344.png" alt="Asistencia">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">RRHH</div>
                     </div>
                     <div class="card-title">Asistencia</div>
+                    <div class="card-desc">Control de personal</div>
                 </a>
 
                 <!-- Monitoreo -->
@@ -918,9 +941,10 @@
                         <div class="card-icon">
                             <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQM8VBzFM8e7GHKOoihF0vphpW6jg3v7GHpqw&s" alt="Monitoreo">
                         </div>
-                        <div class="card-badge">ADMIN</div>
+                        <div class="card-badge">MONITOR</div>
                     </div>
-                    <div class="card-title">Monitoreo toktok group</div>
+                    <div class="card-title">Monitoreo GC</div>
+                    <div class="card-desc">Supervisión en tiempo real</div>
                 </a>
 
                 <!-- Caja -->
@@ -929,9 +953,10 @@
                         <div class="card-icon">
                             <img src="https://thumbs.dreamstime.com/b/vector-de-icono-caja-bancaria-s%C3%ADmbolo-del-banco-dise%C3%B1o-web-aislado-en-color-fondo-blanco-plano-279221610.jpg" alt="Caja">
                         </div>
-                        <div class="card-badge">CAJA ADMIN</div>
+                        <div class="card-badge">CAJA</div>
                     </div>
-                    <div class="card-title">CAJAS</div>
+                    <div class="card-title">Cajas</div>
+                    <div class="card-desc">Arqueo y movimientos</div>
                 </a>
             </div>
         </div>
@@ -940,20 +965,20 @@
     
     <!-- Botón de instalación PWA -->
     <button id="installButton" aria-label="Instalar aplicación">
-        <i class="fas fa-download"></i> Instalar App
+        <i class="fas fa-download"></i> Instalar App GC
     </button>
 
     <script>
-        // Contraseñas para cada tipo de admin
+        // CONTRASEÑAS ACTUALIZADAS - FORMATO GC2026 + INICIALES
         const adminPasswords = {
-            '1': 'CEO2024',      // ADMIN1 - CEO COMPLETO
-            '2': 'TOK2024',      // ADMIN2 - TOKTOK ADMIN Y MONITOREO
-            '3': 'OPERA2024',    // ADMIN3 - OPERADORAS, TIENDA, JUEGOS, ASISTENCIA, CAJAS
-            '4': 'CAJA2024',     // ADMIN4 - OPERADORAS Y CAJA
-            '5': 'BANCO2024',    // ADMIN5 - BANCO BCP, TIENDA Y JUEGOS
-            '6': 'JUEGOS2024',   // ADMIN6 - SOLO JUEGOS
-            '7': 'INCU2024',     // ADMIN7 - INCUBADORA
-            '8': 'ASIS2024'      // ADMIN8 - SOLO ASISTENCIA
+            '1': 'GC2026CEO',      // ADMIN1 - CEO COMPLETO
+            '2': 'GC2026TOK',      // ADMIN2 - TOKTOK ADMIN Y MONITOREO
+            '3': 'GC2026OPE',      // ADMIN3 - OPERADORAS, TIENDA, JUEGOS, ASISTENCIA, CAJAS
+            '4': 'GC2026CAJ',      // ADMIN4 - OPERADORAS Y CAJA
+            '5': 'GC2026BAN',      // ADMIN5 - BANCO BCP, TIENDA Y JUEGOS
+            '6': 'GC2026JUE',      // ADMIN6 - SOLO JUEGOS
+            '7': 'GC2026INC',      // ADMIN7 - INCUBADORA
+            '8': 'GC2026ASI'       // ADMIN8 - SOLO ASISTENCIA
         };
 
         // Nombres de cada tipo de admin
@@ -993,10 +1018,10 @@
         adminTypeSelect.addEventListener('change', function() {
             const selectedValue = this.value;
             if (selectedValue) {
-                currentAdminTypeText.textContent = `ADMIN${selectedValue} - ${adminNames[selectedValue]}`;
+                currentAdminTypeText.textContent = `ADMIN${selectedValue} · ${adminNames[selectedValue]}`;
                 passwordInput.focus();
             } else {
-                currentAdminTypeText.textContent = 'Seleccione un tipo de administrador';
+                currentAdminTypeText.textContent = 'Seleccione un perfil';
             }
         });
 
@@ -1025,14 +1050,14 @@
             const password = passwordInput.value.trim();
             
             if (!adminType) {
-                errorMessage.textContent = 'Por favor seleccione un tipo de administrador';
+                errorMessage.textContent = 'Seleccione un perfil de acceso';
                 errorMessage.classList.add('show');
                 adminTypeSelect.focus();
                 return;
             }
             
             if (!password) {
-                errorMessage.textContent = 'Por favor ingrese la contraseña';
+                errorMessage.textContent = 'Ingrese su contraseña';
                 errorMessage.classList.add('show');
                 passwordInput.focus();
                 return;
@@ -1054,30 +1079,27 @@
                 filterCardsByAdmin(adminType);
                 
                 // Actualizar UI
-                currentAdminBadge.textContent = `ADMIN${adminType}`;
-                currentAdminText.textContent = `ADMIN${adminType} - ${adminNames[adminType]}`;
+                currentAdminBadge.textContent = `ADMIN ${adminType}`;
+                currentAdminText.textContent = `ADMIN${adminType} · ${adminNames[adminType]}`;
                 
                 // Mostrar dashboard y ocultar login
                 loginScreen.classList.add('hidden');
                 dashboardHeader.style.display = 'block';
                 mainContent.classList.add('show');
-                navBar.style.display = 'flex';
-                
-                // Cargar estadísticas
-                updateRealTimeStats();
+                if (navBar) navBar.style.display = 'flex';
                 
                 // Feedback visual
                 loginButton.innerHTML = '<i class="fas fa-check"></i> Acceso concedido';
-                loginButton.style.background = 'linear-gradient(135deg, var(--success), #059669)';
+                loginButton.style.background = 'linear-gradient(135deg, #10b981, #059669)';
                 setTimeout(() => {
                     loginButton.innerHTML = 'Acceder';
-                    loginButton.style.background = 'linear-gradient(135deg, var(--primary), var(--primary-dark))';
+                    loginButton.style.background = 'linear-gradient(135deg, #7c3aed, #5b21b6)';
                 }, 1500);
                 
             } else {
                 // Login fallido
                 failedAttempts++;
-                errorMessage.textContent = `Contraseña incorrecta. Intentos restantes: ${maxAttempts - failedAttempts}`;
+                errorMessage.textContent = `Clave incorrecta. Intentos restantes: ${maxAttempts - failedAttempts}`;
                 errorMessage.classList.add('show');
                 passwordInput.value = '';
                 passwordInput.focus();
@@ -1092,7 +1114,7 @@
                 if (failedAttempts >= maxAttempts) {
                     loginButton.disabled = true;
                     loginButton.innerHTML = 'BLOQUEADO';
-                    errorMessage.textContent = 'Demasiados intentos fallidos. El sistema ha sido bloqueado temporalmente.';
+                    errorMessage.textContent = 'Demasiados intentos. Sistema bloqueado 30s.';
                     setTimeout(() => {
                         loginButton.disabled = false;
                         loginButton.innerHTML = 'Acceder';
@@ -1124,13 +1146,13 @@
             passwordInput.type = 'password';
             togglePassword.innerHTML = '<i class="far fa-eye"></i>';
             errorMessage.classList.remove('show');
-            currentAdminTypeText.textContent = 'Seleccione un tipo de administrador';
+            currentAdminTypeText.textContent = 'Seleccione un perfil';
             
             // Mostrar login y ocultar dashboard
             loginScreen.classList.remove('hidden');
             dashboardHeader.style.display = 'none';
             mainContent.classList.remove('show');
-            navBar.style.display = 'none';
+            if (navBar) navBar.style.display = 'none';
             
             // Mostrar todas las tarjetas nuevamente
             ceoCards.forEach(card => card.classList.remove('hidden'));
@@ -1150,14 +1172,13 @@
                     if (sessionAge < 8) {
                         currentAdminType = sessionData.adminType;
                         filterCardsByAdmin(currentAdminType);
-                        currentAdminBadge.textContent = `ADMIN${currentAdminType}`;
-                        currentAdminText.textContent = `ADMIN${currentAdminType} - ${adminNames[currentAdminType]}`;
+                        currentAdminBadge.textContent = `ADMIN ${currentAdminType}`;
+                        currentAdminText.textContent = `ADMIN${currentAdminType} · ${adminNames[currentAdminType]}`;
                         
                         loginScreen.classList.add('hidden');
                         dashboardHeader.style.display = 'block';
                         mainContent.classList.add('show');
-                        navBar.style.display = 'flex';
-                        updateRealTimeStats();
+                        if (navBar) navBar.style.display = 'flex';
                     } else {
                         // Sesión expirada
                         localStorage.removeItem('toktokAdminSession');
@@ -1190,62 +1211,14 @@
         // Efecto táctil para tarjetas
         ceoCards.forEach(card => {
             card.addEventListener('touchstart', function() {
-                this.style.transform = 'translateY(-2px) scale(0.98)';
+                this.style.transform = 'translateY(-4px) scale(0.98)';
             });
             
             card.addEventListener('touchend', function() {
-                this.style.transform = 'translateY(-3px)';
+                this.style.transform = 'translateY(-6px)';
                 setTimeout(() => {
                     this.style.transform = '';
                 }, 150);
-            });
-        });
-        
-        // Actualizar estadísticas en tiempo real
-        function updateRealTimeStats() {
-            const stats = document.querySelectorAll('.stat-value');
-            if (stats.length >= 3) {
-                // Actualizar ingresos (simulación)
-                const currentIncome = parseInt(stats[0].textContent.replace(/[^\d]/g, ''));
-                const randomIncome = Math.floor(Math.random() * 200) - 100;
-                const newIncome = Math.max(24000, currentIncome + randomIncome);
-                stats[0].textContent = `Bs ${(newIncome / 1000).toFixed(1)}K`;
-                
-                // Actualizar crecimiento
-                const growth = (Math.random() * 3 - 0.5).toFixed(1);
-                const sign = growth >= 0 ? '+' : '';
-                stats[1].textContent = `${sign}${growth}%`;
-                
-                // Actualizar operatividad
-                const uptime = 95 + Math.random() * 5;
-                stats[2].textContent = `${uptime.toFixed(0)}%`;
-            }
-        }
-        
-        // Actualizar cada 30 segundos
-        setInterval(updateRealTimeStats, 30000);
-        
-        // Simular datos al cargar
-        setTimeout(updateRealTimeStats, 1000);
-        
-        // Navegación activa
-        document.querySelectorAll('.nav-item').forEach(item => {
-            item.addEventListener('click', function(e) {
-                if (!this.classList.contains('active')) {
-                    document.querySelectorAll('.nav-item').forEach(i => {
-                        i.classList.remove('active');
-                    });
-                    this.classList.add('active');
-                    
-                    // Aquí podrías agregar lógica para cambiar contenido
-                    e.preventDefault();
-                    
-                    // Feedback táctil
-                    this.style.transform = 'scale(0.95)';
-                    setTimeout(() => {
-                        this.style.transform = '';
-                    }, 150);
-                }
             });
         });
         
@@ -1269,7 +1242,7 @@
         });
         
         window.addEventListener('appinstalled', () => {
-            console.log('TOKTOK CEO PWA installed successfully');
+            console.log('TOKTOK GC PWA installed successfully');
             installButton.style.display = 'none';
         });
         
@@ -1297,9 +1270,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
-
