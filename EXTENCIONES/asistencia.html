@@ -3,973 +3,393 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TOKTOK · Admin Dashboard</title>
-    
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        tok: {
-                            green: '#10b981',
-                            blue: '#3b82f6',
-                            red: '#ef4444',
-                            yellow: '#f59e0b',
-                            purple: '#8b5cf6'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    
-    <!-- Supabase JS -->
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    
-    <!-- QR Code Generator -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-    
-    <!-- Chart.js para gráficos -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
+    <title>TOKTOK · Administración</title>
     <style>
         :root {
-            --tok-green: #10b981;
-            --tok-blue: #3b82f6;
+            --primary: #1e3a5f;
+            --sidebar-bg: #0f2847;
+            --sidebar-hover: #1a3b5c;
+            --accent: #2563eb;
+            --accent-hover: #1d4ed8;
+            --bg: #f1f5f9;
+            --card: #ffffff;
+            --text: #1e293b;
+            --text-light: #64748b;
+            --border: #e2e8f0;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --radius: 8px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.06);
+            --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
         }
-        
-        .status-badge {
-            display: inline-block;
-            padding: 0.25rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-        
-        .status-connected { background: #d1fae5; color: #065f46; }
-        .status-disconnected { background: #fee2e2; color: #991b1b; }
-        .status-pending { background: #fef3c7; color: #92400e; }
-        
-        .card {
-            background: white;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .card:hover {
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-        
-        .id-card {
-            width: 85.6mm;
-            height: 54mm;
-            border-radius: 8mm;
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 50%, #60a5fa 100%);
-            color: white;
-            position: relative;
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background: var(--bg);
+            color: var(--text);
+            display: flex;
+            height: 100vh;
             overflow: hidden;
         }
-        
-        .qr-overlay {
-            position: absolute;
-            bottom: 8mm;
-            right: 8mm;
-            width: 25mm;
-            height: 25mm;
-            background: white;
-            padding: 2mm;
-            border-radius: 3mm;
+        .sidebar {
+            width: 240px;
+            background: var(--sidebar-bg);
+            color: #fff;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
         }
-        
-        .loading-spinner {
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid var(--tok-green);
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            animation: spin 1s linear infinite;
+        .sidebar .logo {
+            padding: 20px 18px;
+            font-size: 1.4rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .sidebar .logo span { color: #60a5fa; }
+        .sidebar nav { flex: 1; padding: 12px 8px; }
+        .sidebar nav button {
+            display: flex; align-items: center; gap: 10px;
+            width: 100%; padding: 11px 14px; margin-bottom: 4px;
+            border: none; background: transparent; color: #cbd5e1;
+            font-size: 0.88rem; font-weight: 500; border-radius: 6px;
+            cursor: pointer; transition: 0.15s; text-align: left;
+            font-family: var(--font);
         }
-        
-        .toast {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 1rem 1.5rem;
-            border-radius: 0.75rem;
-            color: white;
-            z-index: 1000;
-            transform: translateY(100px);
-            opacity: 0;
-            transition: all 0.3s ease;
+        .sidebar nav button:hover { background: var(--sidebar-hover); color: #fff; }
+        .sidebar nav button.active { background: var(--accent); color: #fff; font-weight: 600; }
+        .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+        .topbar {
+            background: #fff; padding: 14px 24px;
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; justify-content: space-between;
         }
-        
-        .toast.show {
-            transform: translateY(0);
-            opacity: 1;
+        .topbar .title { font-size: 1.15rem; font-weight: 600; color: var(--primary); }
+        .user-badge { background: #e0e7ff; color: #1e3a5f; padding: 6px 14px; border-radius: 20px; font-weight: 600; font-size: 0.82rem; }
+        .content { flex: 1; overflow-y: auto; padding: 20px 24px; }
+        .section { display: none; animation: fade 0.25s ease; }
+        .section.active { display: block; }
+        @keyframes fade { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+        .card {
+            background: var(--card); border-radius: 10px; padding: 18px 20px;
+            margin-bottom: 18px; border: 1px solid var(--border); box-shadow: var(--shadow);
         }
-        
-        .toast-success { background: var(--tok-green); }
-        .toast-error { background: var(--tok-red); }
-        .toast-info { background: var(--tok-blue); }
+        .card h3 { font-size: 1rem; font-weight: 600; margin-bottom: 12px; color: var(--primary); }
+        label { font-size: 0.8rem; font-weight: 600; color: #475569; display: block; margin-bottom: 4px; margin-top: 8px; }
+        input, select, textarea {
+            width: 100%; padding: 9px 12px; border: 1px solid #cbd5e1;
+            border-radius: 6px; font-size: 0.88rem; font-family: var(--font);
+            background: #fff; color: #1e293b; transition: 0.2s; margin-bottom: 6px;
+        }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+        button { cursor: pointer; border: none; border-radius: 6px; padding: 9px 16px; font-weight: 600; font-size: 0.82rem; font-family: var(--font); transition: 0.15s; }
+        .btn-primary { background: var(--accent); color: #fff; width: 100%; padding: 10px; }
+        .btn-primary:hover { background: var(--accent-hover); }
+        .btn-sm { padding: 5px 10px; font-size: 0.75rem; border-radius: 4px; }
+        .btn-danger { background: #fee2e2; color: #b91c1c; }
+        .btn-warning { background: #fef3c7; color: #92400e; }
+        .btn-outline { background: transparent; border: 2px solid var(--accent); color: var(--accent); width: 100%; margin-top: 6px; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        th { text-align: left; padding: 8px 6px; color: #475569; font-weight: 600; border-bottom: 2px solid #e2e8f0; }
+        td { padding: 7px 6px; border-bottom: 1px solid #f1f5f9; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-danger { background: #fee2e2; color: #991b1b; }
+        .badge-info { background: #dbeafe; color: #1e40af; }
+        .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+        .stat-card { background: #fff; border-radius: 10px; padding: 16px; text-align: center; border: 1px solid #e2e8f0; box-shadow: var(--shadow); }
+        .stat-card .num { font-size: 1.7rem; font-weight: 700; color: var(--accent); }
+        .stat-card .lbl { font-size: 0.75rem; color: #64748b; margin-top: 2px; }
+        .table-wrap { overflow-x: auto; }
+        .empty-state { text-align: center; color: #94a3b8; padding: 20px; font-style: italic; }
+        .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #1e293b; color: #fff; padding: 10px 22px; border-radius: 30px; font-weight: 500; font-size: 0.85rem; z-index: 999; animation: toastIn 0.3s ease; }
+        @keyframes toastIn { from { opacity: 0; transform: translateX(-50%) translateY(20px); } to { opacity: 1; transform: translateX(-50%) translateY(0); } }
+        @media (max-width: 768px) { .sidebar { width: 200px; } .stat-grid { grid-template-columns: 1fr 1fr; } }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen">
-    <!-- Toast Notification -->
-    <div id="toast" class="toast"></div>
-    
-    <!-- Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between h-16">
-                <div class="flex items-center">
-                    <div class="flex-shrink-0 flex items-center">
-                        <div class="bg-tok-green text-white p-2 rounded-lg font-bold text-xl">
-                            TOK
-                        </div>
-                        <span class="ml-2 text-xl font-bold text-gray-800">TOKTOK Dashboard</span>
-                    </div>
-                </div>
-                
-                <div class="flex items-center space-x-4">
-                    <div id="connection-status" class="status-badge status-pending">
-                        <span class="flex items-center">
-                            <span class="animate-pulse">●</span>
-                            <span class="ml-2">Conectando...</span>
-                        </span>
-                    </div>
-                    <button onclick="testConnection()" class="px-3 py-1 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
-                        Probar Conexión
-                    </button>
-                </div>
-            </div>
+<body>
+    <div class="sidebar">
+        <div class="logo">TOK<span>TOK</span> · Admin</div>
+        <nav>
+            <button class="active" data-section="dashboard">📊 Dashboard</button>
+            <button data-section="trabajadores">👥 Trabajadores</button>
+            <button data-section="asistencias">📋 Asistencias</button>
+            <button data-section="ranking">🏆 Ranking</button>
+            <button data-section="pagos">💰 Pagos</button>
+            <button data-section="descuentos">🔻 Descuentos/Adic.</button>
+        </nav>
+    </div>
+    <div class="main">
+        <div class="topbar">
+            <div class="title" id="sectionTitle">Dashboard</div>
+            <div class="user-badge">👑 Administrador</div>
         </div>
-    </nav>
-    
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <!-- Stats Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-            <div class="card p-6">
-                <div class="flex items-center">
-                    <div class="bg-tok-green bg-opacity-10 p-3 rounded-lg">
-                        <span class="text-tok-green text-2xl">👥</span>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-sm font-medium text-gray-500">Trabajadores</h3>
-                        <p id="stats-workers" class="text-2xl font-bold text-gray-800">0</p>
-                    </div>
+        <div class="content">
+            <!-- Dashboard -->
+            <div class="section active" id="dashboard">
+                <div class="stat-grid">
+                    <div class="stat-card"><div class="num" id="statTrab">0</div><div class="lbl">Trabajadores</div></div>
+                    <div class="stat-card"><div class="num" id="statAsistHoy">0</div><div class="lbl">Asistencias Hoy</div></div>
+                    <div class="stat-card"><div class="num" id="statHorasHoy">0h</div><div class="lbl">Horas Hoy</div></div>
+                    <div class="stat-card"><div class="num" id="statProxPago">-</div><div class="lbl">Próximo Pago</div></div>
                 </div>
+                <div class="card"><h3>🔔 Próximos Pagos (aviso 10 días antes)</h3><div id="listaProxPagos"></div></div>
+                <div class="card"><h3>📌 Resumen del Día</h3><div id="resumenDiario"></div></div>
             </div>
-            
-            <div class="card p-6">
-                <div class="flex items-center">
-                    <div class="bg-tok-blue bg-opacity-10 p-3 rounded-lg">
-                        <span class="text-tok-blue text-2xl">📊</span>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-sm font-medium text-gray-500">Asistencias Hoy</h3>
-                        <p id="stats-today" class="text-2xl font-bold text-gray-800">0</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card p-6">
-                <div class="flex items-center">
-                    <div class="bg-tok-yellow bg-opacity-10 p-3 rounded-lg">
-                        <span class="text-tok-yellow text-2xl">⏱️</span>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-sm font-medium text-gray-500">Horas Extras</h3>
-                        <p id="stats-extras" class="text-2xl font-bold text-gray-800">0h</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="card p-6">
-                <div class="flex items-center">
-                    <div class="bg-tok-purple bg-opacity-10 p-3 rounded-lg">
-                        <span class="text-tok-purple text-2xl">📈</span>
-                    </div>
-                    <div class="ml-4">
-                        <h3 class="text-sm font-medium text-gray-500">Prom. Diario</h3>
-                        <p id="stats-avg" class="text-2xl font-bold text-gray-800">0h</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tabs Navigation -->
-        <div class="mb-8">
-            <div class="border-b border-gray-200">
-                <nav class="-mb-px flex space-x-8">
-                    <button data-tab="workers" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-tok-green text-tok-green">
-                        👤 Trabajadores
-                    </button>
-                    <button data-tab="reports" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        📊 Reportes
-                    </button>
-                    <button data-tab="cards" class="tab-button py-4 px-1 border-b-2 font-medium text-sm border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        🏷️ Credenciales
-                    </button>
-                </nav>
-            </div>
-        </div>
-        
-        <!-- Tab Content: Workers -->
-        <div id="tab-workers" class="tab-content">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Formulario Registro -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Registrar Nuevo Trabajador</h2>
-                    
-                    <form id="worker-form" class="space-y-4">
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Nombres *</label>
-                                <input type="text" id="input-nombres" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Apellidos *</label>
-                                <input type="text" id="input-apellidos" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
-                            </div>
-                        </div>
-                        
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Cédula *</label>
-                                <input type="text" id="input-ci" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-1">Cargo *</label>
-                                <input type="text" id="input-cargo" required
-                                       class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-tok-green focus:border-transparent">
-                            </div>
-                        </div>
-                        
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Foto (opcional)</label>
-                            <input type="file" id="input-foto" accept="image/*"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg">
-                        </div>
-                        
-                        <div class="pt-4">
-                            <button type="submit" 
-                                    class="w-full bg-tok-green text-white py-3 px-4 rounded-lg font-medium hover:bg-emerald-600 transition-colors">
-                                💾 Guardar Trabajador
-                            </button>
-                        </div>
+            <!-- Trabajadores -->
+            <div class="section" id="trabajadores">
+                <div class="card">
+                    <h3>➕ Agregar / Editar Trabajador</h3>
+                    <form id="formTrabajador">
+                        <input type="hidden" id="trabId">
+                        <label>Nombre</label><input type="text" id="trabNombre" required placeholder="Nombre">
+                        <label>Apellido</label><input type="text" id="trabApellido" required placeholder="Apellido">
+                        <label>Cargo</label><input type="text" id="trabCargo" required placeholder="Ej: Operario">
+                        <label>Celular</label><input type="tel" id="trabCelular" required placeholder="+591 7XXXXXXXX">
+                        <label>Cédula</label><input type="text" id="trabCedula" required placeholder="12345678">
+                        <label>Contraseña</label><input type="text" id="trabPassword" required placeholder="Contraseña inicial">
+                        <label>Sucursal</label><input type="text" id="trabSucursal" value="Principal">
+                        <button type="submit" class="btn-primary" id="btnSaveTrab">💾 Guardar Trabajador</button>
+                        <button type="button" class="btn-outline" id="btnCancelTrab" style="display:none;">Cancelar Edición</button>
                     </form>
                 </div>
-                
-                <!-- Lista de Trabajadores -->
-                <div class="card p-6">
-                    <div class="flex justify-between items-center mb-6">
-                        <h2 class="text-xl font-bold text-gray-800">Lista de Trabajadores</h2>
-                        <button onclick="loadWorkers()" class="px-4 py-2 bg-gray-100 rounded-lg text-sm hover:bg-gray-200">
-                            🔄 Actualizar
-                        </button>
-                    </div>
-                    
-                    <div class="overflow-x-auto">
-                        <table class="min-w-full divide-y divide-gray-200">
-                            <thead>
-                                <tr>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nombre</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">CI</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Cargo</th>
-                                    <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody id="workers-list" class="divide-y divide-gray-200">
-                                <!-- Datos cargados aquí -->
-                            </tbody>
-                        </table>
-                    </div>
+                <div class="card">
+                    <h3>👥 Lista de Trabajadores</h3>
+                    <div class="table-wrap"><table><thead><tr><th>Nombre</th><th>Cargo</th><th>Celular</th><th>Cédula</th><th>Sucursal</th><th>Acciones</th></tr></thead><tbody id="tbodyTrabajadores"></tbody></table></div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Tab Content: Reports -->
-        <div id="tab-reports" class="tab-content hidden">
-            <div class="card p-6">
-                <h2 class="text-xl font-bold text-gray-800 mb-6">Reportes de Asistencia</h2>
-                
-                <!-- Filtros -->
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-                    <input type="date" id="filter-fecha" class="px-3 py-2 border rounded-lg">
-                    <select id="filter-trabajador" class="px-3 py-2 border rounded-lg">
-                        <option value="">Todos los trabajadores</option>
-                    </select>
-                    <select id="filter-evento" class="px-3 py-2 border rounded-lg">
-                        <option value="">Todos los eventos</option>
-                        <option value="entrada">Entrada</option>
-                        <option value="salida">Salida</option>
-                        <option value="extra">Horas Extra</option>
-                    </select>
-                    <button onclick="loadReports()" class="bg-tok-blue text-white py-2 px-4 rounded-lg hover:bg-blue-600">
-                        🔍 Filtrar
-                    </button>
-                </div>
-                
-                <!-- Tabla de Reportes -->
-                <div class="overflow-x-auto">
-                    <table class="min-w-full divide-y divide-gray-200">
-                        <thead>
-                            <tr>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Fecha</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Trabajador</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Evento</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Hora</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Horas</th>
-                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Notas</th>
-                            </tr>
-                        </thead>
-                        <tbody id="reports-list" class="divide-y divide-gray-200">
-                            <!-- Datos cargados aquí -->
-                        </tbody>
-                    </table>
-                </div>
-                
-                <!-- Exportar -->
-                <div class="mt-6 flex justify-end">
-                    <button onclick="exportToPDF()" class="px-4 py-2 bg-tok-green text-white rounded-lg hover:bg-emerald-600">
-                        📄 Exportar PDF
-                    </button>
+            <!-- Asistencias -->
+            <div class="section" id="asistencias">
+                <div class="card">
+                    <h3>📋 Reporte de Asistencias</h3>
+                    <label>Filtrar por Trabajador</label><select id="filtroTrabajadorAsist"><option value="">Todos</option></select>
+                    <div class="table-wrap" style="max-height:55vh;overflow-y:auto;"><table><thead><tr><th>Fecha</th><th>Trabajador</th><th>Entrada</th><th>Salida</th><th>Horas</th><th>Estado</th></tr></thead><tbody id="tbodyAsistencias"></tbody></table></div>
                 </div>
             </div>
-        </div>
-        
-        <!-- Tab Content: Cards -->
-        <div id="tab-cards" class="tab-content hidden">
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <!-- Generador de Credencial -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Generar Credencial</h2>
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Seleccionar Trabajador</label>
-                            <select id="select-worker" class="w-full px-3 py-2 border border-gray-300 rounded-lg"
-                                    onchange="loadWorkerForCard(this.value)">
-                                <option value="">Seleccione un trabajador</option>
-                            </select>
-                        </div>
-                        
-                        <div id="card-preview" class="hidden">
-                            <div class="flex justify-center mb-6">
-                                <div class="id-card">
-                                    <div class="absolute top-4 left-4 text-white font-bold">TOKTOK</div>
-                                    <div class="h-full flex">
-                                        <div class="w-1/3 bg-gray-200 flex items-center justify-center">
-                                            <img id="card-photo" class="w-full h-full object-cover">
-                                        </div>
-                                        <div class="w-2/3 p-4 flex flex-col justify-between">
-                                            <div class="text-white">
-                                                <div class="mb-2">
-                                                    <div class="text-xs opacity-80">Nombre:</div>
-                                                    <div id="card-name" class="font-bold"></div>
-                                                </div>
-                                                <div class="mb-2">
-                                                    <div class="text-xs opacity-80">CI:</div>
-                                                    <div id="card-ci" class="font-mono"></div>
-                                                </div>
-                                                <div>
-                                                    <div class="text-xs opacity-80">Cargo:</div>
-                                                    <div id="card-cargo"></div>
-                                                </div>
-                                            </div>
-                                            <div class="qr-overlay" id="qr-container"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="grid grid-cols-2 gap-3">
-                                <button onclick="printCard()" class="py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-800">
-                                    🖨️ Imprimir
-                                </button>
-                                <button onclick="downloadCard()" class="py-3 bg-tok-blue text-white rounded-lg hover:bg-blue-600">
-                                    📥 Descargar
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+            <!-- Ranking -->
+            <div class="section" id="ranking">
+                <div class="card"><h3>🏆 Ranking de Horas Trabajadas</h3><div id="rankingList"></div></div>
+            </div>
+            <!-- Pagos -->
+            <div class="section" id="pagos">
+                <div class="card">
+                    <h3>⚙️ Configuración de Pago</h3>
+                    <label>Días entre pagos</label><input type="number" id="configDiasPago" value="30" min="1">
+                    <label>Días de aviso</label><input type="number" id="configDiasAviso" value="10" min="1">
+                    <button class="btn-primary" onclick="guardarConfiguracion()">💾 Guardar</button>
                 </div>
-                
-                <!-- Lista de Credenciales -->
-                <div class="card p-6">
-                    <h2 class="text-xl font-bold text-gray-800 mb-6">Credenciales Generadas</h2>
-                    <div id="cards-list" class="space-y-4">
-                        <!-- Lista cargada aquí -->
-                    </div>
+                <div class="card"><h3>📅 Próximos Pagos</h3><div id="listaPagosCompleta"></div></div>
+            </div>
+            <!-- Descuentos -->
+            <div class="section" id="descuentos">
+                <div class="card">
+                    <h3>🔻 Descuentos / ➕ Adicionales</h3>
+                    <form id="formDescAdic">
+                        <label>Trabajador</label><select id="descTrabajadorId" required></select>
+                        <label>Tipo</label><select id="descTipo" required><option value="descuento">Descuento (-)</option><option value="adicional">Adicional (+)</option></select>
+                        <label>Cantidad Días</label><input type="number" id="descCantidad" value="1" min="1">
+                        <label>Motivo</label><textarea id="descMotivo" placeholder="Motivo..."></textarea>
+                        <button type="submit" class="btn-primary">📝 Registrar</button>
+                    </form>
+                </div>
+                <div class="card">
+                    <h3>📋 Historial</h3>
+                    <div class="table-wrap"><table><thead><tr><th>Fecha</th><th>Trabajador</th><th>Tipo</th><th>Días</th><th>Motivo</th></tr></thead><tbody id="tbodyDescAdic"></tbody></table></div>
                 </div>
             </div>
         </div>
     </div>
-    
     <script>
-        // ============================================
-        // CONFIGURACIÓN SUPABASE
-        // ============================================
-        const SUPABASE_URL = 'https://gqmkhqrsfnmrlunagjsx.supabase.co';
-        const SUPABASE_KEY = 'sb_publishable_cAAL7KuzDhu2zzsZeF7oLg__awJFxHQ';
-        
-        let supabase = null;
-        let currentWorkerData = null;
-        let qrCodeInstance = null;
-        
-        // ============================================
-        // INICIALIZACIÓN
-        // ============================================
-        document.addEventListener('DOMContentLoaded', async function() {
-            await initializeApp();
-            setupEventListeners();
-            setupTabs();
+        const SUPABASE_URL = 'https://jlzftmbewtzhzmmnbfyq.supabase.co';
+        const SUPABASE_ANON_KEY = 'sb_publishable_CGJqccnvB82QXTHBnwhIhg_bG0YQyDN';
+        const TELEGRAM_BOT_TOKEN = 'TU_BOT_TOKEN';
+        const TELEGRAM_CHAT_ID = 'TU_CHAT_ID';
+        const headers = { 'apikey': SUPABASE_ANON_KEY, 'Authorization': 'Bearer ' + SUPABASE_ANON_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=representation' };
+        async function supabaseGet(t, q='') { const r = await fetch(`${SUPABASE_URL}/rest/v1/${t}?${q}`,{headers}); if(!r.ok) throw new Error('GET '+t); return await r.json(); }
+        async function supabasePost(t, d) { const r = await fetch(`${SUPABASE_URL}/rest/v1/${t}`,{method:'POST',headers,body:JSON.stringify(d)}); if(!r.ok) throw new Error('POST '+t); return await r.json(); }
+        async function supabasePatch(t, id, d) { const r = await fetch(`${SUPABASE_URL}/rest/v1/${t}?id=eq.${id}`,{method:'PATCH',headers,body:JSON.stringify(d)}); if(!r.ok) throw new Error('PATCH '+t); return await r.json(); }
+        async function supabaseDelete(t, id) { await fetch(`${SUPABASE_URL}/rest/v1/${t}?id=eq.${id}`,{method:'DELETE',headers}); }
+        function toast(m) { const t = document.createElement('div'); t.className='toast'; t.textContent=m; document.body.appendChild(t); setTimeout(()=>t.remove(),2800); }
+
+        // Navegación
+        document.querySelectorAll('.sidebar nav button').forEach(btn => {
+            btn.addEventListener('click', ()=>{
+                document.querySelectorAll('.sidebar nav button').forEach(b=>b.classList.remove('active'));
+                btn.classList.add('active');
+                document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+                document.getElementById(btn.dataset.section).classList.add('active');
+                document.getElementById('sectionTitle').textContent = btn.textContent.trim();
+                if(btn.dataset.section==='dashboard') cargarDashboard();
+                if(btn.dataset.section==='trabajadores') cargarTrabajadores();
+                if(btn.dataset.section==='asistencias') cargarAsistencias();
+                if(btn.dataset.section==='ranking') cargarRanking();
+                if(btn.dataset.section==='pagos') cargarPagos();
+                if(btn.dataset.section==='descuentos') cargarDescuentos();
+            });
         });
-        
-        async function initializeApp() {
-            showToast('🔌 Conectando con Supabase...', 'info');
-            updateConnectionStatus('connecting');
-            
-            try {
-                // Inicializar Supabase
-                supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
-                    auth: { persistSession: false }
-                });
-                
-                // Verificar conexión
-                const { data, error } = await supabase
-                    .from('workers')
-                    .select('count', { count: 'exact', head: true });
-                
-                if (error) {
-                    throw new Error(`Error de conexión: ${error.message}`);
-                }
-                
-                // Conexión exitosa
-                updateConnectionStatus('connected');
-                showToast('✅ Conectado a Supabase exitosamente!', 'success');
-                
-                // Cargar datos iniciales
-                await loadInitialData();
-                
-            } catch (error) {
-                console.error('Error de inicialización:', error);
-                updateConnectionStatus('error');
-                showToast(`❌ Error: ${error.message}`, 'error');
-            }
-        }
-        
-        async function loadInitialData() {
-            try {
-                await Promise.all([
-                    loadWorkers(),
-                    loadStats(),
-                    loadReports()
-                ]);
-            } catch (error) {
-                console.error('Error cargando datos:', error);
-            }
-        }
-        
-        // ============================================
-        // FUNCIONES DE CONEXIÓN
-        // ============================================
-        function updateConnectionStatus(status) {
-            const statusEl = document.getElementById('connection-status');
-            statusEl.className = 'status-badge ';
-            
-            switch(status) {
-                case 'connected':
-                    statusEl.classList.add('status-connected');
-                    statusEl.innerHTML = '<span class="flex items-center"><span class="text-green-500">●</span><span class="ml-2">Conectado</span></span>';
-                    break;
-                case 'connecting':
-                    statusEl.classList.add('status-pending');
-                    statusEl.innerHTML = '<span class="flex items-center"><span class="animate-pulse">●</span><span class="ml-2">Conectando...</span></span>';
-                    break;
-                case 'error':
-                    statusEl.classList.add('status-disconnected');
-                    statusEl.innerHTML = '<span class="flex items-center"><span class="text-red-500">●</span><span class="ml-2">Error</span></span>';
-                    break;
-            }
-        }
-        
-        async function testConnection() {
-            showToast('🔍 Probando conexión...', 'info');
-            
-            try {
-                const { data, error } = await supabase
-                    .from('workers')
-                    .select('*')
-                    .limit(1);
-                
-                if (error) throw error;
-                
-                showToast('✅ Conexión exitosa!', 'success');
-                return true;
-            } catch (error) {
-                showToast(`❌ Error de conexión: ${error.message}`, 'error');
-                return false;
-            }
-        }
-        
-        // ============================================
-        // FUNCIONES DE TRABAJADORES
-        // ============================================
-        async function loadWorkers() {
-            try {
-                const { data, error } = await supabase
-                    .from('workers')
-                    .select('*')
-                    .order('nombres');
-                
-                if (error) throw error;
-                
-                // Actualizar lista
-                const tbody = document.getElementById('workers-list');
-                const select = document.getElementById('select-worker');
-                const filterSelect = document.getElementById('filter-trabajador');
-                
-                tbody.innerHTML = '';
-                select.innerHTML = '<option value="">Seleccione un trabajador</option>';
-                filterSelect.innerHTML = '<option value="">Todos los trabajadores</option>';
-                
-                if (data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="4" class="px-4 py-8 text-center text-gray-500">
-                                No hay trabajadores registrados
-                            </td>
-                        </tr>`;
-                    return;
-                }
-                
-                data.forEach(worker => {
-                    // Tabla
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-4 py-3">${worker.nombres} ${worker.apellidos}</td>
-                        <td class="px-4 py-3 font-mono">${worker.ci}</td>
-                        <td class="px-4 py-3">${worker.cargo}</td>
-                        <td class="px-4 py-3">
-                            <button onclick="deleteWorker('${worker.id}')" 
-                                    class="px-3 py-1 bg-red-100 text-red-700 rounded text-sm hover:bg-red-200">
-                                Eliminar
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                    
-                    // Selectores
-                    const option = `<option value="${worker.id}">${worker.nombres} ${worker.apellidos} - ${worker.ci}</option>`;
-                    select.innerHTML += option;
-                    filterSelect.innerHTML += option;
-                });
-                
-            } catch (error) {
-                console.error('Error cargando trabajadores:', error);
-                showToast('❌ Error al cargar trabajadores', 'error');
-            }
-        }
-        
-        async function deleteWorker(id) {
-            if (!confirm('¿Está seguro de eliminar este trabajador?')) return;
-            
-            try {
-                const { error } = await supabase
-                    .from('workers')
-                    .delete()
-                    .eq('id', id);
-                
-                if (error) throw error;
-                
-                showToast('✅ Trabajador eliminado', 'success');
-                await loadWorkers();
-                await loadStats();
-                
-            } catch (error) {
-                console.error('Error eliminando trabajador:', error);
-                showToast('❌ Error al eliminar trabajador', 'error');
-            }
-        }
-        
-        // ============================================
-        // FORMULARIO DE TRABAJADOR
-        // ============================================
-        document.getElementById('worker-form').addEventListener('submit', async function(e) {
+
+        // Trabajadores CRUD
+        let editando = null;
+        document.getElementById('formTrabajador').addEventListener('submit', async e => {
             e.preventDefault();
-            
-            const nombres = document.getElementById('input-nombres').value.trim();
-            const apellidos = document.getElementById('input-apellidos').value.trim();
-            const ci = document.getElementById('input-ci').value.trim();
-            const cargo = document.getElementById('input-cargo').value.trim();
-            const fotoFile = document.getElementById('input-foto').files[0];
-            
-            if (!nombres || !apellidos || !ci || !cargo) {
-                showToast('❌ Complete todos los campos obligatorios', 'error');
-                return;
-            }
-            
-            try {
-                showToast('🔄 Guardando trabajador...', 'info');
-                
-                // Subir foto si existe
-                let fotoUrl = null;
-                if (fotoFile) {
-                    const fileExt = fotoFile.name.split('.').pop();
-                    const fileName = `${ci}_${Date.now()}.${fileExt}`;
-                    const filePath = `fotos/${fileName}`;
-                    
-                    const { error: uploadError } = await supabase.storage
-                        .from('fotos_trabajadores')
-                        .upload(filePath, fotoFile);
-                    
-                    if (!uploadError) {
-                        const { data: urlData } = supabase.storage
-                            .from('fotos_trabajadores')
-                            .getPublicUrl(filePath);
-                        fotoUrl = urlData.publicUrl;
-                    }
-                }
-                
-                // Generar QR único
-                const qrId = `TOK-${ci}-${Date.now().toString(36)}`;
-                
-                // Insertar en base de datos
-                const { error } = await supabase
-                    .from('workers')
-                    .insert([{
-                        nombres,
-                        apellidos,
-                        ci,
-                        cargo,
-                        foto_url: fotoUrl,
-                        qr_id: qrId
-                    }]);
-                
-                if (error) {
-                    if (error.code === '23505') {
-                        throw new Error('Ya existe un trabajador con esa cédula');
-                    }
-                    throw error;
-                }
-                
-                // Éxito
-                showToast('✅ Trabajador registrado exitosamente!', 'success');
-                
-                // Limpiar formulario
-                this.reset();
-                
-                // Actualizar datos
-                await Promise.all([
-                    loadWorkers(),
-                    loadStats()
-                ]);
-                
-            } catch (error) {
-                console.error('Error guardando trabajador:', error);
-                showToast(`❌ Error: ${error.message}`, 'error');
-            }
+            const data = {
+                nombre: document.getElementById('trabNombre').value.trim(),
+                apellido: document.getElementById('trabApellido').value.trim(),
+                cargo: document.getElementById('trabCargo').value.trim(),
+                celular: document.getElementById('trabCelular').value.trim(),
+                cedula: document.getElementById('trabCedula').value.trim(),
+                password: document.getElementById('trabPassword').value.trim(),
+                sucursal: document.getElementById('trabSucursal').value.trim()||'Principal',
+                activo: true,
+                fecha_creacion: new Date().toISOString().split('T')[0]
+            };
+            if(editando) { await supabasePatch('trabajadores', editando, data); toast('✅ Actualizado'); editando=null; document.getElementById('btnCancelTrab').style.display='none'; document.getElementById('btnSaveTrab').textContent='💾 Guardar Trabajador'; }
+            else { await supabasePost('trabajadores', data); toast('✅ Creado'); }
+            document.getElementById('formTrabajador').reset();
+            document.getElementById('trabSucursal').value='Principal';
+            cargarTrabajadores(); cargarDashboard();
         });
-        
-        // ============================================
-        // FUNCIONES DE CREDENCIALES
-        // ============================================
-        async function loadWorkerForCard(workerId) {
-            if (!workerId) {
-                document.getElementById('card-preview').classList.add('hidden');
-                return;
-            }
-            
-            try {
-                const { data, error } = await supabase
-                    .from('workers')
-                    .select('*')
-                    .eq('id', workerId)
-                    .single();
-                
-                if (error) throw error;
-                
-                currentWorkerData = data;
-                
-                // Actualizar vista
-                document.getElementById('card-name').textContent = `${data.nombres} ${data.apellidos}`;
-                document.getElementById('card-ci').textContent = data.ci;
-                document.getElementById('card-cargo').textContent = data.cargo;
-                document.getElementById('card-photo').src = data.foto_url || 'https://placehold.co/100x100?text=Foto';
-                
-                // Generar QR
-                const qrContainer = document.getElementById('qr-container');
-                qrContainer.innerHTML = '';
-                
-                if (qrCodeInstance) {
-                    qrCodeInstance.clear();
-                }
-                
-                qrCodeInstance = new QRCode(qrContainer, {
-                    text: data.qr_id,
-                    width: 80,
-                    height: 80,
-                    colorDark: "#000000",
-                    colorLight: "#ffffff"
-                });
-                
-                document.getElementById('card-preview').classList.remove('hidden');
-                
-            } catch (error) {
-                console.error('Error cargando trabajador:', error);
-                showToast('❌ Error al cargar datos del trabajador', 'error');
-            }
-        }
-        
-        function printCard() {
-            if (!currentWorkerData) {
-                showToast('❌ Seleccione un trabajador primero', 'error');
-                return;
-            }
-            
-            const printWindow = window.open('', '_blank');
-            printWindow.document.write(`
-                <html>
-                    <head>
-                        <title>Credencial TOKTOK - ${currentWorkerData.nombres}</title>
-                        <style>
-                            body { 
-                                margin: 0; 
-                                padding: 20px; 
-                                display: flex; 
-                                justify-content: center; 
-                                align-items: center; 
-                                min-height: 100vh; 
-                            }
-                            @media print {
-                                .id-card { 
-                                    box-shadow: none !important; 
-                                    border: 1px solid #ccc; 
-                                }
-                            }
-                        </style>
-                    </head>
-                    <body>
-                        ${document.getElementById('card-preview').innerHTML}
-                        <script>
-                            window.onload = () => window.print();
-                        <\/script>
-                    </body>
-                </html>
-            `);
-            printWindow.document.close();
-        }
-        
-        function downloadCard() {
-            showToast('⚠ Función en desarrollo', 'info');
-            // Implementar descarga de imagen
-        }
-        
-        // ============================================
-        // FUNCIONES DE REPORTES
-        // ============================================
-        async function loadReports() {
-            try {
-                const fecha = document.getElementById('filter-fecha').value;
-                const trabajadorId = document.getElementById('filter-trabajador').value;
-                const evento = document.getElementById('filter-evento').value;
-                
-                let query = supabase
-                    .from('attendance')
-                    .select(`
-                        *,
-                        workers (nombres, apellidos, ci, cargo)
-                    `)
-                    .order('created_at', { ascending: false })
-                    .limit(100);
-                
-                if (fecha) {
-                    const startDate = fecha + 'T00:00:00';
-                    const endDate = fecha + 'T23:59:59';
-                    query = query.gte('created_at', startDate).lte('created_at', endDate);
-                }
-                
-                if (trabajadorId) {
-                    query = query.eq('worker_id', trabajadorId);
-                }
-                
-                if (evento) {
-                    query = query.eq('event_type', evento);
-                }
-                
-                const { data, error } = await query;
-                
-                if (error) throw error;
-                
-                const tbody = document.getElementById('reports-list');
-                tbody.innerHTML = '';
-                
-                if (!data || data.length === 0) {
-                    tbody.innerHTML = `
-                        <tr>
-                            <td colspan="6" class="px-4 py-8 text-center text-gray-500">
-                                No hay registros para mostrar
-                            </td>
-                        </tr>`;
-                    return;
-                }
-                
-                data.forEach(record => {
-                    const worker = record.workers || {};
-                    const date = new Date(record.created_at);
-                    
-                    const tr = document.createElement('tr');
-                    tr.innerHTML = `
-                        <td class="px-4 py-3">${date.toLocaleDateString('es-ES')}</td>
-                        <td class="px-4 py-3">${worker.nombres || ''} ${worker.apellidos || ''}</td>
-                        <td class="px-4 py-3">
-                            <span class="px-2 py-1 rounded text-xs ${
-                                record.event_type === 'entrada' ? 'bg-green-100 text-green-800' :
-                                record.event_type === 'salida' ? 'bg-blue-100 text-blue-800' :
-                                'bg-yellow-100 text-yellow-800'
-                            }">
-                                ${record.event_type}
-                            </span>
-                        </td>
-                        <td class="px-4 py-3">${date.toLocaleTimeString('es-ES', {hour: '2-digit', minute:'2-digit'})}</td>
-                        <td class="px-4 py-3">${record.horas_trabajadas || '0'}h</td>
-                        <td class="px-4 py-3 max-w-xs truncate">${record.notes || ''}</td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-                
-            } catch (error) {
-                console.error('Error cargando reportes:', error);
-                showToast('❌ Error al cargar reportes', 'error');
-            }
-        }
-        
-        async function loadStats() {
-            try {
-                // Total trabajadores
-                const { count: totalWorkers } = await supabase
-                    .from('workers')
-                    .select('*', { count: 'exact', head: true });
-                
-                document.getElementById('stats-workers').textContent = totalWorkers || 0;
-                
-                // Asistencias hoy
-                const today = new Date().toISOString().split('T')[0];
-                const { count: todayAttendances } = await supabase
-                    .from('attendance')
-                    .select('*', { count: 'exact', head: true })
-                    .gte('created_at', today + 'T00:00:00')
-                    .lte('created_at', today + 'T23:59:59');
-                
-                document.getElementById('stats-today').textContent = todayAttendances || 0;
-                
-                // Horas extras
-                const { data: extrasData } = await supabase
-                    .from('attendance')
-                    .select('horas_extras')
-                    .gte('created_at', today + 'T00:00:00')
-                    .lte('created_at', today + 'T23:59:59');
-                
-                const totalExtras = extrasData?.reduce((sum, item) => sum + (item.horas_extras || 0), 0) || 0;
-                document.getElementById('stats-extras').textContent = `${totalExtras.toFixed(1)}h`;
-                
-                // Promedio diario
-                const { data: weeklyData } = await supabase
-                    .from('attendance')
-                    .select('horas_trabajadas, created_at')
-                    .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString());
-                
-                const avgHours = weeklyData?.reduce((sum, item) => sum + (item.horas_trabajadas || 0), 0) / 7 || 0;
-                document.getElementById('stats-avg').textContent = `${avgHours.toFixed(1)}h`;
-                
-            } catch (error) {
-                console.error('Error cargando estadísticas:', error);
-            }
-        }
-        
-        function exportToPDF() {
-            showToast('⚠ Función PDF en desarrollo', 'info');
-        }
-        
-        // ============================================
-        // FUNCIONES DE UTILIDAD
-        // ============================================
-        function showToast(message, type = 'info') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast toast-${type}`;
-            
-            setTimeout(() => {
-                toast.classList.add('show');
-            }, 10);
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 4000);
-        }
-        
-        function setupTabs() {
-            const tabButtons = document.querySelectorAll('.tab-button');
-            const tabContents = document.querySelectorAll('.tab-content');
-            
-            tabButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    const tabId = button.dataset.tab;
-                    
-                    // Actualizar botones
-                    tabButtons.forEach(btn => {
-                        btn.classList.remove('border-tok-green', 'text-tok-green');
-                        btn.classList.add('border-transparent', 'text-gray-500');
-                    });
-                    
-                    button.classList.remove('border-transparent', 'text-gray-500');
-                    button.classList.add('border-tok-green', 'text-tok-green');
-                    
-                    // Mostrar contenido
-                    tabContents.forEach(content => {
-                        content.classList.add('hidden');
-                    });
-                    
-                    document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-                });
+        document.getElementById('btnCancelTrab').addEventListener('click', ()=>{
+            editando=null; document.getElementById('formTrabajador').reset();
+            document.getElementById('trabSucursal').value='Principal';
+            document.getElementById('btnCancelTrab').style.display='none';
+            document.getElementById('btnSaveTrab').textContent='💾 Guardar Trabajador';
+        });
+        async function cargarTrabajadores() {
+            const ts = await supabaseGet('trabajadores', 'select=*&order=id.desc');
+            const tbody = document.getElementById('tbodyTrabajadores');
+            const filtro = document.getElementById('filtroTrabajadorAsist');
+            const descSel = document.getElementById('descTrabajadorId');
+            tbody.innerHTML=''; filtro.innerHTML='<option value="">Todos</option>'; descSel.innerHTML='';
+            ts.forEach(t=>{
+                tbody.innerHTML += `<tr><td>${t.nombre} ${t.apellido}</td><td>${t.cargo}</td><td>${t.celular}</td><td>${t.cedula}</td><td>${t.sucursal||'Principal'}</td><td><button class="btn-sm btn-warning" onclick="editarTrabajador(${t.id})">✏️</button> <button class="btn-sm btn-danger" onclick="eliminarTrabajador(${t.id})">🗑️</button></td></tr>`;
+                filtro.innerHTML += `<option value="${t.id}">${t.nombre} ${t.apellido}</option>`;
+                descSel.innerHTML += `<option value="${t.id}">${t.nombre} ${t.apellido} (${t.cedula})</option>`;
             });
         }
-        
-        function setupEventListeners() {
-            // Test connection button
-            window.testConnection = testConnection;
-            
-            // Reload workers
-            window.loadWorkers = loadWorkers;
-            
-            // Load reports
-            window.loadReports = loadReports;
-            
-            // Export PDF
-            window.exportToPDF = exportToPDF;
-            
-            // Print card
-            window.printCard = printCard;
-            
-            // Download card
-            window.downloadCard = downloadCard;
-            
-            // Delete worker
-            window.deleteWorker = deleteWorker;
+        async function editarTrabajador(id) {
+            const t = (await supabaseGet('trabajadores', `select=*&id=eq.${id}`))[0];
+            document.getElementById('trabId').value=t.id;
+            document.getElementById('trabNombre').value=t.nombre;
+            document.getElementById('trabApellido').value=t.apellido;
+            document.getElementById('trabCargo').value=t.cargo;
+            document.getElementById('trabCelular').value=t.celular;
+            document.getElementById('trabCedula').value=t.cedula;
+            document.getElementById('trabPassword').value=t.password;
+            document.getElementById('trabSucursal').value=t.sucursal||'Principal';
+            editando=t.id;
+            document.getElementById('btnCancelTrab').style.display='block';
+            document.getElementById('btnSaveTrab').textContent='✏️ Actualizar';
+            document.querySelector('[data-section="trabajadores"]').click();
         }
+        async function eliminarTrabajador(id) { if(confirm('¿Eliminar?')) { await supabaseDelete('trabajadores', id); cargarTrabajadores(); cargarDashboard(); } }
+
+        // Asistencias
+        async function cargarAsistencias() {
+            const filtro = document.getElementById('filtroTrabajadorAsist').value;
+            let q = 'select=*&order=fecha.desc,hora_entrada.desc&limit=100';
+            if(filtro) q = `select=*&trabajador_id=eq.${filtro}&order=fecha.desc,hora_entrada.desc&limit=100`;
+            const as = await supabaseGet('asistencias', q);
+            const ts = await supabaseGet('trabajadores', 'select=id,nombre,apellido');
+            const map = {}; ts.forEach(t=>map[t.id]=t.nombre+' '+t.apellido);
+            const tbody = document.getElementById('tbodyAsistencias');
+            tbody.innerHTML='';
+            as.forEach(a=>{
+                const estado = a.hora_salida?'Completo':'Pendiente';
+                tbody.innerHTML += `<tr><td>${a.fecha}</td><td>${map[a.trabajador_id]||'ID:'+a.trabajador_id}</td><td>${a.hora_entrada||'-'}</td><td>${a.hora_salida||'-'}</td><td>${a.horas_trabajadas||'0'}h</td><td><span class="badge ${a.hora_salida?'badge-success':'badge-warning'}">${estado}</span></td></tr>`;
+            });
+        }
+        document.getElementById('filtroTrabajadorAsist').addEventListener('change', cargarAsistencias);
+
+        // Ranking
+        async function cargarRanking() {
+            const ts = await supabaseGet('trabajadores', 'select=id,nombre,apellido,cargo');
+            const as = await supabaseGet('asistencias', 'select=trabajador_id,horas_trabajadas&horas_trabajadas=not.is.null');
+            const map = {}; as.forEach(a=>{ map[a.trabajador_id]=(map[a.trabajador_id]||0)+parseFloat(a.horas_trabajadas); });
+            const ranking = ts.map(t=>({...t, horas: map[t.id]||0})).sort((a,b)=>b.horas-a.horas);
+            document.getElementById('rankingList').innerHTML = ranking.map((r,i)=>`<div style="display:flex;align-items:center;padding:6px 0;border-bottom:1px solid #e2e8f0;"><span style="font-size:1.2rem;font-weight:700;color:#2563eb;width:30px;">#${i+1}</span><span style="flex:1;">${r.nombre} ${r.apellido} <small style="color:#64748b">${r.cargo}</small></span><span style="font-weight:700;">${r.horas.toFixed(1)}h</span></div>`).join('');
+        }
+
+        // Pagos
+        async function cargarPagos() {
+            const configs = await supabaseGet('configuracion', 'select=*');
+            const mapC = {}; configs.forEach(c=>mapC[c.clave]=c.valor);
+            document.getElementById('configDiasPago').value = mapC['dias_pago']||'30';
+            document.getElementById('configDiasAviso').value = mapC['dias_aviso']||'10';
+            const diasPago = parseInt(mapC['dias_pago']||'30');
+            const ts = await supabaseGet('trabajadores', 'select=*');
+            const hoy = new Date();
+            document.getElementById('listaPagosCompleta').innerHTML = ts.map(t=>{
+                const fc = new Date(t.fecha_creacion+'T00:00:00');
+                let dias = Math.floor((hoy-fc)/(1000*60*60*24));
+                if(dias<0) dias=0;
+                const diasPara = diasPago - (dias%diasPago);
+                return `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #e2e8f0;"><span>${t.nombre} ${t.apellido}</span><span class="badge ${diasPara<=10?'badge-warning':'badge-info'}">📅 ${diasPara} días</span></div>`;
+            }).join('');
+        }
+        async function guardarConfiguracion() {
+            const diasPago = document.getElementById('configDiasPago').value;
+            const diasAviso = document.getElementById('configDiasAviso').value;
+            const configs = await supabaseGet('configuracion', 'select=*');
+            const mapC = {}; configs.forEach(c=>mapC[c.clave]=c.id);
+            if(mapC['dias_pago']) await supabasePatch('configuracion', mapC['dias_pago'], {valor:diasPago});
+            else await supabasePost('configuracion', {clave:'dias_pago', valor:diasPago});
+            if(mapC['dias_aviso']) await supabasePatch('configuracion', mapC['dias_aviso'], {valor:diasAviso});
+            else await supabasePost('configuracion', {clave:'dias_aviso', valor:diasAviso});
+            toast('✅ Configuración guardada'); cargarPagos();
+        }
+
+        // Descuentos
+        document.getElementById('formDescAdic').addEventListener('submit', async e=>{
+            e.preventDefault();
+            await supabasePost('descuentos_adicionales', {
+                trabajador_id: parseInt(document.getElementById('descTrabajadorId').value),
+                tipo: document.getElementById('descTipo').value,
+                cantidad_dias: parseInt(document.getElementById('descCantidad').value),
+                motivo: document.getElementById('descMotivo').value.trim(),
+                fecha: new Date().toISOString().split('T')[0]
+            });
+            toast('✅ Registrado'); cargarDescuentos(); cargarDashboard();
+        });
+        async function cargarDescuentos() {
+            const desc = await supabaseGet('descuentos_adicionales', 'select=*&order=fecha.desc&limit=50');
+            const ts = await supabaseGet('trabajadores', 'select=id,nombre,apellido');
+            const map = {}; ts.forEach(t=>map[t.id]=t.nombre+' '+t.apellido);
+            document.getElementById('tbodyDescAdic').innerHTML = desc.map(d=>`<tr><td>${d.fecha}</td><td>${map[d.trabajador_id]||'ID:'+d.trabajador_id}</td><td><span class="badge ${d.tipo==='descuento'?'badge-danger':'badge-success'}">${d.tipo==='descuento'?'🔻 Descuento':'➕ Adicional'}</span></td><td>${d.cantidad_dias}</td><td>${d.motivo||'-'}</td></tr>`).join('');
+        }
+
+        // Dashboard
+        async function cargarDashboard() {
+            const ts = await supabaseGet('trabajadores', 'select=*');
+            document.getElementById('statTrab').textContent = ts.length;
+            const hoy = new Date().toISOString().split('T')[0];
+            const asHoy = await supabaseGet('asistencias', `select=*&fecha=eq.${hoy}`);
+            document.getElementById('statAsistHoy').textContent = asHoy.length;
+            let totalH = 0; asHoy.forEach(a=>totalH+=parseFloat(a.horas_trabajadas||0));
+            document.getElementById('statHorasHoy').textContent = totalH.toFixed(1)+'h';
+            const configs = await supabaseGet('configuracion', 'select=*');
+            const mapC = {}; configs.forEach(c=>mapC[c.clave]=c.valor);
+            const diasPago = parseInt(mapC['dias_pago']||'30');
+            let minD=999, nom='-'; const hoyD=new Date();
+            ts.forEach(t=>{
+                const fc=new Date(t.fecha_creacion+'T00:00:00');
+                let dias=Math.floor((hoyD-fc)/(1000*60*60*24)); if(dias<0)dias=0;
+                const dp=diasPago-(dias%diasPago); if(dp<minD){minD=dp; nom=t.nombre;}
+            });
+            document.getElementById('statProxPago').textContent = minD<999?minD+'d ('+nom+')':'-';
+            document.getElementById('listaProxPagos').innerHTML = ts.filter(t=>{
+                const fc=new Date(t.fecha_creacion+'T00:00:00');
+                let dias=Math.floor((hoyD-fc)/(1000*60*60*24)); if(dias<0)dias=0;
+                return (diasPago-(dias%diasPago)) <= 10;
+            }).map(t=>`<div>⚠️ <strong>${t.nombre}</strong> - Pago en ${diasPago-(Math.floor((hoyD-new Date(t.fecha_creacion+'T00:00:00'))/(1000*60*60*24))%diasPago)} días</div>`).join('')||'<div class="empty-state">Sin avisos</div>';
+            document.getElementById('resumenDiario').innerHTML = asHoy.length? asHoy.map(a=>`<div>👤 ${ts.find(t=>t.id==a.trabajador_id)?.nombre||'ID:'+a.trabajador_id} | 🕐 ${a.hora_entrada||'-'} → ${a.hora_salida||'Pendiente'} | ⏱️ ${a.horas_trabajadas||'0'}h</div>`).join(''):'<div class="empty-state">Sin asistencias hoy</div>';
+        }
+
+        // Inicial
+        cargarDashboard(); cargarTrabajadores(); cargarPagos(); cargarDescuentos();
+        setInterval(()=>{ if(document.getElementById('dashboard').classList.contains('active')) cargarDashboard(); }, 60000);
     </script>
 </body>
 </html>
