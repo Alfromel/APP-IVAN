@@ -8,8 +8,8 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
     <style>
         :root {
-            --primary: #6d28d9;
-            --primary-dark: #5b21b6;
+            --primary: #4C1D95;
+            --primary-dark: #3E0B5F;
             --secondary: #059669;
             --secondary-dark: #047857;
             --accent: #f59e0b;
@@ -1315,7 +1315,27 @@
                 </div>
             </div>
             
-            <!-- Recent Transactions -->
+            <!-- Dashboard Charts Section -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <div style="position:relative; height:250px; margin-bottom:1.5rem;">
+                            <h6 class="mb-3" style="font-weight:600; color:#495057;">Transacciones por Tipo</h6>
+                            <canvas id="transactions-by-type-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="chart-container">
+                        <div style="position:relative; height:250px; margin-bottom:1.5rem;">
+                            <h6 class="mb-3" style="font-weight:600; color:#495057;">Balances</h6>
+                            <canvas id="income-expense-chart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Transactions Table -->
             <div class="row">
                 <div class="col-12">
                     <div class="table-container">
@@ -1363,8 +1383,8 @@
                 </div>
             </div>
             
-            <!-- Advanced Search Container -->
-            <div class="advanced-search-container">
+            <!-- Advanced Search Container (oculto: filtros no funcionales) -->
+            <div id="users-advanced-search-container" class="advanced-search-container" style="display:none;">
                 <div class="search-header">
                     <h6 class="search-title">Búsqueda y Filtros</h6>
                     <button class="search-toggle" id="toggle-users-filters">
@@ -1490,8 +1510,8 @@
                 
                 <div class="p-3 border-top">
                     <nav>
-                        <ul class="pagination justify-content-center mb-0" id="users-pagination">
-                            <!-- Pagination will be generated here -->
+                        <ul class="pagination justify-content-center mb-0" id="users-pagination" style="display:none;">
+                            <!-- Paginación deshabilitada: mostramos todos los usuarios en una sola lista -->
                         </ul>
                     </nav>
                 </div>
@@ -1598,11 +1618,17 @@
             <div class="table-container">
                 <div class="p-3 border-bottom d-flex justify-content-between align-items-center">
                     <h5 class="mb-0">Todas las Transacciones</h5>
-                    <div class="d-none d-md-flex">
+                    <div class="d-none d-md-flex align-items-center gap-2">
                         <div class="search-box me-2">
                             <i class="fas fa-search"></i>
                             <input type="text" class="form-control form-control-sm" placeholder="Buscar..." id="transaction-search-desktop">
                         </div>
+                        <button class="btn btn-sm btn-outline-success" id="download-transactions-pdf">
+                            <i class="fas fa-file-pdf me-1"></i> Descargar PDF
+                        </button>
+                        <button class="btn btn-sm btn-outline-info" id="download-transactions-excel">
+                            <i class="fas fa-file-excel me-1"></i> Descargar Excel
+                        </button>
                     </div>
                 </div>
                 
@@ -2769,6 +2795,8 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
     <script>
         // Configuración de Supabase
         const supabaseUrl = 'https://aleadadisazocjovibeh.supabase.co';
@@ -2779,6 +2807,7 @@
         let currentAdmin = null;
         let currentSection = 'dashboard';
         let usersData = [];
+        let usersMap = {};
         let transactionsData = [];
         let rechargesData = [];
         let gameRechargesData = [];
@@ -2997,6 +3026,24 @@
                 return userBalances;
             } catch (error) {
                 console.error('Error calculating user balances:', error);
+                return {};
+            }
+        };
+
+        // Asegurar que exista un mapa id->nombre de usuarios
+        const ensureUsersMap = async () => {
+            try {
+                if (usersMap && Object.keys(usersMap).length > 0) return usersMap;
+                // intentar usar usersData si ya está cargado
+                if (usersData && usersData.length > 0) {
+                    usersData.forEach(u => { usersMap[u.id] = u.full_name || u.email || u.id; });
+                    return usersMap;
+                }
+                const allUsers = await fetchAllRecords('user_profiles', 'id, full_name, email');
+                allUsers.forEach(u => { usersMap[u.id] = u.full_name || u.email || u.id; });
+                return usersMap;
+            } catch (err) {
+                console.error('Error building usersMap:', err);
                 return {};
             }
         };
@@ -3294,14 +3341,18 @@
                     });
                 }
                 
-                usersData = filteredUsers;
-                const totalPages = Math.ceil(usersData.length / 10);
-                const start = (page - 1) * 10;
-                const paginatedUsers = usersData.slice(start, start + 10);
-                
-                renderUsersTable(paginatedUsers);
-                renderUsersMobileList(paginatedUsers);
-                renderUsersPagination(page, totalPages);
+                // Ordenar usuarios por saldo descendente y mostrar todos en una sola lista (sin paginación)
+                usersData = filteredUsers.sort((a, b) => {
+                    const ba = userBalances[a.id] || 0;
+                    const bb = userBalances[b.id] || 0;
+                    return bb - ba;
+                });
+
+                renderUsersTable(usersData);
+                renderUsersMobileList(usersData);
+                // Ocultar paginación (ya mostramos todo)
+                const usersPagination = document.getElementById('users-pagination');
+                if (usersPagination) usersPagination.style.display = 'none';
                 updateFilterTags('users');
                 
             } catch (error) {
@@ -3367,14 +3418,17 @@
                 // Ordenar por fecha descendente
                 allTransactions.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
                 
+                // Mostrar todas las transacciones (sin paginación)
                 transactionsData = allTransactions;
-                const totalPages = Math.ceil(transactionsData.length / 10);
-                const start = (page - 1) * 10;
-                const paginatedTransactions = transactionsData.slice(start, start + 10);
-                
-                renderTransactionsTable(paginatedTransactions);
-                renderTransactionsMobileList(paginatedTransactions);
-                renderTransactionsPagination(page, totalPages);
+
+                // Asegurar mapa de usuarios para mostrar nombres
+                await ensureUsersMap();
+
+                renderTransactionsTable(transactionsData);
+                renderTransactionsMobileList(transactionsData);
+                // Ocultar paginación
+                const trPagination = document.getElementById('transactions-pagination');
+                if (trPagination) trPagination.style.display = 'none';
                 updateFilterTags('transactions');
                 
             } catch (error) {
@@ -3382,6 +3436,214 @@
                 showToast('Error al cargar las transacciones', 'error');
             }
         };
+
+        // Descargar todas las transacciones en PDF con diseño profesional
+        const downloadAllTransactionsPDF = async () => {
+            try {
+                // Usar datos ya cargados si existen, sino obtenerlas todas
+                let allTransactions = transactionsData && transactionsData.length ? transactionsData : await fetchAllRecords('transactions', '*');
+                if (!allTransactions || allTransactions.length === 0) {
+                    showToast('No hay transacciones para descargar', 'error');
+                    return;
+                }
+
+                const { jsPDF } = window.jspdf;
+                const doc = new jsPDF({ orientation: 'landscape' });
+                
+                // Colores personalizados
+                const primaryColor = [76, 29, 149];
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                
+                // PÁGINA 1: Encabezado con información
+                doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+                doc.rect(0, 0, pageWidth, 20, 'F');
+                
+                // Título
+                doc.setTextColor(255, 255, 255);
+                doc.setFontSize(14);
+                doc.setFont(undefined, 'bold');
+                doc.text('REPORTE DE TRANSACCIONES', 14, 12);
+                
+                // Fecha en la esquina derecha
+                doc.setFontSize(9);
+                doc.setFont(undefined, 'normal');
+                doc.text(`${new Date().toLocaleDateString('es-ES')} - ${new Date().toLocaleTimeString('es-ES')}`, pageWidth - 14, 12, { align: 'right' });
+                
+                // Línea separadora
+                doc.setDrawColor(200, 200, 200);
+                doc.setLineWidth(0.5);
+                doc.line(14, 22, pageWidth - 14, 22);
+                
+                // Encabezados de tabla
+                doc.setTextColor(0, 0, 0);
+                doc.setFontSize(8);
+                doc.setFont(undefined, 'bold');
+                
+                const headers = ['#', 'ID Transacción', 'Usuario', 'Tipo', 'Monto', 'Fecha', 'Hora', 'Estado'];
+                const colWidths = [6, 28, 28, 15, 22, 18, 18, 20];
+                let xPos = 14;
+                
+                doc.setFillColor(245, 245, 245);
+                doc.setDrawColor(200, 200, 200);
+                headers.forEach((header, idx) => {
+                    doc.rect(xPos, 25, colWidths[idx], 6, 'FD');
+                    doc.text(header, xPos + 2, 28.5);
+                    xPos += colWidths[idx];
+                });
+                
+                // Datos de transacciones
+                doc.setFont(undefined, 'normal');
+                let yTable = 32;
+                
+                allTransactions.forEach((t, idx) => {
+                    const userName = (usersMap && usersMap[t.user_id]) ? usersMap[t.user_id] : t.user_id;
+                    const typeLabel = t.type === 'ingreso' || t.type === 'income' ? 'Ingreso' : 'Retiro';
+                    const isIncome = t.type === 'ingreso' || t.type === 'income';
+                    const fecha = new Date(t.created_at);
+                    
+                    // Alternancia de colores de fondo
+                    if (idx % 2 === 0) {
+                        doc.setFillColor(255, 255, 255);
+                    } else {
+                        doc.setFillColor(250, 250, 250);
+                    }
+                    
+                    // Línea separadora
+                    doc.setDrawColor(240, 240, 240);
+                    doc.rect(14, yTable, pageWidth - 28, 5.5, 'FD');
+                    
+                    doc.setFontSize(7);
+                    const rowData = [
+                        (idx + 1).toString(),
+                        t.id.substring(0, 12),
+                        userName.substring(0, 18),
+                        typeLabel,
+                        formatCurrency(t.amount),
+                        formatDate(t.created_at),
+                        fecha.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' }),
+                        t.status
+                    ];
+                    
+                    xPos = 14;
+                    rowData.forEach((data, colIdx) => {
+                        doc.text(data, xPos + 2, yTable + 3.5);
+                        xPos += colWidths[colIdx];
+                    });
+                    
+                    yTable += 5.5;
+                    
+                    // Nueva página si es necesario
+                    if (yTable > 255) {
+                        doc.addPage();
+                        yTable = 20;
+                        
+                        // Encabezados en nueva página
+                        doc.setFontSize(8);
+                        doc.setFont(undefined, 'bold');
+                        doc.setFillColor(245, 245, 245);
+                        doc.setDrawColor(200, 200, 200);
+                        xPos = 14;
+                        headers.forEach((header, idx) => {
+                            doc.rect(xPos, yTable, colWidths[idx], 6, 'FD');
+                            doc.text(header, xPos + 2, yTable + 3.5);
+                            xPos += colWidths[idx];
+                        });
+                        doc.setFont(undefined, 'normal');
+                        yTable += 8;
+                    }
+                });
+                
+                // Pie de página
+                doc.setFont(undefined, 'normal');
+                doc.setFontSize(7);
+                doc.setTextColor(150, 150, 150);
+                const pageCount = doc.internal.pages.length - 1;
+                for (let i = 1; i <= pageCount; i++) {
+                    doc.setPage(i);
+                    doc.text(`Página ${i} de ${pageCount}`, pageWidth / 2, pageHeight - 8, { align: 'center' });
+                }
+                
+                doc.save(`transacciones_${new Date().toISOString().split('T')[0]}.pdf`);
+                showToast('PDF descargado exitosamente', 'success');
+            } catch (err) {
+                console.error('Error generando PDF:', err);
+                showToast('Error al generar PDF de transacciones', 'error');
+            }
+        };
+
+        // Descargar todas las transacciones en Excel con resumen detallado
+        const downloadAllTransactionsExcel = async () => {
+            try {
+                let allTransactions = transactionsData && transactionsData.length ? transactionsData : await fetchAllRecords('transactions', '*');
+                if (!allTransactions || allTransactions.length === 0) {
+                    showToast('No hay transacciones para descargar', 'error');
+                    return;
+                }
+
+                // Preparar datos para Excel con formato profesional
+                const excelData = allTransactions.map((t, idx) => ({
+                    '#': idx + 1,
+                    'ID Transacción': t.id,
+                    'Usuario': usersMap[t.user_id] || t.user_id,
+                    'Tipo': t.type === 'ingreso' || t.type === 'income' ? 'Ingreso' : 'Retiro',
+                    'Descripción': t.description || 'Sin descripción',
+                    'Monto': t.amount,
+                    'Fecha': formatDate(t.created_at),
+                    'Hora': new Date(t.created_at).toLocaleTimeString('es-ES'),
+                    'Estado': t.status
+                }));
+
+                // Crear hoja de transacciones
+                const worksheet = XLSX.utils.json_to_sheet(excelData);
+                
+                // Configurar ancho de columnas profesional
+                const colWidths = [6, 28, 25, 12, 25, 15, 15, 12, 12];
+                worksheet['!cols'] = colWidths.map(w => ({wch: w}));
+
+                // Aplicar estilos a los encabezados
+                const headerStyle = {
+                    fill: { fgColor: { rgb: 'FF4C1D95' } },
+                    font: { bold: true, color: { rgb: 'FFFFFFFF' } },
+                    alignment: { horizontal: 'center', vertical: 'center' }
+                };
+
+                // Aplicar estilos a las celdas
+                const range = XLSX.utils.decode_range(worksheet['!ref']);
+                for (let C = range.s.c; C <= range.e.c; ++C) {
+                    const address = XLSX.utils.encode_col(C) + '1';
+                    if (!worksheet[address]) continue;
+                    worksheet[address].s = headerStyle;
+                }
+
+                // Crear workbook con solo la hoja de transacciones
+                const workbook = XLSX.utils.book_new();
+                XLSX.utils.book_append_sheet(workbook, worksheet, 'Transacciones');
+                
+                XLSX.writeFile(workbook, `transacciones_${new Date().toISOString().split('T')[0]}.xlsx`);
+                showToast('Excel descargado exitosamente', 'success');
+            } catch (err) {
+                console.error('Error generando Excel:', err);
+                showToast('Error al generar Excel de transacciones', 'error');
+            }
+        };
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const pdfBtn = document.getElementById('download-transactions-pdf');
+            if (pdfBtn) pdfBtn.addEventListener('click', downloadAllTransactionsPDF);
+            const excelBtn = document.getElementById('download-transactions-excel');
+            if (excelBtn) excelBtn.addEventListener('click', downloadAllTransactionsExcel);
+            // Búsqueda rápida de usuario desde la caja de escritorio (mostrar por ID al presionar Enter)
+            const userSearchDesktop = document.getElementById('user-search-desktop');
+            if (userSearchDesktop) {
+                userSearchDesktop.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        currentFilters.users.search = userSearchDesktop.value.trim();
+                        loadUsers(1);
+                    }
+                });
+            }
+        });
         
         const loadRecharges = async (page = 1) => {
             try {
@@ -3410,7 +3672,7 @@
                     queryFilters.lte = { ...queryFilters.lte, created_at: filters.dateTo + 'T23:59:59' };
                 }
                 
-                let allRecharges = await fetchAllRecords('recharges', '*', queryFilters);
+                let allRecharges = await fetchAllRecords('mobile_recharges', '*', queryFilters);
                 
                 // Filtros rápidos
                 if (filters.quickFilter !== 'all') {
@@ -3794,8 +4056,8 @@
                                 <span class="mobile-card-value user-id-badge">${transaction.id.substring(0, 8)}...</span>
                             </div>
                             <div class="mobile-card-field">
-                                <span class="mobile-card-label">Usuario ID:</span>
-                                <span class="mobile-card-value user-id-badge">${transaction.user_id.substring(0, 8)}...</span>
+                                <span class="mobile-card-label">Usuario:</span>
+                                <span class="mobile-card-value user-id-badge">${usersMap[transaction.user_id] || transaction.user_id}</span>
                             </div>
                             <div class="mobile-card-field">
                                 <span class="mobile-card-label">Monto:</span>
@@ -4193,7 +4455,7 @@
                 return `
                     <tr class="transaction-highlight transaction-row">
                         <td><span class="user-id-badge">${transaction.id}</span></td>
-                        <td><span class="user-id-badge">${transaction.user_id}</span></td>
+                        <td><span class="user-id-badge">${usersMap[transaction.user_id] || transaction.user_id}</span></td>
                         <td class="text-capitalize">${typeNames[transaction.type] || transaction.type}</td>
                         <td>${description}</td>
                         <td class="${textColor} fw-medium">${sign}${formatCurrency(transaction.amount)}</td>
@@ -6726,9 +6988,97 @@
                 
                 renderRecentTransactions(allTransactions, users);
                 
+                // Renderizar gráficos del dashboard
+                renderDashboardCharts(allTransactions);
+                
             } catch (error) {
                 console.error('Error loading dashboard data:', error);
                 showToast('Error al cargar los datos del dashboard', 'error');
+            }
+        };
+        
+        // Función para renderizar gráficos del Dashboard
+        const renderDashboardCharts = (transactions) => {
+            try {
+                // Gráfico 1: Transacciones por Tipo (Pie Chart)
+                const typeCounts = { deposit: 0, withdrawal: 0, transfer: 0 };
+                transactions.forEach(t => {
+                    if (t.type in typeCounts) typeCounts[t.type]++;
+                });
+                
+                const ctxType = document.getElementById('transactions-by-type-chart');
+                if (ctxType) {
+                    if (window.transactionsByTypeChart) window.transactionsByTypeChart.destroy();
+                    window.transactionsByTypeChart = new Chart(ctxType, {
+                        type: 'doughnut',
+                        data: {
+                            labels: ['Ingresos', 'Retiros', 'Transferencias'],
+                            datasets: [{
+                                data: [typeCounts.deposit, typeCounts.withdrawal, typeCounts.transfer],
+                                backgroundColor: ['#059669', '#dc2626', '#3b82f6'],
+                                borderColor: 'white',
+                                borderWidth: 2,
+                                tension: 0.4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        font: { size: 12 },
+                                        padding: 15,
+                                        usePointStyle: true
+                                    }
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                // Gráfico 2: Balance Total de Todos los Usuarios
+                let totalBalance = 0;
+                if (userBalances) {
+                    Object.values(userBalances).forEach(balance => {
+                        totalBalance += parseFloat(balance) || 0;
+                    });
+                }
+                
+                const ctxIncomeExpense = document.getElementById('income-expense-chart');
+                if (ctxIncomeExpense) {
+                    // Mostrar solo el número con Canvas
+                    const ctx = ctxIncomeExpense.getContext('2d');
+                    const width = ctxIncomeExpense.offsetWidth || 300;
+                    const height = ctxIncomeExpense.offsetHeight || 200;
+                    ctxIncomeExpense.width = width;
+                    ctxIncomeExpense.height = height;
+                    
+                    // Fondo gradiente: morado oscuro a gris blanco
+                    const gradient = ctx.createLinearGradient(0, 0, width, height);
+                    gradient.addColorStop(0, '#4C1D95');
+                    gradient.addColorStop(1, '#F3F4F6');
+                    ctx.fillStyle = gradient;
+                    ctx.fillRect(0, 0, width, height);
+                    
+                    // Etiqueta superior
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                    ctx.font = '14px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'top';
+                    ctx.fillText('BALANCES TOTALES', width / 2, 20);
+                    
+                    // Dibujar el número con tamaño responsivo
+                    ctx.fillStyle = '#FFFFFF';
+                    const fontSize = Math.max(48, Math.min(60, width / 8));
+                    ctx.font = 'bold ' + fontSize + 'px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText('Bs ' + totalBalance.toFixed(2), width / 2, height / 2 + 15);
+                }
+            } catch (error) {
+                console.error('Error rendering dashboard charts:', error);
             }
         };
     </script>
