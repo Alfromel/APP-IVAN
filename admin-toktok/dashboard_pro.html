@@ -985,7 +985,7 @@
 
         <!-- Dashboard Section -->
         <section id="dashboard-section">
-            <div class="stats-grid">
+            <div class="stats-grid" style="grid-template-columns: repeat(2, minmax(240px, 1fr));">
                 <div class="stat-card">
                     <div class="stat-label">USUARIOS TOTALES</div>
                     <div class="stat-value" id="total-users">0</div>
@@ -993,57 +993,23 @@
                 </div>
                 
                 <div class="stat-card">
-                    <div class="stat-label">DEPÓSITOS HOY</div>
-                    <div class="stat-value" id="today-deposits">0</div>
-                    <div class="stat-sub" id="today-deposits-amount">Bs 0</div>
-                </div>
-                
-                <div class="stat-card">
-                    <div class="stat-label">RETIROS HOY</div>
-                    <div class="stat-value" id="today-withdrawals">0</div>
-                    <div class="stat-sub" id="today-withdrawals-amount">Bs 0</div>
-                </div>
-                
-                <div class="stat-card">
                     <div class="stat-label">BALANCE TOTAL</div>
                     <div class="stat-value" id="total-balance">Bs 0</div>
+                    <div class="stat-sub">En cartera</div>
                 </div>
             </div>
 
-            <!-- Gráficas -->
-            <div class="charts-row">
+            <!-- Gráfica semanal -->
+            <div class="charts-row" style="grid-template-columns: 1fr;">
                 <div class="chart-box">
                     <div class="chart-header">
-                        <h6><i class="fas fa-chart-pie me-2"></i>Distribución</h6>
-                    </div>
-                    <div class="chart-container">
-                        <canvas id="transactionsPieChart"></canvas>
-                    </div>
-                </div>
-                
-                <div class="chart-box">
-                    <div class="chart-header">
-                        <h6><i class="fas fa-chart-line me-2"></i>Depósitos vs Retiros (7d)</h6>
+                        <h6><i class="fas fa-chart-line me-2"></i>Actividad semanal</h6>
                     </div>
                     <div class="chart-container">
                         <canvas id="transactionsLineChart"></canvas>
                     </div>
                 </div>
             </div>
-
-            <!-- Top Usuarios -->
-            <div class="top-users-list mb-4">
-                <h6 class="mb-3"><i class="fas fa-crown me-2" style="color: var(--primary);"></i>Top Usuarios por Balance</h6>
-                <div id="top-users">
-                    <div class="text-center py-3">
-                        <div class="spinner-border text-primary spinner-border-sm"></div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Últimas Transacciones -->
-            <h6 class="mb-3"><i class="fas fa-clock me-2" style="color: var(--primary);"></i>Últimas Transacciones</h6>
-            <div id="recent-transactions"></div>
         </section>
 
         <!-- Users Section -->
@@ -1249,50 +1215,11 @@
 
                 allTransactions = transactions || [];
 
-                // Stats - CORREGIDO: Comparación de fechas correcta
-                const today = new Date();
-                today.setHours(0, 0, 0, 0);
-                
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-
-                console.log('Buscando transacciones entre:', today.toISOString(), 'y', tomorrow.toISOString());
-
-                // Filtrar transacciones de hoy usando el rango de fechas
-                const todayTransactions = allTransactions.filter(t => {
-                    if (!t.created_at) return false;
-                    const txDate = new Date(t.created_at);
-                    return txDate >= today && txDate < tomorrow && t.status === 'completed';
-                });
-
-                const depositsToday = todayTransactions.filter(t => t.type === 'deposit');
-                const withdrawalsToday = todayTransactions.filter(t => t.type === 'withdrawal');
-
-                console.log('Depósitos hoy:', depositsToday.length, depositsToday);
-                console.log('Retiros hoy:', withdrawalsToday.length, withdrawalsToday);
-
                 document.getElementById('total-users').textContent = totalUsers || 0;
-                
-                document.getElementById('today-deposits').textContent = depositsToday.length;
-                document.getElementById('today-deposits-amount').textContent = formatCurrency(
-                    depositsToday.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
-                );
-                
-                document.getElementById('today-withdrawals').textContent = withdrawalsToday.length;
-                document.getElementById('today-withdrawals-amount').textContent = formatCurrency(
-                    withdrawalsToday.reduce((sum, t) => sum + (parseFloat(t.amount) || 0), 0)
-                );
-                
+
                 const totalBalance = Object.values(userBalances).reduce((sum, b) => sum + (b || 0), 0);
                 document.getElementById('total-balance').textContent = formatCurrency(totalBalance);
 
-                // Top usuarios
-                renderTopUsers();
-                
-                // Últimas transacciones
-                renderRecentTransactions(allTransactions.slice(0, 5));
-                
-                // Gráficas
                 renderCharts();
 
             } catch (error) {
@@ -1303,44 +1230,6 @@
 
         // Renderizar gráficas
         const renderCharts = () => {
-            // Gráfica de pastel
-            const types = ['deposit', 'withdrawal', 'transfer', 'bet', 'winning'];
-            const counts = types.map(type => 
-                allTransactions.filter(t => t.type === type && t.status === 'completed').length
-            );
-
-            if (pieChart) pieChart.destroy();
-            const pieCtx = document.getElementById('transactionsPieChart')?.getContext('2d');
-            if (pieCtx) {
-                pieChart = new Chart(pieCtx, {
-                    type: 'doughnut',
-                    data: {
-                        labels: ['Depósitos', 'Retiros', 'Transferencias', 'Apuestas', 'Ganancias'],
-                        datasets: [{
-                            data: counts,
-                            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6'],
-                            borderWidth: 0
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: true,
-                        plugins: {
-                            legend: { 
-                                position: 'bottom', 
-                                labels: { 
-                                    color: '#9ca3af',
-                                    boxWidth: 10, 
-                                    font: { size: 9 } 
-                                } 
-                            }
-                        },
-                        cutout: '65%'
-                    }
-                });
-            }
-
-            // Gráfica de línea
             const last7Days = [];
             const deposits = [];
             const withdrawals = [];
@@ -1432,84 +1321,6 @@
                     }
                 });
             }
-        };
-
-        // Renderizar top usuarios
-        const renderTopUsers = () => {
-            const container = document.getElementById('top-users');
-            const topUsers = [...allUsers]
-                .map(u => ({ ...u, balance: userBalances[u.id] || 0 }))
-                .sort((a, b) => b.balance - a.balance)
-                .slice(0, 5);
-
-            if (!topUsers.length) {
-                container.innerHTML = '<div class="text-center py-3" style="color: var(--gray-400);">No hay usuarios</div>';
-                return;
-            }
-
-            container.innerHTML = topUsers.map((u, i) => `
-                <div class="top-user-item">
-                    <div class="rank-badge">${i + 1}</div>
-                    <div class="flex-grow-1">
-                        <strong style="color: white;">${u.full_name || 'Sin nombre'}</strong>
-                        <div style="color: var(--gray-400); font-size: 0.8rem;">${u.email || ''}</div>
-                    </div>
-                    <div style="color: ${u.balance > 0 ? '#10b981' : u.balance < 0 ? '#ef4444' : '#9ca3af'}; font-weight: 600;">
-                        ${formatCurrency(u.balance)}
-                    </div>
-                </div>
-            `).join('');
-        };
-
-        // Renderizar últimas transacciones
-        const renderRecentTransactions = (transactions) => {
-            const container = document.getElementById('recent-transactions');
-            
-            if (!transactions.length) {
-                container.innerHTML = '<div class="text-center py-4" style="color: var(--gray-400);">No hay transacciones</div>';
-                return;
-            }
-
-            container.innerHTML = transactions.map(t => `
-                <div class="transaction-card ${t.type}">
-                    <div class="transaction-header">
-                        <div class="transaction-type ${t.type}">
-                            <div class="transaction-icon">
-                                <i class="fas ${t.type === 'deposit' ? 'fa-arrow-down' : 
-                                                t.type === 'withdrawal' ? 'fa-arrow-up' : 
-                                                t.type === 'transfer' ? 'fa-exchange-alt' : 
-                                                t.type === 'bet' ? 'fa-ticket-alt' : 'fa-coins'}"></i>
-                            </div>
-                            <div>
-                                <div class="transaction-type-name">${t.type.charAt(0).toUpperCase() + t.type.slice(1)}</div>
-                                <div class="transaction-id">${t.id?.substring(0, 8) || 'N/A'}...</div>
-                            </div>
-                        </div>
-                        <div class="text-end">
-                            <div class="transaction-amount ${t.type === 'deposit' || t.type === 'winning' ? 'positive' : 'negative'}">
-                                ${t.type === 'deposit' || t.type === 'winning' ? '+' : '-'}${formatCurrency(t.amount)}
-                            </div>
-                            <span class="transaction-status ${t.status}">${t.status}</span>
-                        </div>
-                    </div>
-                    <div class="transaction-details">
-                        <div>
-                            <div class="detail-label">Usuario</div>
-                            <div class="detail-value">${t.user_id?.substring(0, 8) || 'N/A'}...</div>
-                        </div>
-                        <div>
-                            <div class="detail-label">Fecha</div>
-                            <div class="detail-value">${formatDate(t.created_at)}</div>
-                        </div>
-                        ${t.description ? `
-                        <div>
-                            <div class="detail-label">Descripción</div>
-                            <div class="detail-value">${t.description.substring(0, 20)}${t.description.length > 20 ? '...' : ''}</div>
-                        </div>
-                        ` : ''}
-                    </div>
-                </div>
-            `).join('');
         };
 
         // Cargar usuarios
