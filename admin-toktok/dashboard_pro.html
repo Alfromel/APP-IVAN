@@ -18,28 +18,38 @@
             --danger: #dc2626;
         }
 
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f5f3ff 0%, #faf5ff 50%, #eff6ff 100%);
             min-height: 100vh;
             color: #1e293b;
+            overflow: hidden;
+            height: 100vh;
         }
 
         .admin-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            padding: 16px;
+            gap: 16px;
         }
 
         .admin-header {
             background: linear-gradient(135deg, #1e1147 0%, #2d1b69 40%, #3b2682 100%);
-            border-radius: 24px;
-            padding: 24px 32px;
+            border-radius: 16px;
+            padding: 16px 24px;
             color: white;
-            margin-bottom: 24px;
             box-shadow: 0 10px 30px rgba(46, 26, 99, 0.3);
             position: relative;
             overflow: hidden;
+            flex-shrink: 0;
         }
 
         .admin-header::before {
@@ -65,42 +75,73 @@
         }
 
         .admin-title {
-            font-size: 28px;
+            font-size: 24px;
             font-weight: 700;
             position: relative;
             z-index: 1;
         }
 
         .admin-subtitle {
-            font-size: 14px;
+            font-size: 13px;
             color: rgba(255, 255, 255, 0.8);
             position: relative;
             z-index: 1;
-            margin-top: 4px;
+            margin-top: 2px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 16px;
+            flex: 1;
+            min-height: 0;
+        }
+
+        .left-panel {
+            flex: 0 0 45%;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 0;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            min-height: 0;
         }
 
         .admin-card {
             background: white;
             border-radius: 16px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-            padding: 24px;
-            margin-bottom: 24px;
+            padding: 20px;
             border: 1px solid #e2e8f0;
-            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
 
-        .admin-card:hover {
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+        .card-form {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .card-list {
+            flex: 1;
+            overflow-y: auto;
         }
 
         .admin-card-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             color: #1e293b;
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
+            flex-shrink: 0;
         }
 
         .admin-card-title i {
@@ -109,10 +150,10 @@
 
         .input-field {
             width: 100%;
-            padding: 12px 16px;
+            padding: 10px 14px;
             border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            font-size: 14px;
+            border-radius: 10px;
+            font-size: 13px;
             transition: all 0.2s;
             background: #f8fafc;
         }
@@ -127,13 +168,14 @@
         .btn-primary {
             background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
             color: white;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 600;
             transition: all 0.3s;
             box-shadow: 0 4px 15px rgba(109, 40, 217, 0.3);
             cursor: pointer;
             border: none;
+            font-size: 13px;
         }
 
         .btn-primary:hover {
@@ -144,12 +186,13 @@
         .btn-secondary {
             background: #f1f5f9;
             color: #334155;
-            padding: 12px 24px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 10px;
             font-weight: 600;
             transition: all 0.3s;
             cursor: pointer;
             border: none;
+            font-size: 13px;
         }
 
         .btn-secondary:hover {
@@ -159,13 +202,13 @@
         .btn-danger {
             background: #fee2e2;
             color: var(--danger);
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s;
             cursor: pointer;
             border: none;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .btn-danger:hover {
@@ -175,13 +218,13 @@
         .btn-edit {
             background: #e0e7ff;
             color: #4338ca;
-            padding: 8px 16px;
+            padding: 6px 12px;
             border-radius: 8px;
             font-weight: 600;
             transition: all 0.3s;
             cursor: pointer;
             border: none;
-            font-size: 12px;
+            font-size: 11px;
         }
 
         .btn-edit:hover {
@@ -196,20 +239,23 @@
 
         .ad-table th {
             background: #f8fafc;
-            padding: 12px 16px;
+            padding: 10px 12px;
             text-align: left;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
             color: #64748b;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             border-bottom: 2px solid #e2e8f0;
+            position: sticky;
+            top: 0;
+            z-index: 1;
         }
 
         .ad-table td {
-            padding: 16px;
+            padding: 12px;
             border-bottom: 1px solid #f1f5f9;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .ad-table tr:hover {
@@ -217,17 +263,17 @@
         }
 
         .ad-thumbnail {
-            width: 80px;
-            height: 50px;
+            width: 60px;
+            height: 40px;
             object-fit: cover;
-            border-radius: 8px;
+            border-radius: 6px;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
         }
 
         .status-badge {
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-size: 11px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 10px;
             font-weight: 600;
             text-transform: uppercase;
         }
@@ -263,15 +309,13 @@
 
         .modal-content {
             background: white;
-            border-radius: 24px;
-            padding: 32px;
-            max-width: 500px;
+            border-radius: 20px;
+            padding: 24px;
+            max-width: 400px;
             width: 90%;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.2);
             transform: translateY(20px);
             transition: all 0.3s;
-            max-height: 90vh;
-            overflow-y: auto;
         }
 
         .modal-overlay.active .modal-content {
@@ -279,9 +323,9 @@
         }
 
         .modal-title {
-            font-size: 20px;
+            font-size: 18px;
             font-weight: 600;
-            margin-bottom: 24px;
+            margin-bottom: 16px;
             color: #1e293b;
         }
 
@@ -289,13 +333,14 @@
             position: fixed;
             top: 20px;
             right: 20px;
-            padding: 16px 24px;
-            border-radius: 12px;
+            padding: 12px 20px;
+            border-radius: 10px;
             color: white;
             font-weight: 600;
             z-index: 200;
             animation: slideIn 0.3s ease;
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+            font-size: 13px;
         }
 
         @keyframes slideIn {
@@ -320,38 +365,41 @@
         /* Contenedor de vista previa con las mismas medidas del dashboard */
         .preview-wrapper {
             width: 100%;
-            max-width: 500px;
-            margin: 12px auto;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(8px);
-            border-radius: 20px;
-            padding: 16px;
+            border-radius: 16px;
+            padding: 12px;
             display: flex;
             justify-content: center;
             align-items: center;
+            flex: 1;
+            min-height: 0;
         }
 
         .preview-modal-content {
             position: relative;
             width: 100%;
-            max-width: 500px;
+            max-width: 400px;
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             overflow: hidden;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         .preview-close-btn {
             position: absolute;
-            top: 12px;
-            right: 12px;
-            width: 36px;
-            height: 36px;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
             background: rgba(0, 0, 0, 0.6);
             color: white;
             border: none;
-            font-size: 16px;
+            font-size: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -360,10 +408,11 @@
 
         .preview-image-container {
             width: 100%;
-            height: 400px;
+            flex: 1;
             overflow: hidden;
             position: relative;
             background: #f1f5f9;
+            min-height: 0;
         }
 
         .preview-image-container img {
@@ -375,14 +424,15 @@
         .preview-indicators {
             display: flex;
             justify-content: center;
-            gap: 8px;
-            padding: 12px;
+            gap: 6px;
+            padding: 8px;
             background: white;
+            flex-shrink: 0;
         }
 
         .preview-dot {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 50%;
             background: #cbd5e1;
             transition: all 0.3s;
@@ -390,40 +440,41 @@
 
         .preview-dot.active {
             background: var(--primary);
-            width: 24px;
-            border-radius: 4px;
+            width: 18px;
+            border-radius: 3px;
         }
 
         .preview-placeholder {
             width: 100%;
-            height: 400px;
+            height: 100%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: #94a3b8;
-            font-size: 14px;
+            font-size: 13px;
         }
 
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 20px;
         }
 
         .empty-state i {
-            font-size: 48px;
+            font-size: 36px;
             color: #cbd5e1;
-            margin-bottom: 16px;
+            margin-bottom: 12px;
         }
 
         .toggle-switch {
             position: relative;
-            width: 48px;
-            height: 24px;
+            width: 40px;
+            height: 20px;
             background: #cbd5e1;
-            border-radius: 12px;
+            border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
             border: none;
+            flex-shrink: 0;
         }
 
         .toggle-switch.active {
@@ -435,8 +486,8 @@
             position: absolute;
             top: 2px;
             left: 2px;
-            width: 20px;
-            height: 20px;
+            width: 16px;
+            height: 16px;
             background: white;
             border-radius: 50%;
             transition: all 0.3s;
@@ -444,42 +495,54 @@
         }
 
         .toggle-switch.active::after {
-            left: 26px;
+            left: 22px;
+        }
+
+        /* Scrollbar personalizado */
+        .card-form::-webkit-scrollbar,
+        .card-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .card-form::-webkit-scrollbar-track,
+        .card-list::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 3px;
+        }
+
+        .card-form::-webkit-scrollbar-thumb,
+        .card-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        .card-form::-webkit-scrollbar-thumb:hover,
+        .card-list::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
 
         @media (max-width: 768px) {
+            body {
+                overflow: auto;
+                height: auto;
+            }
+
             .admin-container {
-                padding: 10px;
+                height: auto;
+                min-height: 100vh;
             }
 
-            .admin-header {
-                padding: 20px;
+            .main-content {
+                flex-direction: column;
             }
 
-            .admin-title {
-                font-size: 22px;
+            .left-panel,
+            .right-panel {
+                flex: none;
+                min-height: 400px;
             }
 
-            .admin-card {
-                padding: 16px;
-            }
-
-            .ad-table {
-                display: block;
-                overflow-x: auto;
-                white-space: nowrap;
-            }
-
-            .modal-content {
-                padding: 20px;
-                width: 95%;
-            }
-
-            .preview-image-container {
-                height: 300px;
-            }
-
-            .preview-placeholder {
+            .preview-modal-content {
                 height: 300px;
             }
         }
@@ -496,35 +559,14 @@
             <p class="admin-subtitle">Gestiona los anuncios que se muestran en el dashboard de TokTok</p>
         </div>
 
-        <!-- Formulario para agregar/editar anuncio -->
-        <div class="admin-card">
-            <h2 class="admin-card-title" id="form-title">
-                <i class="fas fa-plus-circle"></i>
-                Agregar Nuevo Anuncio
-            </h2>
-            <form id="ad-form">
-                <input type="hidden" id="ad-id" value="">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label for="ad-title" class="block text-sm font-medium text-gray-700 mb-2">
-                            Título del Anuncio *
-                        </label>
-                        <input type="text" id="ad-title" class="input-field" placeholder="Ej: Promoción Especial" required>
-                    </div>
-                    <div>
-                        <label for="ad-order" class="block text-sm font-medium text-gray-700 mb-2">
-                            Orden de Visualización
-                        </label>
-                        <input type="number" id="ad-order" class="input-field" placeholder="1, 2, 3..." min="1" value="1">
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <label for="ad-image-url" class="block text-sm font-medium text-gray-700 mb-2">
-                        URL de la Imagen *
-                    </label>
-                    <input type="url" id="ad-image-url" class="input-field" placeholder="https://ejemplo.com/imagen.jpg" required>
-                    
-                    <!-- Vista previa con las mismas medidas del dashboard -->
+        <div class="main-content">
+            <!-- Panel Izquierdo - Vista Previa -->
+            <div class="left-panel">
+                <div class="admin-card" style="flex:1;">
+                    <h2 class="admin-card-title">
+                        <i class="fas fa-eye"></i>
+                        Vista Previa del Anuncio
+                    </h2>
                     <div class="preview-wrapper">
                         <div class="preview-modal-content">
                             <div class="preview-close-btn">
@@ -541,34 +583,67 @@
                         </div>
                     </div>
                 </div>
-                <div class="mt-4 flex items-center gap-3">
-                    <label for="ad-active" class="text-sm font-medium text-gray-700">Anuncio Activo</label>
-                    <button type="button" id="ad-active-toggle" class="toggle-switch active"></button>
-                    <input type="hidden" id="ad-active" value="true">
-                </div>
-                <div class="mt-6 flex gap-3">
-                    <button type="submit" class="btn-primary flex items-center gap-2">
-                        <i class="fas fa-save"></i>
-                        <span id="submit-text">Guardar Anuncio</span>
-                    </button>
-                    <button type="button" id="cancel-edit" class="btn-secondary hidden">
-                        Cancelar Edición
-                    </button>
-                </div>
-            </form>
-        </div>
 
-        <!-- Lista de anuncios -->
-        <div class="admin-card">
-            <h2 class="admin-card-title">
-                <i class="fas fa-list"></i>
-                Anuncios Existentes
-                <span class="text-sm font-normal text-gray-500">(Máximo 3 activos se mostrarán en el dashboard)</span>
-            </h2>
-            <div id="ads-list">
-                <div class="empty-state">
-                    <i class="fas fa-spinner fa-spin"></i>
-                    <p class="text-gray-500">Cargando anuncios...</p>
+                <!-- Lista de anuncios -->
+                <div class="admin-card card-list">
+                    <h2 class="admin-card-title">
+                        <i class="fas fa-list"></i>
+                        Anuncios Existentes
+                        <span class="text-xs font-normal text-gray-500">(Máx 3 activos)</span>
+                    </h2>
+                    <div id="ads-list">
+                        <div class="empty-state">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p class="text-gray-500 text-sm">Cargando anuncios...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Panel Derecho - Formulario -->
+            <div class="right-panel">
+                <div class="admin-card card-form">
+                    <h2 class="admin-card-title" id="form-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Agregar Nuevo Anuncio
+                    </h2>
+                    <form id="ad-form">
+                        <input type="hidden" id="ad-id" value="">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                            <div>
+                                <label for="ad-title" class="block text-xs font-medium text-gray-700 mb-1">
+                                    Título del Anuncio *
+                                </label>
+                                <input type="text" id="ad-title" class="input-field" placeholder="Ej: Promoción Especial" required>
+                            </div>
+                            <div>
+                                <label for="ad-order" class="block text-xs font-medium text-gray-700 mb-1">
+                                    Orden de Visualización
+                                </label>
+                                <input type="number" id="ad-order" class="input-field" placeholder="1, 2, 3..." min="1" value="1">
+                            </div>
+                        </div>
+                        <div class="mt-3">
+                            <label for="ad-image-url" class="block text-xs font-medium text-gray-700 mb-1">
+                                URL de la Imagen *
+                            </label>
+                            <input type="url" id="ad-image-url" class="input-field" placeholder="https://ejemplo.com/imagen.jpg" required>
+                        </div>
+                        <div class="mt-3 flex items-center gap-3">
+                            <label for="ad-active" class="text-xs font-medium text-gray-700">Anuncio Activo</label>
+                            <button type="button" id="ad-active-toggle" class="toggle-switch active"></button>
+                            <input type="hidden" id="ad-active" value="true">
+                        </div>
+                        <div class="mt-4 flex gap-2">
+                            <button type="submit" class="btn-primary flex items-center gap-2">
+                                <i class="fas fa-save"></i>
+                                <span id="submit-text">Guardar Anuncio</span>
+                            </button>
+                            <button type="button" id="cancel-edit" class="btn-secondary hidden">
+                                Cancelar Edición
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -578,8 +653,8 @@
     <div id="delete-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 class="modal-title">¿Eliminar Anuncio?</h3>
-            <p class="text-gray-600 mb-6">Esta acción no se puede deshacer. El anuncio será eliminado permanentemente.</p>
-            <div class="flex gap-3 justify-end">
+            <p class="text-gray-600 mb-5 text-sm">Esta acción no se puede deshacer. El anuncio será eliminado permanentemente.</p>
+            <div class="flex gap-2 justify-end">
                 <button id="cancel-delete" class="btn-secondary">Cancelar</button>
                 <button id="confirm-delete" class="btn-primary" style="background: #dc2626;">
                     <i class="fas fa-trash mr-2"></i>Eliminar
@@ -637,8 +712,8 @@
                 document.getElementById('ads-list').innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-exclamation-triangle text-yellow-500"></i>
-                        <p class="text-gray-500">No se pudieron cargar los anuncios</p>
-                        <p class="text-gray-400 text-sm mt-2">Error: ${error.message}</p>
+                        <p class="text-gray-500 text-sm">No se pudieron cargar los anuncios</p>
+                        <p class="text-gray-400 text-xs mt-1">Error: ${error.message}</p>
                     </div>
                 `;
             }
@@ -652,8 +727,8 @@
                 container.innerHTML = `
                     <div class="empty-state">
                         <i class="fas fa-images"></i>
-                        <p class="text-gray-500 font-medium">No hay anuncios creados</p>
-                        <p class="text-gray-400 text-sm mt-2">Agrega tu primer anuncio usando el formulario de arriba</p>
+                        <p class="text-gray-500 text-sm font-medium">No hay anuncios creados</p>
+                        <p class="text-gray-400 text-xs mt-1">Agrega tu primer anuncio usando el formulario</p>
                     </div>
                 `;
                 return;
@@ -663,21 +738,18 @@
                 <table class="ad-table">
                     <thead>
                         <tr>
-                            <th>ID</th>
                             <th>Imagen</th>
                             <th>Título</th>
                             <th>Orden</th>
                             <th>Estado</th>
-                            <th>Fecha Creación</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
                         ${adsList.map(ad => `
                             <tr>
-                                <td class="text-gray-400 text-xs">${ad.id}</td>
                                 <td>
-                                    <img src="${ad.imagen_url}" alt="${ad.titulo}" class="ad-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2280%22 height=%2250%22%3E%3Crect width=%2280%22 height=%2250%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2240%22 y=%2230%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%2210%22%3ESin imagen%3C/text%3E%3C/svg%3E'">
+                                    <img src="${ad.imagen_url}" alt="${ad.titulo}" class="ad-thumbnail" onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2240%22%3E%3Crect width=%2260%22 height=%2240%22 fill=%22%23e2e8f0%22/%3E%3Ctext x=%2230%22 y=%2224%22 text-anchor=%22middle%22 fill=%22%2394a3b8%22 font-size=%228%22%3ESin imagen%3C/text%3E%3C/svg%3E'">
                                 </td>
                                 <td class="font-medium">${ad.titulo}</td>
                                 <td>${ad.orden || 0}</td>
@@ -686,17 +758,10 @@
                                         ${ad.activo ? 'Activo' : 'Inactivo'}
                                     </span>
                                 </td>
-                                <td class="text-gray-500 text-sm">
-                                    ${ad.created_at ? new Date(ad.created_at).toLocaleDateString('es-ES', { 
-                                        year: 'numeric', 
-                                        month: 'short', 
-                                        day: 'numeric' 
-                                    }) : 'N/A'}
-                                </td>
                                 <td>
-                                    <div class="flex gap-2">
+                                    <div class="flex gap-1">
                                         <button class="btn-edit" onclick="editAd('${ad.id}')">
-                                            <i class="fas fa-edit"></i> Editar
+                                            <i class="fas fa-edit"></i>
                                         </button>
                                         <button class="btn-danger" onclick="openDeleteModal('${ad.id}')">
                                             <i class="fas fa-trash"></i>
@@ -751,9 +816,6 @@
             document.getElementById('form-title').innerHTML = '<i class="fas fa-edit"></i> Editar Anuncio';
             document.getElementById('submit-text').textContent = 'Actualizar Anuncio';
             document.getElementById('cancel-edit').classList.remove('hidden');
-            
-            // Scroll al formulario
-            document.getElementById('ad-form').scrollIntoView({ behavior: 'smooth' });
         }
 
         // Función para resetear el formulario
