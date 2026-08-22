@@ -3,54 +3,72 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>TOKTOK GC · Panel Ejecutivo</title>
-    <meta name="theme-color" content="#0f172a">
+    <title>TOKTOK GC · CEO Dashboard</title>
+    <meta name="theme-color" content="#1e1e2e">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TOKTOK CEO">
-    <meta name="description" content="Panel ejecutivo corporativo TOKTOK GC 2026">
+    <meta name="description" content="Panel ejecutivo para CEO y dueños de TOKTOK GC">
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icons/icon-152x152.png">
     <link rel="icon" type="image/png" href="icons/icon-32x32.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
-            --primary: #3b82f6;
-            --primary-dark: #2563eb;
-            --primary-light: #60a5fa;
-            --bg-body: #0b1120;
-            --bg-card: rgba(17, 24, 39, 0.85);
-            --bg-card-hover: rgba(30, 41, 59, 0.9);
-            --border-glass: rgba(59, 130, 246, 0.25);
-            --text-main: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --text-muted: #64748b;
-            --shadow-card: 0 8px 32px rgba(0,0,0,0.4);
-            --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.15);
-            --radius-sm: 8px;
-            --radius-md: 14px;
-            --radius-lg: 20px;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --accent: #93c5fd;
+            --dark-bg: #0f172a;
+            --card-bg: rgba(30, 41, 59, 0.9);
+            --card-hover: rgba(51, 65, 85, 0.95);
+            --glass-border: rgba(59, 130, 246, 0.2);
+            --text-primary: #f8fafc;
+            --text-secondary: #e2e8f0;
+            --text-muted: #94a3b8;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --shadow-glow: 0 0 30px rgba(37, 99, 235, 0.15);
+            --error: #ef4444;
+            --success: #10b981;
+            --border: rgba(59, 130, 246, 0.1);
+            --border-radius-sm: 8px;
+            --border-radius: 12px;
+            --border-radius-lg: 16px;
+            --border-radius-xl: 20px;
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', Roboto, sans-serif;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, sans-serif;
         }
 
         body {
-            background: var(--bg-body);
-            color: var(--text-main);
+            background: var(--dark-bg);
+            color: var(--text-primary);
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            background-image: 
-                radial-gradient(circle at 15% 20%, rgba(59, 130, 246, 0.08) 0%, transparent 40%),
-                radial-gradient(circle at 85% 80%, rgba(37, 99, 235, 0.05) 0%, transparent 45%),
-                radial-gradient(circle at 50% 50%, rgba(147, 197, 253, 0.03) 0%, transparent 60%);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background:
+                radial-gradient(circle at 20% 80%, rgba(37, 99, 235, 0.08) 0%, transparent 45%),
+                radial-gradient(circle at 80% 20%, rgba(29, 78, 216, 0.06) 0%, transparent 45%),
+                radial-gradient(circle at 50% 50%, rgba(147, 197, 253, 0.04) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: -1;
         }
 
         /* ===== PANTALLA DE LOGIN ===== */
@@ -60,124 +78,107 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: var(--bg-body);
+            background: var(--dark-bg);
             display: flex;
             justify-content: center;
             align-items: center;
-            padding: 20px;
+            padding: 24px;
             z-index: 1000;
-            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition: opacity 0.3s ease;
         }
         .login-screen.hidden {
             opacity: 0;
             pointer-events: none;
-            transform: scale(1.05);
         }
 
         .login-container {
-            background: var(--bg-card);
-            backdrop-filter: blur(30px);
-            -webkit-backdrop-filter: blur(30px);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-lg);
+            background: rgba(30, 41, 59, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--border-radius-xl);
             padding: 40px 32px;
             width: 100%;
-            max-width: 440px;
-            box-shadow: var(--shadow-card), var(--shadow-glow);
-            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            max-width: 420px;
+            box-shadow: var(--shadow-lg), var(--shadow-glow);
+            animation: slideUp 0.5s ease-out;
         }
 
         @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
         }
 
         .login-logo {
             text-align: center;
-            margin-bottom: 36px;
-        }
-        .login-logo .logo-icon {
-            width: 64px;
-            height: 64px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 18px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 16px;
-            font-size: 2rem;
-            color: white;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            margin-bottom: 32px;
         }
         .login-logo h1 {
-            font-size: 2rem;
-            font-weight: 800;
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: var(--text-primary);
             letter-spacing: -0.5px;
-            background: linear-gradient(135deg, #fff, #93c5fd);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            margin-bottom: 4px;
         }
         .login-logo p {
-            font-size: 0.75rem;
+            font-size: 0.85rem;
             color: var(--text-muted);
-            letter-spacing: 3px;
-            font-weight: 600;
+            letter-spacing: 2px;
+            font-weight: 500;
             text-transform: uppercase;
-            margin-top: 4px;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         .form-label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             color: var(--text-secondary);
             margin-bottom: 8px;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
         .form-select {
             width: 100%;
             padding: 14px 16px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: var(--radius-sm);
-            color: var(--text-main);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
             font-size: 0.95rem;
             font-weight: 500;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             cursor: pointer;
             appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2364748b' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%2394a3b8' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
             background-repeat: no-repeat;
             background-position: right 16px center;
         }
         .form-select:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
 
-        .password-container {
+        .password-input-container {
             position: relative;
         }
         .password-input {
             width: 100%;
             padding: 14px 48px 14px 16px;
-            background: rgba(15, 23, 42, 0.9);
-            border: 1px solid rgba(59, 130, 246, 0.2);
-            border-radius: var(--radius-sm);
-            color: var(--text-main);
+            background: rgba(15, 23, 42, 0.8);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius);
+            color: var(--text-primary);
             font-size: 0.95rem;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
         .password-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
         }
         .toggle-password {
             position: absolute;
@@ -188,47 +189,41 @@
             border: none;
             color: var(--text-muted);
             cursor: pointer;
-            font-size: 1.1rem;
+            font-size: 1.2rem;
             padding: 4px;
-            transition: color 0.2s;
         }
-        .toggle-password:hover { color: var(--text-secondary); }
 
         .login-button {
             width: 100%;
-            padding: 15px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            padding: 14px;
+            background: var(--primary);
             color: white;
             border: none;
-            border-radius: var(--radius-sm);
-            font-size: 0.9rem;
-            font-weight: 700;
+            border-radius: var(--border-radius);
+            font-size: 0.95rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 12px;
-            letter-spacing: 1px;
+            transition: all 0.2s ease;
+            margin-top: 16px;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
-            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.4);
         }
         .login-button:hover {
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
-            transform: translateY(-1px);
+            background: var(--primary-dark);
         }
-        .login-button:active { transform: scale(0.98); }
         .login-button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
-            transform: none;
         }
 
         .error-message {
             background: rgba(239, 68, 68, 0.1);
             border: 1px solid rgba(239, 68, 68, 0.3);
-            color: #fca5a5;
+            color: var(--error);
             padding: 12px 16px;
-            border-radius: var(--radius-sm);
+            border-radius: var(--border-radius);
             font-size: 0.85rem;
-            margin-top: 16px;
+            margin-top: 20px;
             display: none;
             text-align: center;
             font-weight: 500;
@@ -237,103 +232,94 @@
             display: block;
             animation: shake 0.5s ease;
         }
+
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+            20%, 60% { transform: translateX(-4px); }
+            40%, 80% { transform: translateX(4px); }
         }
 
         .admin-info {
             margin-top: 24px;
-            padding-top: 20px;
-            border-top: 1px solid rgba(59, 130, 246, 0.15);
+            padding-top: 24px;
+            border-top: 1px solid var(--border);
             text-align: center;
         }
         .admin-info p {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
-            letter-spacing: 2px;
             margin-bottom: 8px;
+            letter-spacing: 1px;
         }
-        .admin-type-badge {
-            font-size: 0.8rem;
-            color: var(--primary-light);
+        .admin-type {
+            font-size: 0.85rem;
+            color: var(--accent);
             font-weight: 600;
-            padding: 8px 16px;
-            background: rgba(59, 130, 246, 0.12);
+            margin-top: 12px;
+            padding: 10px 16px;
+            background: rgba(37, 99, 235, 0.1);
             border-radius: 50px;
             display: inline-block;
-            border: 1px solid var(--border-glass);
+            border: 1px solid var(--glass-border);
         }
 
         /* ===== HEADER ===== */
         .ceo-header {
-            padding: 16px 24px;
+            padding: 20px 24px 16px;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(59, 130, 246, 0.15);
+            border-bottom: 1px solid var(--border);
             position: sticky;
             top: 0;
             z-index: 100;
             display: none;
         }
-        .header-content {
-            max-width: 1100px;
-            margin: 0 auto;
+        .header-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative;
         }
-        .brand-section {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .brand-icon {
-            width: 40px;
-            height: 40px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            color: white;
-        }
-        .brand-name {
-            font-size: 1.4rem;
-            font-weight: 800;
+        .company-name {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--text-primary);
             letter-spacing: -0.3px;
         }
         .ceo-badge {
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            background: var(--primary);
             color: white;
-            padding: 8px 18px;
+            padding: 8px 16px;
             border-radius: 50px;
-            font-size: 0.7rem;
-            font-weight: 700;
+            font-size: 0.75rem;
+            font-weight: 600;
             display: flex;
             align-items: center;
             gap: 8px;
             letter-spacing: 0.5px;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+        .current-admin {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 8px;
+            text-align: center;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         .logout-btn {
-            background: rgba(239, 68, 68, 0.12);
+            background: rgba(239, 68, 68, 0.1);
             color: #fca5a5;
-            border: 1px solid rgba(239, 68, 68, 0.25);
+            border: 1px solid rgba(239, 68, 68, 0.2);
             border-radius: 50px;
-            padding: 8px 16px;
+            padding: 6px 14px;
             font-size: 0.7rem;
             font-weight: 600;
             cursor: pointer;
-            transition: all 0.3s ease;
-            letter-spacing: 0.5px;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
             text-transform: uppercase;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
         .logout-btn:hover {
             background: rgba(239, 68, 68, 0.2);
@@ -342,48 +328,37 @@
 
         /* ===== CONTENIDO PRINCIPAL ===== */
         .main-content {
-            max-width: 1100px;
+            padding: 24px 20px;
+            padding-bottom: 60px;
+            max-width: 1000px;
             margin: 0 auto;
-            padding: 32px 24px 40px;
             display: none;
         }
         .main-content.show {
             display: block;
-            animation: fadeIn 0.5s ease;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            animation: fadeIn 0.4s ease;
         }
 
-        /* ===== TÍTULO DE SECCIÓN ===== */
-        .section-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 28px;
-            padding-bottom: 16px;
-            border-bottom: 2px solid rgba(59, 130, 246, 0.15);
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
+
         .section-title {
-            font-size: 1.1rem;
-            color: var(--text-main);
-            font-weight: 700;
-            letter-spacing: 0.5px;
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-weight: 600;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
+            padding-left: 8px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         .section-title i {
             color: var(--primary);
-            font-size: 1.2rem;
-        }
-        .section-subtitle {
-            font-size: 0.7rem;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            font-weight: 600;
+            font-size: 1.1rem;
         }
 
         /* ===== GRID DE TARJETAS ===== */
@@ -400,52 +375,55 @@
         }
 
         .ceo-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: var(--radius-md);
-            padding: 22px 18px;
-            transition: all 0.3s ease;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--border-radius-lg);
+            padding: 20px 16px;
+            transition: all 0.2s ease;
             cursor: pointer;
             text-decoration: none;
             color: inherit;
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            min-height: 140px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            min-height: 120px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             position: relative;
             overflow: hidden;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
-            animation: fadeInUp 0.5s ease forwards;
+            box-shadow: var(--shadow);
+            animation: fadeInUp 0.4s ease forwards;
             opacity: 0;
-        }
-        .ceo-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, transparent, var(--primary), transparent);
-            opacity: 0;
-            transition: opacity 0.3s ease;
         }
         .ceo-card:hover {
-            background: var(--bg-card-hover);
-            border-color: rgba(59, 130, 246, 0.45);
-            box-shadow: var(--shadow-card);
-            transform: translateY(-4px);
+            background: var(--card-hover);
+            border-color: rgba(59, 130, 246, 0.3);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
         }
-        .ceo-card:hover::before {
-            opacity: 1;
+        .ceo-card:active {
+            transform: scale(0.98);
         }
-        .ceo-card:active { transform: scale(0.96); }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(15px); }
+            from { opacity: 0; transform: translateY(10px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
+        .ceo-card:nth-child(1) { animation-delay: 0.03s; }
+        .ceo-card:nth-child(2) { animation-delay: 0.06s; }
+        .ceo-card:nth-child(3) { animation-delay: 0.09s; }
+        .ceo-card:nth-child(4) { animation-delay: 0.12s; }
+        .ceo-card:nth-child(5) { animation-delay: 0.15s; }
+        .ceo-card:nth-child(6) { animation-delay: 0.18s; }
+        .ceo-card:nth-child(7) { animation-delay: 0.21s; }
+        .ceo-card:nth-child(8) { animation-delay: 0.24s; }
+        .ceo-card:nth-child(9) { animation-delay: 0.27s; }
+        .ceo-card:nth-child(10) { animation-delay: 0.3s; }
+        .ceo-card:nth-child(11) { animation-delay: 0.33s; }
+        .ceo-card:nth-child(12) { animation-delay: 0.36s; }
+        .ceo-card:nth-child(13) { animation-delay: 0.39s; }
+        .ceo-card:nth-child(14) { animation-delay: 0.42s; }
 
         .card-header {
             display: flex;
@@ -454,122 +432,98 @@
             margin-bottom: 16px;
         }
         .card-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: var(--border-radius);
+            background: rgba(37, 99, 235, 0.15);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
+            color: var(--primary-light);
             flex-shrink: 0;
-            transition: all 0.3s ease;
+            border: 1px solid rgba(59, 130, 246, 0.2);
         }
         .card-icon img {
-            width: 28px;
-            height: 28px;
+            width: 24px;
+            height: 24px;
             object-fit: contain;
-            border-radius: 6px;
+            border-radius: 4px;
         }
         .card-badge {
-            font-size: 0.6rem;
+            background: rgba(37, 99, 235, 0.15);
+            color: var(--accent);
+            font-size: 0.65rem;
             padding: 4px 10px;
             border-radius: 50px;
-            font-weight: 700;
-            letter-spacing: 1px;
+            font-weight: 600;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+            letter-spacing: 0.5px;
             text-transform: uppercase;
-            background: rgba(59, 130, 246, 0.15);
-            color: var(--primary-light);
-            border: 1px solid rgba(59, 130, 246, 0.3);
         }
         .card-title {
-            font-size: 0.95rem;
-            font-weight: 700;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
             margin-bottom: 4px;
-            letter-spacing: -0.2px;
         }
         .card-desc {
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             color: var(--text-muted);
             line-height: 1.3;
-            font-weight: 400;
         }
 
         /* Colores específicos */
-        .entel-card .card-icon { background: rgba(239, 68, 68, 0.15); color: #f87171; border: 1px solid rgba(239,68,68,0.3); }
-        .entel-card:hover { border-color: rgba(239, 68, 68, 0.5); }
-        .entel-card::before { background: linear-gradient(90deg, transparent, #ef4444, transparent); }
-        
-        .tigo-card .card-icon { background: rgba(6, 214, 160, 0.15); color: #34d399; border: 1px solid rgba(6,214,160,0.3); }
-        .tigo-card:hover { border-color: rgba(6, 214, 160, 0.5); }
-        .tigo-card::before { background: linear-gradient(90deg, transparent, #06d6a0, transparent); }
-        
-        .viva-card .card-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-        .viva-card:hover { border-color: rgba(245, 158, 11, 0.5); }
-        .viva-card::before { background: linear-gradient(90deg, transparent, #f59e0b, transparent); }
-        
-        .bcp-card .card-icon { background: rgba(5, 150, 105, 0.15); color: #34d399; border: 1px solid rgba(5,150,105,0.3); }
-        .bcp-card:hover { border-color: rgba(5, 150, 105, 0.5); }
-        .bcp-card::before { background: linear-gradient(90deg, transparent, #059669, transparent); }
-        
-        .tienda-card .card-icon { background: rgba(249, 115, 22, 0.15); color: #fb923c; border: 1px solid rgba(249,115,22,0.3); }
-        .tienda-card:hover { border-color: rgba(249, 115, 22, 0.5); }
-        .tienda-card::before { background: linear-gradient(90deg, transparent, #f97316, transparent); }
-        
-        .juegos-card .card-icon { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border: 1px solid rgba(139,92,246,0.3); }
-        .juegos-card:hover { border-color: rgba(139, 92, 246, 0.5); }
-        .juegos-card::before { background: linear-gradient(90deg, transparent, #8b5cf6, transparent); }
-        
-        .inventario-card .card-icon { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59,130,246,0.3); }
-        .inventario-card:hover { border-color: rgba(59, 130, 246, 0.5); }
-        
-        .admin-card .card-icon { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
-        
-        .asistencia-card .card-icon { background: rgba(100, 116, 139, 0.15); color: #94a3b8; border: 1px solid rgba(100,116,139,0.3); }
-        .asistencia-card:hover { border-color: rgba(100, 116, 139, 0.5); }
-        .asistencia-card::before { background: linear-gradient(90deg, transparent, #64748b, transparent); }
-        
-        .monitoreo-card .card-icon { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
-        .monitoreo-card:hover { border-color: rgba(16, 185, 129, 0.5); }
-        .monitoreo-card::before { background: linear-gradient(90deg, transparent, #10b981, transparent); }
-        
-        .cajas-card .card-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
-        .cajas-card:hover { border-color: rgba(245, 158, 11, 0.5); }
-        .cajas-card::before { background: linear-gradient(90deg, transparent, #f59e0b, transparent); }
+        .entel-card .card-icon { background: rgba(239, 68, 68, 0.15); color: #f87171; border-color: rgba(239, 68, 68, 0.3); }
+        .entel-card:hover { border-color: rgba(239, 68, 68, 0.4); }
+        .tigo-card .card-icon { background: rgba(6, 214, 160, 0.15); color: #34d399; border-color: rgba(6, 214, 160, 0.3); }
+        .tigo-card:hover { border-color: rgba(6, 214, 160, 0.4); }
+        .viva-card .card-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
+        .viva-card:hover { border-color: rgba(245, 158, 11, 0.4); }
+        .bcp-card .card-icon { background: rgba(5, 150, 105, 0.15); color: #34d399; border-color: rgba(5, 150, 105, 0.3); }
+        .bcp-card:hover { border-color: rgba(5, 150, 105, 0.4); }
+        .tienda-card .card-icon { background: rgba(249, 115, 22, 0.15); color: #fb923c; border-color: rgba(249, 115, 22, 0.3); }
+        .tienda-card:hover { border-color: rgba(249, 115, 22, 0.4); }
+        .juegos-card .card-icon { background: rgba(139, 92, 246, 0.15); color: #a78bfa; border-color: rgba(139, 92, 246, 0.3); }
+        .juegos-card:hover { border-color: rgba(139, 92, 246, 0.4); }
+        .inventario-card .card-icon { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border-color: rgba(59, 130, 246, 0.3); }
+        .inventario-card:hover { border-color: rgba(59, 130, 246, 0.4); }
+        .admin-card .card-icon { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border-color: rgba(37, 99, 235, 0.3); }
+        .asistencia-card .card-icon { background: rgba(37, 99, 235, 0.15); color: #93c5fd; border-color: rgba(37, 99, 235, 0.3); }
+        .monitoreo-card .card-icon { background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3); }
+        .cajas-card .card-icon { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
 
         .ceo-card.hidden { display: none; }
 
-        /* ===== INSTALL BUTTON ===== */
+        /* ===== BOTÓN INSTALAR ===== */
         #installButton {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            bottom: 24px;
+            right: 24px;
+            background: var(--primary);
             color: white;
             border: none;
             border-radius: 50px;
-            padding: 14px 22px;
-            font-size: 0.8rem;
-            font-weight: 700;
-            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+            padding: 14px 24px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            box-shadow: var(--shadow-md);
             cursor: pointer;
             display: none;
-            z-index: 99;
-            transition: all 0.3s ease;
+            z-index: 1000;
+            transition: all 0.2s ease;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
             letter-spacing: 0.5px;
+            text-transform: uppercase;
         }
         #installButton:hover {
-            box-shadow: 0 12px 32px rgba(59, 130, 246, 0.6);
+            background: var(--primary-dark);
+            box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
         }
 
-        /* ===== RESPONSIVE ===== */
         @media all and (display-mode: standalone) {
-            body {
-                padding-top: env(safe-area-inset-top);
-                padding-bottom: env(safe-area-inset-bottom);
-            }
             #installButton { display: none !important; }
         }
     </style>
@@ -580,9 +534,6 @@
     <div class="login-screen" id="loginScreen">
         <div class="login-container">
             <div class="login-logo">
-                <div class="logo-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
                 <h1>TOKTOK GC</h1>
                 <p>Panel Ejecutivo</p>
             </div>
@@ -604,449 +555,423 @@
 
             <div class="form-group">
                 <label class="form-label">Contraseña</label>
-                <div class="password-container">
-                    <input type="password" class="password-input" id="passwordInput" placeholder="Ingrese su clave de acceso">
-                    <button type="button" class="toggle-password" id="togglePassword" aria-label="Mostrar contraseña">
+                <div class="password-input-container">
+                    <input type="password" class="password-input" id="passwordInput" placeholder="Ingrese su clave">
+                    <button type="button" class="toggle-password" id="togglePassword">
                         <i class="far fa-eye"></i>
                     </button>
                 </div>
             </div>
 
-            <button class="login-button" id="loginButton">
-                <i class="fas fa-lock-open"></i> Acceder
-            </button>
+            <button class="login-button" id="loginButton">Acceder</button>
 
             <div class="error-message" id="errorMessage">
-                <i class="fas fa-exclamation-circle"></i> Clave incorrecta. Verifique e intente nuevamente.
+                Clave incorrecta. Verifique e intente nuevamente.
             </div>
 
             <div class="admin-info">
                 <p>SISTEMA DE ACCESO RESTRINGIDO</p>
-                <div class="admin-type-badge" id="currentAdminType">Seleccione un perfil</div>
+                <div class="admin-type" id="currentAdminType">Seleccione un perfil</div>
             </div>
         </div>
     </div>
 
     <!-- ===== HEADER ===== -->
     <header class="ceo-header" id="dashboardHeader">
-        <div class="header-content">
-            <div class="brand-section">
-                <div class="brand-icon">
-                    <i class="fas fa-bolt"></i>
-                </div>
-                <div>
-                    <h1 class="brand-name">TOKTOK GC</h1>
-                </div>
+        <div class="header-top">
+            <h1 class="company-name">TOKTOK GC</h1>
+            <div class="ceo-badge">
+                <i class="fas fa-crown"></i>
+                <span id="currentAdminBadge"></span>
             </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-                <div class="ceo-badge" id="currentAdminBadge">
-                    <i class="fas fa-crown"></i> CEO
-                </div>
-                <button class="logout-btn" id="logoutButton" title="Cerrar sesión">
-                    <i class="fas fa-sign-out-alt"></i> Salir
-                </button>
-            </div>
+            <button class="logout-btn" id="logoutButton">
+                <i class="fas fa-sign-out-alt"></i> Salir
+            </button>
         </div>
+        <div class="current-admin" id="currentAdminText">Admin1 · CEO Completo</div>
     </header>
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="main-content" id="mainContent">
-        
-        <!-- Panel de Control -->
-        <div class="section-header">
-            <div>
-                <h2 class="section-title">
-                    <i class="fas fa-th-large"></i> Módulos de Gestión
-                </h2>
+        <div class="quick-section">
+            <h2 class="section-title">
+                <i class="fas fa-th-large"></i> Panel de Control Ejecutivo
+            </h2>
+            
+            <div class="ceo-grid">
+                <!-- 1. TokTok Admin -->
+                <a href="admin-toktok/index.html" class="ceo-card admin-card" data-admin="1,2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-tachometer-alt"></i>
+                        </div>
+                        <div class="card-badge">CORE</div>
+                    </div>
+                    <div>
+                        <div class="card-title">TokTok Admin</div>
+                        <div class="card-desc">Panel administrativo principal</div>
+                    </div>
+                </a>
+
+                <!-- 2. Publicidad -->
+                <a href="admin-toktok/dashboard_pro" class="ceo-card admin-card" data-admin="1,2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-bullhorn"></i>
+                        </div>
+                        <div class="card-badge">PUBLICIDAD</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Publicidad totok</div>
+                        <div class="card-desc">Anuncios url</div>
+                    </div>
+                </a>
+
+                <!-- 3. Recargas -->
+                <a href="admin-toktok/dashboard_recargas" class="ceo-card admin-card" data-admin="1,2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="card-badge">RECARGAS</div>
+                    </div>
+                    <div>
+                        <div class="card-title">TokTok Recargas</div>
+                        <div class="card-desc">Administración de recargas</div>
+                    </div>
+                </a>
+
+                <!-- 4. Entel -->
+                <a href="EXTENCIONES/admin-entel.html" class="ceo-card entel-card" data-admin="1,3,4">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3);">TELCO</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Entel</div>
+                        <div class="card-desc">Gestión operadora Entel</div>
+                    </div>
+                </a>
+
+                <!-- 5. Tigo -->
+                <a href="EXTENCIONES/admin-tigo.html" class="ceo-card tigo-card" data-admin="1,3,4">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="card-badge" style="background:rgba(6,214,160,0.15);color:#34d399;border-color:rgba(6,214,160,0.3);">TELCO</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Tigo</div>
+                        <div class="card-desc">Gestión operadora Tigo</div>
+                    </div>
+                </a>
+
+                <!-- 6. Viva -->
+                <a href="EXTENCIONES/admin-viva.html" class="ceo-card viva-card" data-admin="1,3,4">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-signal"></i>
+                        </div>
+                        <div class="card-badge" style="background:rgba(245,158,11,0.15);color:#fbbf24;border-color:rgba(245,158,11,0.3);">TELCO</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Viva</div>
+                        <div class="card-desc">Gestión operadora Viva</div>
+                    </div>
+                </a>
+
+                <!-- 7. Reportes -->
+                <a href="EXTENCIONES/reportes.html" class="ceo-card admin-card" data-admin="1,2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <div class="card-badge">ANALYTICS</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Reportes</div>
+                        <div class="card-desc">Métricas y estadísticas</div>
+                    </div>
+                </a>
+
+                <!-- 8. Banco BCP -->
+                <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card" data-admin="1,5">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-university"></i>
+                        </div>
+                        <div class="card-badge" style="background:rgba(5,150,105,0.15);color:#34d399;border-color:rgba(5,150,105,0.3);">BANCA</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Banco BCP</div>
+                        <div class="card-desc">Operaciones bancarias</div>
+                    </div>
+                </a>
+
+                <!-- 9. Tienda -->
+                <a href="EXTENCIONES/admin-tienda.html" class="ceo-card tienda-card" data-admin="1,3,5">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-shopping-bag"></i>
+                        </div>
+                        <div class="card-badge" style="background:rgba(249,115,22,0.15);color:#fb923c;border-color:rgba(249,115,22,0.3);">E-COMMERCE</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Tienda</div>
+                        <div class="card-desc">Gestión de productos</div>
+                    </div>
+                </a>
+
+                <!-- 10. Juegos -->
+                <a href="EXTENCIONES/admin-juegos.html" class="ceo-card juegos-card" data-admin="1,3,5,6">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-gamepad"></i>
+                        </div>
+                        <div class="card-badge" style="background:rgba(139,92,246,0.15);color:#a78bfa;border-color:rgba(139,92,246,0.3);">GAMING</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Juegos</div>
+                        <div class="card-desc">Plataforma de juegos</div>
+                    </div>
+                </a>
+
+                <!-- 11. Incubadora -->
+                <a href="EXTENCIONES/admin-incubadora.html" class="ceo-card inventario-card" data-admin="1,7">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-flask"></i>
+                        </div>
+                        <div class="card-badge">LAB</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Incubadora</div>
+                        <div class="card-desc">Gestión de inventario</div>
+                    </div>
+                </a>
+
+                <!-- 12. Asistencia -->
+                <a href="EXTENCIONES/admin-asistencia.html" class="ceo-card asistencia-card" data-admin="1,3,8">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-user-clock"></i>
+                        </div>
+                        <div class="card-badge">RRHH</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Asistencia</div>
+                        <div class="card-desc">Control de personal</div>
+                    </div>
+                </a>
+
+                <!-- 13. Monitoreo GC -->
+                <a href="EXTENCIONES/monitoreo-gc.html" class="ceo-card monitoreo-card" data-admin="1,2">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-video"></i>
+                        </div>
+                        <div class="card-badge">MONITOR</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Monitoreo GC</div>
+                        <div class="card-desc">Supervisión en tiempo real</div>
+                    </div>
+                </a>
+
+                <!-- 14. Cajas -->
+                <a href="EXTENCIONES/admin-cajas.html" class="ceo-card cajas-card" data-admin="1,3,4">
+                    <div class="card-header">
+                        <div class="card-icon">
+                            <i class="fas fa-cash-register"></i>
+                        </div>
+                        <div class="card-badge">CAJA</div>
+                    </div>
+                    <div>
+                        <div class="card-title">Cajas</div>
+                        <div class="card-desc">Arqueo y movimientos</div>
+                    </div>
+                </a>
             </div>
-            <span class="section-subtitle" id="moduleCount"></span>
-        </div>
-
-        <div class="ceo-grid">
-            <!-- Panel Admin TokTok -->
-            <a href="admin-toktok/index.html" class="ceo-card admin-card" data-admin="1,2" style="animation-delay:0.02s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-tachometer-alt"></i>
-                    </div>
-                    <div class="card-badge">CORE</div>
-                </div>
-                <div>
-                    <div class="card-title">TokTok Admin</div>
-                    <div class="card-desc">Panel administrativo principal</div>
-                </div>
-            </a>
-
-            <!-- Publicidad -->
-            <a href="admin-toktok/dashboard_pro" class="ceo-card admin-card" data-admin="1,2" style="animation-delay:0.04s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-bullhorn"></i>
-                    </div>
-                    <div class="card-badge">PUBLICIDAD</div>
-                </div>
-                <div>
-                    <div class="card-title">Publicidad totok</div>
-                    <div class="card-desc">Anuncios url</div>
-                </div>
-            </a>
-
-            <!-- Recargas -->
-            <a href="admin-toktok/dashboard_recargas" class="ceo-card admin-card" data-admin="1,2" style="animation-delay:0.06s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-mobile-alt"></i>
-                    </div>
-                    <div class="card-badge">RECARGAS</div>
-                </div>
-                <div>
-                    <div class="card-title">TokTok Recargas</div>
-                    <div class="card-desc">Administración de recargas</div>
-                </div>
-            </a>
-
-            <!-- Entel -->
-            <a href="EXTENCIONES/admin-entel.html" class="ceo-card entel-card" data-admin="1,3,4" style="animation-delay:0.08s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-signal"></i>
-                    </div>
-                    <div class="card-badge" style="background:rgba(239,68,68,0.15);color:#f87171;border-color:rgba(239,68,68,0.3);">TELCO</div>
-                </div>
-                <div>
-                    <div class="card-title">Entel</div>
-                    <div class="card-desc">Gestión operadora Entel</div>
-                </div>
-            </a>
-
-            <!-- Tigo -->
-            <a href="EXTENCIONES/admin-tigo.html" class="ceo-card tigo-card" data-admin="1,3,4" style="animation-delay:0.1s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-signal"></i>
-                    </div>
-                    <div class="card-badge" style="background:rgba(6,214,160,0.15);color:#34d399;border-color:rgba(6,214,160,0.3);">TELCO</div>
-                </div>
-                <div>
-                    <div class="card-title">Tigo</div>
-                    <div class="card-desc">Gestión operadora Tigo</div>
-                </div>
-            </a>
-
-            <!-- Viva -->
-            <a href="EXTENCIONES/admin-viva.html" class="ceo-card viva-card" data-admin="1,3,4" style="animation-delay:0.12s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-signal"></i>
-                    </div>
-                    <div class="card-badge" style="background:rgba(245,158,11,0.15);color:#fbbf24;border-color:rgba(245,158,11,0.3);">TELCO</div>
-                </div>
-                <div>
-                    <div class="card-title">Viva</div>
-                    <div class="card-desc">Gestión operadora Viva</div>
-                </div>
-            </a>
-
-            <!-- Reportes -->
-            <a href="EXTENCIONES/reportes.html" class="ceo-card admin-card" data-admin="1,2" style="animation-delay:0.14s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-chart-bar"></i>
-                    </div>
-                    <div class="card-badge">ANALYTICS</div>
-                </div>
-                <div>
-                    <div class="card-title">Reportes</div>
-                    <div class="card-desc">Métricas y estadísticas</div>
-                </div>
-            </a>
-
-            <!-- Banco BCP -->
-            <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card" data-admin="1,5" style="animation-delay:0.16s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-university"></i>
-                    </div>
-                    <div class="card-badge" style="background:rgba(5,150,105,0.15);color:#34d399;border-color:rgba(5,150,105,0.3);">BANCA</div>
-                </div>
-                <div>
-                    <div class="card-title">Banco BCP</div>
-                    <div class="card-desc">Operaciones bancarias</div>
-                </div>
-            </a>
-
-            <!-- Tienda -->
-            <a href="EXTENCIONES/admin-tienda.html" class="ceo-card tienda-card" data-admin="1,3,5" style="animation-delay:0.18s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-shopping-bag"></i>
-                    </div>
-                    <div class="card-badge" style="background:rgba(249,115,22,0.15);color:#fb923c;border-color:rgba(249,115,22,0.3);">E-COMMERCE</div>
-                </div>
-                <div>
-                    <div class="card-title">Tienda</div>
-                    <div class="card-desc">Gestión de productos</div>
-                </div>
-            </a>
-
-            <!-- Juegos -->
-            <a href="EXTENCIONES/admin-juegos.html" class="ceo-card juegos-card" data-admin="1,3,5,6" style="animation-delay:0.2s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-gamepad"></i>
-                    </div>
-                    <div class="card-badge" style="background:rgba(139,92,246,0.15);color:#a78bfa;border-color:rgba(139,92,246,0.3);">GAMING</div>
-                </div>
-                <div>
-                    <div class="card-title">Juegos</div>
-                    <div class="card-desc">Plataforma de juegos</div>
-                </div>
-            </a>
-
-            <!-- Incubadora -->
-            <a href="EXTENCIONES/admin-incubadora.html" class="ceo-card inventario-card" data-admin="1,7" style="animation-delay:0.22s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-flask"></i>
-                    </div>
-                    <div class="card-badge">LAB</div>
-                </div>
-                <div>
-                    <div class="card-title">Incubadora</div>
-                    <div class="card-desc">Gestión de inventario</div>
-                </div>
-            </a>
-
-            <!-- Asistencia -->
-            <a href="EXTENCIONES/admin-asistencia.html" class="ceo-card asistencia-card" data-admin="1,3,8" style="animation-delay:0.24s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-user-clock"></i>
-                    </div>
-                    <div class="card-badge">RRHH</div>
-                </div>
-                <div>
-                    <div class="card-title">Asistencia</div>
-                    <div class="card-desc">Control de personal</div>
-                </div>
-            </a>
-
-            <!-- Monitoreo GC -->
-            <a href="EXTENCIONES/monitoreo-gc.html" class="ceo-card monitoreo-card" data-admin="1,2" style="animation-delay:0.26s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-video"></i>
-                    </div>
-                    <div class="card-badge">MONITOR</div>
-                </div>
-                <div>
-                    <div class="card-title">Monitoreo GC</div>
-                    <div class="card-desc">Supervisión en tiempo real</div>
-                </div>
-            </a>
-
-            <!-- Cajas -->
-            <a href="EXTENCIONES/admin-cajas.html" class="ceo-card cajas-card" data-admin="1,3,4" style="animation-delay:0.28s;">
-                <div class="card-header">
-                    <div class="card-icon">
-                        <i class="fas fa-cash-register"></i>
-                    </div>
-                    <div class="card-badge">CAJA</div>
-                </div>
-                <div>
-                    <div class="card-title">Cajas</div>
-                    <div class="card-desc">Arqueo y movimientos</div>
-                </div>
-            </a>
         </div>
     </main>
 
     <!-- ===== BOTÓN INSTALAR ===== -->
     <button id="installButton" aria-label="Instalar aplicación">
-        <i class="fas fa-download"></i> Instalar App
+        <i class="fas fa-download"></i> Instalar App GC
     </button>
 
     <script>
-        (function() {
-            // ===== CONFIGURACIÓN =====
-            const adminPasswords = {
-                '1': 'GC2026CEO',
-                '2': 'GC2026TOK',
-                '3': 'GC2026OPE',
-                '4': 'GC2026CAJ',
-                '5': 'GC2026BAN',
-                '6': 'GC2026JUE',
-                '7': 'GC2026INC',
-                '8': 'GC2026ASI'
-            };
-            
-            const adminNames = {
-                '1': 'CEO Completo',
-                '2': 'TokTok Admin y Monitoreo',
-                '3': 'Operadoras, Tienda, Juegos, Asistencia, Cajas',
-                '4': 'Operadoras y Caja',
-                '5': 'Banco BCP, Tienda y Juegos',
-                '6': 'Solo Juegos',
-                '7': 'Incubadora',
-                '8': 'Solo Asistencia'
-            };
+        // CONTRASEÑAS
+        const adminPasswords = {
+            '1': 'GC2026CEO',
+            '2': 'GC2026TOK',
+            '3': 'GC2026OPE',
+            '4': 'GC2026CAJ',
+            '5': 'GC2026BAN',
+            '6': 'GC2026JUE',
+            '7': 'GC2026INC',
+            '8': 'GC2026ASI'
+        };
 
-            // ===== VARIABLES DE ESTADO =====
-            let currentAdminType = null;
-            let failedAttempts = 0;
-            const maxAttempts = 5;
-            let deferredPrompt = null;
-            const SESSION_DURATION_HOURS = 8;
-            const LOCKOUT_DURATION_MS = 30000;
+        const adminNames = {
+            '1': 'CEO Completo',
+            '2': 'TokTok Admin y Monitoreo',
+            '3': 'Operadoras, Tienda, Juegos, Asistencia, Cajas',
+            '4': 'Operadoras y Caja',
+            '5': 'Banco BCP, Tienda y Juegos',
+            '6': 'Solo Juegos',
+            '7': 'Incubadora',
+            '8': 'Solo Asistencia'
+        };
 
-            // ===== ELEMENTOS DOM =====
-            const loginScreen = document.getElementById('loginScreen');
-            const dashboardHeader = document.getElementById('dashboardHeader');
-            const mainContent = document.getElementById('mainContent');
-            const adminTypeSelect = document.getElementById('adminType');
-            const passwordInput = document.getElementById('passwordInput');
-            const togglePasswordBtn = document.getElementById('togglePassword');
-            const loginButton = document.getElementById('loginButton');
-            const errorMessage = document.getElementById('errorMessage');
-            const currentAdminTypeBadge = document.getElementById('currentAdminType');
-            const currentAdminBadge = document.getElementById('currentAdminBadge');
-            const logoutButton = document.getElementById('logoutButton');
-            const ceoCards = document.querySelectorAll('.ceo-card');
-            const moduleCountSpan = document.getElementById('moduleCount');
-            const installButton = document.getElementById('installButton');
+        let currentAdminType = null;
+        let failedAttempts = 0;
+        const maxAttempts = 5;
 
-            // ===== FUNCIONES UTILITARIAS =====
-            function updateModuleCount() {
-                if (moduleCountSpan) {
-                    const visibleCards = document.querySelectorAll('.ceo-card:not(.hidden)');
-                    moduleCountSpan.textContent = `${visibleCards.length} módulos`;
+        const loginScreen = document.getElementById('loginScreen');
+        const dashboardHeader = document.getElementById('dashboardHeader');
+        const mainContent = document.getElementById('mainContent');
+        const adminTypeSelect = document.getElementById('adminType');
+        const passwordInput = document.getElementById('passwordInput');
+        const togglePassword = document.getElementById('togglePassword');
+        const loginButton = document.getElementById('loginButton');
+        const errorMessage = document.getElementById('errorMessage');
+        const currentAdminTypeText = document.getElementById('currentAdminType');
+        const currentAdminBadge = document.getElementById('currentAdminBadge');
+        const currentAdminText = document.getElementById('currentAdminText');
+        const logoutButton = document.getElementById('logoutButton');
+        const ceoCards = document.querySelectorAll('.ceo-card');
+
+        adminTypeSelect.addEventListener('change', function() {
+            const selectedValue = this.value;
+            if (selectedValue) {
+                currentAdminTypeText.textContent = `ADMIN${selectedValue} · ${adminNames[selectedValue]}`;
+                passwordInput.focus();
+            } else {
+                currentAdminTypeText.textContent = 'Seleccione un perfil';
+            }
+        });
+
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
+            passwordInput.setAttribute('type', type);
+            this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
+        });
+
+        function filterCardsByAdmin(adminType) {
+            ceoCards.forEach(card => {
+                const allowedAdmins = card.getAttribute('data-admin').split(',').map(num => num.trim());
+                if (allowedAdmins.includes(adminType.toString())) {
+                    card.classList.remove('hidden');
+                } else {
+                    card.classList.add('hidden');
                 }
-            }
+            });
+        }
 
-            function filterCardsByAdmin(adminType) {
-                ceoCards.forEach(card => {
-                    const allowedAdmins = card.getAttribute('data-admin').split(',').map(n => n.trim());
-                    if (allowedAdmins.includes(adminType.toString())) {
-                        card.classList.remove('hidden');
-                    } else {
-                        card.classList.add('hidden');
-                    }
-                });
-                updateModuleCount();
-            }
+        function login() {
+            const adminType = adminTypeSelect.value;
+            const password = passwordInput.value.trim();
 
-            function showError(msg) {
-                errorMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i> ${msg}`;
+            if (!adminType) {
+                errorMessage.textContent = 'Seleccione un perfil de acceso';
                 errorMessage.classList.add('show');
-                setTimeout(() => errorMessage.classList.remove('show'), 4000);
+                adminTypeSelect.focus();
+                return;
             }
 
-            function resetLoginForm() {
-                adminTypeSelect.value = '';
-                passwordInput.value = '';
-                passwordInput.type = 'password';
-                togglePasswordBtn.innerHTML = '<i class="far fa-eye"></i>';
-                currentAdminTypeBadge.textContent = 'Seleccione un perfil';
-                errorMessage.classList.remove('show');
-                loginButton.disabled = false;
-                loginButton.innerHTML = '<i class="fas fa-lock-open"></i> Acceder';
+            if (!password) {
+                errorMessage.textContent = 'Ingrese su contraseña';
+                errorMessage.classList.add('show');
+                passwordInput.focus();
+                return;
             }
 
-            function showDashboard(adminType) {
+            if (password === adminPasswords[adminType]) {
+                failedAttempts = 0;
                 currentAdminType = adminType;
-                filterCardsByAdmin(adminType);
-                currentAdminBadge.innerHTML = `<i class="fas fa-crown"></i> ADMIN ${adminType}`;
-                loginScreen.classList.add('hidden');
-                dashboardHeader.style.display = 'block';
-                mainContent.classList.add('show');
-                
-                // Guardar sesión
+
                 localStorage.setItem('toktokAdminSession', JSON.stringify({
                     adminType: adminType,
                     loginTime: Date.now()
                 }));
-            }
 
-            function hideDashboard() {
-                loginScreen.classList.remove('hidden');
-                dashboardHeader.style.display = 'none';
-                mainContent.classList.remove('show');
-                ceoCards.forEach(card => card.classList.remove('hidden'));
-                resetLoginForm();
-                currentAdminType = null;
-                localStorage.removeItem('toktokAdminSession');
-            }
+                filterCardsByAdmin(adminType);
+                currentAdminBadge.textContent = `ADMIN ${adminType}`;
+                currentAdminText.textContent = `ADMIN${adminType} · ${adminNames[adminType]}`;
 
-            // ===== MANEJO DE LOGIN =====
-            function handleLogin() {
-                const adminType = adminTypeSelect.value;
-                const password = passwordInput.value.trim();
+                loginScreen.classList.add('hidden');
+                dashboardHeader.style.display = 'block';
+                mainContent.classList.add('show');
 
-                if (!adminType) {
-                    showError('Seleccione un perfil de acceso');
-                    adminTypeSelect.focus();
-                    return;
-                }
+                loginButton.innerHTML = '<i class="fas fa-check"></i> Acceso concedido';
+                loginButton.style.background = '#059669';
+                setTimeout(() => {
+                    loginButton.innerHTML = 'Acceder';
+                    loginButton.style.background = '';
+                }, 1500);
+            } else {
+                failedAttempts++;
+                errorMessage.textContent = `Clave incorrecta. Intentos restantes: ${maxAttempts - failedAttempts}`;
+                errorMessage.classList.add('show');
+                passwordInput.value = '';
+                passwordInput.focus();
 
-                if (!password) {
-                    showError('Ingrese su contraseña');
-                    passwordInput.focus();
-                    return;
-                }
+                passwordInput.style.animation = 'none';
+                setTimeout(() => {
+                    passwordInput.style.animation = 'shake 0.5s ease';
+                }, 10);
 
-                if (password === adminPasswords[adminType]) {
-                    // Éxito
-                    failedAttempts = 0;
-                    showDashboard(adminType);
-                    
-                    // Feedback visual
-                    loginButton.innerHTML = '<i class="fas fa-check-circle"></i> Acceso Concedido';
-                    loginButton.style.background = 'linear-gradient(135deg, #059669, #047857)';
+                if (failedAttempts >= maxAttempts) {
+                    loginButton.disabled = true;
+                    loginButton.innerHTML = 'BLOQUEADO';
+                    errorMessage.textContent = 'Demasiados intentos. Sistema bloqueado 30s.';
                     setTimeout(() => {
-                        loginButton.innerHTML = '<i class="fas fa-lock-open"></i> Acceder';
-                        loginButton.style.background = '';
-                    }, 2000);
-                } else {
-                    // Fallo
-                    failedAttempts++;
-                    const remaining = maxAttempts - failedAttempts;
-                    
-                    if (remaining > 0) {
-                        showError(`Clave incorrecta. Intentos restantes: ${remaining}`);
-                    } else {
-                        showError('Demasiados intentos. Sistema bloqueado 30 segundos.');
-                        loginButton.disabled = true;
-                        loginButton.innerHTML = '<i class="fas fa-hourglass-half"></i> Bloqueado...';
-                        
-                        setTimeout(() => {
-                            loginButton.disabled = false;
-                            loginButton.innerHTML = '<i class="fas fa-lock-open"></i> Acceder';
-                            failedAttempts = 0;
-                        }, LOCKOUT_DURATION_MS);
-                    }
-                    
-                    passwordInput.value = '';
-                    passwordInput.focus();
-                    
-                    // Animación de sacudida
-                    passwordInput.style.animation = 'none';
-                    setTimeout(() => {
-                        passwordInput.style.animation = 'shake 0.5s ease';
-                    }, 10);
+                        loginButton.disabled = false;
+                        loginButton.innerHTML = 'Acceder';
+                        failedAttempts = 0;
+                        errorMessage.classList.remove('show');
+                    }, 30000);
                 }
             }
+        }
 
-            // ===== MANEJO DE SESIÓN =====
-            function checkSession() {
-                const session = localStorage.getItem('toktokAdminSession');
-                if (!session) return;
-                
+        loginButton.addEventListener('click', login);
+        passwordInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        logoutButton.addEventListener('click', function() {
+            localStorage.removeItem('toktokAdminSession');
+            adminTypeSelect.value = '';
+            passwordInput.value = '';
+            passwordInput.type = 'password';
+            togglePassword.innerHTML = '<i class="far fa-eye"></i>';
+            errorMessage.classList.remove('show');
+            currentAdminTypeText.textContent = 'Seleccione un perfil';
+            loginScreen.classList.remove('hidden');
+            dashboardHeader.style.display = 'none';
+            mainContent.classList.remove('show');
+            ceoCards.forEach(card => card.classList.remove('hidden'));
+        });
+
+        function checkSession() {
+            const session = localStorage.getItem('toktokAdminSession');
+            if (session) {
                 try {
                     const sessionData = JSON.parse(session);
                     const sessionAge = (Date.now() - sessionData.loginTime) / (1000 * 60 * 60);
-                    
-                    if (sessionAge < SESSION_DURATION_HOURS && adminPasswords[sessionData.adminType]) {
-                        showDashboard(sessionData.adminType);
+                    if (sessionAge < 8) {
+                        currentAdminType = sessionData.adminType;
+                        filterCardsByAdmin(currentAdminType);
+                        currentAdminBadge.textContent = `ADMIN ${currentAdminType}`;
+                        currentAdminText.textContent = `ADMIN${currentAdminType} · ${adminNames[currentAdminType]}`;
+                        loginScreen.classList.add('hidden');
+                        dashboardHeader.style.display = 'block';
+                        mainContent.classList.add('show');
                     } else {
                         localStorage.removeItem('toktokAdminSession');
                     }
@@ -1054,108 +979,33 @@
                     localStorage.removeItem('toktokAdminSession');
                 }
             }
+        }
 
-            // ===== EVENTOS =====
-            adminTypeSelect.addEventListener('change', function() {
-                const selected = this.value;
-                if (selected) {
-                    currentAdminTypeBadge.textContent = `ADMIN${selected} · ${adminNames[selected]}`;
-                    passwordInput.focus();
-                } else {
-                    currentAdminTypeBadge.textContent = 'Seleccione un perfil';
-                }
-            });
+        // PWA
+        let deferredPrompt;
+        const installButton = document.getElementById('installButton');
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installButton.style.display = 'flex';
+        });
+        installButton.addEventListener('click', async () => {
+            installButton.style.display = 'none';
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            deferredPrompt = null;
+        });
 
-            togglePasswordBtn.addEventListener('click', function() {
-                const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
-                passwordInput.setAttribute('type', type);
-                this.innerHTML = type === 'password' ? '<i class="far fa-eye"></i>' : '<i class="far fa-eye-slash"></i>';
-            });
-
-            loginButton.addEventListener('click', handleLogin);
-
-            passwordInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') handleLogin();
-            });
-
-            logoutButton.addEventListener('click', hideDashboard);
-
-            // Efecto táctil en tarjetas
-            ceoCards.forEach(card => {
-                card.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.97)';
-                    this.style.background = 'rgba(30, 41, 59, 0.9)';
-                });
-                card.addEventListener('touchend', function() {
-                    this.style.transform = '';
-                    this.style.background = '';
-                });
-            });
-
-            // ===== PWA =====
-            window.addEventListener('beforeinstallprompt', (e) => {
-                e.preventDefault();
-                deferredPrompt = e;
-                installButton.style.display = 'flex';
-            });
-
-            installButton.addEventListener('click', async () => {
-                if (!deferredPrompt) return;
-                installButton.style.display = 'none';
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                console.log(`Instalación: ${outcome}`);
-                deferredPrompt = null;
-            });
-
-            window.addEventListener('appinstalled', () => {
-                installButton.style.display = 'none';
-            });
-
-            if (window.matchMedia('(display-mode: standalone)').matches) {
-                installButton.style.display = 'none';
-            }
-
-            // ===== SERVICE WORKER =====
-            if ('serviceWorker' in navigator) {
-                window.addEventListener('load', () => {
-                    navigator.serviceWorker.register('/sw.js').then(reg => {
-                        console.log('SW registrado:', reg.scope);
-                    }).catch(err => {
-                        console.log('Error SW:', err);
-                    });
-                });
-            }
-
-            // ===== PRECARGAR IMÁGENES =====
-            const imageUrls = [
-                'https://androidbolivia.com/wp-content/uploads/entel-bolivia-1.jpg',
-                'https://play-lh.googleusercontent.com/i7eXCqvEszOsN_LwPHkxXMx8j2vb0QphVwkqTr3U8GodBeNA9AuQVxgs7nyCnEru',
-                'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDjM0IP2cxcg231iXsqKa-q2eJH5uTbaQ0xA&s',
-                'https://i.pinimg.com/1200x/b3/08/3b/b3083be0d3f3a188bb9697e5fcbccfeb.jpg',
-                'https://static.vecteezy.com/system/resources/previews/003/043/711/non_2x/online-shop-logo-for-business-vector.jpg',
-                'https://img.freepik.com/vector-premium/plantilla-logotipo-tema-tienda-videojuegos_1056-348.jpg'
-            ];
-            
-            imageUrls.forEach(src => {
-                const img = new Image();
-                img.src = src;
-            });
-
-            // ===== INICIALIZACIÓN =====
+        // Service Worker
+        if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                checkSession();
-                updateModuleCount();
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => console.log('SW registrado:', registration.scope))
+                    .catch(error => console.log('Error SW:', error));
             });
+        }
 
-            // Exportar para debugging
-            window.toktokDashboard = {
-                login: handleLogin,
-                logout: hideDashboard,
-                session: checkSession,
-                passwords: adminPasswords
-            };
-        })();
+        window.addEventListener('load', checkSession);
     </script>
 </body>
 </html>
