@@ -30,14 +30,6 @@
             --radius-sm: 8px;
             --radius-md: 14px;
             --radius-lg: 20px;
-            --entel: #ef4444;
-            --tigo: #06d6a0;
-            --viva: #f59e0b;
-            --bcp: #059669;
-            --tienda: #f97316;
-            --juegos: #8b5cf6;
-            --success: #10b981;
-            --error: #ef4444;
         }
 
         * {
@@ -472,6 +464,12 @@
             flex-shrink: 0;
             transition: all 0.3s ease;
         }
+        .card-icon img {
+            width: 28px;
+            height: 28px;
+            object-fit: contain;
+            border-radius: 6px;
+        }
         .card-badge {
             font-size: 0.6rem;
             padding: 4px 10px;
@@ -688,8 +686,8 @@
                     <div class="card-badge">PUBLICIDAD</div>
                 </div>
                 <div>
-                    <div class="card-title">Publicidad TokTok</div>
-                    <div class="card-desc">Gestión de anuncios y campañas</div>
+                    <div class="card-title">Publicidad totok</div>
+                    <div class="card-desc">Anuncios url</div>
                 </div>
             </a>
 
@@ -703,7 +701,7 @@
                 </div>
                 <div>
                     <div class="card-title">TokTok Recargas</div>
-                    <div class="card-desc">Administración de recargas móviles</div>
+                    <div class="card-desc">Administración de recargas</div>
                 </div>
             </a>
 
@@ -750,7 +748,7 @@
             </a>
 
             <!-- Reportes -->
-            <a href="reportes/dashboard.html" class="ceo-card admin-card" data-admin="1,2" style="animation-delay:0.14s;">
+            <a href="EXTENCIONES/reportes.html" class="ceo-card admin-card" data-admin="1,2" style="animation-delay:0.14s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-chart-bar"></i>
@@ -759,12 +757,12 @@
                 </div>
                 <div>
                     <div class="card-title">Reportes</div>
-                    <div class="card-desc">Métricas y estadísticas avanzadas</div>
+                    <div class="card-desc">Métricas y estadísticas</div>
                 </div>
             </a>
 
             <!-- Banco BCP -->
-            <a href="banca/bcp.html" class="ceo-card bcp-card" data-admin="1,5" style="animation-delay:0.16s;">
+            <a href="EXTENCIONES/admin-bcp.html" class="ceo-card bcp-card" data-admin="1,5" style="animation-delay:0.16s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-university"></i>
@@ -773,12 +771,12 @@
                 </div>
                 <div>
                     <div class="card-title">Banco BCP</div>
-                    <div class="card-desc">Operaciones bancarias y financieras</div>
+                    <div class="card-desc">Operaciones bancarias</div>
                 </div>
             </a>
 
             <!-- Tienda -->
-            <a href="tienda/index.html" class="ceo-card tienda-card" data-admin="1,3,5" style="animation-delay:0.18s;">
+            <a href="EXTENCIONES/admin-tienda.html" class="ceo-card tienda-card" data-admin="1,3,5" style="animation-delay:0.18s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-shopping-bag"></i>
@@ -787,12 +785,12 @@
                 </div>
                 <div>
                     <div class="card-title">Tienda</div>
-                    <div class="card-desc">Gestión de productos y ventas</div>
+                    <div class="card-desc">Gestión de productos</div>
                 </div>
             </a>
 
             <!-- Juegos -->
-            <a href="juegos/plataforma.html" class="ceo-card juegos-card" data-admin="1,3,5,6" style="animation-delay:0.2s;">
+            <a href="EXTENCIONES/admin-juegos.html" class="ceo-card juegos-card" data-admin="1,3,5,6" style="animation-delay:0.2s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-gamepad"></i>
@@ -801,12 +799,12 @@
                 </div>
                 <div>
                     <div class="card-title">Juegos</div>
-                    <div class="card-desc">Plataforma de entretenimiento</div>
+                    <div class="card-desc">Plataforma de juegos</div>
                 </div>
             </a>
 
             <!-- Incubadora -->
-            <a href="inventario/incubadora.html" class="ceo-card inventario-card" data-admin="1,7" style="animation-delay:0.22s;">
+            <a href="EXTENCIONES/admin-incubadora.html" class="ceo-card inventario-card" data-admin="1,7" style="animation-delay:0.22s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-flask"></i>
@@ -815,12 +813,12 @@
                 </div>
                 <div>
                     <div class="card-title">Incubadora</div>
-                    <div class="card-desc">Gestión de inventario y proyectos</div>
+                    <div class="card-desc">Gestión de inventario</div>
                 </div>
             </a>
 
             <!-- Asistencia -->
-            <a href="rrhh/asistencia.html" class="ceo-card asistencia-card" data-admin="1,3,8" style="animation-delay:0.24s;">
+            <a href="EXTENCIONES/admin-asistencia.html" class="ceo-card asistencia-card" data-admin="1,3,8" style="animation-delay:0.24s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-user-clock"></i>
@@ -829,12 +827,12 @@
                 </div>
                 <div>
                     <div class="card-title">Asistencia</div>
-                    <div class="card-desc">Control de personal y horarios</div>
+                    <div class="card-desc">Control de personal</div>
                 </div>
             </a>
 
-            <!-- Monitoreo -->
-            <a href="monitoreo/gc.html" class="ceo-card monitoreo-card" data-admin="1,2" style="animation-delay:0.26s;">
+            <!-- Monitoreo GC -->
+            <a href="EXTENCIONES/monitoreo-gc.html" class="ceo-card monitoreo-card" data-admin="1,2" style="animation-delay:0.26s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-video"></i>
@@ -848,7 +846,7 @@
             </a>
 
             <!-- Cajas -->
-            <a href="cajas/arqueo.html" class="ceo-card cajas-card" data-admin="1,3,4" style="animation-delay:0.28s;">
+            <a href="EXTENCIONES/admin-cajas.html" class="ceo-card cajas-card" data-admin="1,3,4" style="animation-delay:0.28s;">
                 <div class="card-header">
                     <div class="card-icon">
                         <i class="fas fa-cash-register"></i>
@@ -857,7 +855,7 @@
                 </div>
                 <div>
                     <div class="card-title">Cajas</div>
-                    <div class="card-desc">Arqueo y movimientos de caja</div>
+                    <div class="card-desc">Arqueo y movimientos</div>
                 </div>
             </a>
         </div>
