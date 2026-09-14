@@ -1,0 +1,807 @@
+4<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Plan Hogar | Admin Pro</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000000; }
+  .app { width: 100vw; height: 100vh; display: flex; overflow: hidden; background: #000000; }
+
+  .sidebar { width: 260px; background: #080808; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s ease; overflow: hidden; }
+  .sidebar.collapsed { width: 72px; }
+  .sidebar-brand { padding: 20px 22px; display: flex; align-items: center; gap: 12px; color: #f0f0f5; font-weight: 700; font-size: 17px; white-space: nowrap; flex-shrink: 0; }
+  .sidebar-brand i { color: #facc15; font-size: 26px; min-width: 28px; text-align: center; }
+  .sidebar-brand span.accent { color: #facc15; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 14px; padding: 11px 14px; border-radius: 10px; color: #9a9ab0; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; background: transparent; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; position: relative; }
+  .nav-item i { font-size: 17px; min-width: 22px; text-align: center; color: #6a6a85; }
+  .nav-item:hover { background: #181818; color: #d0d0e0; }
+  .nav-item.active { background: #202020; color: #fff; }
+  .nav-item.active i { color: #facc15; }
+  .nav-item .pill { position: absolute; right: 10px; background: #facc15; color: #000000; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .sidebar.collapsed .nav-item span, .sidebar.collapsed .sidebar-brand span, .sidebar.collapsed .nav-item .pill { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 11px 0; }
+  .sidebar-footer { padding: 16px 18px; border-top: 1px solid #242424; display: flex; align-items: center; gap: 12px; color: #6a6a85; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+  .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #facc15; font-weight: 700; flex-shrink: 0; }
+  .sidebar.collapsed .sidebar-footer span { display: none; }
+  .sidebar.collapsed .sidebar-footer { justify-content: center; }
+
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #000000; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px; background: #080808; flex-shrink: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .toggle-btn { background: transparent; border: none; color: #8a8aa0; font-size: 18px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+  .toggle-btn:hover { background: #181818; color: #fff; }
+  .topbar h1 { color: #e8e8f0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .topbar h1 i { color: #facc15; font-size: 20px; }
+  .topbar-right .badge { background: #181818; color: #8a8aa0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+
+  .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .page-header h2 { color: #f0f0f5; font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .page-header h2 i { color: #facc15; }
+  .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+  .btn { background: #181818; border: none; color: #d0d0e0; padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.15s; white-space: nowrap; }
+  .btn:hover { background: #2a2a2a; color: #fff; }
+  .btn-primary { background: #facc15; color: #000000; }
+  .btn-primary:hover { background: #eab308; }
+  .btn-success { background: #16a34a; color: #fff; }
+  .btn-success:hover { background: #15803d; }
+  .btn-danger { background: #ca8a04; color: #000000; }
+  .btn-danger:hover { background: #a16207; }
+  .btn-gray { background: #475569; color: #fff; }
+  .btn-gray:hover { background: #334155; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: #101010; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+  .stat-card .label { color: #8a8aa0; font-size: 12px; font-weight: 500; text-transform: uppercase; }
+  .stat-card .value { color: #fff; font-size: 28px; font-weight: 700; }
+  .stat-card .icon-wrap { display: flex; justify-content: space-between; align-items: center; }
+  .stat-card .icon-wrap i { font-size: 22px; opacity: 0.7; }
+
+  .filter-tabs { display: flex; gap: 6px; background: #101010; padding: 6px; border-radius: 12px; margin-bottom: 16px; overflow-x: auto; }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .filter-tab { background: transparent; border: none; color: #8a8aa0; padding: 8px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .filter-tab:hover { color: #d0d0e0; }
+  .filter-tab.active { background: #202020; color: #fff; }
+  .filter-tab .count { background: #333333; color: #b0b0c8; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 700; }
+  .filter-tab.active .count { background: #facc15; color: #000000; }
+
+  .search-box { margin-bottom: 16px; position: relative; }
+  .search-box input { width: 100%; background: #101010; border: 1px solid #282828; border-radius: 12px; padding: 11px 14px 11px 42px; color: #e0e0f0; font-size: 13.5px; outline: none; font-family: inherit; }
+  .search-box input:focus { border-color: #facc15; }
+  .search-box i { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #6a6a85; font-size: 14px; }
+
+  .table-wrap { background: #101010; border-radius: 14px; overflow: hidden; }
+  .table-scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 700px; }
+  th { text-align: left; padding: 13px 18px; color: #8a8aa0; font-weight: 600; font-size: 11.5px; text-transform: uppercase; background: #0a0a0a; white-space: nowrap; }
+  td { padding: 12px 18px; color: #c0c0d0; white-space: nowrap; vertical-align: middle; }
+  tr:hover td { background: #16162a; }
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; background: #202020; color: #b0b0c8; }
+  .tag.activo { background: #14331f; color: #4ade80; }
+  .tag.inactivo { background: #3a300f; color: #facc15; }
+  .tag.pendiente { background: #3a2a1a; color: #fbbf24; }
+  .tag.confirmado { background: #14331f; color: #4ade80; }
+  .tag.cancelado { background: #3a300f; color: #facc15; }
+  .tag.sincob { background: #333333; color: #a0a0c0; }
+  .actions-cell { display: flex; gap: 6px; }
+  .empty-state { padding: 40px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
+  .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
+  .loading i { animation: spin 1s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(6px); }
+  .modal-overlay.show { display: flex; }
+  .modal { background: #101010; border-radius: 16px; width: 100%; max-width: 640px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #242424; flex-shrink: 0; }
+  .modal-header h3 { color: #f0f0f5; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .modal-header h3 i { color: #facc15; }
+  .modal-close { background: transparent; border: none; color: #8a8aa0; font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
+  .modal-close:hover { background: #181818; color: #fff; }
+  .modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
+  .fields-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  .fields-grid .field-full { grid-column: 1 / -1; }
+  .field { display: flex; flex-direction: column; gap: 6px; }
+  .field label { color: #9a9ab0; font-size: 12.5px; font-weight: 500; text-transform: capitalize; }
+  .field input, .field select, .field textarea { background: #080808; border: 1px solid #282828; border-radius: 10px; padding: 10px 14px; color: #e0e0f0; font-size: 13.5px; outline: none; font-family: inherit; width: 100%; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #facc15; }
+  .field textarea { resize: vertical; min-height: 70px; }
+  .field-checkbox { flex-direction: row; align-items: center; gap: 10px; }
+  .field-checkbox input { width: auto; accent-color: #facc15; }
+  .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #242424; flex-shrink: 0; }
+
+  .detail-section { background: #080808; border-radius: 10px; padding: 12px 14px; margin-bottom: 12px; }
+  .detail-section-title { color: #8a8aa0; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .detail-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #181818; font-size: 13px; gap: 12px; }
+  .detail-row:last-child { border-bottom: none; }
+  .detail-label { color: #8a8aa0; font-weight: 500; flex-shrink: 0; }
+  .detail-value { color: #e0e0f0; font-weight: 500; text-align: right; word-break: break-word; }
+
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+  .toast { background: #181818; color: #e0e0f0; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); animation: slideIn 0.25s ease; min-width: 260px; }
+  .toast.success { border-left: 3px solid #4ade80; }
+  .toast.error { border-left: 3px solid #facc15; }
+  .toast.info { border-left: 3px solid #60a5fa; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
+
+  @media (max-width: 800px) {
+    .sidebar { width: 72px; }
+    .sidebar .nav-item span, .sidebar .sidebar-brand span, .sidebar-footer span, .sidebar .nav-item .pill { display: none; }
+    .sidebar .nav-item { justify-content: center; padding: 11px 0; }
+    .sidebar-footer { justify-content: center; }
+    .content { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+    .fields-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-wifi"></i>
+      <span>Plan<span class="accent"> Hogar</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-section="dashboard"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
+      <button class="nav-item" data-section="requests"><i class="fas fa-file-alt"></i><span>Solicitudes</span><span class="pill" id="pill-pending">0</span></button>
+      <button class="nav-item" data-section="categories"><i class="fas fa-tags"></i><span>Categorías</span></button>
+      <button class="nav-item" data-section="packages"><i class="fas fa-box"></i><span>Paquetes</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar">A</div>
+      <span>Administrador</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+        <h1><i class="fas fa-shield-halved"></i> <span id="pageTitle">Panel de Administración</span></h1>
+      </div>
+      <div class="topbar-right">
+        <span class="badge" id="connStatus"><i class="fas fa-circle" style="color:#4ade80;font-size:8px;margin-right:6px;"></i>Conectado</span>
+      </div>
+    </div>
+    <div class="content" id="content">
+      <div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <h3 id="modalTitle"><i class="fas fa-plus"></i> Nuevo registro</h3>
+      <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body" id="modalBody"></div>
+    <div class="modal-footer" id="modalFooter">
+      <button class="btn" id="modalCancel">Cancelar</button>
+      <button class="btn btn-primary" id="modalSave"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<script>
+const SUPABASE_URL = 'https://aleadadisazocjovibeh.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E';
+const { createClient } = supabase;
+const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const TELEGRAM_BOT_TOKEN = '7596286871:AAGFe3sHy-GhykyM_xsFwDU8qrt6SWXSWHY';
+const TELEGRAM_CHAT_ID = '-5155315945';
+
+let currentSection = 'dashboard';
+let currentFilter = 'all';
+let currentData = [];
+let allRequests = [];
+let profilesMap = {};
+let editingId = null;
+let currentTableKey = null;
+let categoriesCache = [];
+let searchTerm = '';
+
+const $ = (s) => document.querySelector(s);
+const content = $('#content');
+
+const SCHEMA = {
+  categories: {
+    table: 'package_categories', label: 'Categorías', singular: 'Categoría', icon: 'fa-tags', pk: 'id',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'name', label: 'Nombre', type: 'text', required: true },
+      { key: 'slug', label: 'Slug', type: 'text', required: true },
+      { key: 'description', label: 'Descripción', type: 'textarea', full: true },
+      { key: 'icon', label: 'Icono (Font Awesome)', type: 'text', placeholder: 'fa-home' },
+      { key: 'display_order', label: 'Orden', type: 'number' },
+      { key: 'is_active', label: 'Activo', type: 'boolean' },
+    ],
+    listFields: ['name', 'slug', 'icon', 'display_order', 'is_active'],
+  },
+  packages: {
+    table: 'internet_packages', label: 'Paquetes', singular: 'Paquete', icon: 'fa-box', pk: 'id',
+    joinSelect: '*, package_categories(name)',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'category_id', label: 'Categoría', type: 'select-fk', fk: 'categories' },
+      { key: 'name', label: 'Nombre', type: 'text', required: true },
+      { key: 'description', label: 'Descripción', type: 'textarea', full: true },
+      { key: 'image_url', label: 'URL de Imagen', type: 'text', full: true },
+      { key: 'speed_mbps', label: 'Velocidad (Mbps)', type: 'number', required: true },
+      { key: 'price', label: 'Precio (Bs)', type: 'number', step: '0.01', required: true },
+      { key: 'installation_fee', label: 'Instalación (Bs)', type: 'number', step: '0.01' },
+      { key: 'contract_months', label: 'Meses de Contrato', type: 'number' },
+      { key: 'discount_percentage', label: 'Descuento (%)', type: 'number' },
+      { key: 'features', label: 'Características (una por línea)', type: 'textarea', full: true },
+      { key: 'is_featured', label: 'Destacado', type: 'boolean' },
+      { key: 'is_active', label: 'Activo', type: 'boolean' },
+    ],
+    listFields: ['name', 'category_id', 'speed_mbps', 'price', 'discount_percentage', 'is_featured', 'is_active'],
+  },
+};
+
+function toast(msg, type = 'info') {
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+  t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${msg}`;
+  $('#toastContainer').appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+function escapeHtml(s) {
+  if (s === null || s === undefined) return '';
+  return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+}
+function formatCurrency(n) { return 'Bs ' + parseFloat(n || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ','); }
+function getCategoryName(id) { const c = categoriesCache.find(x => x.id === id); return c ? c.name : '—'; }
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('show'); }
+
+const STATUS_MAP = {
+  'pending': { class: 'pendiente', label: '⏳ Pendiente' },
+  'confirmed': { class: 'confirmado', label: '✅ Confirmado' },
+  'cancelled': { class: 'cancelado', label: '❌ Cancelado' },
+  'no_coverage': { class: 'sincob', label: '📡 Sin Cobertura' }
+};
+
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentSection = btn.dataset.section;
+    renderSection(currentSection);
+  });
+});
+$('#toggleSidebar').addEventListener('click', () => $('#sidebar').classList.toggle('collapsed'));
+
+async function renderSection(section) {
+  content.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>`;
+  try {
+    if (section === 'dashboard') return await renderDashboard();
+    if (section === 'requests') return await renderRequests();
+    if (SCHEMA[section]) return await renderTable(section);
+    content.innerHTML = `<div class="empty-state">Sección no encontrada</div>`;
+  } catch (err) {
+    console.error(err);
+    content.innerHTML = `<div class="empty-state" style="color:#facc15;">Error: ${escapeHtml(err.message)}</div>`;
+    toast(err.message, 'error');
+  }
+}
+
+async function loadCategoriesCache() {
+  if (categoriesCache.length) return categoriesCache;
+  const { data, error } = await db.from('package_categories').select('*').order('display_order');
+  if (error) throw error;
+  categoriesCache = data || [];
+  return categoriesCache;
+}
+
+async function loadProfilesMap(userIds) {
+  const ids = [...new Set(userIds.filter(Boolean))];
+  if (!ids.length) return {};
+  const { data, error } = await db.from('user_profiles').select('*').in('id', ids);
+  if (error) { console.error('profiles', error); return {}; }
+  const map = {};
+  (data || []).forEach(p => { map[p.id] = p; });
+  return map;
+}
+
+async function updatePendingPill() {
+  const { count } = await db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'pending');
+  document.getElementById('pill-pending').textContent = count || 0;
+}
+
+async function renderDashboard() {
+  await loadCategoriesCache();
+  const [cats, packs, reqs, pending, confirmed, cancelled, noCov] = await Promise.all([
+    db.from('package_categories').select('*', { count: 'exact', head: true }),
+    db.from('internet_packages').select('*', { count: 'exact', head: true }),
+    db.from('request_status').select('*', { count: 'exact', head: true }),
+    db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
+    db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'confirmed'),
+    db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'cancelled'),
+    db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'no_coverage'),
+  ]);
+
+  const cards = [
+    { label: 'Categorías', value: cats.count || 0, icon: 'fa-tags', color: '#facc15' },
+    { label: 'Paquetes', value: packs.count || 0, icon: 'fa-box', color: '#fbbf24' },
+    { label: 'Solicitudes', value: reqs.count || 0, icon: 'fa-file-alt', color: '#60a5fa' },
+    { label: 'Pendientes', value: pending.count || 0, icon: 'fa-clock', color: '#f59e0b' },
+    { label: 'Confirmadas', value: confirmed.count || 0, icon: 'fa-check-circle', color: '#4ade80' },
+    { label: 'Canceladas', value: cancelled.count || 0, icon: 'fa-times-circle', color: '#facc15' },
+    { label: 'Sin Cobertura', value: noCov.count || 0, icon: 'fa-signal', color: '#a0a0c0' },
+  ];
+
+  const { data: allPackages } = await db.from('internet_packages').select('category_id, price');
+  const summaryRows = categoriesCache.map(cat => {
+    const pkgs = (allPackages || []).filter(x => x.category_id === cat.id);
+    return `<tr>
+      <td><i class="fas ${cat.icon || 'fa-tag'}" style="color:#facc15;margin-right:10px;"></i>${escapeHtml(cat.name)}</td>
+      <td>${pkgs.length}</td>
+      <td>${cat.is_active ? '<span class="tag activo">Activo</span>' : '<span class="tag inactivo">Inactivo</span>'}</td>
+    </tr>`;
+  }).join('');
+
+  content.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fas fa-chart-pie"></i> Dashboard</h2>
+      <span class="badge" style="background:#181818;color:#8a8aa0;padding:6px 14px;border-radius:20px;font-size:12px;">Resumen general</span>
+    </div>
+    <div class="stats-grid">
+      ${cards.map(c => `<div class="stat-card"><div class="icon-wrap"><span class="label">${c.label}</span><i class="fas ${c.icon}" style="color:${c.color}"></i></div><span class="value">${c.value}</span></div>`).join('')}
+    </div>
+    <div class="table-wrap">
+      <div class="table-scroll">
+        <table>
+          <thead><tr><th>Categoría</th><th>Paquetes</th><th>Estado</th></tr></thead>
+          <tbody>${summaryRows || `<tr><td colspan="3" class="empty-state">No hay categorías</td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+async function renderRequests() {
+  const { data, error } = await db.from('request_status').select('*').order('created_at', { ascending: false });
+  if (error) throw error;
+  allRequests = data || [];
+
+  profilesMap = await loadProfilesMap(allRequests.map(r => r.user_id));
+
+  const counts = {
+    all: allRequests.length,
+    pending: allRequests.filter(r => r.status === 'pending').length,
+    confirmed: allRequests.filter(r => r.status === 'confirmed').length,
+    cancelled: allRequests.filter(r => r.status === 'cancelled').length,
+    no_coverage: allRequests.filter(r => r.status === 'no_coverage').length,
+  };
+  document.getElementById('pill-pending').textContent = counts.pending;
+
+  content.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fas fa-file-alt"></i> Solicitudes</h2>
+      <div class="header-actions"><button class="btn" id="btnRefreshReq"><i class="fas fa-sync"></i> Refrescar</button></div>
+    </div>
+    <div class="stats-grid" style="margin-bottom:16px;">
+      <div class="stat-card"><div class="icon-wrap"><span class="label">Pendientes</span><i class="fas fa-clock" style="color:#f59e0b"></i></div><span class="value">${counts.pending}</span></div>
+      <div class="stat-card"><div class="icon-wrap"><span class="label">Confirmadas</span><i class="fas fa-check-circle" style="color:#4ade80"></i></div><span class="value">${counts.confirmed}</span></div>
+      <div class="stat-card"><div class="icon-wrap"><span class="label">Canceladas</span><i class="fas fa-times-circle" style="color:#facc15"></i></div><span class="value">${counts.cancelled}</span></div>
+      <div class="stat-card"><div class="icon-wrap"><span class="label">Sin Cobertura</span><i class="fas fa-signal" style="color:#a0a0c0"></i></div><span class="value">${counts.no_coverage}</span></div>
+    </div>
+    <div class="filter-tabs" id="filterTabs">
+      <button class="filter-tab active" data-status="all">Todas <span class="count">${counts.all}</span></button>
+      <button class="filter-tab" data-status="pending">Pendientes <span class="count">${counts.pending}</span></button>
+      <button class="filter-tab" data-status="confirmed">Confirmadas <span class="count">${counts.confirmed}</span></button>
+      <button class="filter-tab" data-status="cancelled">Canceladas <span class="count">${counts.cancelled}</span></button>
+      <button class="filter-tab" data-status="no_coverage">Sin Cobertura <span class="count">${counts.no_coverage}</span></button>
+    </div>
+    <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchReq" placeholder="Buscar por nombre, email o teléfono..."></div>
+    <div id="requestsList"></div>
+  `;
+
+  document.getElementById('btnRefreshReq').onclick = () => renderSection('requests');
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentFilter = btn.dataset.status;
+      paintRequests();
+    });
+  });
+  document.getElementById('searchReq').addEventListener('input', (e) => { searchTerm = e.target.value.toLowerCase(); paintRequests(); });
+  paintRequests();
+}
+
+function paintRequests() {
+  const list = document.getElementById('requestsList');
+  if (!list) return;
+  let filtered = allRequests;
+  if (currentFilter !== 'all') filtered = filtered.filter(r => r.status === currentFilter);
+  if (searchTerm) {
+    filtered = filtered.filter(r => {
+      const p = profilesMap[r.user_id] || {};
+      return (p.full_name || '').toLowerCase().includes(searchTerm) ||
+             (p.email || '').toLowerCase().includes(searchTerm) ||
+             (p.phone || '').toLowerCase().includes(searchTerm) ||
+             (r.package_name || '').toLowerCase().includes(searchTerm);
+    });
+  }
+  if (!filtered.length) {
+    list.innerHTML = `<div class="table-wrap"><div class="empty-state"><i class="fas fa-inbox" style="font-size:36px;display:block;margin-bottom:12px;opacity:0.5;"></i>No hay solicitudes</div></div>`;
+    return;
+  }
+  list.innerHTML = `
+    <div class="table-wrap"><div class="table-scroll"><table>
+      <thead><tr><th>Cliente</th><th>Contacto</th><th>Paquete</th><th>Monto</th><th>Estado</th><th>Fecha</th><th style="text-align:right;">Acciones</th></tr></thead>
+      <tbody>
+        ${filtered.map(req => {
+          const st = STATUS_MAP[req.status] || STATUS_MAP['pending'];
+          const p = profilesMap[req.user_id] || {};
+          const dateStr = new Date(req.created_at).toLocaleDateString('es-BO', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+          return `<tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:34px;height:34px;border-radius:50%;background:#333333;display:flex;align-items:center;justify-content:center;color:#facc15;font-weight:700;flex-shrink:0;font-size:13px;">
+                  ${(p.full_name || 'U').charAt(0).toUpperCase()}
+                </div>
+                <div>
+                  <div style="font-weight:600;color:#e0e0f0;">${escapeHtml(p.full_name || '—')}</div>
+                  <div style="font-size:11.5px;color:#8a8aa0;">${escapeHtml(p.email || '—')}</div>
+                </div>
+              </div>
+            </td>
+            <td><span style="color:#c0c0d0;">📞 ${escapeHtml(p.phone || '—')}</span></td>
+            <td><div style="color:#e0e0f0;">${escapeHtml(req.package_name || '—')}</div><div style="font-size:11.5px;color:#8a8aa0;">${formatCurrency(req.monthly_price)}/mes</div></td>
+            <td><span style="color:#60a5fa;font-weight:600;">${formatCurrency(req.total_first_payment)}</span></td>
+            <td><span class="tag ${st.class}">${st.label}</span></td>
+            <td><span style="color:#8a8aa0;font-size:12px;">${dateStr}</span></td>
+            <td><div class="actions-cell" style="justify-content:flex-end;"><button class="btn btn-sm" data-view="${req.id}"><i class="fas fa-eye"></i></button></div></td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table></div></div>
+  `;
+  document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => openRequestDetail(b.dataset.view));
+}
+
+function openRequestDetail(id) {
+  const req = allRequests.find(r => r.id === id);
+  if (!req) return;
+  const st = STATUS_MAP[req.status] || STATUS_MAP['pending'];
+  const p = profilesMap[req.user_id] || {};
+  const body = document.getElementById('modalBody');
+  const title = document.getElementById('modalTitle');
+  const footer = document.getElementById('modalFooter');
+
+  title.innerHTML = `<i class="fas fa-file-alt"></i> Solicitud #${req.id.slice(0, 8)}`;
+
+  body.innerHTML = `
+    <div style="text-align:center;margin-bottom:6px;"><span class="tag ${st.class}" style="font-size:13px;padding:6px 16px;">${st.label}</span></div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Cliente (user_profiles)</div>
+      <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value">${escapeHtml(p.full_name || '—')}</span></div>
+      <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${escapeHtml(p.email || '—')}</span></div>
+      <div class="detail-row"><span class="detail-label">Teléfono</span><span class="detail-value">${escapeHtml(p.phone || '—')}</span></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Paquete</div>
+      <div class="detail-row"><span class="detail-label">Plan</span><span class="detail-value">${escapeHtml(req.package_name || '—')}</span></div>
+      <div class="detail-row"><span class="detail-label">Precio mensual</span><span class="detail-value">${formatCurrency(req.monthly_price)}</span></div>
+      <div class="detail-row"><span class="detail-label">Instalación</span><span class="detail-value">${formatCurrency(req.installation_fee)}</span></div>
+      <div class="detail-row"><span class="detail-label">Primer pago</span><span class="detail-value" style="color:#60a5fa;font-weight:700;">${formatCurrency(req.total_first_payment)}</span></div>
+    </div>
+
+    <div class="detail-section">
+      <div class="detail-section-title">Fechas</div>
+      <div class="detail-row"><span class="detail-label">Creada</span><span class="detail-value">${new Date(req.created_at).toLocaleString('es-BO')}</span></div>
+      ${req.updated_at ? `<div class="detail-row"><span class="detail-label">Actualizada</span><span class="detail-value">${new Date(req.updated_at).toLocaleString('es-BO')}</span></div>` : ''}
+    </div>
+
+    ${req.status_message ? `<div class="detail-section" style="background:#3a2a1a;"><div class="detail-section-title" style="color:#fbbf24;">Mensaje de estado</div><p style="font-size:13px;color:#fde68a;">${escapeHtml(req.status_message)}</p></div>` : ''}
+
+    <div class="detail-section" style="background:#0f1a2e;border:1px solid #1e3a5f;">
+      <div class="detail-section-title" style="color:#60a5fa;">ℹ️ Más detalles</div>
+      <p style="font-size:12.5px;color:#93c5fd;line-height:1.5;">Las fotos (CI, selfie), dirección, coordenadas y demás datos se envían directamente al <b>Bot de Telegram</b> al momento de crear la solicitud.</p>
+    </div>
+
+    <div class="field field-full">
+      <label>Mensaje para el cliente (opcional)</label>
+      <textarea id="actionMsg" placeholder="Ej: Su solicitud fue aprobada, un técnico lo contactará."></textarea>
+    </div>
+
+    ${req.status === 'pending' ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:4px;">
+        <button class="btn btn-success" data-act="confirmed"><i class="fas fa-check"></i> Confirmar</button>
+        <button class="btn btn-gray" data-act="no_coverage"><i class="fas fa-signal"></i> S/Cobertura</button>
+        <button class="btn btn-danger" data-act="cancelled"><i class="fas fa-times"></i> Cancelar</button>
+      </div>
+    ` : `
+      <div style="margin-top:4px;"><button class="btn" style="width:100%;" data-act="pending"><i class="fas fa-undo"></i> Volver a Pendiente</button></div>
+    `}
+  `;
+
+  body.querySelectorAll('[data-act]').forEach(b => b.onclick = () => execAction(b.dataset.act, req.id));
+  footer.innerHTML = `<button class="btn" onclick="document.getElementById('modalOverlay').classList.remove('show')">Cerrar</button>`;
+  openModal('modalOverlay');
+}
+
+async function execAction(type, id) {
+  const req = allRequests.find(r => r.id === id);
+  if (!req) return;
+  const p = profilesMap[req.user_id] || {};
+  const msg = document.getElementById('actionMsg')?.value.trim() || null;
+
+  const labels = { 'confirmed': 'confirmar', 'cancelled': 'cancelar', 'no_coverage': 'marcar sin cobertura', 'pending': 'volver a pendiente' };
+  if (!confirm(`¿Estás seguro de ${labels[type]} la solicitud de ${p.full_name || 'este cliente'}?`)) return;
+
+  try {
+    // 1) Actualizar el estado
+    const { error: updErr } = await db.from('request_status').update({
+      status: type, status_message: msg, updated_at: new Date().toISOString()
+    }).eq('id', req.id);
+    if (updErr) throw updErr;
+
+    // 2) Si es cancelado o sin cobertura -> ELIMINAR la transacción (withdrawal)
+    let txDeleted = false;
+    if (type === 'cancelled' || type === 'no_coverage') {
+      // Buscar por metadata.request_id
+      const { data: txs, error: findErr } = await db
+        .from('transactions')
+        .select('id')
+        .eq('user_id', req.user_id)
+        .eq('type', 'withdrawal')
+        .eq('metadata->>request_id', req.id);
+
+      if (findErr) console.error('Error buscando transacción:', findErr);
+
+      let idsToDelete = (txs || []).map(t => t.id);
+
+      // Fallback: buscar por descripción con el ID corto
+      if (!idsToDelete.length) {
+        const { data: txsAlt } = await db
+          .from('transactions')
+          .select('id')
+          .eq('user_id', req.user_id)
+          .eq('type', 'withdrawal')
+          .ilike('description', `%#${req.id.slice(0, 8)}%`);
+        idsToDelete = (txsAlt || []).map(t => t.id);
+      }
+
+      if (idsToDelete.length) {
+        const { error: delErr } = await db.from('transactions').delete().in('id', idsToDelete);
+        if (delErr) throw delErr;
+        txDeleted = true;
+      }
+    }
+
+    // 3) Notificar por Telegram
+    const emoji = { 'confirmed': '✅', 'cancelled': '❌', 'no_coverage': '📡', 'pending': '⏳' };
+    const tgMsg = `
+${emoji[type]} <b>SOLICITUD ${type.toUpperCase()}</b>
+
+🆔 #${req.id.slice(0, 8)}
+👤 ${p.full_name || 'Cliente'}
+📧 ${p.email || 'No'}
+📞 ${p.phone || 'No'}
+📦 ${req.package_name}
+💰 ${formatCurrency(req.total_first_payment)}
+
+${txDeleted ? '💸 <b>Transacción eliminada — saldo restaurado al cliente.</b>' : ''}
+${msg ? `💬 <b>Mensaje:</b> ${msg}` : ''}
+⏰ ${new Date().toLocaleString('es-BO')}`;
+
+    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: tgMsg, parse_mode: 'HTML' })
+    });
+
+    toast(
+      txDeleted
+        ? 'Solicitud cancelada y saldo restaurado'
+        : 'Solicitud actualizada',
+      'success'
+    );
+    closeModal('modalOverlay');
+    await renderRequests();
+  } catch (err) {
+    console.error(err);
+    toast(err.message, 'error');
+  }
+}
+
+async function renderTable(tableKey) {
+  currentTableKey = tableKey;
+  const schema = SCHEMA[tableKey];
+  await loadCategoriesCache();
+
+  const { data, error } = await db.from(schema.table).select(schema.joinSelect || '*').order(schema.pk, { ascending: false }).limit(200);
+  if (error) throw error;
+  currentData = data || [];
+
+  content.innerHTML = `
+    <div class="page-header">
+      <h2><i class="fas ${schema.icon}"></i> ${schema.label}</h2>
+      <div class="header-actions">
+        <button class="btn btn-primary" id="btnNew"><i class="fas fa-plus"></i> Nuevo</button>
+        <button class="btn" id="btnRefresh"><i class="fas fa-sync"></i> Refrescar</button>
+      </div>
+    </div>
+    <div class="table-wrap"><div class="table-scroll"><table>
+      <thead><tr>${schema.listFields.map(f => `<th>${schema.columns.find(c => c.key === f)?.label || f}</th>`).join('')}<th style="text-align:right;">Acciones</th></tr></thead>
+      <tbody>
+        ${currentData.length ? currentData.map(row => `
+          <tr>
+            ${schema.listFields.map(f => `<td>${renderCell(row, f, schema)}</td>`).join('')}
+            <td><div class="actions-cell" style="justify-content:flex-end;">
+              <button class="btn btn-sm" data-edit="${row[schema.pk]}"><i class="fas fa-pen"></i></button>
+              <button class="btn btn-sm btn-danger" data-del="${row[schema.pk]}"><i class="fas fa-trash"></i></button>
+            </div></td>
+          </tr>`).join('') : `<tr><td colspan="${schema.listFields.length + 1}" class="empty-state">No hay registros</td></tr>`}
+      </tbody>
+    </table></div></div>
+  `;
+
+  document.getElementById('btnNew').onclick = () => openCrudModal(tableKey, null);
+  document.getElementById('btnRefresh').onclick = () => renderSection(tableKey);
+  document.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => {
+    const row = currentData.find(r => String(r[schema.pk]) === b.dataset.edit);
+    openCrudModal(tableKey, row);
+  });
+  document.querySelectorAll('[data-del]').forEach(b => b.onclick = () => deleteRecord(tableKey, b.dataset.del));
+}
+
+function renderCell(row, fieldKey, schema) {
+  const col = schema.columns.find(c => c.key === fieldKey);
+  let value = row[fieldKey];
+  if (col?.type === 'select-fk' && fieldKey === 'category_id') return escapeHtml(getCategoryName(value));
+  if (value === null || value === undefined || value === '') return '—';
+  if (col?.type === 'boolean') return value ? '<span class="tag activo">Sí</span>' : '<span class="tag inactivo">No</span>';
+  if (fieldKey === 'is_active') return value ? '<span class="tag activo">Activo</span>' : '<span class="tag inactivo">Inactivo</span>';
+  if (fieldKey === 'is_featured') return value ? '<span class="tag activo">⭐ Destacado</span>' : '<span class="tag">Normal</span>';
+  if (fieldKey === 'discount_percentage' && Number(value) > 0) return `<span class="tag activo">-${value}%</span>`;
+  if (fieldKey === 'icon') return `<i class="fas ${escapeHtml(value)}" style="color:#facc15;font-size:16px;margin-right:6px;"></i>${escapeHtml(value)}`;
+  if (fieldKey === 'price' || fieldKey === 'installation_fee') return formatCurrency(value);
+  if (fieldKey === 'speed_mbps') return `${value} Mbps`;
+  return escapeHtml(value);
+}
+
+function openCrudModal(tableKey, row) {
+  const schema = SCHEMA[tableKey];
+  editingId = row ? row[schema.pk] : null;
+  currentTableKey = tableKey;
+
+  document.getElementById('modalTitle').innerHTML = row ? `<i class="fas fa-pen"></i> Editar ${schema.singular}` : `<i class="fas fa-plus"></i> Nuevo ${schema.singular}`;
+
+  const fields = schema.columns.filter(c => !['created_at', 'updated_at'].includes(c.key));
+  let html = '<div class="fields-grid">';
+
+  fields.forEach(col => {
+    if (col.type === 'readonly') return;
+    const val = row ? row[col.key] : '';
+    const full = col.full || col.type === 'textarea' ? ' field-full' : '';
+
+    if (col.type === 'textarea') {
+      let textVal = val;
+      if (col.key === 'features' && Array.isArray(val)) textVal = val.join('\n');
+      html += `<div class="field${full}"><label>${col.label}</label><textarea data-key="${col.key}" ${col.required ? 'required' : ''}>${escapeHtml(textVal || '')}</textarea></div>`;
+    } else if (col.type === 'select-fk') {
+      const cache = col.fk === 'categories' ? categoriesCache : [];
+      html += `<div class="field${full}"><label>${col.label}</label>
+        <select data-key="${col.key}" ${col.required ? 'required' : ''}>
+          <option value="">— Seleccionar —</option>
+          ${cache.map(o => `<option value="${o.id}" ${val === o.id ? 'selected' : ''}>${escapeHtml(o.name)}</option>`).join('')}
+        </select></div>`;
+    } else if (col.type === 'boolean') {
+      html += `<div class="field field-checkbox${full}"><input type="checkbox" data-key="${col.key}" id="chk_${col.key}" ${val ? 'checked' : ''}><label for="chk_${col.key}" style="text-transform:none;">${col.label}</label></div>`;
+    } else {
+      const inputType = col.type === 'number' ? 'number' : 'text';
+      const step = col.step ? `step="${col.step}"` : '';
+      const ph = col.placeholder ? `placeholder="${col.placeholder}"` : '';
+      html += `<div class="field${full}"><label>${col.label}</label><input type="${inputType}" data-key="${col.key}" value="${escapeHtml(val ?? '')}" ${col.required ? 'required' : ''} ${step} ${ph}></div>`;
+    }
+  });
+  html += '</div>';
+
+  document.getElementById('modalBody').innerHTML = html;
+  document.getElementById('modalFooter').innerHTML = `<button class="btn" id="modalCancel">Cancelar</button><button class="btn btn-primary" id="modalSave"><i class="fas fa-save"></i> Guardar</button>`;
+  document.getElementById('modalCancel').onclick = () => closeModal('modalOverlay');
+  document.getElementById('modalSave').onclick = saveRecord;
+  openModal('modalOverlay');
+}
+
+async function saveRecord() {
+  if (!currentTableKey) return;
+  const schema = SCHEMA[currentTableKey];
+  const payload = {};
+  let valid = true;
+
+  document.querySelectorAll('#modalBody [data-key]').forEach(el => {
+    const key = el.dataset.key;
+    const col = schema.columns.find(c => c.key === key);
+    if (!col) return;
+    let val;
+    if (col.type === 'boolean') val = el.checked;
+    else if (col.type === 'number') { val = el.value === '' ? null : Number(el.value); if (val !== null && isNaN(val)) val = null; }
+    else if (key === 'features') val = el.value.split('\n').map(s => s.trim()).filter(Boolean);
+    else val = el.value === '' ? null : el.value;
+
+    if (col.required && (val === null || val === '' || (Array.isArray(val) && !val.length))) {
+      toast(`El campo "${col.label}" es obligatorio`, 'error');
+      valid = false;
+    }
+    payload[key] = val;
+  });
+
+  if (!valid) return;
+  const saveBtn = document.getElementById('modalSave');
+  saveBtn.disabled = true;
+  saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+  try {
+    if (editingId !== null) {
+      const { error } = await db.from(schema.table).update(payload).eq(schema.pk, editingId);
+      if (error) throw error;
+      toast('Registro actualizado', 'success');
+    } else {
+      const { error } = await db.from(schema.table).insert([payload]);
+      if (error) throw error;
+      toast('Registro creado', 'success');
+    }
+    const t = currentTableKey;
+    categoriesCache = [];
+    closeModal('modalOverlay');
+    await renderSection(t);
+  } catch (err) {
+    console.error(err);
+    toast(err.message, 'error');
+    saveBtn.disabled = false;
+    saveBtn.innerHTML = '<i class="fas fa-save"></i> Guardar';
+  }
+}
+
+async function deleteRecord(tableKey, id) {
+  const schema = SCHEMA[tableKey];
+  if (!confirm(`¿Eliminar registro de ${schema.label}?`)) return;
+  try {
+    const { error } = await db.from(schema.table).delete().eq(schema.pk, id);
+    if (error) throw error;
+    toast('Registro eliminado', 'success');
+    categoriesCache = [];
+    await renderSection(tableKey);
+  } catch (err) { console.error(err); toast(err.message, 'error'); }
+}
+
+document.getElementById('modalClose').onclick = () => closeModal('modalOverlay');
+document.getElementById('modalOverlay').onclick = (e) => { if (e.target === document.getElementById('modalOverlay')) closeModal('modalOverlay'); };
+
+(async function init() {
+  try {
+    const { error } = await db.from('package_categories').select('id', { count: 'exact', head: true });
+    if (error) throw error;
+    await updatePendingPill();
+    await renderDashboard();
+  } catch (err) {
+    console.error(err);
+    $('#connStatus').innerHTML = '<i class="fas fa-circle" style="color:#facc15;font-size:8px;margin-right:6px;"></i>Error';
+    content.innerHTML = `<div class="empty-state" style="color:#facc15;"><i class="fas fa-exclamation-circle" style="font-size:36px;display:block;margin-bottom:12px;"></i>Error al conectar: ${escapeHtml(err.message)}</div>`;
+  }
+})();
+</script>
+</body>
+</html>
