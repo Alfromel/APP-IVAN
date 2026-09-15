@@ -255,11 +255,11 @@ const SCHEMA = {
 function generateSlug(text) {
   return String(text || '')
     .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita acentos
-    .replace(/[^a-z0-9\s-]/g, '')                     // quita caracteres raros
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9\s-]/g, '')
     .trim()
-    .replace(/\s+/g, '-')                             // espacios -> guiones
-    .replace(/-+/g, '-');                             // colapsa guiones
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
 }
 
 function toast(msg, type = 'info') {
@@ -543,11 +543,62 @@ function openRequestDetail(id) {
     ` : `
       <div style="margin-top:4px;"><button class="btn" style="width:100%;" data-act="pending"><i class="fas fa-undo"></i> Volver a Pendiente</button></div>
     `}
+
+    <div style="margin-top:10px;padding-top:14px;border-top:1px dashed #2a2a2a;">
+      <button class="btn" id="btnDeleteReq" style="width:100%;background:#7f1d1d;color:#fecaca;"><i class="fas fa-trash"></i> Eliminar solicitud</button>
+    </div>
   `;
 
   body.querySelectorAll('[data-act]').forEach(b => b.onclick = () => execAction(b.dataset.act, req.id));
+  const delBtn = document.getElementById('btnDeleteReq');
+  if (delBtn) delBtn.onclick = () => deleteSingleRequest(req.id);
+
   footer.innerHTML = `<button class="btn" onclick="document.getElementById('modalOverlay').classList.remove('show')">Cerrar</button>`;
   openModal('modalOverlay');
+}
+
+// ✅ Eliminar UNA sola solicitud
+async function deleteSingleRequest(id) {
+  const req = allRequests.find(r => r.id === id);
+  if (!req) return;
+  const p = profilesMap[req.user_id] || {};
+  if (!confirm(`¿Eliminar la solicitud de ${p.full_name || 'este cliente'}? Esta acción no se puede deshacer.`)) return;
+
+  try {
+    // Eliminar transacción asociada si existe
+    const { data: txs } = await db
+      .from('transactions')
+      .select('id')
+      .eq('user_id', req.user_id)
+      .eq('type', 'withdrawal')
+      .eq('metadata->>request_id', req.id);
+
+    let idsToDelete = (txs || []).map(t => t.id);
+
+    if (!idsToDelete.length) {
+      const { data: txsAlt } = await db
+        .from('transactions')
+        .select('id')
+        .eq('user_id', req.user_id)
+        .eq('type', 'withdrawal')
+        .ilike('description', `%#${req.id.slice(0, 8)}%`);
+      idsToDelete = (txsAlt || []).map(t => t.id);
+    }
+
+    if (idsToDelete.length) {
+      await db.from('transactions').delete().in('id', idsToDelete);
+    }
+
+    const { error } = await db.from('request_status').delete().eq('id', req.id);
+    if (error) throw error;
+
+    toast('Solicitud eliminada correctamente', 'success');
+    closeModal('modalOverlay');
+    await renderRequests();
+  } catch (err) {
+    console.error(err);
+    toast(err.message, 'error');
+  }
 }
 
 async function execAction(type, id) {
@@ -560,16 +611,13 @@ async function execAction(type, id) {
   if (!confirm(`¿Estás seguro de ${labels[type]} la solicitud de ${p.full_name || 'este cliente'}?`)) return;
 
   try {
-    // 1) Actualizar el estado
     const { error: updErr } = await db.from('request_status').update({
       status: type, status_message: msg, updated_at: new Date().toISOString()
     }).eq('id', req.id);
     if (updErr) throw updErr;
 
-    // 2) Si es cancelado o sin cobertura -> ELIMINAR la transacción (withdrawal)
     let txDeleted = false;
     if (type === 'cancelled' || type === 'no_coverage') {
-      // Buscar por metadata.request_id
       const { data: txs, error: findErr } = await db
         .from('transactions')
         .select('id')
@@ -581,7 +629,6 @@ async function execAction(type, id) {
 
       let idsToDelete = (txs || []).map(t => t.id);
 
-      // Fallback: buscar por descripción con el ID corto
       if (!idsToDelete.length) {
         const { data: txsAlt } = await db
           .from('transactions')
@@ -599,7 +646,6 @@ async function execAction(type, id) {
       }
     }
 
-    // 3) Notificar por Telegram
     const emoji = { 'confirmed': '✅', 'cancelled': '❌', 'no_coverage': '📡', 'pending': '⏳' };
     const tgMsg = `
 ${emoji[type]} <b>SOLICITUD ${type.toUpperCase()}</b>
@@ -759,7 +805,7 @@ async function saveRecord() {
 
   if (!valid) return;
 
-  // ✅ Auto-generar slug para categorías (columna NOT NULL en la BD)
+  // ✅ Auto-generar slug para categorías
   if (currentTableKey === 'categories' && payload.name) {
     payload.slug = generateSlug(payload.name);
   }
@@ -792,6 +838,88 @@ async function saveRecord() {
 
 async function deleteRecord(tableKey, id) {
   const schema = SCHEMA[tableKey];
+
+  // ✅ Si es un paquete, verificar solicitudes asociadas
+  if (tableKey === 'packages') {
+    const { data: relatedReqs, error: checkErr } = await db
+      .from('request_status')
+      .select('id, user_id, package_name')
+      .eq('package_id', id);
+
+    if (checkErr) {
+      console.error(checkErr);
+      toast('Error al verificar solicitudes: ' + checkErr.message, 'error');
+      return;
+    }
+
+    const count = (relatedReqs || []).length;
+
+    if (count > 0) {
+      // Preguntar si quiere eliminar también las solicitudes asociadas
+      const confirmMsg =
+        `⚠️ Este paquete tiene ${count} solicitud(es) asociada(s).\n\n` +
+        `¿Quieres ELIMINAR TAMBIÉN esas ${count} solicitud(es) y luego el paquete?\n\n` +
+        `• Aceptar = elimina las solicitudes y el paquete\n` +
+        `• Cancelar = no elimina nada`;
+
+      if (!confirm(confirmMsg)) {
+        toast('Operación cancelada. No se eliminó nada.', 'info');
+        return;
+      }
+
+      // Confirmar de nuevo (doble verificación porque es destructivo)
+      if (!confirm(`¿Estás SEGURO? Se eliminarán ${count} solicitud(es) + el paquete. Esta acción no se puede deshacer.`)) {
+        toast('Operación cancelada.', 'info');
+        return;
+      }
+
+      try {
+        // 1) Eliminar transacciones asociadas a esas solicitudes
+        for (const req of relatedReqs) {
+          const { data: txs } = await db
+            .from('transactions')
+            .select('id')
+            .eq('user_id', req.user_id)
+            .eq('type', 'withdrawal')
+            .eq('metadata->>request_id', req.id);
+
+          let idsToDelete = (txs || []).map(t => t.id);
+
+          if (!idsToDelete.length) {
+            const { data: txsAlt } = await db
+              .from('transactions')
+              .select('id')
+              .eq('user_id', req.user_id)
+              .eq('type', 'withdrawal')
+              .ilike('description', `%#${req.id.slice(0, 8)}%`);
+            idsToDelete = (txsAlt || []).map(t => t.id);
+          }
+
+          if (idsToDelete.length) {
+            await db.from('transactions').delete().in('id', idsToDelete);
+          }
+        }
+
+        // 2) Eliminar las solicitudes
+        const { error: delReqErr } = await db.from('request_status').delete().eq('package_id', id);
+        if (delReqErr) throw delReqErr;
+
+        // 3) Eliminar el paquete
+        const { error: delPkgErr } = await db.from(schema.table).delete().eq(schema.pk, id);
+        if (delPkgErr) throw delPkgErr;
+
+        toast(`Paquete y ${count} solicitud(es) eliminadas correctamente`, 'success');
+        categoriesCache = [];
+        await renderSection(tableKey);
+      } catch (err) {
+        console.error(err);
+        toast('Error al eliminar: ' + err.message, 'error');
+      }
+      return;
+    }
+  }
+
+  // Eliminación normal (sin dependencias)
   if (!confirm(`¿Eliminar registro de ${schema.label}?`)) return;
   try {
     const { error } = await db.from(schema.table).delete().eq(schema.pk, id);
