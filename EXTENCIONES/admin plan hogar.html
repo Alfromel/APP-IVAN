@@ -1,4 +1,4 @@
-4<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -223,13 +223,11 @@ const SCHEMA = {
     columns: [
       { key: 'id', label: 'ID', type: 'readonly' },
       { key: 'name', label: 'Nombre', type: 'text', required: true },
-      { key: 'slug', label: 'Slug', type: 'text', required: true },
       { key: 'description', label: 'Descripción', type: 'textarea', full: true },
-      { key: 'icon', label: 'Icono (Font Awesome)', type: 'text', placeholder: 'fa-home' },
       { key: 'display_order', label: 'Orden', type: 'number' },
       { key: 'is_active', label: 'Activo', type: 'boolean' },
     ],
-    listFields: ['name', 'slug', 'icon', 'display_order', 'is_active'],
+    listFields: ['name', 'display_order', 'is_active'],
   },
   packages: {
     table: 'internet_packages', label: 'Paquetes', singular: 'Paquete', icon: 'fa-box', pk: 'id',
