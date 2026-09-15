@@ -251,6 +251,17 @@ const SCHEMA = {
   },
 };
 
+// ✅ Genera un slug a partir del nombre
+function generateSlug(text) {
+  return String(text || '')
+    .toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '') // quita acentos
+    .replace(/[^a-z0-9\s-]/g, '')                     // quita caracteres raros
+    .trim()
+    .replace(/\s+/g, '-')                             // espacios -> guiones
+    .replace(/-+/g, '-');                             // colapsa guiones
+}
+
 function toast(msg, type = 'info') {
   const t = document.createElement('div');
   t.className = `toast ${type}`;
@@ -747,6 +758,12 @@ async function saveRecord() {
   });
 
   if (!valid) return;
+
+  // ✅ Auto-generar slug para categorías (columna NOT NULL en la BD)
+  if (currentTableKey === 'categories' && payload.name) {
+    payload.slug = generateSlug(payload.name);
+  }
+
   const saveBtn = document.getElementById('modalSave');
   saveBtn.disabled = true;
   saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
