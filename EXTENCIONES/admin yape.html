@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Participaciones YAPE</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  * { -webkit-tap-highlight-color: transparent; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+</style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+
+  <header class="sticky top-0 z-20 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800">
+    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-purple-900
+                    flex items-center justify-center shadow-lg shadow-violet-900/50">
+          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"
+               stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+            <path d="M12 2L4 7v10l8 5 8-5V7z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-[15px] font-bold tracking-tight">Admin YAPE</h1>
+          <p class="text-[11px] text-slate-500">Panel de participaciones</p>
+        </div>
+      </div>
+      <button id="refrescar" class="px-3.5 h-9 rounded-lg bg-slate-800 hover:bg-slate-700
+                                    text-[13px] font-medium transition flex items-center gap-2">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
+          <path d="M21 12a9 9 0 11-3-6.7L21 8"/>
+          <path d="M21 3v5h-5"/>
+        </svg>
+        Refrescar
+      </button>
+    </div>
+  </header>
+
+  <div class="max-w-5xl mx-auto px-4 pt-6">
+    <div class="flex gap-2 overflow-x-auto pb-1">
+      <button data-filtro="pending" class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Pendientes</button>
+      <button data-filtro="won"     class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Ganados</button>
+      <button data-filtro="lost"    class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Perdidos</button>
+      <button data-filtro="all"     class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Todos</button>
+    </div>
+  </div>
+
+  <div class="max-w-5xl mx-auto px-4 pt-4 grid grid-cols-3 gap-3">
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+      <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Pendientes</div>
+      <div id="statPend" class="text-2xl font-bold text-yellow-400 mt-1">0</div>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+      <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Ganados</div>
+      <div id="statWon" class="text-2xl font-bold text-green-400 mt-1">0</div>
+    </div>
+    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
+      <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Perdidos</div>
+      <div id="statLost" class="text-2xl font-bold text-slate-400 mt-1">0</div>
+    </div>
+  </div>
+
+  <main class="max-w-5xl mx-auto px-4 py-6">
+    <div id="lista" class="space-y-3">
+      <div class="text-center py-12 text-slate-500 text-sm">Cargando...</div>
+    </div>
+  </main>
+
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl
+                        text-sm font-medium shadow-2xl opacity-0 pointer-events-none
+                        transition-opacity duration-300 z-50"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  const SUPABASE_URL      = "https://aleadadisazocjovibeh.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E";
+
+  const { createClient } = supabase;
+  const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const $ = (id) => document.getElementById(id);
+
+  let filtroActual = "pending";
+  let autoTimer = null;
+  let cache = [];
+
+  function toast(msg, tipo) {
+    const t = $("toast");
+    const colores = {
+      ok:   "bg-green-500 text-white",
+      err:  "bg-red-500 text-white",
+      info: "bg-slate-700 text-white"
+    };
+    t.className = "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl " +
+                  "text-sm font-medium shadow-2xl transition-opacity duration-300 z-50 " +
+                  (colores[tipo] || colores.info);
+    t.textContent = msg;
+    t.style.opacity = "1";
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => { t.style.opacity = "0"; }, 2500);
+  }
+
+  function fmtFecha(iso) {
+    if (!iso) return "";
+    const d = new Date(iso);
+    return d.toLocaleString("es-BO", {
+      timeZone: "America/La_Paz",
+      day: "2-digit", month: "2-digit", year: "2-digit",
+      hour: "2-digit", minute: "2-digit"
+    });
+  }
+
+  async function cargar() {
+    let query = sb.from("yape_participaciones")
+      .select("id, user_id, status, reviewed_at, created_at")
+      .order("created_at", { ascending: false })
+      .limit(200);
+
+    if (filtroActual !== "all") query = query.eq("status", filtroActual);
+
+    const { data, error } = await query;
+    if (error) {
+      $("lista").innerHTML = `<div class="text-center py-12 text-red-400 text-sm">Error: ${error.message}</div>`;
+      return;
+    }
+
+    const ids = [...new Set((data || []).map(d => d.user_id))];
+    let perfiles = {};
+    if (ids.length) {
+      const { data: profs } = await sb.from("user_profiles")
+        .select("id, full_name, email, phone").in("id", ids);
+      (profs || []).forEach(p => { perfiles[p.id] = p; });
+    }
+
+    cache = (data || []).map(d => ({ ...d, perfil: perfiles[d.user_id] || {} }));
+    render();
+    actualizarStats();
+  }
+
+  async function actualizarStats() {
+    const [p, w, l] = await Promise.all([
+      sb.from("yape_participaciones").select("id", { count: "exact", head: true }).eq("status", "pending"),
+      sb.from("yape_participaciones").select("id", { count: "exact", head: true }).eq("status", "won"),
+      sb.from("yape_participaciones").select("id", { count: "exact", head: true }).eq("status", "lost"),
+    ]);
+    $("statPend").textContent = p.count || 0;
+    $("statWon").textContent  = w.count || 0;
+    $("statLost").textContent = l.count || 0;
+  }
+
+  function render() {
+    const cont = $("lista");
+    if (!cache.length) {
+      cont.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">
+        No hay participaciones ${filtroActual !== "all" ? "en este estado" : ""}.</div>`;
+      return;
+    }
+
+    cont.innerHTML = cache.map(p => {
+      const nombre  = p.perfil.full_name || p.perfil.email || "Usuario";
+      const inicial = (nombre[0] || "?").toUpperCase();
+      const st      = p.status;
+
+      let badge = "";
+      if (st === "pending") badge = `<span class="px-2.5 py-1 rounded-md bg-yellow-500/15 text-yellow-400 text-[11px] font-bold uppercase tracking-wide">Pendiente</span>`;
+      if (st === "won")     badge = `<span class="px-2.5 py-1 rounded-md bg-green-500/15 text-green-400 text-[11px] font-bold uppercase tracking-wide">Ganó</span>`;
+      if (st === "lost")    badge = `<span class="px-2.5 py-1 rounded-md bg-slate-500/15 text-slate-400 text-[11px] font-bold uppercase tracking-wide">Perdió</span>`;
+
+      const botones = st === "pending" ? `
+        <div class="flex gap-2 mt-3">
+          <button data-id="${p.id}" data-accion="won"
+                  class="flex-1 h-10 rounded-lg bg-green-500/15 border border-green-500/40
+                         text-green-400 text-[13px] font-bold hover:bg-green-500/25 transition
+                         flex items-center justify-center gap-1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                 stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+              <path d="M20 6L9 17l-5-5"/>
+            </svg>
+            GANÓ 4 BS
+          </button>
+          <button data-id="${p.id}" data-accion="lost"
+                  class="flex-1 h-10 rounded-lg bg-slate-700/40 border border-slate-600/40
+                         text-slate-300 text-[13px] font-bold hover:bg-slate-700/60 transition
+                         flex items-center justify-center gap-1.5">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
+                 stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
+              <path d="M18 6L6 18M6 6l12 12"/>
+            </svg>
+            PERDIÓ
+          </button>
+        </div>` : "";
+
+      return `
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
+          <div class="flex items-start gap-3">
+            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-900
+                        flex items-center justify-center text-white font-bold text-sm shrink-0">
+              ${inicial}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center justify-between gap-2 mb-0.5">
+                <div class="font-semibold text-[14px] truncate">${nombre}</div>
+                ${badge}
+              </div>
+              <div class="text-[12px] text-slate-500 truncate">
+                ${p.perfil.email || p.perfil.phone || "sin contacto"}
+              </div>
+              <div class="text-[11px] text-slate-600 mt-1 tabular-nums">
+                📅 ${fmtFecha(p.created_at)}
+                ${p.reviewed_at ? ` · ✅ Revisado ${fmtFecha(p.reviewed_at)}` : ""}
+              </div>
+            </div>
+          </div>
+          ${botones}
+        </div>`;
+    }).join("");
+
+    cont.querySelectorAll("button[data-accion]").forEach(b => {
+      b.addEventListener("click", () => cambiarEstado(b.dataset.id, b.dataset.accion, b));
+    });
+  }
+
+  async function cambiarEstado(id, accion, boton) {
+    const ok = confirm(
+      accion === "won"
+        ? "¿Confirmar que GANÓ? Se le hará un depósito de 4 Bs."
+        : "¿Confirmar que PERDIÓ? No se le dará nada."
+    );
+    if (!ok) return;
+
+    boton.disabled = true;
+    boton.style.opacity = "0.5";
+
+    const { error } = await sb.from("yape_participaciones")
+      .update({ status: accion })
+      .eq("id", id);
+
+    if (error) {
+      toast("Error: " + error.message, "err");
+      boton.disabled = false;
+      boton.style.opacity = "1";
+      return;
+    }
+
+    toast(accion === "won" ? "✅ Depósito de 4 Bs acreditado" : "❌ Marcado como perdido", "ok");
+    cargar();
+  }
+
+  function actualizarTabs() {
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      const activo = b.dataset.filtro === filtroActual;
+      b.className = "tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition " +
+        (activo
+          ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40"
+          : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200");
+    });
+  }
+
+  document.querySelectorAll(".tab-btn").forEach(b => {
+    b.addEventListener("click", () => {
+      filtroActual = b.dataset.filtro;
+      actualizarTabs();
+      cargar();
+    });
+  });
+
+  $("refrescar").addEventListener("click", () => {
+    toast("Actualizando...", "info");
+    cargar();
+  });
+
+  function iniciarAuto() {
+    if (autoTimer) clearInterval(autoTimer);
+    autoTimer = setInterval(cargar, 10000);
+  }
+
+  actualizarTabs();
+  cargar();
+  iniciarAuto();
+})();
+</script>
+</body>
+</html>
