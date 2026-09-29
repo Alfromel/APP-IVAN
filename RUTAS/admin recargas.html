@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - TokTok</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0b0b12;
+            --bg-secondary: #0f0f1a;
+            --bg-tertiary: #13131f;
+            --bg-hover: #1a1a2a;
+            --bg-active: #1e1e30;
+            --border-color: #1d1d2b;
+            --border-light: #232334;
+            --text-primary: #f0f0f5;
+            --text-secondary: #c0c0d0;
+            --text-muted: #8a8aa0;
+            --text-dim: #6a6a85;
+            --accent: #16a34a;
+            --accent-hover: #15803d;
+            --accent-light: #4ade80;
+            --accent-bg: #14331f;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+        }
+        
+        * { box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            margin: 0;
+            padding: 0;
+        }
+        
+        .sidebar {
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            height: 100vh;
+            position: fixed;
+            width: 250px;
+            transition: all 0.3s;
+            z-index: 1000;
+            overflow-y: auto;
+            border-right: 1px solid var(--border-color);
+        }
+        .sidebar .p-4 { border-bottom: 1px solid var(--border-color); }
+        .sidebar .p-4 h4 { color: var(--text-primary); }
+        .sidebar .nav-link {
+            color: var(--text-muted);
+            padding: 12px 20px;
+            margin: 4px 10px;
+            border-radius: 10px;
+            transition: all 0.15s;
+            font-size: 14px;
+            font-weight: 500;
+            text-decoration: none;
+            display: block;
+        }
+        .sidebar .nav-link:hover { color: var(--text-primary); background-color: var(--bg-hover); }
+        .sidebar .nav-link.active { color: #fff; background-color: var(--bg-active); }
+        .sidebar .nav-link.active i { color: var(--accent); }
+        .sidebar .nav-link i { margin-right: 12px; width: 20px; text-align: center; color: var(--text-dim); font-size: 16px; }
+        
+        .main-content { margin-left: 250px; padding: 20px; background: var(--bg-primary); min-height: 100vh; }
+        
+        .navbar {
+            background-color: var(--bg-secondary) !important;
+            border-radius: 12px;
+            padding: 10px 20px !important;
+            margin-bottom: 20px !important;
+        }
+        .navbar .form-control {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            border-radius: 10px;
+        }
+        .navbar .form-control:focus {
+            background: var(--bg-primary);
+            border-color: var(--accent);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+        .navbar .form-control::placeholder { color: var(--text-dim); }
+        .navbar .btn-light {
+            background: var(--bg-hover);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+        }
+        .navbar .btn-light:hover { background: var(--bg-active); color: #fff; }
+        .navbar .dropdown-menu {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-light);
+            border-radius: 12px;
+            padding: 6px;
+        }
+        .navbar .dropdown-item { color: var(--text-secondary); border-radius: 8px; padding: 8px 12px; font-size: 13.5px; }
+        .navbar .dropdown-item:hover { background: var(--bg-hover); color: #fff; }
+        .navbar .dropdown-divider { border-color: var(--border-light); }
+        
+        h1, h2, h3, h4, h5, h6 { color: var(--text-primary); }
+        .section-header h2 { color: var(--text-primary); font-weight: 600; font-size: 22px; }
+        
+        .table-container {
+            background-color: var(--bg-tertiary);
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .table-container .p-3 { border-color: var(--border-color) !important; }
+        .table-container .p-3 h5 { color: var(--text-primary); font-weight: 600; font-size: 16px; }
+        .table { color: var(--text-secondary); margin-bottom: 0; }
+        .table th {
+            background-color: #10101c !important;
+            border-top: none;
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            color: var(--text-muted);
+            font-size: 11.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            padding: 13px 18px;
+        }
+        .table td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            vertical-align: middle;
+            background: transparent;
+        }
+        .table-hover tbody tr:hover td { background-color: var(--bg-hover); color: var(--text-primary); }
+        
+        .badge-success, .bg-success { background-color: var(--accent-bg) !important; color: var(--accent-light) !important; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+        .badge-warning, .bg-warning { background-color: #3a2a1a !important; color: #fbbf24 !important; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+        .badge-danger, .bg-danger { background-color: #3a1a1a !important; color: #f87171 !important; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+        .badge-info, .bg-info { background-color: #1a2a3a !important; color: #60a5fa !important; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+        .badge-secondary, .bg-secondary { background-color: #1e1e30 !important; color: #b0b0c8 !important; padding: 4px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; }
+        
+        .btn { border-radius: 10px; font-size: 13px; font-weight: 500; padding: 8px 16px; transition: all 0.15s; border: none; }
+        .btn-primary { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+        .btn-primary:hover, .btn-primary:focus { background-color: var(--accent-hover); border-color: var(--accent-hover); color: #fff; }
+        .btn-success { background-color: var(--accent); border-color: var(--accent); color: #fff; }
+        .btn-success:hover { background-color: var(--accent-hover); border-color: var(--accent-hover); }
+        .btn-danger { background-color: var(--danger); border-color: var(--danger); color: #fff; }
+        .btn-danger:hover { background-color: var(--danger-hover); border-color: var(--danger-hover); }
+        .btn-secondary { background-color: var(--bg-hover); border-color: var(--border-light); color: var(--text-secondary); }
+        .btn-secondary:hover { background-color: var(--bg-active); color: #fff; }
+        .btn-outline-primary { background: transparent; border: 1px solid var(--accent); color: var(--accent-light); }
+        .btn-outline-primary:hover { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-light); }
+        .btn-outline-success { background: transparent; border: 1px solid var(--accent); color: var(--accent-light); }
+        .btn-outline-success:hover { background: var(--accent-bg); border-color: var(--accent); color: var(--accent-light); }
+        .btn-outline-danger { background: transparent; border: 1px solid var(--danger); color: #f87171; }
+        .btn-outline-danger:hover { background: #3a1a1a; border-color: var(--danger); color: #f87171; }
+        .btn-light { background: var(--bg-hover); border: 1px solid var(--border-light); color: var(--text-secondary); }
+        .btn-outline-secondary { background: transparent; border: 1px solid var(--border-light); color: var(--text-muted); }
+        .btn-outline-secondary:hover { background: var(--bg-hover); color: var(--text-primary); }
+        
+        .modal-content { background-color: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 14px; color: var(--text-primary); }
+        .modal-header { background-color: #10101c; color: var(--text-primary); border-bottom: 1px solid var(--border-color); border-radius: 14px 14px 0 0; padding: 18px 24px; }
+        .modal-header .modal-title { color: var(--text-primary); font-size: 17px; font-weight: 600; }
+        .modal-header .btn-close { filter: invert(1); opacity: 0.6; }
+        .modal-header .btn-close:hover { opacity: 1; }
+        .modal-body { padding: 20px 24px; color: var(--text-secondary); }
+        .modal-footer { border-top: 1px solid var(--border-color); padding: 16px 24px; }
+        .modal .form-label { color: var(--text-muted); font-size: 12.5px; font-weight: 500; margin-bottom: 6px; }
+        .modal .form-control, .modal .form-select {
+            background: var(--bg-primary);
+            border: 1px solid var(--border-light);
+            color: var(--text-primary);
+            border-radius: 10px;
+            padding: 10px 14px;
+            font-size: 13.5px;
+        }
+        .modal .form-control:focus, .modal .form-select:focus {
+            background: var(--bg-primary);
+            border-color: var(--accent);
+            color: var(--text-primary);
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+        .modal .form-control::placeholder { color: var(--text-dim); }
+        .modal .form-check-input { background-color: var(--bg-primary); border-color: var(--border-light); }
+        .modal .form-check-input:checked { background-color: var(--accent); border-color: var(--accent); }
+        .modal .form-check-label { color: var(--text-secondary); font-size: 13.5px; }
+        .modal-backdrop { background-color: rgba(0,0,0,0.75); }
+        
+        .search-box { position: relative; }
+        .search-box input { padding-left: 40px; background: var(--bg-primary); border: 1px solid var(--border-light); color: var(--text-primary); border-radius: 10px; }
+        .search-box input:focus { background: var(--bg-primary); border-color: var(--accent); color: var(--text-primary); box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1); }
+        .search-box input::placeholder { color: var(--text-dim); }
+        .search-box i { position: absolute; left: 15px; top: 12px; color: var(--text-dim); }
+        
+        .spinner-border { color: var(--accent) !important; }
+        .spinner-border.text-primary { color: var(--accent) !important; }
+        
+        .detail-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 14px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            z-index: 1050;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            display: none;
+            color: var(--text-primary);
+        }
+        .detail-modal.show { display: block; }
+        .detail-modal-header {
+            padding: 18px 24px;
+            border-bottom: 1px solid var(--border-color);
+            background-color: #10101c;
+            color: var(--text-primary);
+            border-radius: 14px 14px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .detail-modal-header h5 { color: var(--text-primary); font-size: 17px; font-weight: 600; margin: 0; }
+        .detail-modal-body { padding: 20px 24px; color: var(--text-secondary); }
+        .detail-modal-footer { padding: 16px 24px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end; }
+        .modal-backdrop-custom {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(6px);
+            z-index: 1040;
+            display: none;
+        }
+        .modal-backdrop-custom.show { display: block; }
+        .detail-item {
+            display: flex;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .detail-label { font-weight: 600; min-width: 150px; color: var(--text-muted); }
+        .detail-value { flex: 1; color: var(--text-secondary); }
+        
+        .user-id-badge {
+            font-family: monospace;
+            background-color: var(--bg-hover);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+        }
+        
+        .operator-logo { width: 24px; height: 24px; border-radius: 4px; margin-right: 8px; object-fit: contain; }
+        .operator-logo-large { width: 60px; height: 60px; border-radius: 12px; object-fit: contain; background-color: var(--bg-hover); padding: 8px; border: 1px solid var(--border-light); }
+        .package-card { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 14px; padding: 1.5rem; margin-bottom: 1rem; transition: all 0.15s; color: var(--text-secondary); }
+        .package-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+        .package-name { font-size: 1.1rem; font-weight: 600; color: var(--text-primary); }
+        .package-operator { font-size: 0.85rem; color: var(--accent-light); font-weight: 500; }
+        .package-price { font-size: 1.2rem; color: var(--accent-light); }
+        .package-final-price { font-size: 0.9rem; color: #fbbf24; font-weight: 600; }
+        .package-detail { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+        .package-detail i { width: 20px; color: var(--accent); }
+        
+        .action-buttons { display: flex; gap: 4px; }
+        .action-buttons .btn { padding: 4px 8px; }
+        
+        .no-results { text-align: center; padding: 3rem 1rem; color: var(--text-muted); }
+        .no-results i { font-size: 3rem; margin-bottom: 1rem; color: var(--text-dim); }
+        
+        .toast {
+            background: var(--bg-tertiary) !important;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary) !important;
+            border-radius: 12px;
+            min-width: 300px;
+        }
+        .toast.toast-success { border-left: 3px solid var(--accent-light); }
+        .toast.toast-error { border-left: 3px solid #f87171; }
+        .toast .btn-close { filter: invert(1); }
+        
+        .text-muted { color: var(--text-muted) !important; }
+        .bg-light { background-color: var(--bg-hover) !important; color: var(--text-secondary); }
+        .border-bottom { border-color: var(--border-color) !important; }
+        .border-top { border-color: var(--border-color) !important; }
+        
+        .table-mobile-view { display: none; }
+        .mobile-card {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 0.75rem;
+            color: var(--text-secondary);
+        }
+        .mobile-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+        .mobile-card-title { font-weight: 600; color: var(--text-primary); font-size: 0.9rem; }
+        .mobile-card-status { font-size: 0.7rem; padding: 0.125rem 0.5rem; border-radius: 10px; }
+        .mobile-card-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.75rem; margin-bottom: 0.75rem; }
+        .mobile-card-field { display: flex; flex-direction: column; }
+        .mobile-card-label { font-size: 0.7rem; color: var(--text-muted); margin-bottom: 0.25rem; }
+        .mobile-card-value { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        .mobile-card-actions { display: flex; gap: 0.5rem; justify-content: flex-end; padding-top: 0.75rem; border-top: 1px solid var(--border-color); }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 60px;
+                position: fixed;
+                bottom: 0;
+                top: auto;
+                border-radius: 20px 20px 0 0;
+                padding: 0;
+                overflow-x: auto;
+                overflow-y: hidden;
+                border-right: none;
+                border-top: 1px solid var(--border-color);
+            }
+            .sidebar .p-4 { display: none; }
+            .sidebar .nav { flex-direction: row; padding: 0.5rem; justify-content: space-around; }
+            .sidebar .nav-item { flex: 1; text-align: center; }
+            .sidebar .nav-link { flex-direction: column; padding: 0.5rem; margin: 0; font-size: 0.7rem; border-radius: 8px; }
+            .sidebar .nav-link i { margin-right: 0; margin-bottom: 0.25rem; font-size: 1rem; }
+            .main-content { margin-left: 0; margin-bottom: 80px; padding: 1rem; }
+            .table-desktop-view { display: none; }
+            .table-mobile-view { display: block; }
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="p-4">
+            <h4 class="text-white mb-0">TokTok Admin</h4>
+            <small class="text-white-50">Panel de Administración</small>
+        </div>
+        
+        <ul class="nav flex-column">
+            <li class="nav-item">
+                <a class="nav-link active" href="#" data-section="operadores">
+                    <i class="fas fa-sim-card"></i> <span>Operadores Móviles</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="tipos-recarga">
+                    <i class="fas fa-tags"></i> <span>Tipos Recarga</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-section="paquetes">
+                    <i class="fas fa-boxes"></i> <span>Paquetes Móviles</span>
+                </a>
+            </li>
+            <li class="nav-item mt-4 d-none d-md-block">
+                <a class="nav-link" href="#" id="logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> <span>Cerrar Sesión</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <nav class="navbar navbar-expand-lg mb-4">
+            <div class="container-fluid">
+                <div class="d-flex align-items-center w-100">
+                    <div class="dropdown ms-auto">
+                        <button class="btn btn-light dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user-circle me-2"></i> <span class="d-none d-md-inline">Administrador</span>
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i> Configuración</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="#" id="navbar-logout-btn"><i class="fas fa-sign-out-alt me-2"></i> Cerrar Sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <!-- Operadores Section -->
+        <section id="operadores-section">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Operadores Móviles</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-operador-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Operador</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Lista de Operadores</h5>
+                </div>
+                
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Logo</th>
+                                    <th>Nombre</th>
+                                    <th>Código</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th>Creado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="operadores-table-body">
+                                <tr><td colspan="7" class="text-center py-4"><div class="spinner-border"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="table-mobile-view">
+                    <div id="operadores-mobile-list">
+                        <div class="text-center py-4"><div class="spinner-border"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Tipos Recarga Section -->
+        <section id="tipos-recarga-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Tipos de Recarga</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-tipo-recarga-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Tipo</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="table-container">
+                <div class="p-3 border-bottom">
+                    <h5 class="mb-0">Lista de Tipos de Recarga</h5>
+                </div>
+                
+                <div class="table-desktop-view">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Operador</th>
+                                    <th>Nombre</th>
+                                    <th>Código</th>
+                                    <th>Orden</th>
+                                    <th>Estado</th>
+                                    <th>Creado</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tipos-recarga-table-body">
+                                <tr><td colspan="7" class="text-center py-4"><div class="spinner-border"></div></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="table-mobile-view">
+                    <div id="tipos-recarga-mobile-list">
+                        <div class="text-center py-4"><div class="spinner-border"></div></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Paquetes Section -->
+        <section id="paquetes-section" class="d-none">
+            <div class="d-flex justify-content-between align-items-center mb-4 section-header">
+                <h2>Paquetes Móviles</h2>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-primary" id="add-paquete-btn">
+                        <i class="fas fa-plus me-0 me-md-2"></i> <span class="d-none d-md-inline">Agregar Paquete</span>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="row" id="paquetes-container"></div>
+            
+            <div class="p-3 text-center" id="paquetes-loading">
+                <div class="spinner-border"></div>
+            </div>
+        </section>
+    </div>
+
+    <!-- Modal de Detalles -->
+    <div class="modal-backdrop-custom" id="detail-modal-backdrop"></div>
+    <div class="detail-modal" id="detail-modal">
+        <div class="detail-modal-header">
+            <h5 class="mb-0" id="detail-modal-title">Detalles</h5>
+            <button type="button" class="btn-close btn-close-white" id="close-detail-modal"></button>
+        </div>
+        <div class="detail-modal-body" id="detail-modal-body"></div>
+        <div class="detail-modal-footer">
+            <button type="button" class="btn btn-secondary" id="close-detail-modal-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <!-- Operador Modal -->
+    <div class="modal fade" id="operadorModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="operadorModalTitle">Agregar Operador</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="operadorForm">
+                        <input type="hidden" id="operador-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="operador-nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="operador-nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="operador-codigo" class="form-label">Código</label>
+                                <input type="text" class="form-control" id="operador-codigo" required placeholder="entel, tigo, viva">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="operador-logo" class="form-label">URL del Logo</label>
+                                <input type="text" class="form-control" id="operador-logo" placeholder="https://ejemplo.com/logo.png">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="operador-orden" class="form-label">Orden de Visualización</label>
+                                <input type="number" class="form-control" id="operador-orden" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="operador-activo" checked>
+                                <label class="form-check-label" for="operador-activo">Activo</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-operador">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Tipo Recarga Modal -->
+    <div class="modal fade" id="tipoRecargaModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tipoRecargaModalTitle">Agregar Tipo de Recarga</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="tipoRecargaForm">
+                        <input type="hidden" id="tipo-recarga-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo-recarga-operador" class="form-label">Operador</label>
+                                <select class="form-select" id="tipo-recarga-operador" required>
+                                    <option value="">Seleccionar operador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo-recarga-nombre" class="form-label">Nombre</label>
+                                <input type="text" class="form-control" id="tipo-recarga-nombre" required placeholder="Prepago, Pospago, Internet">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo-recarga-codigo" class="form-label">Código</label>
+                                <input type="text" class="form-control" id="tipo-recarga-codigo" required placeholder="prepago, pospago, internet">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="tipo-recarga-orden" class="form-label">Orden</label>
+                                <input type="number" class="form-control" id="tipo-recarga-orden" min="0" value="0">
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="tipo-recarga-activo" checked>
+                                <label class="form-check-label" for="tipo-recarga-activo">Activo</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-tipo-recarga">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Paquete Modal -->
+    <div class="modal fade" id="paqueteModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="paqueteModalTitle">Agregar Paquete Móvil</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="paqueteForm">
+                        <input type="hidden" id="paquete-id">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="paquete-operador" class="form-label">Operador</label>
+                                <select class="form-select" id="paquete-operador" required>
+                                    <option value="">Seleccionar operador</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="paquete-tipo-recarga" class="form-label">Tipo de Recarga</label>
+                                <select class="form-select" id="paquete-tipo-recarga" required>
+                                    <option value="">Seleccionar tipo</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="paquete-nombre" class="form-label">Nombre del Paquete</label>
+                                <input type="text" class="form-control" id="paquete-nombre" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="paquete-descripcion" class="form-label">Descripción</label>
+                                <input type="text" class="form-control" id="paquete-descripcion">
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="paquete-precio" class="form-label">Precio Visual (Bs)</label>
+                                <input type="number" class="form-control" id="paquete-precio" step="0.01" min="0" required>
+                                <small class="text-muted">Precio que ve el usuario en la app</small>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="paquete-precio-final" class="form-label">Precio Final / Cobro (Bs)</label>
+                                <input type="number" class="form-control" id="paquete-precio-final" step="0.01" min="0">
+                                <small class="text-warning">⚠ Precio real que se descuenta del saldo (oculto al usuario)</small>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" id="paquete-activo" checked>
+                                <label class="form-check-label" for="paquete-activo">Activo</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="button" class="btn btn-primary" id="save-paquete">Guardar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script>
+        // ============================================================
+        // SUPABASE
+        // ============================================================
+        const SUPABASE_URL = 'https://aleadadisazocjovibeh.supabase.co';
+        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E';
+        const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+        
+        // ============================================================
+        // ESTADO
+        // ============================================================
+        let currentSection = 'operadores';
+        let operadoresData = [];
+        let tiposRecargaData = [];
+        let paquetesData = [];
+        
+        // ============================================================
+        // HELPERS
+        // ============================================================
+        const $ = (id) => document.getElementById(id);
+        
+        const formatCurrency = (amount) => {
+            return 'Bs ' + parseFloat(amount || 0).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+        };
+        
+        const formatDate = (dateString) => {
+            if (!dateString) return '—';
+            const options = { year: 'numeric', month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        };
+        
+        const formatDateShort = (dateString) => {
+            if (!dateString) return '—';
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return new Date(dateString).toLocaleDateString('es-ES', options);
+        };
+        
+        const escapeHtml = (s) => {
+            if (s === null || s === undefined) return '';
+            return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+        };
+        
+        const showToast = (message, type = 'success') => {
+            const toast = document.createElement('div');
+            toast.className = `toast align-items-center border-0 position-fixed top-0 end-0 m-3 ${type === 'success' ? 'toast-success' : 'toast-error'}`;
+            toast.style.zIndex = '9999';
+            toast.setAttribute('role', 'alert');
+            
+            toast.innerHTML = `
+                <div class="d-flex">
+                    <div class="toast-body">${escapeHtml(message)}</div>
+                    <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            const bsToast = new bootstrap.Toast(toast, { delay: 3000 });
+            bsToast.show();
+            
+            toast.addEventListener('hidden.bs.toast', () => toast.remove());
+        };
+        
+        // ============================================================
+        // DETAIL MODAL
+        // ============================================================
+        const showDetailModal = (title, details) => {
+            $('detail-modal-title').textContent = title;
+            $('detail-modal-body').innerHTML = details;
+            $('detail-modal').classList.add('show');
+            $('detail-modal-backdrop').classList.add('show');
+        };
+        
+        const closeDetailModal = () => {
+            $('detail-modal').classList.remove('show');
+            $('detail-modal-backdrop').classList.remove('show');
+        };
+        
+        // ============================================================
+        // LOAD DATA
+        // ============================================================
+        const loadOperadores = async () => {
+            try {
+                const { data, error } = await db.from('operadores_moviles').select('*').order('orden_visual', { ascending: true });
+                if (error) throw error;
+                operadoresData = data || [];
+                renderOperadoresTable(operadoresData);
+                renderOperadoresMobileList(operadoresData);
+            } catch (error) {
+                console.error('Error loading operadores:', error);
+                showToast('Error al cargar operadores: ' + error.message, 'error');
+            }
+        };
+        
+        const loadTiposRecarga = async () => {
+            try {
+                const { data, error } = await db.from('tipos_recarga').select('*, operadores_moviles(nombre)').order('orden_visual', { ascending: true });
+                if (error) throw error;
+                tiposRecargaData = data || [];
+                renderTiposRecargaTable(tiposRecargaData);
+                renderTiposRecargaMobileList(tiposRecargaData);
+            } catch (error) {
+                console.error('Error loading tipos recarga:', error);
+                showToast('Error al cargar tipos de recarga: ' + error.message, 'error');
+            }
+        };
+        
+        const loadPaquetes = async () => {
+            try {
+                const { data, error } = await db.from('paquetes_moviles').select('*, operadores_moviles(nombre, codigo), tipos_recarga(nombre)').order('precio', { ascending: true });
+                if (error) throw error;
+                paquetesData = data || [];
+                renderPaquetes(paquetesData);
+            } catch (error) {
+                console.error('Error loading paquetes:', error);
+                showToast('Error al cargar paquetes: ' + error.message, 'error');
+                $('paquetes-loading').style.display = 'none';
+            }
+        };
+        
+        // ============================================================
+        // RENDER OPERADORES
+        // ============================================================
+        const renderOperadoresTable = (operadores) => {
+            const container = $('operadores-table-body');
+            if (!operadores || operadores.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No se encontraron operadores</td></tr>`;
+                return;
+            }
+            container.innerHTML = operadores.map(op => `
+                <tr>
+                    <td>${op.logo_url ? `<img src="${escapeHtml(op.logo_url)}" class="operator-logo" onerror="this.style.display='none'">` : `<i class="fas fa-sim-card text-muted"></i>`}</td>
+                    <td class="fw-medium">${escapeHtml(op.nombre)}</td>
+                    <td><span class="user-id-badge">${escapeHtml(op.codigo)}</span></td>
+                    <td>${op.orden_visual || 0}</td>
+                    <td><span class="badge ${op.activo ? 'bg-success' : 'bg-secondary'}">${op.activo ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>${formatDateShort(op.creado_en)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewOperador('${op.id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-success" onclick="editOperador('${op.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteOperador('${op.id}', '${escapeHtml(op.nombre)}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        };
+        
+        const renderOperadoresMobileList = (operadores) => {
+            const container = $('operadores-mobile-list');
+            if (!operadores || operadores.length === 0) {
+                container.innerHTML = `<div class="no-results"><i class="fas fa-sim-card"></i><p>No se encontraron operadores</p></div>`;
+                return;
+            }
+            container.innerHTML = operadores.map(op => `
+                <div class="mobile-card">
+                    <div class="mobile-card-header">
+                        <div class="mobile-card-title">${escapeHtml(op.nombre)}</div>
+                        <span class="badge ${op.activo ? 'bg-success' : 'bg-secondary'}">${op.activo ? 'Activo' : 'Inactivo'}</span>
+                    </div>
+                    <div class="mobile-card-body">
+                        <div class="mobile-card-field"><span class="mobile-card-label">Código:</span><span class="mobile-card-value">${escapeHtml(op.codigo)}</span></div>
+                        <div class="mobile-card-field"><span class="mobile-card-label">Orden:</span><span class="mobile-card-value">${op.orden_visual || 0}</span></div>
+                    </div>
+                    <div class="mobile-card-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewOperador('${op.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-success" onclick="editOperador('${op.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteOperador('${op.id}', '${escapeHtml(op.nombre)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        };
+        
+        // ============================================================
+        // RENDER TIPOS RECARGA
+        // ============================================================
+        const renderTiposRecargaTable = (tipos) => {
+            const container = $('tipos-recarga-table-body');
+            if (!tipos || tipos.length === 0) {
+                container.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No se encontraron tipos</td></tr>`;
+                return;
+            }
+            container.innerHTML = tipos.map(t => `
+                <tr>
+                    <td>${escapeHtml(t.operadores_moviles?.nombre || 'N/A')}</td>
+                    <td class="fw-medium">${escapeHtml(t.nombre)}</td>
+                    <td><span class="user-id-badge">${escapeHtml(t.codigo)}</span></td>
+                    <td>${t.orden_visual || 0}</td>
+                    <td><span class="badge ${t.activo ? 'bg-success' : 'bg-secondary'}">${t.activo ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>${formatDateShort(t.creado_en)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-sm btn-outline-primary" onclick="viewTipoRecarga('${t.id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn btn-sm btn-outline-success" onclick="editTipoRecarga('${t.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteTipoRecarga('${t.id}', '${escapeHtml(t.nombre)}')"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        };
+        
+        const renderTiposRecargaMobileList = (tipos) => {
+            const container = $('tipos-recarga-mobile-list');
+            if (!tipos || tipos.length === 0) {
+                container.innerHTML = `<div class="no-results"><i class="fas fa-tags"></i><p>No se encontraron tipos</p></div>`;
+                return;
+            }
+            container.innerHTML = tipos.map(t => `
+                <div class="mobile-card">
+                    <div class="mobile-card-header">
+                        <div class="mobile-card-title">${escapeHtml(t.nombre)}</div>
+                        <span class="badge ${t.activo ? 'bg-success' : 'bg-secondary'}">${t.activo ? 'Activo' : 'Inactivo'}</span>
+                    </div>
+                    <div class="mobile-card-body">
+                        <div class="mobile-card-field"><span class="mobile-card-label">Operador:</span><span class="mobile-card-value">${escapeHtml(t.operadores_moviles?.nombre || 'N/A')}</span></div>
+                        <div class="mobile-card-field"><span class="mobile-card-label">Código:</span><span class="mobile-card-value">${escapeHtml(t.codigo)}</span></div>
+                    </div>
+                    <div class="mobile-card-actions">
+                        <button class="btn btn-sm btn-outline-primary" onclick="viewTipoRecarga('${t.id}')"><i class="fas fa-eye"></i></button>
+                        <button class="btn btn-sm btn-outline-success" onclick="editTipoRecarga('${t.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-outline-danger" onclick="deleteTipoRecarga('${t.id}', '${escapeHtml(t.nombre)}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        };
+        
+        // ============================================================
+        // RENDER PAQUETES
+        // ============================================================
+        const renderPaquetes = (paquetes) => {
+            const container = $('paquetes-container');
+            $('paquetes-loading').style.display = 'none';
+            
+            if (!paquetes || paquetes.length === 0) {
+                container.innerHTML = `<div class="col-12"><div class="no-results"><i class="fas fa-boxes"></i><p>No se encontraron paquetes</p></div></div>`;
+                return;
+            }
+            
+            container.innerHTML = paquetes.map(pkg => `
+                <div class="col-md-6 col-lg-4 mb-4">
+                    <div class="package-card">
+                        <div class="d-flex justify-content-between align-items-start mb-3">
+                            <div>
+                                <span class="package-operator">${escapeHtml(pkg.operadores_moviles?.nombre || 'N/A')} - ${escapeHtml(pkg.tipos_recarga?.nombre || 'General')}</span>
+                                <h5 class="package-name mt-1">${escapeHtml(pkg.nombre)}</h5>
+                            </div>
+                        </div>
+                        <div class="row mb-3">
+                            <div class="col-6">
+                                <div class="package-price">${formatCurrency(pkg.precio)}</div>
+                                <small class="text-muted">Precio Visual</small>
+                            </div>
+                            <div class="col-6">
+                                <div class="package-final-price">${formatCurrency(pkg.precio_final || pkg.precio)}</div>
+                                <small class="text-muted">Precio Final</small>
+                            </div>
+                        </div>
+                        ${pkg.descripcion ? `<p class="text-muted small mt-2">${escapeHtml(pkg.descripcion)}</p>` : ''}
+                        <div class="d-flex justify-content-between align-items-center mt-3">
+                            <span class="badge ${pkg.activo ? 'bg-success' : 'bg-secondary'}">${pkg.activo ? 'Activo' : 'Inactivo'}</span>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-outline-primary" onclick="viewPaquete('${pkg.id}')"><i class="fas fa-eye"></i></button>
+                                <button class="btn btn-sm btn-outline-success" onclick="editPaquete('${pkg.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deletePaquete('${pkg.id}', '${escapeHtml(pkg.nombre)}')"><i class="fas fa-trash"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        };
+        
+        // ============================================================
+        // SELECTS (para modales)
+        // ============================================================
+        const populateOperadorSelect = async (selectId, selectedValue = null) => {
+            const select = $(selectId);
+            if (!select) return;
+            const { data: operadores } = await db.from('operadores_moviles').select('id, nombre').eq('activo', true).order('orden_visual', { ascending: true });
+            select.innerHTML = '<option value="">Seleccionar operador</option>';
+            (operadores || []).forEach(op => {
+                const option = document.createElement('option');
+                option.value = op.id;
+                option.textContent = op.nombre;
+                select.appendChild(option);
+            });
+            if (selectedValue) select.value = selectedValue;
+        };
+        
+        const loadTiposRecargaForOperador = async (operadorId, selectedTipoId = null) => {
+            const select = $('paquete-tipo-recarga');
+            if (!select) return;
+            const { data: tipos } = await db.from('tipos_recarga').select('id, nombre').eq('operador_id', operadorId).eq('activo', true).order('orden_visual', { ascending: true });
+            select.innerHTML = '<option value="">Seleccionar tipo</option>';
+            (tipos || []).forEach(t => {
+                const option = document.createElement('option');
+                option.value = t.id;
+                option.textContent = t.nombre;
+                select.appendChild(option);
+            });
+            if (selectedTipoId) select.value = selectedTipoId;
+        };
+        
+        // ============================================================
+        // OPEN MODALS
+        // ============================================================
+        const openOperadorModal = (op = null) => {
+            $('operadorModalTitle').textContent = op ? 'Editar Operador' : 'Agregar Operador';
+            $('operadorForm').reset();
+            $('operador-id').value = '';
+            
+            if (op) {
+                $('operador-id').value = op.id;
+                $('operador-nombre').value = op.nombre || '';
+                $('operador-codigo').value = op.codigo || '';
+                $('operador-logo').value = op.logo_url || '';
+                $('operador-orden').value = op.orden_visual || 0;
+                $('operador-activo').checked = op.activo !== false;
+            } else {
+                $('operador-orden').value = '0';
+                $('operador-activo').checked = true;
+            }
+            
+            new bootstrap.Modal($('operadorModal')).show();
+        };
+        
+        const openTipoRecargaModal = async (tipo = null) => {
+            $('tipoRecargaModalTitle').textContent = tipo ? 'Editar Tipo de Recarga' : 'Agregar Tipo de Recarga';
+            $('tipoRecargaForm').reset();
+            $('tipo-recarga-id').value = '';
+            
+            await populateOperadorSelect('tipo-recarga-operador');
+            
+            if (tipo) {
+                $('tipo-recarga-id').value = tipo.id;
+                $('tipo-recarga-operador').value = tipo.operador_id || '';
+                $('tipo-recarga-nombre').value = tipo.nombre || '';
+                $('tipo-recarga-codigo').value = tipo.codigo || '';
+                $('tipo-recarga-orden').value = tipo.orden_visual || 0;
+                $('tipo-recarga-activo').checked = tipo.activo !== false;
+            } else {
+                $('tipo-recarga-orden').value = '0';
+                $('tipo-recarga-activo').checked = true;
+            }
+            
+            new bootstrap.Modal($('tipoRecargaModal')).show();
+        };
+        
+        const openPaqueteModal = async (pkg = null) => {
+            $('paqueteModalTitle').textContent = pkg ? 'Editar Paquete' : 'Agregar Paquete';
+            $('paqueteForm').reset();
+            $('paquete-id').value = '';
+            
+            await populateOperadorSelect('paquete-operador');
+            
+            if (pkg) {
+                $('paquete-id').value = pkg.id;
+                $('paquete-operador').value = pkg.operador_id || '';
+                $('paquete-nombre').value = pkg.nombre || '';
+                $('paquete-descripcion').value = pkg.descripcion || '';
+                $('paquete-precio').value = pkg.precio || '';
+                $('paquete-precio-final').value = pkg.precio_final || '';
+                $('paquete-activo').checked = pkg.activo !== false;
+                
+                if (pkg.operador_id) {
+                    await loadTiposRecargaForOperador(pkg.operador_id, pkg.tipo_recarga_id);
+                }
+            } else {
+                $('paquete-activo').checked = true;
+            }
+            
+            new bootstrap.Modal($('paqueteModal')).show();
+        };
+        
+        // ============================================================
+        // CRUD OPERADORES
+        // ============================================================
+        const editOperador = (id) => {
+            const op = operadoresData.find(o => o.id === id);
+            if (op) openOperadorModal(op);
+        };
+        
+        const deleteOperador = async (id, nombre) => {
+            if (!confirm(`¿Eliminar operador "${nombre}"?`)) return;
+            try {
+                const { data: tipos } = await db.from('tipos_recarga').select('id').eq('operador_id', id);
+                if (tipos && tipos.length > 0) {
+                    showToast('No se puede eliminar: tiene tipos de recarga asociados', 'error');
+                    return;
+                }
+                const { error } = await db.from('operadores_moviles').delete().eq('id', id);
+                if (error) throw error;
+                showToast(`Operador "${nombre}" eliminado`);
+                loadOperadores();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        const viewOperador = async (id) => {
+            const op = operadoresData.find(o => o.id === id);
+            if (!op) return;
+            const { count: tCount } = await db.from('tipos_recarga').select('*', { count: 'exact', head: true }).eq('operador_id', id);
+            const { count: pCount } = await db.from('paquetes_moviles').select('*', { count: 'exact', head: true }).eq('operador_id', id);
+            
+            showDetailModal(`Detalles: ${op.nombre}`, `
+                <div class="detail-item"><div class="detail-label">ID:</div><div class="detail-value"><span class="user-id-badge">${op.id}</span></div></div>
+                <div class="detail-item"><div class="detail-label">Nombre:</div><div class="detail-value fw-medium">${escapeHtml(op.nombre)}</div></div>
+                <div class="detail-item"><div class="detail-label">Código:</div><div class="detail-value">${escapeHtml(op.codigo)}</div></div>
+                <div class="detail-item"><div class="detail-label">Logo:</div><div class="detail-value">${op.logo_url ? `<img src="${escapeHtml(op.logo_url)}" style="max-height:100px;">` : 'Sin logo'}</div></div>
+                <div class="detail-item"><div class="detail-label">Orden:</div><div class="detail-value">${op.orden_visual || 0}</div></div>
+                <div class="detail-item"><div class="detail-label">Estado:</div><div class="detail-value"><span class="badge ${op.activo ? 'bg-success' : 'bg-secondary'}">${op.activo ? 'Activo' : 'Inactivo'}</span></div></div>
+                <div class="detail-item"><div class="detail-label">Tipos de recarga:</div><div class="detail-value">${tCount || 0}</div></div>
+                <div class="detail-item"><div class="detail-label">Paquetes:</div><div class="detail-value">${pCount || 0}</div></div>
+                <div class="detail-item"><div class="detail-label">Creado:</div><div class="detail-value">${formatDate(op.creado_en)}</div></div>
+            `);
+        };
+        
+        // ============================================================
+        // CRUD TIPOS RECARGA
+        // ============================================================
+        const editTipoRecarga = (id) => {
+            const t = tiposRecargaData.find(x => x.id === id);
+            if (t) openTipoRecargaModal(t);
+        };
+        
+        const deleteTipoRecarga = async (id, nombre) => {
+            if (!confirm(`¿Eliminar tipo "${nombre}"?`)) return;
+            try {
+                const { data: pkgs } = await db.from('paquetes_moviles').select('id').eq('tipo_recarga_id', id);
+                if (pkgs && pkgs.length > 0) {
+                    showToast('No se puede eliminar: tiene paquetes asociados', 'error');
+                    return;
+                }
+                const { error } = await db.from('tipos_recarga').delete().eq('id', id);
+                if (error) throw error;
+                showToast(`Tipo "${nombre}" eliminado`);
+                loadTiposRecarga();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        const viewTipoRecarga = async (id) => {
+            const t = tiposRecargaData.find(x => x.id === id);
+            if (!t) return;
+            const { count: pCount } = await db.from('paquetes_moviles').select('*', { count: 'exact', head: true }).eq('tipo_recarga_id', id);
+            showDetailModal(`Detalles: ${t.nombre}`, `
+                <div class="detail-item"><div class="detail-label">ID:</div><div class="detail-value"><span class="user-id-badge">${t.id}</span></div></div>
+                <div class="detail-item"><div class="detail-label">Operador:</div><div class="detail-value">${escapeHtml(t.operadores_moviles?.nombre || 'N/A')}</div></div>
+                <div class="detail-item"><div class="detail-label">Nombre:</div><div class="detail-value fw-medium">${escapeHtml(t.nombre)}</div></div>
+                <div class="detail-item"><div class="detail-label">Código:</div><div class="detail-value">${escapeHtml(t.codigo)}</div></div>
+                <div class="detail-item"><div class="detail-label">Orden:</div><div class="detail-value">${t.orden_visual || 0}</div></div>
+                <div class="detail-item"><div class="detail-label">Estado:</div><div class="detail-value"><span class="badge ${t.activo ? 'bg-success' : 'bg-secondary'}">${t.activo ? 'Activo' : 'Inactivo'}</span></div></div>
+                <div class="detail-item"><div class="detail-label">Paquetes:</div><div class="detail-value">${pCount || 0}</div></div>
+                <div class="detail-item"><div class="detail-label">Creado:</div><div class="detail-value">${formatDate(t.creado_en)}</div></div>
+            `);
+        };
+        
+        // ============================================================
+        // CRUD PAQUETES
+        // ============================================================
+        const editPaquete = (id) => {
+            const p = paquetesData.find(x => x.id === id);
+            if (p) openPaqueteModal(p);
+        };
+        
+        const deletePaquete = async (id, nombre) => {
+            if (!confirm(`¿Eliminar paquete "${nombre}"?`)) return;
+            try {
+                const { error } = await db.from('paquetes_moviles').delete().eq('id', id);
+                if (error) throw error;
+                showToast(`Paquete "${nombre}" eliminado`);
+                loadPaquetes();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        const viewPaquete = (id) => {
+            const p = paquetesData.find(x => x.id === id);
+            if (!p) return;
+            showDetailModal(`Detalles: ${p.nombre}`, `
+                <div class="detail-item"><div class="detail-label">ID:</div><div class="detail-value"><span class="user-id-badge">${p.id}</span></div></div>
+                <div class="detail-item"><div class="detail-label">Operador:</div><div class="detail-value">${escapeHtml(p.operadores_moviles?.nombre || 'N/A')}</div></div>
+                <div class="detail-item"><div class="detail-label">Tipo:</div><div class="detail-value">${escapeHtml(p.tipos_recarga?.nombre || 'N/A')}</div></div>
+                <div class="detail-item"><div class="detail-label">Nombre:</div><div class="detail-value fw-medium">${escapeHtml(p.nombre)}</div></div>
+                <div class="detail-item"><div class="detail-label">Descripción:</div><div class="detail-value">${escapeHtml(p.descripcion || 'Sin descripción')}</div></div>
+                <div class="detail-item"><div class="detail-label">Precio Visual:</div><div class="detail-value package-price">${formatCurrency(p.precio)}</div></div>
+                <div class="detail-item"><div class="detail-label">Precio Final:</div><div class="detail-value package-final-price">${formatCurrency(p.precio_final || p.precio)}</div></div>
+                <div class="detail-item"><div class="detail-label">Estado:</div><div class="detail-value"><span class="badge ${p.activo ? 'bg-success' : 'bg-secondary'}">${p.activo ? 'Activo' : 'Inactivo'}</span></div></div>
+                <div class="detail-item"><div class="detail-label">Creado:</div><div class="detail-value">${formatDate(p.creado_en)}</div></div>
+            `);
+        };
+        
+        // ============================================================
+        // SAVE HANDLERS
+        // ============================================================
+        const saveOperador = async () => {
+            const id = $('operador-id').value;
+            const data = {
+                nombre: $('operador-nombre').value.trim(),
+                codigo: $('operador-codigo').value.trim(),
+                logo_url: $('operador-logo').value.trim() || null,
+                orden_visual: parseInt($('operador-orden').value) || 0,
+                activo: $('operador-activo').checked
+            };
+            
+            if (!data.nombre || !data.codigo) { showToast('Nombre y código son obligatorios', 'error'); return; }
+            
+            try {
+                if (id) {
+                    const { error } = await db.from('operadores_moviles').update(data).eq('id', id);
+                    if (error) throw error;
+                    showToast('Operador actualizado');
+                } else {
+                    const { error } = await db.from('operadores_moviles').insert([data]);
+                    if (error) throw error;
+                    showToast('Operador creado');
+                }
+                bootstrap.Modal.getInstance($('operadorModal')).hide();
+                loadOperadores();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        const saveTipoRecarga = async () => {
+            const id = $('tipo-recarga-id').value;
+            const data = {
+                operador_id: $('tipo-recarga-operador').value,
+                nombre: $('tipo-recarga-nombre').value.trim(),
+                codigo: $('tipo-recarga-codigo').value.trim(),
+                orden_visual: parseInt($('tipo-recarga-orden').value) || 0,
+                activo: $('tipo-recarga-activo').checked
+            };
+            
+            if (!data.operador_id || !data.nombre || !data.codigo) { showToast('Complete los campos obligatorios', 'error'); return; }
+            
+            try {
+                if (id) {
+                    const { error } = await db.from('tipos_recarga').update(data).eq('id', id);
+                    if (error) throw error;
+                    showToast('Tipo actualizado');
+                } else {
+                    const { error } = await db.from('tipos_recarga').insert([data]);
+                    if (error) throw error;
+                    showToast('Tipo creado');
+                }
+                bootstrap.Modal.getInstance($('tipoRecargaModal')).hide();
+                loadTiposRecarga();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        const savePaquete = async () => {
+            const id = $('paquete-id').value;
+            
+            const data = {
+                operador_id: $('paquete-operador').value,
+                tipo_recarga_id: $('paquete-tipo-recarga').value,
+                nombre: $('paquete-nombre').value.trim(),
+                descripcion: $('paquete-descripcion').value.trim() || null,
+                precio: parseFloat($('paquete-precio').value),
+                precio_final: $('paquete-precio-final').value ? parseFloat($('paquete-precio-final').value) : null,
+                activo: $('paquete-activo').checked
+            };
+            
+            if (!data.operador_id || !data.tipo_recarga_id || !data.nombre) { showToast('Complete los campos obligatorios', 'error'); return; }
+            if (isNaN(data.precio)) { showToast('El precio visual es obligatorio', 'error'); return; }
+            
+            // Validación: precio_final no puede ser mayor que precio
+            if (data.precio_final !== null && data.precio_final > data.precio) {
+                showToast('El Precio Final no puede ser mayor que el Precio Visual', 'error');
+                return;
+            }
+            
+            try {
+                if (id) {
+                    const { error } = await db.from('paquetes_moviles').update(data).eq('id', id);
+                    if (error) throw error;
+                    showToast('Paquete actualizado');
+                } else {
+                    const { error } = await db.from('paquetes_moviles').insert([data]);
+                    if (error) throw error;
+                    showToast('Paquete creado');
+                }
+                bootstrap.Modal.getInstance($('paqueteModal')).hide();
+                loadPaquetes();
+            } catch (error) {
+                showToast('Error: ' + error.message, 'error');
+            }
+        };
+        
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+        const showSection = (sectionId) => {
+            document.querySelectorAll('section').forEach(s => s.classList.add('d-none'));
+            const section = $(sectionId);
+            if (section) section.classList.remove('d-none');
+            
+            document.querySelectorAll('.sidebar .nav-link').forEach(l => l.classList.remove('active'));
+            const sectionName = sectionId.replace('-section', '');
+            const link = document.querySelector(`.sidebar .nav-link[data-section="${sectionName}"]`);
+            if (link) link.classList.add('active');
+            
+            currentSection = sectionName;
+            
+            switch (currentSection) {
+                case 'operadores': loadOperadores(); break;
+                case 'tipos-recarga': loadTiposRecarga(); break;
+                case 'paquetes':
+                    $('paquetes-loading').style.display = 'block';
+                    $('paquetes-container').innerHTML = '';
+                    loadPaquetes();
+                    break;
+            }
+        };
+        
+        // ============================================================
+        // EXPONER FUNCIONES GLOBALES
+        // ============================================================
+        window.editOperador = editOperador;
+        window.deleteOperador = deleteOperador;
+        window.viewOperador = viewOperador;
+        window.editTipoRecarga = editTipoRecarga;
+        window.deleteTipoRecarga = deleteTipoRecarga;
+        window.viewTipoRecarga = viewTipoRecarga;
+        window.editPaquete = editPaquete;
+        window.deletePaquete = deletePaquete;
+        window.viewPaquete = viewPaquete;
+        
+        // ============================================================
+        // INIT
+        // ============================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.sidebar .nav-link[data-section]').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const section = e.target.closest('a').dataset.section;
+                    showSection(`${section}-section`);
+                });
+            });
+            
+            $('logout-btn')?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try { await db.auth.signOut(); } catch {}
+                showToast('Sesión cerrada (recarga para volver a entrar)');
+            });
+            $('navbar-logout-btn')?.addEventListener('click', async (e) => {
+                e.preventDefault();
+                try { await db.auth.signOut(); } catch {}
+                showToast('Sesión cerrada (recarga para volver a entrar)');
+            });
+            
+            $('close-detail-modal').addEventListener('click', closeDetailModal);
+            $('close-detail-modal-btn').addEventListener('click', closeDetailModal);
+            $('detail-modal-backdrop').addEventListener('click', closeDetailModal);
+            
+            // Botones de agregar
+            $('add-operador-btn').addEventListener('click', () => openOperadorModal());
+            $('add-tipo-recarga-btn').addEventListener('click', () => openTipoRecargaModal());
+            $('add-paquete-btn').addEventListener('click', () => openPaqueteModal());
+            
+            // Botones de guardar
+            $('save-operador').addEventListener('click', saveOperador);
+            $('save-tipo-recarga').addEventListener('click', saveTipoRecarga);
+            $('save-paquete').addEventListener('click', savePaquete);
+            
+            // Cambio de operador en modal de paquete
+            $('paquete-operador').addEventListener('change', function() {
+                if (this.value) loadTiposRecargaForOperador(this.value);
+                else $('paquete-tipo-recarga').innerHTML = '<option value="">Seleccionar tipo</option>';
+            });
+            
+            // Sección inicial
+            showSection('operadores-section');
+        });
+    </script>
+</body>
+</html>

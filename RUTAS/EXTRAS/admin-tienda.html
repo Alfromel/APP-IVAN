@@ -1,0 +1,3506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin - Inventario Tienda Multi-sucursal</title>
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-purple: #6A0DAD;
+            --secondary-purple: #8A2BE2;
+            --light-purple: #E6E6FA;
+            --dark-purple: #4B0082;
+            --white: #FFFFFF;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --gray-light: #f8f9fa;
+            --gray-dark: #343a40;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            background: linear-gradient(135deg, var(--light-purple) 0%, #f5f5f5 100%);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            font-size: 14px;
+        }
+        
+        /* Estilo de aplicación de escritorio nativa */
+        .desktop-app {
+            display: flex;
+            height: 100vh;
+            background: var(--white);
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        
+        /* Sidebar estilo Windows/Mac */
+        .sidebar {
+            width: 220px;
+            background: linear-gradient(180deg, var(--primary-purple) 0%, var(--dark-purple) 100%);
+            color: var(--white);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 3px 0 10px rgba(0,0,0,0.1);
+            z-index: 100;
+        }
+        
+        .sidebar-header {
+            padding: 18px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-header h3 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-menu {
+            padding: 15px 0;
+            flex-grow: 1;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 15px;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .menu-item:hover {
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            border-left-color: var(--white);
+        }
+        
+        .menu-item.active {
+            background: rgba(255,255,255,0.15);
+            color: var(--white);
+            border-left-color: var(--white);
+        }
+        
+        .menu-item i {
+            width: 20px;
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+        
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        
+        .user-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1rem;
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .user-details {
+            text-align: left;
+        }
+        
+        .user-name {
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .user-role {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+        
+        /* Selector de sucursal en sidebar */
+        .branch-selector {
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .branch-selector label {
+            font-size: 0.75rem;
+            opacity: 0.8;
+            margin-bottom: 4px;
+            display: block;
+        }
+        
+        .branch-select {
+            width: 100%;
+            padding: 6px 10px;
+            border-radius: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+            background: rgba(255,255,255,0.1);
+            color: var(--white);
+            font-size: 0.85rem;
+        }
+        
+        .branch-select option {
+            background: var(--primary-purple);
+            color: var(--white);
+        }
+        
+        /* Contenido principal */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            background: var(--white);
+        }
+        
+        .content-header {
+            padding: 15px 20px;
+            background: var(--white);
+            border-bottom: 1px solid #e9ecef;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+        }
+        
+        .current-branch {
+            background: linear-gradient(135deg, var(--light-purple) 0%, #f0f0ff 100%);
+            border: 1px solid var(--primary-purple);
+            color: var(--dark-purple);
+            padding: 6px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            margin-top: 3px;
+            font-size: 0.85rem;
+        }
+        
+        .content-body {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background: var(--gray-light);
+            position: relative;
+        }
+        
+        /* Tarjetas estilo escritorio */
+        .desktop-card {
+            background: var(--white);
+            border-radius: 10px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            border: 1px solid #e9ecef;
+            margin-bottom: 20px;
+            overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        
+        .desktop-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .desktop-card-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, var(--light-purple) 0%, #f0f0ff 100%);
+            border-bottom: 1px solid #e9ecef;
+            font-weight: 600;
+            color: var(--dark-purple);
+            font-size: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .desktop-card-body {
+            padding: 20px;
+        }
+        
+        /* Botones estilo escritorio */
+        .desktop-btn {
+            border-radius: 6px;
+            padding: 10px 18px;
+            font-weight: 600;
+            border: none;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+        
+        .desktop-btn-primary {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+        }
+        
+        .desktop-btn-primary:hover {
+            background: linear-gradient(135deg, var(--dark-purple) 0%, var(--primary-purple) 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(106, 13, 173, 0.2);
+        }
+        
+        .desktop-btn-success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: var(--white);
+        }
+        
+        .desktop-btn-danger {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc3545 100%);
+            color: var(--white);
+        }
+        
+        .desktop-btn-warning {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ffc107 100%);
+            color: var(--gray-dark);
+        }
+        
+        /* Tablas estilo escritorio */
+        .desktop-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            border-radius: 6px;
+            overflow: hidden;
+            box-shadow: 0 1px 5px rgba(0,0,0,0.03);
+            font-size: 0.9rem;
+        }
+        
+        .desktop-table th {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 12px 16px;
+            font-weight: 600;
+            border: none;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+        
+        .desktop-table td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e9ecef;
+            vertical-align: middle;
+        }
+        
+        .desktop-table tbody tr:hover {
+            background-color: var(--light-purple);
+            cursor: pointer;
+        }
+        
+        /* Estadísticas */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: var(--white);
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+            border-left: 3px solid var(--primary-purple);
+            transition: transform 0.2s;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--primary-purple);
+            margin-bottom: 4px;
+            line-height: 1;
+        }
+        
+        .stat-label {
+            color: #6c757d;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: var(--light-purple);
+            margin-bottom: 10px;
+        }
+        
+        /* Formularios */
+        .desktop-form-control {
+            border-radius: 6px;
+            padding: 10px 12px;
+            border: 1px solid #dee2e6;
+            transition: all 0.2s;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        
+        .desktop-form-control:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.15);
+        }
+        
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-purple);
+            margin-bottom: 6px;
+            font-size: 0.9rem;
+        }
+        
+        /* Notificaciones estilo escritorio */
+        .desktop-notification {
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            padding: 12px 16px;
+            border-radius: 6px;
+            color: var(--white);
+            font-weight: 500;
+            z-index: 9999;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            transform: translateX(150%);
+            transition: transform 0.2s;
+            max-width: 300px;
+            font-size: 0.9rem;
+        }
+        
+        .desktop-notification.show {
+            transform: translateX(0);
+        }
+        
+        .desktop-notification.success {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+        }
+        
+        .desktop-notification.error {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc3545 100%);
+        }
+        
+        .desktop-notification.info {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+        }
+        
+        /* Badges */
+        .status-badge {
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .status-activo {
+            background: linear-gradient(135deg, var(--success-color) 0%, #20c997 100%);
+            color: var(--white);
+        }
+        
+        .status-bajo {
+            background: linear-gradient(135deg, var(--warning-color) 0%, #ffc107 100%);
+            color: var(--gray-dark);
+        }
+        
+        .status-agotado {
+            background: linear-gradient(135deg, var(--danger-color) 0%, #dc3545 100%);
+            color: var(--white);
+        }
+        
+        .status-vencido {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: var(--white);
+        }
+        
+        .status-por-vencer {
+            background: linear-gradient(135deg, #ffc107 0%, #e0a800 100%);
+            color: var(--gray-dark);
+        }
+        
+        /* Dinero */
+        .money {
+            color: var(--primary-purple);
+            font-weight: 600;
+        }
+        
+        .money::before {
+            content: 'Bs. ';
+        }
+        
+        /* Buscador */
+        .desktop-search {
+            position: relative;
+            max-width: 300px;
+        }
+        
+        .desktop-search-input {
+            padding: 10px 16px 10px 38px;
+            border-radius: 20px;
+            border: 1px solid #dee2e6;
+            width: 100%;
+            font-size: 0.9rem;
+            background: var(--white);
+            transition: all 0.2s;
+        }
+        
+        .desktop-search-input:focus {
+            border-color: var(--primary-purple);
+            box-shadow: 0 0 0 2px rgba(106, 13, 173, 0.15);
+        }
+        
+        .desktop-search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--primary-purple);
+            font-size: 1rem;
+        }
+        
+        /* Modal flotante para balance de vendedor */
+        .floating-balance-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--white);
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            z-index: 1050;
+            width: 90%;
+            max-width: 400px;
+            display: none;
+        }
+        
+        .floating-balance-modal.show {
+            display: block;
+        }
+        
+        .balance-modal-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            padding: 20px;
+            border-radius: 12px 12px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .balance-modal-body {
+            padding: 30px 20px;
+            text-align: center;
+        }
+        
+        .balance-modal-footer {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        
+        .balance-amount {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--primary-purple);
+            margin: 20px 0;
+        }
+        
+        .balance-user-info {
+            margin-bottom: 20px;
+        }
+        
+        .balance-user-name {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: var(--dark-purple);
+        }
+        
+        .balance-user-details {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1040;
+            display: none;
+        }
+        
+        .overlay.show {
+            display: block;
+        }
+        
+        /* Botón flotante en ventas */
+        .floating-balance-btn {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            border: none;
+            box-shadow: 0 4px 15px rgba(106, 13, 173, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 100;
+            transition: all 0.3s;
+        }
+        
+        .floating-balance-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 6px 20px rgba(106, 13, 173, 0.4);
+        }
+        
+        .floating-balance-btn i {
+            font-size: 1.5rem;
+        }
+        
+        /* Modal */
+        .desktop-modal .modal-content {
+            border-radius: 10px;
+            border: none;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .desktop-modal .modal-header {
+            background: linear-gradient(135deg, var(--primary-purple) 0%, var(--secondary-purple) 100%);
+            color: var(--white);
+            border-bottom: none;
+            border-radius: 10px 10px 0 0;
+            padding: 16px 20px;
+        }
+        
+        .desktop-modal .modal-body {
+            padding: 20px;
+        }
+        
+        .desktop-modal .modal-footer {
+            border-top: 1px solid #e9ecef;
+            padding: 16px 20px;
+        }
+        
+        /* Scrollbar personalizado */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-purple);
+            border-radius: 3px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--dark-purple);
+        }
+        
+        /* Estado vacío mejorado */
+        .empty-state {
+            text-align: center;
+            padding: 30px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 3rem;
+            color: #dee2e6;
+            margin-bottom: 15px;
+        }
+        
+        .empty-state-text {
+            font-weight: 600;
+            color: #6c757d;
+            margin-bottom: 8px;
+        }
+        
+        .empty-state-subtext {
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+        
+        /* Gráficos en Dashboard */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .chart-card {
+            height: 100%;
+        }
+        
+        .chart-card .desktop-card-body {
+            padding: 15px;
+        }
+        
+        .dashboard-row {
+            margin-bottom: 20px;
+        }
+        
+        .dashboard-row .col-md-6 {
+            margin-bottom: 20px;
+        }
+        
+        /* Indicadores de fecha */
+        .expiration-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 3px 8px;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .expiration-vencido {
+            background-color: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+            border: 1px solid rgba(220, 53, 69, 0.2);
+        }
+        
+        .expiration-proximo {
+            background-color: rgba(255, 193, 7, 0.1);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.2);
+        }
+        
+        .expiration-normal {
+            background-color: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.2);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 60px;
+            }
+            
+            .sidebar-header h3 span,
+            .menu-item span,
+            .user-details,
+            .branch-selector {
+                display: none;
+            }
+            
+            .menu-item i {
+                margin-right: 0;
+                font-size: 1.2rem;
+            }
+            
+            .user-avatar {
+                width: 35px;
+                height: 35px;
+            }
+            
+            .floating-balance-btn {
+                bottom: 20px;
+                right: 20px;
+                width: 50px;
+                height: 50px;
+            }
+            
+            .chart-container {
+                height: 250px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-container {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="desktop-app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3>
+                    <i class="bi bi-shop"></i>
+                    <span>TIENDA ADMIN</span>
+                </h3>
+            </div>
+            
+            <!-- Selector de sucursal -->
+            <div class="branch-selector">
+                <label>Seleccionar Sucursal:</label>
+                <select class="branch-select" id="branchSelector">
+                    <option value="">Cargando...</option>
+                </select>
+            </div>
+            
+            <div class="sidebar-menu">
+                <a href="#" class="menu-item active" data-section="dashboard">
+                    <i class="bi bi-speedometer2"></i>
+                    <span>Dashboard</span>
+                </a>
+                <a href="#" class="menu-item" data-section="inventario">
+                    <i class="bi bi-box-seam"></i>
+                    <span>Inventario</span>
+                </a>
+                <a href="#" class="menu-item" data-section="ventas">
+                    <i class="bi bi-cash-stack"></i>
+                    <span>Ventas</span>
+                </a>
+                <a href="#" class="menu-item" data-section="sucursales">
+                    <i class="bi bi-shop-window"></i>
+                    <span>Sucursales</span>
+                </a>
+            </div>
+            
+            <div class="sidebar-footer">
+                <div class="user-info">
+                    <div class="user-avatar">
+                        <span>A</span>
+                    </div>
+                    <div class="user-details">
+                        <div class="user-name">Administrador</div>
+                        <div class="user-role">Super Admin</div>
+                    </div>
+                </div>
+                <button class="desktop-btn desktop-btn-danger w-100" id="logoutBtn">
+                    <i class="bi bi-box-arrow-right"></i>
+                    <span>Cerrar Sesión</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenido Principal -->
+        <div class="main-content">
+            <!-- Header del contenido -->
+            <div class="content-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h2 id="pageTitle" class="mb-0" style="font-size: 1.3rem;">Dashboard</h2>
+                        <div class="current-branch" id="currentBranch">
+                            <i class="bi bi-shop"></i>
+                            <span>Cargando sucursal...</span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="desktop-search">
+                            <i class="bi bi-search desktop-search-icon"></i>
+                            <input type="text" class="desktop-search-input" id="globalSearch" 
+                                   placeholder="Buscar en el sistema...">
+                        </div>
+                        <button class="desktop-btn desktop-btn-primary" id="refreshBtn">
+                            <i class="bi bi-arrow-clockwise"></i>
+                            <span>Actualizar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Cuerpo del contenido -->
+            <div class="content-body">
+                <!-- Dashboard -->
+                <div id="dashboardSection" class="fade-in">
+                    <!-- Estadísticas principales -->
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <div class="stat-number" id="totalProducts">0</div>
+                            <div class="stat-label">Total Productos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-exclamation-triangle"></i>
+                            </div>
+                            <div class="stat-number" id="lowStockProducts">0</div>
+                            <div class="stat-label">Stock Bajo</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-x-circle"></i>
+                            </div>
+                            <div class="stat-number" id="outOfStockProducts">0</div>
+                            <div class="stat-label">Agotados</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-cash-coin"></i>
+                            </div>
+                            <div class="stat-number" id="totalValue">Bs. 0</div>
+                            <div class="stat-label">Valor Inventario</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-x"></i>
+                            </div>
+                            <div class="stat-number" id="expiredProducts">0</div>
+                            <div class="stat-label">Productos Vencidos</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-week"></i>
+                            </div>
+                            <div class="stat-number" id="expiringProducts">0</div>
+                            <div class="stat-label">Por Vencer (7 días)</div>
+                        </div>
+                    </div>
+
+                    <!-- Gráficos y estadísticas -->
+                    <div class="dashboard-row">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="desktop-card chart-card">
+                                    <div class="desktop-card-header">
+                                        <span>Estado del Inventario</span>
+                                    </div>
+                                    <div class="desktop-card-body">
+                                        <div class="chart-container">
+                                            <canvas id="inventoryStatusChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="desktop-card chart-card">
+                                    <div class="desktop-card-header">
+                                        <span>Productos por Vencer</span>
+                                    </div>
+                                    <div class="desktop-card-body">
+                                        <div class="chart-container">
+                                            <canvas id="expirationChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos con stock bajo -->
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Productos con Stock Bajo</span>
+                            <small class="text-muted" id="lowStockCount">0 productos</small>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Producto</th>
+                                            <th>Stock Actual</th>
+                                            <th>Stock Mínimo</th>
+                                            <th>Estado</th>
+                                            <th>Vencimiento</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lowStockTable">
+                                        <!-- Productos con stock bajo -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Productos vencidos y por vencer -->
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Productos Vencidos y por Vencer</span>
+                            <div class="d-flex gap-2">
+                                <span class="expiration-indicator expiration-vencido" id="expiredCount">0 vencidos</span>
+                                <span class="expiration-indicator expiration-proximo" id="expiringCount">0 por vencer</span>
+                            </div>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Producto</th>
+                                            <th>Stock</th>
+                                            <th>Precio Venta</th>
+                                            <th>Vencimiento</th>
+                                            <th>Estado</th>
+                                            <th>Días Restantes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="expirationTable">
+                                        <!-- Productos vencidos y por vencer -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Últimas ventas -->
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Últimas Ventas</span>
+                            <button class="desktop-btn desktop-btn-primary btn-sm" onclick="showSection('ventas')">
+                                Ver Todas
+                            </button>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th># Venta</th>
+                                            <th>Vendedor</th>
+                                            <th>Total</th>
+                                            <th>Fecha/Hora</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentSalesTable">
+                                        <!-- Últimas ventas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Inventario -->
+                <div id="inventarioSection" class="fade-in d-none">
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Gestión de Inventario - <span id="branchInventoryTitle">Sucursal</span></span>
+                            <div>
+                                <button class="desktop-btn desktop-btn-primary me-2" id="addProductBtn">
+                                    <i class="bi bi-plus-circle"></i>
+                                    <span>Agregar Producto</span>
+                                </button>
+                                <button class="desktop-btn desktop-btn-warning" id="transferStockBtn">
+                                    <i class="bi bi-arrow-left-right"></i>
+                                    <span>Transferir Stock</span>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="mb-4">
+                                <div class="desktop-search">
+                                    <i class="bi bi-search desktop-search-icon"></i>
+                                    <input type="text" class="desktop-search-input" id="productSearch" 
+                                           placeholder="Buscar productos por código o nombre...">
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Código</th>
+                                            <th>Nombre</th>
+                                            <th>Stock</th>
+                                            <th>Precio Compra</th>
+                                            <th>Precio Venta</th>
+                                            <th>Vencimiento</th>
+                                            <th>Estado</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="productsTable">
+                                        <!-- Productos -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ventas -->
+                <div id="ventasSection" class="fade-in d-none">
+                    <div class="desktop-card">
+                        <div class="desktop-card-header">
+                            <span>Historial de Ventas - <span id="salesBranchTitle">Sucursal</span></span>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="mb-4">
+                                <div class="row g-2">
+                                    <div class="col-md-4">
+                                        <label class="form-label">Filtrar por fecha</label>
+                                        <input type="date" class="desktop-form-control" id="salesDateFilter">
+                                    </div>
+                                    <div class="col-md-4">
+                                        <label class="form-label">Filtrar por vendedor</label>
+                                        <select class="desktop-form-control" id="salesUserFilter">
+                                            <option value="">Todos los vendedores</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-4 d-flex align-items-end">
+                                        <button class="desktop-btn desktop-btn-primary w-100" onclick="filterSales()">
+                                            <i class="bi bi-funnel"></i>
+                                            <span>Filtrar</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th># Venta</th>
+                                            <th>Vendedor</th>
+                                            <th>Productos</th>
+                                            <th>Cantidad</th>
+                                            <th>Total</th>
+                                            <th>Fecha/Hora</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="salesTable">
+                                        <!-- Ventas -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Botón flotante para ver balance -->
+                    <button class="floating-balance-btn" id="showBalanceBtn" title="Ver Balance de Vendedor">
+                        <i class="bi bi-cash-coin"></i>
+                    </button>
+                </div>
+
+                <!-- Sucursales -->
+                <div id="sucursalesSection" class="fade-in d-none">
+                    <div class="desktop-card">
+                        <div class="desktop-card-header d-flex justify-content-between align-items-center">
+                            <span>Gestión de Sucursales</span>
+                            <button class="desktop-btn desktop-btn-primary" id="addBranchBtn">
+                                <i class="bi bi-plus-circle"></i>
+                                <span>Agregar Sucursal</span>
+                            </button>
+                        </div>
+                        <div class="desktop-card-body">
+                            <div class="table-responsive">
+                                <table class="desktop-table">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Nombre</th>
+                                            <th>Dirección</th>
+                                            <th>Teléfono</th>
+                                            <th>Email</th>
+                                            <th>Vendedores</th>
+                                            <th>Acciones</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="branchesTable">
+                                        <!-- Sucursales -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notificaciones -->
+    <div id="notification" class="desktop-notification d-none"></div>
+
+    <!-- Modal flotante para balance -->
+    <div class="overlay" id="balanceOverlay"></div>
+    <div class="floating-balance-modal" id="balanceModal">
+        <div class="balance-modal-header">
+            <h5 class="mb-0">Balance del Vendedor</h5>
+            <button type="button" class="btn-close btn-close-white" id="closeBalanceModal"></button>
+        </div>
+        <div class="balance-modal-body">
+            <div class="balance-user-info">
+                <div class="balance-user-name" id="balanceUserName">Seleccionar Vendedor</div>
+                <div class="balance-user-details" id="balanceUserDetails">Usuario: --- | Rol: ---</div>
+            </div>
+            <div class="balance-amount" id="balanceAmount">Bs. 0.00</div>
+            <div class="mb-3">
+                <label class="form-label">Seleccionar Vendedor:</label>
+                <select class="desktop-form-control" id="balanceUserSelect">
+                    <option value="">Seleccionar vendedor...</option>
+                </select>
+            </div>
+        </div>
+        <div class="balance-modal-footer">
+            <button class="desktop-btn desktop-btn-danger" id="cancelBalanceBtn">
+                Cancelar
+            </button>
+            <button class="desktop-btn desktop-btn-success" id="deliverBalanceBtn" disabled>
+                <i class="bi bi-cash-coin"></i>
+                Entregar
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Producto -->
+    <div class="modal fade desktop-modal" id="productModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="productModalLabel">Agregar Producto</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="productForm">
+                        <input type="hidden" id="productId">
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="productCode" class="form-label">Código del Producto *</label>
+                                <input type="text" class="desktop-form-control" id="productCode" required>
+                                <small class="text-muted">Código único (ej: PROD001)</small>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="productName" class="form-label">Nombre del Producto *</label>
+                                <input type="text" class="desktop-form-control" id="productName" required>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="productPurchasePrice" class="form-label">Precio de Compra (Bs.) *</label>
+                                <input type="number" step="0.01" class="desktop-form-control" id="productPurchasePrice" min="0" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="productSalePrice" class="form-label">Precio de Venta (Bs.) *</label>
+                                <input type="number" step="0.01" class="desktop-form-control" id="productSalePrice" min="0" required>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="productStock" class="form-label">Stock Inicial *</label>
+                                <input type="number" class="desktop-form-control" id="productStock" min="0" value="0" required>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="productMinimumStock" class="form-label">Stock Mínimo</label>
+                                <input type="number" class="desktop-form-control" id="productMinimumStock" min="0" value="5">
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="productExpirationDate" class="form-label">Fecha de Vencimiento</label>
+                                <input type="date" class="desktop-form-control" id="productExpirationDate">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="productSucursal" class="form-label">Sucursal</label>
+                                <input type="text" class="desktop-form-control" id="productSucursal" readonly value="Cargando...">
+                                <small class="text-muted">El producto se agregará a esta sucursal</small>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label for="productDescription" class="form-label">Descripción</label>
+                            <textarea class="desktop-form-control" id="productDescription" rows="2"></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="desktop-btn desktop-btn-danger" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="desktop-btn desktop-btn-primary" id="saveProductBtn">
+                        Guardar Producto
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Transferir Stock -->
+    <div class="modal fade desktop-modal" id="transferModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Transferir Stock entre Sucursales</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="transferForm">
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="transferFrom" class="form-label">Desde Sucursal *</label>
+                                <select class="desktop-form-control" id="transferFrom" required>
+                                    <option value="">Seleccionar sucursal origen</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="transferTo" class="form-label">Hacia Sucursal *</label>
+                                <select class="desktop-form-control" id="transferTo" required>
+                                    <option value="">Seleccionar sucursal destino</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="transferProduct" class="form-label">Producto *</label>
+                                <select class="desktop-form-control" id="transferProduct" required>
+                                    <option value="">Seleccionar producto</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="transferQuantity" class="form-label">Cantidad a Transferir *</label>
+                                <input type="number" class="desktop-form-control" id="transferQuantity" min="1" required>
+                                <small class="text-muted" id="availableStock">Stock disponible: 0</small>
+                            </div>
+                        </div>
+                        <div class="mb-2">
+                            <label for="transferNotes" class="form-label">Notas (Opcional)</label>
+                            <textarea class="desktop-form-control" id="transferNotes" rows="2" placeholder="Motivo de la transferencia..."></textarea>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="desktop-btn desktop-btn-danger" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="desktop-btn desktop-btn-primary" id="saveTransferBtn">
+                        Transferir Stock
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal para Agregar/Editar Sucursal -->
+    <div class="modal fade desktop-modal" id="branchModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="branchModalLabel">Agregar Sucursal</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="branchForm">
+                        <input type="hidden" id="branchId">
+                        <div class="mb-2">
+                            <label for="branchName" class="form-label">Nombre de la Sucursal *</label>
+                            <input type="text" class="desktop-form-control" id="branchName" required>
+                        </div>
+                        <div class="mb-2">
+                            <label for="branchAddress" class="form-label">Dirección</label>
+                            <textarea class="desktop-form-control" id="branchAddress" rows="2"></textarea>
+                        </div>
+                        <div class="row g-2">
+                            <div class="col-md-6 mb-2">
+                                <label for="branchPhone" class="form-label">Teléfono</label>
+                                <input type="text" class="desktop-form-control" id="branchPhone">
+                            </div>
+                            <div class="col-md-6 mb-2">
+                                <label for="branchEmail" class="form-label">Email</label>
+                                <input type="email" class="desktop-form-control" id="branchEmail">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="desktop-btn desktop-btn-danger" data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+                    <button type="button" class="desktop-btn desktop-btn-primary" id="saveBranchBtn">
+                        Guardar Sucursal
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        // Configuración de Supabase
+        const SUPABASE_URL = 'https://iyowgljzuryeowyceaio.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_xr2MZ4YwV7zslfp9Wzs2WQ_aSfFX_87';
+
+        // Variables globales
+        let currentBranch = null;
+        let allProducts = [];
+        let allSales = [];
+        let allUsers = [];
+        let allBranches = [];
+        let branchInventory = [];
+        let inventoryStatusChart = null;
+        let expirationChart = null;
+
+        // Mapa para almacenar usuarios por ID para búsquedas rápidas
+        let usersMap = new Map();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeAdminApp();
+        });
+
+        function initializeAdminApp() {
+            // Cargar sucursales primero
+            loadBranches().then(() => {
+                // Configurar selector de sucursal
+                const branchSelector = document.getElementById('branchSelector');
+                branchSelector.addEventListener('change', function() {
+                    const branchId = this.value;
+                    if (branchId) {
+                        changeBranch(branchId);
+                    }
+                });
+
+                // Configurar navegación del sidebar
+                document.querySelectorAll('.menu-item').forEach(item => {
+                    item.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const section = this.getAttribute('data-section');
+                        showSection(section);
+                        
+                        // Actualizar clase activa
+                        document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Actualizar título de página
+                        document.getElementById('pageTitle').textContent = 
+                            this.querySelector('span').textContent;
+                    });
+                });
+
+                // Configurar eventos de botones
+                document.getElementById('addProductBtn').addEventListener('click', showAddProductModal);
+                document.getElementById('saveProductBtn').addEventListener('click', saveProduct);
+                document.getElementById('transferStockBtn').addEventListener('click', showTransferModal);
+                document.getElementById('saveTransferBtn').addEventListener('click', saveTransfer);
+                document.getElementById('addBranchBtn').addEventListener('click', showAddBranchModal);
+                document.getElementById('saveBranchBtn').addEventListener('click', saveBranch);
+                document.getElementById('refreshBtn').addEventListener('click', refreshData);
+                document.getElementById('logoutBtn').addEventListener('click', handleLogout);
+                document.getElementById('productSearch').addEventListener('input', searchProducts);
+                document.getElementById('globalSearch').addEventListener('input', globalSearch);
+
+                // Configurar eventos de transferencia
+                document.getElementById('transferFrom').addEventListener('change', updateTransferProductList);
+                document.getElementById('transferProduct').addEventListener('change', updateAvailableStock);
+
+                // Configurar eventos del modal de balance
+                document.getElementById('showBalanceBtn').addEventListener('click', showBalanceModal);
+                document.getElementById('closeBalanceModal').addEventListener('click', hideBalanceModal);
+                document.getElementById('cancelBalanceBtn').addEventListener('click', hideBalanceModal);
+                document.getElementById('balanceOverlay').addEventListener('click', hideBalanceModal);
+                document.getElementById('balanceUserSelect').addEventListener('change', updateBalanceInfo);
+                document.getElementById('deliverBalanceBtn').addEventListener('click', deliverBalance);
+
+                // Cargar datos iniciales (usando la primera sucursal por defecto)
+                if (allBranches.length > 0) {
+                    const firstBranch = allBranches[0];
+                    branchSelector.value = firstBranch.id;
+                    changeBranch(firstBranch.id);
+                }
+            });
+        }
+
+        async function loadBranches() {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branches?order=name.asc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Error al cargar sucursales');
+                allBranches = await response.json();
+                
+                // Actualizar selector de sucursal
+                const branchSelector = document.getElementById('branchSelector');
+                branchSelector.innerHTML = '';
+                
+                allBranches.forEach(branch => {
+                    const option = document.createElement('option');
+                    option.value = branch.id;
+                    option.textContent = branch.name;
+                    branchSelector.appendChild(option);
+                });
+                
+            } catch (error) {
+                console.error('Error al cargar sucursales:', error);
+                showNotification('Error al cargar sucursales', 'error');
+            }
+        }
+
+        async function changeBranch(branchId) {
+            currentBranch = allBranches.find(b => b.id == branchId);
+            
+            if (!currentBranch) {
+                showNotification('Sucursal no encontrada', 'error');
+                return;
+            }
+            
+            // Actualizar UI
+            document.getElementById('currentBranch').innerHTML = `
+                <i class="bi bi-shop"></i>
+                <span>${currentBranch.name}</span>
+            `;
+            
+            // Actualizar títulos en todas las secciones
+            document.getElementById('branchInventoryTitle').textContent = currentBranch.name;
+            document.getElementById('salesBranchTitle').textContent = currentBranch.name;
+            
+            // Cargar datos de la sucursal
+            await loadBranchData();
+        }
+
+        async function loadBranchData() {
+            if (!currentBranch) return;
+            
+            try {
+                // Cargar inventario de la sucursal
+                const inventoryResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&select=*,products(*)`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!inventoryResponse.ok) throw new Error('Error al cargar inventario');
+                branchInventory = await inventoryResponse.json();
+                
+                // Cargar productos (solo los que están en esta sucursal)
+                const productIds = branchInventory.map(item => item.product_id);
+                if (productIds.length > 0) {
+                    const productsResponse = await fetch(
+                        `${SUPABASE_URL}/rest/v1/products?id=in.(${productIds.join(',')})&order=name.asc`,
+                        {
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`
+                            }
+                        }
+                    );
+                    
+                    if (!productsResponse.ok) throw new Error('Error al cargar productos');
+                    allProducts = await productsResponse.json();
+                } else {
+                    allProducts = [];
+                }
+                
+                // Cargar ventas de la sucursal
+                const salesResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/sales?branch_id=eq.${currentBranch.id}&order=fecha_hora.desc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!salesResponse.ok) throw new Error('Error al cargar ventas');
+                allSales = await salesResponse.json();
+                
+                // Cargar TODOS los usuarios (no solo de esta sucursal) para poder relacionar con ventas
+                const usersResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/users?order=nombre.asc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!usersResponse.ok) throw new Error('Error al cargar usuarios');
+                allUsers = await usersResponse.json();
+                
+                // Crear mapa de usuarios para búsquedas rápidas
+                usersMap.clear();
+                allUsers.forEach(user => {
+                    usersMap.set(user.id, user);
+                });
+                
+                // Cargar usuarios de esta sucursal específicamente (para filtros)
+                const branchUsersResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/users?branch_id=eq.${currentBranch.id}&order=nombre.asc`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                let branchUsers = [];
+                if (branchUsersResponse.ok) {
+                    branchUsers = await branchUsersResponse.json();
+                }
+                
+                // Actualizar todas las vistas
+                updateDashboard();
+                displayProducts();
+                displaySales(allSales);
+                populateFilters(branchUsers);
+                
+            } catch (error) {
+                console.error('Error al cargar datos de sucursal:', error);
+                showNotification('Error al cargar datos', 'error');
+            }
+        }
+
+        function updateDashboard() {
+            if (!currentBranch) return;
+            
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                minimum_stock: item.minimum_stock,
+                expiration_date: item.products.expiration_date
+            }));
+            
+            // Estadísticas básicas
+            document.getElementById('totalProducts').textContent = branchProducts.length;
+            
+            const lowStock = branchProducts.filter(p => p.stock <= p.minimum_stock && p.stock > 0).length;
+            document.getElementById('lowStockProducts').textContent = lowStock;
+            
+            const outOfStock = branchProducts.filter(p => p.stock === 0).length;
+            document.getElementById('outOfStockProducts').textContent = outOfStock;
+            
+            const totalValue = branchProducts.reduce((sum, p) => sum + (p.stock * p.purchase_price), 0);
+            document.getElementById('totalValue').textContent = `Bs. ${totalValue.toFixed(2)}`;
+            
+            // Estadísticas de vencimientos
+            const today = new Date();
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(today.getDate() + 7);
+            
+            let expiredCount = 0;
+            let expiringCount = 0;
+            
+            branchProducts.forEach(product => {
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    if (expDate < today) {
+                        expiredCount++;
+                    } else if (expDate <= sevenDaysFromNow) {
+                        expiringCount++;
+                    }
+                }
+            });
+            
+            document.getElementById('expiredProducts').textContent = expiredCount;
+            document.getElementById('expiringProducts').textContent = expiringCount;
+            document.getElementById('expiredCount').textContent = `${expiredCount} vencidos`;
+            document.getElementById('expiringCount').textContent = `${expiringCount} por vencer`;
+            
+            // Productos con stock bajo
+            updateLowStockTable();
+            
+            // Productos vencidos y por vencer
+            updateExpirationTable();
+            
+            // Últimas ventas
+            updateRecentSalesTable();
+            
+            // Actualizar gráficos
+            updateCharts();
+        }
+
+        function updateCharts() {
+            createInventoryStatusChart();
+            createExpirationChart();
+        }
+
+        function createInventoryStatusChart() {
+            const ctx = document.getElementById('inventoryStatusChart').getContext('2d');
+            
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                minimum_stock: item.minimum_stock
+            }));
+            
+            // Contar productos por estado
+            const normalStock = branchProducts.filter(p => p.stock > p.minimum_stock).length;
+            const lowStock = branchProducts.filter(p => p.stock <= p.minimum_stock && p.stock > 0).length;
+            const outOfStock = branchProducts.filter(p => p.stock === 0).length;
+            
+            if (inventoryStatusChart) {
+                inventoryStatusChart.destroy();
+            }
+            
+            inventoryStatusChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Stock Normal', 'Stock Bajo', 'Agotado'],
+                    datasets: [{
+                        data: [normalStock, lowStock, outOfStock],
+                        backgroundColor: [
+                            '#28a745', // Verde para stock normal
+                            '#ffc107', // Amarillo para stock bajo
+                            '#dc3545'  // Rojo para agotado
+                        ],
+                        borderWidth: 1,
+                        borderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estado del Inventario - ' + currentBranch.name,
+                            font: {
+                                size: 14
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const label = context.label || '';
+                                    const value = context.raw || 0;
+                                    const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                    const percentage = Math.round((value / total) * 100);
+                                    return `${label}: ${value} productos (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function createExpirationChart() {
+            const ctx = document.getElementById('expirationChart').getContext('2d');
+            
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                expiration_date: item.products.expiration_date
+            }));
+            
+            // Filtrar productos con fecha de vencimiento
+            const productsWithExpiration = branchProducts.filter(p => p.expiration_date);
+            
+            // Contar por categoría de vencimiento
+            const today = new Date();
+            const sevenDaysFromNow = new Date();
+            sevenDaysFromNow.setDate(today.getDate() + 7);
+            const thirtyDaysFromNow = new Date();
+            thirtyDaysFromNow.setDate(today.getDate() + 30);
+            
+            let expired = 0;
+            let expiringIn7Days = 0;
+            let expiringIn30Days = 0;
+            let expiringAfter30Days = 0;
+            let noExpirationDate = branchProducts.length - productsWithExpiration.length;
+            
+            productsWithExpiration.forEach(product => {
+                const expDate = new Date(product.expiration_date);
+                if (expDate < today) {
+                    expired++;
+                } else if (expDate <= sevenDaysFromNow) {
+                    expiringIn7Days++;
+                } else if (expDate <= thirtyDaysFromNow) {
+                    expiringIn30Days++;
+                } else {
+                    expiringAfter30Days++;
+                }
+            });
+            
+            if (expirationChart) {
+                expirationChart.destroy();
+            }
+            
+            expirationChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Vencidos', 'Vence en 7 días', 'Vence en 30 días', 'Vence después', 'Sin fecha'],
+                    datasets: [{
+                        label: 'Cantidad de Productos',
+                        data: [expired, expiringIn7Days, expiringIn30Days, expiringAfter30Days, noExpirationDate],
+                        backgroundColor: [
+                            '#dc3545', // Rojo para vencidos
+                            '#ffc107', // Amarillo para vence en 7 días
+                            '#17a2b8', // Azul para vence en 30 días
+                            '#28a745', // Verde para vence después
+                            '#6c757d'  // Gris para sin fecha
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        title: {
+                            display: true,
+                            text: 'Productos por Estado de Vencimiento - ' + currentBranch.name,
+                            font: {
+                                size: 14
+                            }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    return `${context.dataset.label}: ${context.raw} productos`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Cantidad'
+                            }
+                        },
+                        x: {
+                            ticks: {
+                                maxRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        function updateLowStockTable() {
+            const tbody = document.getElementById('lowStockTable');
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                minimum_stock: item.minimum_stock,
+                expiration_date: item.products.expiration_date
+            }));
+            
+            const lowStockProducts = branchProducts.filter(p => p.stock <= p.minimum_stock);
+            
+            document.getElementById('lowStockCount').textContent = `${lowStockProducts.length} productos`;
+            
+            tbody.innerHTML = lowStockProducts.map(product => {
+                let statusClass = 'status-activo';
+                let statusText = 'Normal';
+                
+                if (product.stock === 0) {
+                    statusClass = 'status-agotado';
+                    statusText = 'Agotado';
+                } else if (product.stock <= product.minimum_stock) {
+                    statusClass = 'status-bajo';
+                    statusText = 'Stock Bajo';
+                }
+                
+                // Información de vencimiento
+                let expirationInfo = 'Sin fecha';
+                let expirationClass = '';
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    const today = new Date();
+                    const daysDiff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                    
+                    expirationInfo = expDate.toLocaleDateString('es-ES');
+                    
+                    if (expDate < today) {
+                        expirationClass = 'text-danger fw-bold';
+                        expirationInfo += ` (Vencido hace ${Math.abs(daysDiff)} días)`;
+                    } else if (daysDiff <= 7) {
+                        expirationClass = 'text-warning fw-bold';
+                        expirationInfo += ` (Vence en ${daysDiff} días)`;
+                    }
+                }
+                
+                return `
+                <tr onclick="editProduct(${product.id})" style="cursor: pointer;">
+                    <td>${product.id}</td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        <br><small class="text-muted">${product.code}</small>
+                    </td>
+                    <td class="fw-bold ${product.stock <= product.minimum_stock ? 'text-warning' : ''}">
+                        ${product.stock}
+                    </td>
+                    <td>${product.minimum_stock}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td class="${expirationClass}">${expirationInfo}</td>
+                </tr>
+                `;
+            }).join('');
+            
+            if (lowStockProducts.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-check-circle"></i>
+                            </div>
+                            <div class="empty-state-text">¡Excelente! Todo el stock está en niveles normales</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }
+        }
+
+        function updateExpirationTable() {
+            const tbody = document.getElementById('expirationTable');
+            const branchProducts = branchInventory.map(item => ({
+                ...item.products,
+                stock: item.stock,
+                expiration_date: item.products.expiration_date
+            }));
+            
+            // Filtrar productos con fecha de vencimiento
+            const productsWithExpiration = branchProducts.filter(p => p.expiration_date);
+            
+            // Ordenar por fecha de vencimiento (más cercanos primero)
+            productsWithExpiration.sort((a, b) => {
+                const dateA = new Date(a.expiration_date);
+                const dateB = new Date(b.expiration_date);
+                return dateA - dateB;
+            });
+            
+            // Limitar a 20 productos para no saturar la vista
+            const displayProducts = productsWithExpiration.slice(0, 20);
+            
+            const today = new Date();
+            
+            tbody.innerHTML = displayProducts.map(product => {
+                const expDate = new Date(product.expiration_date);
+                const daysDiff = Math.ceil((expDate - today) / (1000 * 60 * 60 * 24));
+                
+                let statusClass = 'status-normal';
+                let statusText = 'Normal';
+                let daysText = `${daysDiff} días`;
+                
+                if (expDate < today) {
+                    statusClass = 'status-vencido';
+                    statusText = 'Vencido';
+                    daysText = `Hace ${Math.abs(daysDiff)} días`;
+                } else if (daysDiff <= 7) {
+                    statusClass = 'status-por-vencer';
+                    statusText = 'Por Vencer';
+                }
+                
+                return `
+                <tr onclick="editProduct(${product.id})" style="cursor: pointer;">
+                    <td>${product.id}</td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        <br><small class="text-muted">${product.code}</small>
+                    </td>
+                    <td>${product.stock}</td>
+                    <td class="money">${product.sale_price.toFixed(2)}</td>
+                    <td>${expDate.toLocaleDateString('es-ES')}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td class="${expDate < today ? 'text-danger' : daysDiff <= 7 ? 'text-warning' : ''}">
+                        ${daysText}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+            
+            if (productsWithExpiration.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="7" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-calendar-check"></i>
+                            </div>
+                            <div class="empty-state-text">No hay productos con fecha de vencimiento</div>
+                            <div class="empty-state-subtext">Todos los productos están sin fecha de vencimiento registrada</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }
+        }
+
+        function updateRecentSalesTable() {
+            const tbody = document.getElementById('recentSalesTable');
+            const recentSales = allSales.slice(0, 10);
+            
+            tbody.innerHTML = recentSales.map(sale => {
+                // Buscar vendedor en el mapa de usuarios usando user_id
+                const seller = usersMap.get(sale.user_id);
+                const sellerName = seller ? seller.nombre : `Usuario ${sale.user_id}`;
+                const sellerDetails = seller ? `${seller.nombre} (${seller.username || 'Sin usuario'})` : `ID: ${sale.user_id}`;
+                
+                // Parsear productos
+                let total = 0;
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        total = products.reduce((sum, p) => sum + p.subtotal, 0);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+                
+                // Formatear fecha
+                const fechaHora = sale.fecha_hora || sale.created_at || new Date().toLocaleString('es-ES');
+                
+                return `
+                <tr>
+                    <td>#${sale.id}</td>
+                    <td title="${sellerDetails}">${sellerName}</td>
+                    <td class="money">${total.toFixed(2)}</td>
+                    <td>${fechaHora}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function displayProducts() {
+            const tbody = document.getElementById('productsTable');
+            
+            if (branchInventory.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-box"></i>
+                            </div>
+                            <div class="empty-state-text">No hay productos en esta sucursal</div>
+                            <div class="empty-state-subtext">Agrega productos usando el botón "Agregar Producto"</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = branchInventory.map(inventoryItem => {
+                const product = inventoryItem.products;
+                const stock = inventoryItem.stock;
+                const minimumStock = inventoryItem.minimum_stock;
+                
+                // Determinar estado del stock
+                let statusClass = 'status-activo';
+                let statusText = 'Disponible';
+                
+                if (stock === 0) {
+                    statusClass = 'status-agotado';
+                    statusText = 'Agotado';
+                } else if (stock <= minimumStock) {
+                    statusClass = 'status-bajo';
+                    statusText = 'Stock Bajo';
+                }
+                
+                // Formatear fecha de vencimiento
+                let expirationDisplay = 'Sin fecha';
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    expirationDisplay = expDate.toLocaleDateString('es-ES');
+                    
+                    // Marcar si está próximo a vencer o vencido
+                    const today = new Date();
+                    if (expDate < today) {
+                        expirationDisplay = `<span class="text-danger fw-bold">${expirationDisplay} (Vencido)</span>`;
+                    } else if (expDate < new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+                        expirationDisplay = `<span class="text-warning fw-bold">${expirationDisplay} (Próximo)</span>`;
+                    }
+                }
+                
+                return `
+                <tr>
+                    <td>${product.id}</td>
+                    <td><code>${product.code}</code></td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        ${product.description ? `<br><small class="text-muted">${product.description}</small>` : ''}
+                    </td>
+                    <td class="fw-bold ${stock <= minimumStock ? 'text-warning' : ''}">
+                        ${stock}
+                    </td>
+                    <td class="money">${product.purchase_price.toFixed(2)}</td>
+                    <td class="money">${product.sale_price.toFixed(2)}</td>
+                    <td>${expirationDisplay}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editProduct(${product.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="editProductStock(${product.id})">
+                                <i class="bi bi-box-arrow-in-down"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteProductFromBranch(${product.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function displaySales(sales) {
+            const tbody = document.getElementById('salesTable');
+            
+            if (sales.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="6" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-cash-stack"></i>
+                            </div>
+                            <div class="empty-state-text">No hay ventas registradas</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = sales.map(sale => {
+                // Buscar vendedor en el mapa de usuarios usando user_id
+                const seller = usersMap.get(sale.user_id);
+                const sellerName = seller ? seller.nombre : `Usuario ${sale.user_id}`;
+                const sellerUsername = seller ? seller.username : 'Sin usuario';
+                const sellerRole = seller ? seller.rol : 'Desconocido';
+                
+                // Parsear productos vendidos
+                let productsList = 'No hay productos';
+                let totalAmount = 0;
+                let totalQuantity = 0;
+                
+                try {
+                    if (sale.products) {
+                        const products = JSON.parse(sale.products);
+                        productsList = products.map(p => 
+                            `${p.quantity}x ${p.name}`
+                        ).join(', ');
+                        totalAmount = products.reduce((sum, p) => sum + p.subtotal, 0);
+                        totalQuantity = products.reduce((sum, p) => sum + p.quantity, 0);
+                    }
+                } catch (e) {
+                    console.error('Error parsing sale:', e);
+                }
+                
+                // Formatear fecha
+                const fechaHora = sale.fecha_hora || sale.created_at || new Date().toLocaleString('es-ES');
+                
+                return `
+                <tr>
+                    <td>#${sale.id}</td>
+                    <td>
+                        <strong>${sellerName}</strong>
+                        <br><small class="text-muted">Usuario: ${sellerUsername} | Rol: ${sellerRole}</small>
+                    </td>
+                    <td>${productsList}</td>
+                    <td>${totalQuantity}</td>
+                    <td class="money fw-bold">${totalAmount.toFixed(2)}</td>
+                    <td>${fechaHora}</td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function populateFilters(branchUsers) {
+            // Filtro de usuarios en ventas
+            const userFilter = document.getElementById('salesUserFilter');
+            userFilter.innerHTML = '<option value="">Todos los vendedores</option>';
+            
+            // Usar branchUsers (usuarios de esta sucursal) para el filtro
+            branchUsers.forEach(user => {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = user.nombre;
+                userFilter.appendChild(option);
+            });
+            
+            // Si no hay usuarios en esta sucursal, mostrar usuarios generales
+            if (branchUsers.length === 0) {
+                allUsers.forEach(user => {
+                    const option = document.createElement('option');
+                    option.value = user.id;
+                    option.textContent = user.nombre;
+                    userFilter.appendChild(option);
+                });
+            }
+        }
+
+        function filterSales() {
+            const dateFilter = document.getElementById('salesDateFilter').value;
+            const userFilter = document.getElementById('salesUserFilter').value;
+            
+            let filtered = allSales;
+            
+            // Filtrar por fecha
+            if (dateFilter) {
+                filtered = filtered.filter(sale => {
+                    if (!sale.fecha_hora) return false;
+                    
+                    // Extraer fecha de fecha_hora usando función mejorada
+                    const saleDateStr = extractDateFromFechaHora(sale.fecha_hora);
+                    if (!saleDateStr) return false;
+                    
+                    // Comparar fechas
+                    return saleDateStr === dateFilter;
+                });
+            }
+            
+            // Filtrar por usuario
+            if (userFilter) {
+                filtered = filtered.filter(sale => sale.user_id == userFilter);
+            }
+            
+            // Mostrar resultados
+            if (filtered.length === 0) {
+                let message = 'No hay ventas que coincidan con los filtros.';
+                if (dateFilter || userFilter) {
+                    message += '<br><small class="text-muted">';
+                    if (dateFilter) message += `Fecha: ${dateFilter} `;
+                    if (userFilter) {
+                        const user = usersMap.get(parseInt(userFilter));
+                        message += `Vendedor: ${user ? user.nombre : userFilter}`;
+                    }
+                    message += '</small>';
+                }
+                
+                displaySales(filtered);
+                showNotification(message, 'info');
+            } else {
+                displaySales(filtered);
+                showNotification(`Se encontraron ${filtered.length} ventas`, 'success');
+            }
+        }
+
+        function extractDateFromFechaHora(fechaHora) {
+            if (!fechaHora) return null;
+            
+            try {
+                // Intentar diferentes formatos de fecha
+                let dateObj;
+                
+                // Si ya está en formato ISO (YYYY-MM-DD)
+                if (fechaHora.includes('T') || fechaHora.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    dateObj = new Date(fechaHora);
+                } 
+                // Si está en formato DD/MM/YYYY HH:MM:SS
+                else if (fechaHora.includes('/')) {
+                    const parts = fechaHora.split(' ');
+                    const dateParts = parts[0].split('/');
+                    if (dateParts.length === 3) {
+                        dateObj = new Date(`${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`);
+                    }
+                }
+                // Si está en formato YYYY-MM-DD HH:MM:SS
+                else if (fechaHora.includes('-') && fechaHora.includes(':')) {
+                    dateObj = new Date(fechaHora.split(' ')[0]);
+                }
+                
+                if (dateObj && !isNaN(dateObj.getTime())) {
+                    // Formatear a YYYY-MM-DD
+                    const year = dateObj.getFullYear();
+                    const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                    const day = String(dateObj.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
+                }
+                
+                return null;
+            } catch (e) {
+                console.error('Error parsing fecha_hora:', fechaHora, e);
+                return null;
+            }
+        }
+
+        // FUNCIÓN PARA MOSTRAR MODAL DE BALANCE
+        function showBalanceModal() {
+            const modal = document.getElementById('balanceModal');
+            const overlay = document.getElementById('balanceOverlay');
+            const userSelect = document.getElementById('balanceUserSelect');
+            
+            // Limpiar y llenar selector de usuarios
+            userSelect.innerHTML = '<option value="">Seleccionar vendedor...</option>';
+            
+            // Obtener usuarios únicos que tienen ventas en esta sucursal
+            const usersWithSales = new Set();
+            allSales.forEach(sale => {
+                if (sale.user_id) {
+                    usersWithSales.add(sale.user_id);
+                }
+            });
+            
+            // Agregar usuarios al selector
+            Array.from(usersWithSales).forEach(userId => {
+                const user = usersMap.get(userId);
+                if (user) {
+                    const option = document.createElement('option');
+                    option.value = userId;
+                    option.textContent = `${user.nombre} (${user.username || 'Sin usuario'})`;
+                    userSelect.appendChild(option);
+                }
+            });
+            
+            // Si no hay usuarios con ventas
+            if (usersWithSales.size === 0) {
+                userSelect.innerHTML = '<option value="">No hay vendedores con ventas</option>';
+            }
+            
+            // Resetear información
+            document.getElementById('balanceUserName').textContent = 'Seleccionar Vendedor';
+            document.getElementById('balanceUserDetails').textContent = 'Usuario: --- | Rol: ---';
+            document.getElementById('balanceAmount').textContent = 'Bs. 0.00';
+            document.getElementById('deliverBalanceBtn').disabled = true;
+            
+            // Mostrar modal
+            modal.classList.add('show');
+            overlay.classList.add('show');
+        }
+
+        // FUNCIÓN PARA OCULTAR MODAL DE BALANCE
+        function hideBalanceModal() {
+            const modal = document.getElementById('balanceModal');
+            const overlay = document.getElementById('balanceOverlay');
+            
+            modal.classList.remove('show');
+            overlay.classList.remove('show');
+        }
+
+        // FUNCIÓN PARA ACTUALIZAR INFORMACIÓN DEL BALANCE
+        function updateBalanceInfo() {
+            const userId = document.getElementById('balanceUserSelect').value;
+            const deliverBtn = document.getElementById('deliverBalanceBtn');
+            
+            if (!userId) {
+                document.getElementById('balanceUserName').textContent = 'Seleccionar Vendedor';
+                document.getElementById('balanceUserDetails').textContent = 'Usuario: --- | Rol: ---';
+                document.getElementById('balanceAmount').textContent = 'Bs. 0.00';
+                deliverBtn.disabled = true;
+                return;
+            }
+            
+            // Obtener información del usuario
+            const user = usersMap.get(parseInt(userId));
+            if (!user) {
+                showNotification('Usuario no encontrado', 'error');
+                return;
+            }
+            
+            // Calcular balance total (suma de todas las ventas)
+            let totalBalance = 0;
+            allSales.forEach(sale => {
+                if (sale.user_id == userId) {
+                    try {
+                        if (sale.products) {
+                            const products = JSON.parse(sale.products);
+                            totalBalance += products.reduce((sum, p) => sum + p.subtotal, 0);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing sale:', e);
+                    }
+                }
+            });
+            
+            // Actualizar información en el modal
+            document.getElementById('balanceUserName').textContent = user.nombre;
+            document.getElementById('balanceUserDetails').textContent = `Usuario: ${user.username || 'Sin usuario'} | Rol: ${user.rol || 'Desconocido'}`;
+            document.getElementById('balanceAmount').textContent = `Bs. ${totalBalance.toFixed(2)}`;
+            
+            // Habilitar botón de entregar si hay balance
+            deliverBtn.disabled = totalBalance === 0;
+        }
+
+        // FUNCIÓN PARA ENTREGAR BALANCE Y BORRAR HISTORIAL
+        async function deliverBalance() {
+            const userId = document.getElementById('balanceUserSelect').value;
+            
+            if (!userId) {
+                showNotification('Seleccione un vendedor primero', 'error');
+                return;
+            }
+            
+            // Obtener información del usuario
+            const user = usersMap.get(parseInt(userId));
+            if (!user) {
+                showNotification('Usuario no encontrado', 'error');
+                return;
+            }
+            
+            // Calcular balance total para mostrar en confirmación
+            let totalBalance = 0;
+            let salesToDelete = [];
+            
+            allSales.forEach(sale => {
+                if (sale.user_id == userId) {
+                    salesToDelete.push(sale.id);
+                    try {
+                        if (sale.products) {
+                            const products = JSON.parse(sale.products);
+                            totalBalance += products.reduce((sum, p) => sum + p.subtotal, 0);
+                        }
+                    } catch (e) {
+                        console.error('Error parsing sale:', e);
+                    }
+                }
+            });
+            
+            if (totalBalance === 0) {
+                showNotification('El vendedor no tiene balance pendiente', 'info');
+                return;
+            }
+            
+            // Confirmar entrega
+            if (!confirm(`¿Está seguro de entregar el balance de ${user.nombre}?\n\nTotal a entregar: Bs. ${totalBalance.toFixed(2)}\n\nEsta acción eliminará el historial de ventas de este vendedor.`)) {
+                return;
+            }
+            
+            try {
+                // Eliminar ventas del vendedor (una por una)
+                let deleteCount = 0;
+                for (const saleId of salesToDelete) {
+                    const response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/sales?id=eq.${saleId}`,
+                        {
+                            method: 'DELETE',
+                            headers: {
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            }
+                        }
+                    );
+                    
+                    if (response.ok) {
+                        deleteCount++;
+                    }
+                }
+                
+                // Actualizar datos locales
+                allSales = allSales.filter(sale => sale.user_id != userId);
+                
+                // Actualizar vista
+                displaySales(allSales);
+                updateRecentSalesTable();
+                
+                // Cerrar modal
+                hideBalanceModal();
+                
+                // Mostrar notificación
+                showNotification(`Balance entregado exitosamente. Se eliminaron ${deleteCount} ventas de ${user.nombre}. Total: Bs. ${totalBalance.toFixed(2)}`, 'success');
+                
+            } catch (error) {
+                console.error('Error al entregar balance:', error);
+                showNotification('Error al entregar balance', 'error');
+            }
+        }
+
+        function searchProducts() {
+            const searchTerm = document.getElementById('productSearch').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                displayProducts();
+                return;
+            }
+
+            const filtered = branchInventory.filter(inventoryItem => {
+                const product = inventoryItem.products;
+                return (
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.code.toLowerCase().includes(searchTerm) ||
+                    (product.description && product.description.toLowerCase().includes(searchTerm))
+                );
+            });
+
+            // Mostrar productos filtrados
+            const tbody = document.getElementById('productsTable');
+            
+            if (filtered.length === 0) {
+                tbody.innerHTML = `
+                <tr>
+                    <td colspan="9" class="text-center py-4">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">
+                                <i class="bi bi-search"></i>
+                            </div>
+                            <div class="empty-state-text">No se encontraron productos</div>
+                            <div class="empty-state-subtext">Intenta con otros términos de búsqueda</div>
+                        </div>
+                    </td>
+                </tr>
+                `;
+                return;
+            }
+            
+            tbody.innerHTML = filtered.map(inventoryItem => {
+                const product = inventoryItem.products;
+                const stock = inventoryItem.stock;
+                const minimumStock = inventoryItem.minimum_stock;
+                
+                // Determinar estado del stock
+                let statusClass = 'status-activo';
+                let statusText = 'Disponible';
+                
+                if (stock === 0) {
+                    statusClass = 'status-agotado';
+                    statusText = 'Agotado';
+                } else if (stock <= minimumStock) {
+                    statusClass = 'status-bajo';
+                    statusText = 'Stock Bajo';
+                }
+                
+                // Formatear fecha de vencimiento
+                let expirationDisplay = 'Sin fecha';
+                if (product.expiration_date) {
+                    const expDate = new Date(product.expiration_date);
+                    expirationDisplay = expDate.toLocaleDateString('es-ES');
+                    
+                    const today = new Date();
+                    if (expDate < today) {
+                        expirationDisplay = `<span class="text-danger fw-bold">${expirationDisplay} (Vencido)</span>`;
+                    } else if (expDate < new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000)) {
+                        expirationDisplay = `<span class="text-warning fw-bold">${expirationDisplay} (Próximo)</span>`;
+                    }
+                }
+                
+                return `
+                <tr>
+                    <td>${product.id}</td>
+                    <td><code>${product.code}</code></td>
+                    <td>
+                        <strong>${product.name}</strong>
+                        ${product.description ? `<br><small class="text-muted">${product.description}</small>` : ''}
+                    </td>
+                    <td class="fw-bold ${stock <= minimumStock ? 'text-warning' : ''}">
+                        ${stock}
+                    </td>
+                    <td class="money">${product.purchase_price.toFixed(2)}</td>
+                    <td class="money">${product.sale_price.toFixed(2)}</td>
+                    <td>${expirationDisplay}</td>
+                    <td>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editProduct(${product.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-warning" onclick="editProductStock(${product.id})">
+                                <i class="bi bi-box-arrow-in-down"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteProductFromBranch(${product.id})">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddProductModal() {
+            if (!currentBranch) {
+                showNotification('Por favor seleccione una sucursal primero', 'error');
+                return;
+            }
+            
+            document.getElementById('productModalLabel').textContent = 'Agregar Producto';
+            document.getElementById('productForm').reset();
+            document.getElementById('productId').value = '';
+            document.getElementById('productSucursal').value = currentBranch.name;
+            document.getElementById('productStock').value = 0;
+            document.getElementById('productMinimumStock').value = 5;
+            
+            const modal = new bootstrap.Modal(document.getElementById('productModal'));
+            modal.show();
+        }
+
+        async function saveProduct() {
+            if (!currentBranch) {
+                showNotification('No hay una sucursal seleccionada', 'error');
+                return;
+            }
+            
+            const productId = document.getElementById('productId').value;
+            const code = document.getElementById('productCode').value.trim();
+            const name = document.getElementById('productName').value.trim();
+            const purchasePrice = parseFloat(document.getElementById('productPurchasePrice').value);
+            const salePrice = parseFloat(document.getElementById('productSalePrice').value);
+            const stock = parseInt(document.getElementById('productStock').value);
+            const minimumStock = parseInt(document.getElementById('productMinimumStock').value);
+            const expirationDate = document.getElementById('productExpirationDate').value;
+            const description = document.getElementById('productDescription').value.trim();
+
+            // Validaciones
+            if (!code || !name || isNaN(purchasePrice) || isNaN(salePrice) || isNaN(stock)) {
+                showNotification('Por favor complete todos los campos requeridos', 'error');
+                return;
+            }
+
+            if (purchasePrice < 0 || salePrice < 0 || stock < 0) {
+                showNotification('Los valores no pueden ser negativos', 'error');
+                return;
+            }
+
+            if (salePrice < purchasePrice) {
+                showNotification('El precio de venta no puede ser menor al precio de compra', 'error');
+                return;
+            }
+
+            try {
+                // Obtener fecha y hora local para updated_at
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                const productData = {
+                    code: code,
+                    name: name,
+                    purchase_price: purchasePrice,
+                    sale_price: salePrice,
+                    expiration_date: expirationDate || null,
+                    description: description,
+                    updated_at: fechaHoraLocal
+                };
+
+                let newProductId;
+                
+                if (productId) {
+                    // Actualizar producto existente
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(productData)
+                        }
+                    );
+                    newProductId = productId;
+                } else {
+                    // Crear nuevo producto
+                    productData.created_at = fechaHoraLocal;
+                    const productResponse = await fetch(
+                        `${SUPABASE_URL}/rest/v1/products`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=representation'
+                            },
+                            body: JSON.stringify(productData)
+                        }
+                    );
+                    
+                    const newProduct = await productResponse.json();
+                    newProductId = newProduct[0].id;
+                }
+
+                // Verificar si el producto ya existe en el inventario de esta sucursal
+                const inventoryCheck = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${newProductId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                const existingInventory = await inventoryCheck.json();
+                
+                if (existingInventory.length > 0) {
+                    // Actualizar stock existente
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${newProductId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                stock: stock,
+                                minimum_stock: minimumStock,
+                                updated_at: fechaHoraLocal
+                            })
+                        }
+                    );
+                } else {
+                    // Agregar nuevo inventario solo para la sucursal actual
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/branch_inventory`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                branch_id: currentBranch.id,
+                                product_id: newProductId,
+                                stock: stock,
+                                minimum_stock: minimumStock,
+                                created_at: fechaHoraLocal
+                            })
+                        }
+                    );
+                }
+
+                // Cerrar modal y recargar datos
+                bootstrap.Modal.getInstance(document.getElementById('productModal')).hide();
+                await loadBranchData();
+                showNotification('Producto guardado exitosamente en ' + currentBranch.name, 'success');
+
+            } catch (error) {
+                console.error('Error al guardar producto:', error);
+                showNotification('Error al guardar producto', 'error');
+            }
+        }
+
+        async function editProduct(productId) {
+            try {
+                // Obtener información del producto
+                const productResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!productResponse.ok) throw new Error('Error al cargar producto');
+                const product = await productResponse.json();
+                
+                if (product.length === 0) {
+                    showNotification('Producto no encontrado', 'error');
+                    return;
+                }
+                
+                // Obtener inventario de la sucursal actual para este producto
+                const inventoryResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?product_id=eq.${productId}&branch_id=eq.${currentBranch.id}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                const inventory = await inventoryResponse.json();
+                const stockInfo = inventory.length > 0 ? inventory[0] : null;
+                
+                // Llenar el formulario
+                document.getElementById('productModalLabel').textContent = 'Editar Producto';
+                document.getElementById('productId').value = product[0].id;
+                document.getElementById('productCode').value = product[0].code;
+                document.getElementById('productName').value = product[0].name;
+                document.getElementById('productPurchasePrice').value = product[0].purchase_price;
+                document.getElementById('productSalePrice').value = product[0].sale_price;
+                document.getElementById('productDescription').value = product[0].description || '';
+                document.getElementById('productSucursal').value = currentBranch.name;
+                
+                if (stockInfo) {
+                    document.getElementById('productStock').value = stockInfo.stock;
+                    document.getElementById('productMinimumStock').value = stockInfo.minimum_stock || 5;
+                } else {
+                    document.getElementById('productStock').value = 0;
+                    document.getElementById('productMinimumStock').value = 5;
+                }
+                
+                if (product[0].expiration_date) {
+                    const expDate = new Date(product[0].expiration_date);
+                    document.getElementById('productExpirationDate').value = expDate.toISOString().split('T')[0];
+                } else {
+                    document.getElementById('productExpirationDate').value = '';
+                }
+                
+                const modal = new bootstrap.Modal(document.getElementById('productModal'));
+                modal.show();
+                
+            } catch (error) {
+                console.error('Error al editar producto:', error);
+                showNotification('Error al cargar producto', 'error');
+            }
+        }
+
+        async function editProductStock(productId) {
+            const newStock = prompt('Ingrese el nuevo stock para este producto en la sucursal actual:');
+            
+            if (newStock === null || newStock === '' || isNaN(newStock) || parseInt(newStock) < 0) {
+                showNotification('Stock no válido', 'error');
+                return;
+            }
+            
+            try {
+                // Obtener fecha y hora local
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                // Actualizar stock en la sucursal actual
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${productId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            stock: parseInt(newStock),
+                            updated_at: fechaHoraLocal
+                        })
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Error al actualizar stock');
+                
+                loadBranchData();
+                showNotification('Stock actualizado exitosamente', 'success');
+                
+            } catch (error) {
+                console.error('Error al actualizar stock:', error);
+                showNotification('Error al actualizar stock', 'error');
+            }
+        }
+
+        async function deleteProductFromBranch(productId) {
+            if (!confirm('¿Está seguro de que desea eliminar este producto de la sucursal actual?\n\nNota: Esto solo elimina el producto de esta sucursal, no del sistema completo.')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${currentBranch.id}&product_id=eq.${productId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+
+                if (!response.ok) throw new Error('Error al eliminar producto de la sucursal');
+
+                loadBranchData();
+                showNotification('Producto eliminado de la sucursal exitosamente', 'success');
+
+            } catch (error) {
+                console.error('Error al eliminar producto:', error);
+                showNotification('Error al eliminar producto de la sucursal', 'error');
+            }
+        }
+
+        function showTransferModal() {
+            if (!currentBranch) {
+                showNotification('Por favor seleccione una sucursal primero', 'error');
+                return;
+            }
+            
+            // Llenar selectores de sucursal
+            const fromSelect = document.getElementById('transferFrom');
+            const toSelect = document.getElementById('transferTo');
+            
+            fromSelect.innerHTML = '<option value="">Seleccionar sucursal origen</option>';
+            toSelect.innerHTML = '<option value="">Seleccionar sucursal destino</option>';
+            
+            allBranches.forEach(branch => {
+                fromSelect.innerHTML += `<option value="${branch.id}">${branch.name}</option>`;
+                toSelect.innerHTML += `<option value="${branch.id}">${branch.name}</option>`;
+            });
+            
+            // Seleccionar la sucursal actual como origen por defecto
+            fromSelect.value = currentBranch.id;
+            updateTransferProductList();
+            
+            const modal = new bootstrap.Modal(document.getElementById('transferModal'));
+            modal.show();
+        }
+
+        async function updateTransferProductList() {
+            const fromBranchId = document.getElementById('transferFrom').value;
+            
+            if (!fromBranchId) {
+                document.getElementById('transferProduct').innerHTML = '<option value="">Seleccionar producto</option>';
+                return;
+            }
+            
+            try {
+                // Obtener inventario de la sucursal origen
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${fromBranchId}&select=*,products(*)`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Error al cargar inventario');
+                const inventory = await response.json();
+                
+                const productSelect = document.getElementById('transferProduct');
+                productSelect.innerHTML = '<option value="">Seleccionar producto</option>';
+                
+                inventory.forEach(item => {
+                    if (item.stock > 0) {
+                        productSelect.innerHTML += `
+                            <option value="${item.product_id}" data-stock="${item.stock}">
+                                ${item.products.code} - ${item.products.name} (Stock: ${item.stock})
+                            </option>
+                        `;
+                    }
+                });
+                
+            } catch (error) {
+                console.error('Error al cargar productos:', error);
+                showNotification('Error al cargar productos', 'error');
+            }
+        }
+
+        function updateAvailableStock() {
+            const productSelect = document.getElementById('transferProduct');
+            const selectedOption = productSelect.options[productSelect.selectedIndex];
+            
+            if (selectedOption && selectedOption.value) {
+                const stock = selectedOption.getAttribute('data-stock');
+                document.getElementById('availableStock').textContent = `Stock disponible: ${stock}`;
+                document.getElementById('transferQuantity').max = stock;
+                document.getElementById('transferQuantity').value = Math.min(1, stock);
+            } else {
+                document.getElementById('availableStock').textContent = 'Stock disponible: 0';
+            }
+        }
+
+        async function saveTransfer() {
+            const fromBranchId = document.getElementById('transferFrom').value;
+            const toBranchId = document.getElementById('transferTo').value;
+            const productId = document.getElementById('transferProduct').value;
+            const quantity = parseInt(document.getElementById('transferQuantity').value);
+            const notes = document.getElementById('transferNotes').value.trim();
+            
+            // Validaciones
+            if (!fromBranchId || !toBranchId || !productId || isNaN(quantity) || quantity < 1) {
+                showNotification('Por favor complete todos los campos requeridos', 'error');
+                return;
+            }
+            
+            if (fromBranchId === toBranchId) {
+                showNotification('Las sucursales de origen y destino no pueden ser la misma', 'error');
+                return;
+            }
+            
+            try {
+                // Obtener fecha y hora local
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                // 1. Obtener stock actual en sucursal origen
+                const fromInventoryResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${fromBranchId}&product_id=eq.${productId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                const fromInventory = await fromInventoryResponse.json();
+                
+                if (fromInventory.length === 0 || fromInventory[0].stock < quantity) {
+                    showNotification('Stock insuficiente en la sucursal origen', 'error');
+                    return;
+                }
+                
+                // 2. Obtener información del producto
+                const productResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/products?id=eq.${productId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                const product = await productResponse.json();
+                
+                // 3. Actualizar stock en sucursal origen (reducir)
+                await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${fromBranchId}&product_id=eq.${productId}`,
+                    {
+                        method: 'PATCH',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        },
+                        body: JSON.stringify({
+                            stock: fromInventory[0].stock - quantity,
+                            updated_at: fechaHoraLocal
+                        })
+                    }
+                );
+                
+                // 4. Actualizar o crear stock en sucursal destino
+                const toInventoryResponse = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${toBranchId}&product_id=eq.${productId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                const toInventory = await toInventoryResponse.json();
+                
+                if (toInventory.length > 0) {
+                    // Actualizar stock existente
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${toBranchId}&product_id=eq.${productId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                stock: toInventory[0].stock + quantity,
+                                updated_at: fechaHoraLocal
+                            })
+                        }
+                    );
+                } else {
+                    // Crear nuevo registro de inventario
+                    await fetch(
+                        `${SUPABASE_URL}/rest/v1/branch_inventory`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify({
+                                branch_id: toBranchId,
+                                product_id: productId,
+                                stock: quantity,
+                                minimum_stock: 5,
+                                created_at: fechaHoraLocal
+                            })
+                        }
+                    );
+                }
+                
+                // 5. Cerrar modal y recargar datos
+                bootstrap.Modal.getInstance(document.getElementById('transferModal')).hide();
+                await loadBranchData();
+                
+                // 6. Obtener nombres de sucursales para el mensaje
+                const fromBranch = allBranches.find(b => b.id == fromBranchId);
+                const toBranch = allBranches.find(b => b.id == toBranchId);
+                
+                showNotification(
+                    `Transferencia exitosa: ${quantity} unidades de ${product[0].name} de ${fromBranch.name} a ${toBranch.name}`,
+                    'success'
+                );
+                
+            } catch (error) {
+                console.error('Error al transferir stock:', error);
+                showNotification('Error al transferir stock', 'error');
+            }
+        }
+
+        function showSection(section) {
+            // Ocultar todas las secciones
+            document.getElementById('dashboardSection').classList.add('d-none');
+            document.getElementById('inventarioSection').classList.add('d-none');
+            document.getElementById('ventasSection').classList.add('d-none');
+            document.getElementById('sucursalesSection').classList.add('d-none');
+            
+            // Mostrar la sección seleccionada
+            document.getElementById(section + 'Section').classList.remove('d-none');
+            
+            // Cargar datos específicos si es necesario
+            if (section === 'sucursales') {
+                displayBranches();
+            } else if (section === 'dashboard') {
+                // Actualizar gráficos cuando se vuelve al dashboard
+                if (currentBranch) {
+                    updateCharts();
+                }
+            }
+        }
+
+        function displayBranches() {
+            const tbody = document.getElementById('branchesTable');
+            
+            tbody.innerHTML = allBranches.map(branch => {
+                // Contar vendedores en esta sucursal
+                const usersResponse = fetch(
+                    `${SUPABASE_URL}/rest/v1/users?branch_id=eq.${branch.id}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                ).then(response => response.json()).then(users => users.length).catch(() => 0);
+                
+                // Usaremos 0 por ahora y actualizaremos después
+                const usersInBranch = 0;
+                
+                return `
+                <tr>
+                    <td>${branch.id}</td>
+                    <td>
+                        <strong>${branch.name}</strong>
+                        ${branch.email ? `<br><small class="text-muted">${branch.email}</small>` : ''}
+                    </td>
+                    <td>${branch.address || 'No especificada'}</td>
+                    <td>${branch.phone || 'No especificado'}</td>
+                    <td>${branch.email || 'No especificado'}</td>
+                    <td>
+                        <span class="status-badge status-activo">${usersInBranch} vendedores</span>
+                    </td>
+                    <td>
+                        <div class="d-flex gap-1">
+                            <button class="btn btn-sm btn-outline-primary" onclick="editBranch(${branch.id})">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+                            <button class="btn btn-sm btn-outline-danger" onclick="deleteBranch(${branch.id})" ${branch.id === 1 ? 'disabled' : ''}>
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function showAddBranchModal() {
+            document.getElementById('branchModalLabel').textContent = 'Agregar Sucursal';
+            document.getElementById('branchForm').reset();
+            document.getElementById('branchId').value = '';
+            
+            const modal = new bootstrap.Modal(document.getElementById('branchModal'));
+            modal.show();
+        }
+
+        async function saveBranch() {
+            const branchId = document.getElementById('branchId').value;
+            const name = document.getElementById('branchName').value.trim();
+            const address = document.getElementById('branchAddress').value.trim();
+            const phone = document.getElementById('branchPhone').value.trim();
+            const email = document.getElementById('branchEmail').value.trim();
+            
+            // Validaciones
+            if (!name) {
+                showNotification('El nombre de la sucursal es requerido', 'error');
+                return;
+            }
+            
+            try {
+                // Obtener fecha y hora local
+                const ahora = new Date();
+                const fechaHoraLocal = ahora.toLocaleString('es-ES', {
+                    year: 'numeric',
+                    month: '2-digit',
+                    day: '2-digit',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                
+                const branchData = {
+                    name: name,
+                    address: address || null,
+                    phone: phone || null,
+                    email: email || null,
+                    updated_at: fechaHoraLocal
+                };
+                
+                let response;
+                
+                if (branchId) {
+                    // Actualizar sucursal existente
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/branches?id=eq.${branchId}`,
+                        {
+                            method: 'PATCH',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(branchData)
+                        }
+                    );
+                } else {
+                    // Crear nueva sucursal
+                    branchData.created_at = fechaHoraLocal;
+                    response = await fetch(
+                        `${SUPABASE_URL}/rest/v1/branches`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'apikey': SUPABASE_KEY,
+                                'Authorization': `Bearer ${SUPABASE_KEY}`,
+                                'Prefer': 'return=minimal'
+                            },
+                            body: JSON.stringify(branchData)
+                        }
+                    );
+                }
+                
+                if (!response.ok) throw new Error('Error al guardar sucursal');
+                
+                // Cerrar modal y recargar datos
+                bootstrap.Modal.getInstance(document.getElementById('branchModal')).hide();
+                await loadBranches();
+                displayBranches();
+                showNotification('Sucursal guardada exitosamente', 'success');
+                
+            } catch (error) {
+                console.error('Error al guardar sucursal:', error);
+                showNotification('Error al guardar sucursal', 'error');
+            }
+        }
+
+        async function editBranch(branchId) {
+            try {
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branches?id=eq.${branchId}`,
+                    {
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Error al cargar sucursal');
+                const branch = await response.json();
+                
+                if (branch.length === 0) {
+                    showNotification('Sucursal no encontrada', 'error');
+                    return;
+                }
+                
+                document.getElementById('branchModalLabel').textContent = 'Editar Sucursal';
+                document.getElementById('branchId').value = branch[0].id;
+                document.getElementById('branchName').value = branch[0].name;
+                document.getElementById('branchAddress').value = branch[0].address || '';
+                document.getElementById('branchPhone').value = branch[0].phone || '';
+                document.getElementById('branchEmail').value = branch[0].email || '';
+                
+                const modal = new bootstrap.Modal(document.getElementById('branchModal'));
+                modal.show();
+                
+            } catch (error) {
+                console.error('Error al editar sucursal:', error);
+                showNotification('Error al cargar sucursal', 'error');
+            }
+        }
+
+        async function deleteBranch(branchId) {
+            if (branchId === 1) {
+                showNotification('No se puede eliminar la sucursal principal', 'error');
+                return;
+            }
+            
+            if (!confirm('¿Está seguro de que desea eliminar esta sucursal?\n\nNota: Esta acción eliminará todo el inventario de esta sucursal.')) {
+                return;
+            }
+            
+            try {
+                // 1. Eliminar inventario de la sucursal
+                await fetch(
+                    `${SUPABASE_URL}/rest/v1/branch_inventory?branch_id=eq.${branchId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+                
+                // 2. Eliminar la sucursal
+                const response = await fetch(
+                    `${SUPABASE_URL}/rest/v1/branches?id=eq.${branchId}`,
+                    {
+                        method: 'DELETE',
+                        headers: {
+                            'apikey': SUPABASE_KEY,
+                            'Authorization': `Bearer ${SUPABASE_KEY}`,
+                            'Prefer': 'return=minimal'
+                        }
+                    }
+                );
+                
+                if (!response.ok) throw new Error('Error al eliminar sucursal');
+                
+                // 3. Recargar datos
+                await loadBranches();
+                displayBranches();
+                
+                // 4. Si la sucursal eliminada era la actual, cambiar a la primera sucursal
+                if (currentBranch && currentBranch.id == branchId) {
+                    if (allBranches.length > 0) {
+                        const branchSelector = document.getElementById('branchSelector');
+                        branchSelector.value = allBranches[0].id;
+                        changeBranch(allBranches[0].id);
+                    }
+                }
+                
+                showNotification('Sucursal eliminada exitosamente', 'success');
+                
+            } catch (error) {
+                console.error('Error al eliminar sucursal:', error);
+                showNotification('Error al eliminar sucursal', 'error');
+            }
+        }
+
+        function globalSearch() {
+            const searchTerm = document.getElementById('globalSearch').value.toLowerCase().trim();
+            
+            if (searchTerm === '') {
+                return;
+            }
+            
+            // Buscar en productos de la sucursal actual
+            const productResults = branchInventory.filter(inventoryItem => {
+                const product = inventoryItem.products;
+                return (
+                    product.name.toLowerCase().includes(searchTerm) ||
+                    product.code.toLowerCase().includes(searchTerm)
+                );
+            });
+            
+            // Decidir qué sección mostrar basado en los resultados
+            if (productResults.length > 0) {
+                showSection('inventario');
+                
+                // Mostrar productos filtrados
+                const tbody = document.getElementById('productsTable');
+                tbody.innerHTML = productResults.map(inventoryItem => {
+                    const product = inventoryItem.products;
+                    const stock = inventoryItem.stock;
+                    const minimumStock = inventoryItem.minimum_stock;
+                    
+                    let statusClass = 'status-activo';
+                    let statusText = 'Disponible';
+                    
+                    if (stock === 0) {
+                        statusClass = 'status-agotado';
+                        statusText = 'Agotado';
+                    } else if (stock <= minimumStock) {
+                        statusClass = 'status-bajo';
+                        statusText = 'Stock Bajo';
+                    }
+                    
+                    let expirationDisplay = 'Sin fecha';
+                    if (product.expiration_date) {
+                        const expDate = new Date(product.expiration_date);
+                        expirationDisplay = expDate.toLocaleDateString('es-ES');
+                    }
+                    
+                    return `
+                    <tr>
+                        <td>${product.id}</td>
+                        <td><code>${product.code}</code></td>
+                        <td>
+                            <strong>${product.name}</strong>
+                            ${product.description ? `<br><small class="text-muted">${product.description}</small>` : ''}
+                        </td>
+                        <td class="fw-bold ${stock <= minimumStock ? 'text-warning' : ''}">
+                            ${stock}
+                        </td>
+                        <td class="money">${product.purchase_price.toFixed(2)}</td>
+                        <td class="money">${product.sale_price.toFixed(2)}</td>
+                        <td>${expirationDisplay}</td>
+                        <td>
+                            <span class="status-badge ${statusClass}">${statusText}</span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <button class="btn btn-sm btn-outline-primary" onclick="editProduct(${product.id})">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-warning" onclick="editProductStock(${product.id})">
+                                    <i class="bi bi-box-arrow-in-down"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" onclick="deleteProductFromBranch(${product.id})">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    `;
+                }).join('');
+                
+            } else {
+                showNotification('No se encontraron resultados', 'info');
+            }
+        }
+
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            const originalHTML = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="bi bi-arrow-clockwise spin"></i> Actualizando...';
+            btn.disabled = true;
+            
+            loadBranchData().then(() => {
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.disabled = false;
+                    showNotification('Datos actualizados correctamente', 'success');
+                }, 500);
+            });
+        }
+
+        function handleLogout() {
+            if (confirm('¿Está seguro de que desea cerrar sesión?')) {
+                localStorage.removeItem('currentUser');
+                window.location.href = 'login.html';
+            }
+        }
+
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `desktop-notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 4000);
+        }
+
+        // Hacer funciones accesibles globalmente
+        window.editProduct = editProduct;
+        window.editProductStock = editProductStock;
+        window.deleteProductFromBranch = deleteProductFromBranch;
+        window.editBranch = editBranch;
+        window.deleteBranch = deleteBranch;
+        window.showSection = showSection;
+        window.filterSales = filterSales;
+        window.searchProducts = searchProducts;
+        window.changeBranch = changeBranch;
+        window.showBalanceModal = showBalanceModal;
+        window.hideBalanceModal = hideBalanceModal;
+        window.updateBalanceInfo = updateBalanceInfo;
+        window.deliverBalance = deliverBalance;
+    </script>
+</body>
+</html>
