@@ -9,8 +9,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TOKTOK CEO">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icons/icon-152x152.png">
-    <link rel="icon" type="image/png" href="icons/icon-32x32.png">
+    <link rel="apple-touch-icon" href="ico/1.png">
+    <link rel="icon" type="image/png" href="ico/1.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         :root {
@@ -344,63 +344,265 @@
         .icon-monitoreo { background: rgba(16, 185, 129, 0.15); color: #34d399; border: 1px solid rgba(16,185,129,0.3); }
         .icon-cajas { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245,158,11,0.3); }
         .icon-reportes { background: rgba(37, 99, 235, 0.15); color: #60a5fa; border: 1px solid rgba(37,99,235,0.3); }
+
+        /* Interfaz de escritorio */
+        :root {
+            --primary: #167c68;
+            --primary-dark: #116755;
+            --primary-light: #22a184;
+            --accent: #75d5bd;
+            --dark-bg: #eef2f1;
+            --card-bg: #ffffff;
+            --card-hover: #f8fbfa;
+            --glass-border: #dce6e3;
+            --text-primary: #172522;
+            --text-secondary: #44544f;
+            --text-muted: #788782;
+            --border: #dfe7e4;
+            --border-radius: 8px;
+            --border-radius-lg: 8px;
+            --shadow: 0 1px 2px rgba(25, 47, 40, .06);
+            --shadow-md: 0 8px 20px rgba(25, 47, 40, .08);
+        }
+        * { font-family: "Segoe UI", Tahoma, sans-serif; letter-spacing: 0; }
+        body { background: #eef2f1; color: var(--text-primary); }
+        body::before { display: none; }
+        .ceo-header {
+            position: fixed;
+            inset: 0 auto 0 0;
+            width: 246px;
+            padding: 24px 16px;
+            background: #fff;
+            border-right: 1px solid var(--border);
+            border-bottom: 0;
+            backdrop-filter: none;
+        }
+        .header-top { display: block; }
+        .company-name { font-size: 1.16rem; gap: 11px; }
+        .company-name i { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 8px; background: #e5f4ef; color: var(--primary); font-size: 1rem; }
+        .ceo-badge { margin: 28px 0 14px; padding: 10px 11px; border-radius: 7px; background: #f2f6f4; color: #5d6e68; box-shadow: none; font-size: .72rem; }
+        .side-nav { display: grid; gap: 5px; }
+        .side-nav a { display: flex; align-items: center; gap: 11px; min-height: 40px; padding: 0 11px; border-radius: 6px; color: #53625d; text-decoration: none; font-size: .86rem; font-weight: 600; }
+        .side-nav a:first-child, .side-nav a:hover { background: #eaf5f1; color: var(--primary-dark); }
+        .side-nav i { width: 17px; text-align: center; }
+        .main-content { max-width: 1440px; margin: 0 0 0 246px; padding: 34px 42px 54px; }
+        .workspace-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 20px; margin-bottom: 34px; }
+        .workspace-title { font-size: 1.4rem; font-weight: 650; }
+        .workspace-subtitle { margin-top: 5px; color: var(--text-muted); font-size: .84rem; }
+        .toolbar-tools { display: flex; align-items: center; gap: 12px; }
+        .module-search { width: min(290px, 32vw); height: 38px; padding: 0 12px; border: 1px solid #d8e2de; border-radius: 6px; background: white; color: var(--text-primary); font-size: .84rem; outline: none; }
+        .module-search:focus { border-color: var(--primary-light); box-shadow: 0 0 0 3px rgba(34, 161, 132, .12); }
+        .system-status { display: flex; align-items: center; gap: 7px; color: #5d6e68; font-size: .78rem; white-space: nowrap; }
+        .system-status::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: #2ca879; }
+        .section-title { margin: 0 0 15px; padding: 0; color: #33443e; font-size: .82rem; letter-spacing: .04em; }
+        .section-title i { color: var(--primary); }
+        .ceo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 30px; }
+        .ceo-card { min-height: 136px; padding: 17px; border-color: var(--border); border-radius: 8px; box-shadow: var(--shadow); backdrop-filter: none; }
+        .ceo-card::before { display: none; }
+        .ceo-card:hover { transform: translateY(-2px); border-color: #b7d8cd; background: white; box-shadow: var(--shadow-md); }
+        .card-header { align-items: center; margin-bottom: 14px; }
+        .card-icon { width: 38px; height: 38px; border: 0; border-radius: 8px; background: #e8f4f0; color: var(--primary); font-size: 1rem; }
+        .card-badge { padding: 4px 7px; border: 0; border-radius: 4px; background: #f0f4f2; color: #71807b; font-size: .61rem; }
+        .card-title { margin-bottom: 5px; font-size: .94rem; }
+        .card-desc { font-size: .78rem; }
+        .hidden-modules-section { margin-top: 10px; }
+        .hidden-modules-btn { justify-content: flex-start; padding: 11px 13px; border: 1px solid var(--border); border-radius: 7px; background: #fff; color: var(--text-secondary); letter-spacing: 0; }
+        .hidden-modules-btn:hover { border-color: #b7d8cd; background: #f8fbfa; color: var(--primary-dark); }
+        .hidden-modules-count { margin-left: auto; border-radius: 4px; background: #eaf5f1; color: var(--primary-dark); }
+        .hidden-modules-list { margin-top: 10px; border-color: var(--border); border-radius: 7px; background: white; }
+        .hidden-module-item { min-height: 60px; padding: 10px 14px; border-color: #edf1ef; color: var(--text-secondary); }
+        .hidden-module-item:hover { background: #f6faf8; color: var(--text-primary); }
+        .hidden-module-icon { border-radius: 7px; }
+        .hidden-module-desc { font-size: .74rem; }
+        .workspace-footer { margin-top: 30px; padding-top: 12px; border-top: 1px solid var(--border); color: #82908b; font-size: .73rem; }
+        @media (max-width: 900px) {
+            .ceo-header { width: 210px; }
+            .main-content { margin-left: 210px; padding: 28px 24px; }
+            .ceo-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .workspace-toolbar { align-items: flex-start; flex-direction: column; }
+            .toolbar-tools { width: 100%; }
+            .module-search { width: 100%; }
+        }
+        @media (max-width: 620px) {
+            .ceo-header { position: sticky; inset: auto; width: auto; height: auto; padding: 12px 16px; border-right: 0; border-bottom: 1px solid var(--border); }
+            .header-top { display: flex; align-items: center; justify-content: space-between; }
+            .company-name { font-size: 1rem; }
+            .company-name i { width: 30px; height: 30px; }
+            .ceo-badge { margin: 0; padding: 8px 9px; }
+            .side-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 12px; }
+            .side-nav a { min-height: 35px; font-size: .78rem; }
+            .main-content { margin: 0; padding: 24px 16px 36px; }
+            .ceo-grid { grid-template-columns: 1fr; gap: 9px; }
+            .ceo-card { min-height: 118px; }
+            .workspace-title { font-size: 1.2rem; }
+            .toolbar-tools { align-items: stretch; flex-direction: column; }
+        }
+        :root {
+            color-scheme: light;
+            --app-bg: #f2f5f4;
+            --surface: #ffffff;
+            --surface-subtle: #f5f8f7;
+            --surface-hover: #f7faf9;
+            --line: #e0e7e4;
+            --ink: #192723;
+            --muted: #788781;
+            --brand: #167c68;
+            --brand-soft: #e7f3ef;
+        }
+        body.theme-dark {
+            color-scheme: dark;
+            --app-bg: #171d1b;
+            --surface: #202825;
+            --surface-subtle: #29322e;
+            --surface-hover: #2d3833;
+            --line: #394640;
+            --ink: #edf4f0;
+            --muted: #a3b1aa;
+            --brand: #69c9a9;
+            --brand-soft: #2b4038;
+            --shadow: 0 1px 2px rgba(0, 0, 0, .22);
+            --shadow-md: 0 10px 24px rgba(0, 0, 0, .26);
+        }
+        body { background: var(--app-bg); color: var(--ink); }
+        .ceo-header, .ceo-card, .hidden-modules-btn, .hidden-modules-list, .module-search { background: var(--surface); }
+        .ceo-header { border-color: var(--line); }
+        .company-name { color: var(--ink); }
+        .company-name i { background: var(--brand-soft); color: var(--brand); }
+        .ceo-badge, .card-badge { background: var(--surface-subtle); color: var(--muted); }
+        .side-nav a { color: var(--muted); }
+        .side-nav a:first-child, .side-nav a:hover { background: var(--brand-soft); color: var(--brand); }
+        .workspace-title, .card-title { color: var(--ink); }
+        .workspace-subtitle, .card-desc, .hidden-module-desc, .workspace-footer { color: var(--muted); }
+        .module-search { border-color: var(--line); color: var(--ink); }
+        .module-search::placeholder { color: var(--muted); }
+        .module-search:focus { border-color: var(--brand); box-shadow: 0 0 0 3px color-mix(in srgb, var(--brand) 18%, transparent); }
+        .system-status { color: var(--muted); }
+        .section-title { color: var(--ink); }
+        .ceo-card { border-color: var(--line); }
+        .ceo-card:hover { border-color: color-mix(in srgb, var(--brand) 42%, var(--line)); background: var(--surface-hover); }
+        .card-icon { background: var(--brand-soft); color: var(--brand); }
+        .hidden-modules-btn { border-color: var(--line); color: var(--ink); }
+        .hidden-modules-btn:hover { border-color: var(--brand); background: var(--surface-hover); color: var(--brand); }
+        .hidden-modules-count { background: var(--brand-soft); color: var(--brand); }
+        .hidden-modules-list { border-color: var(--line); }
+        .hidden-module-item { border-color: var(--line); color: var(--ink); }
+        .hidden-module-item:hover { background: var(--surface-hover); }
+        .hidden-module-arrow { color: var(--muted); }
+        .workspace-footer { border-color: var(--line); }
+        .toolbar-tools { flex-wrap: wrap; justify-content: flex-end; }
+        .theme-toggle { display: inline-flex; align-items: center; justify-content: center; gap: 8px; min-height: 38px; padding: 0 12px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--ink); font: 600 .8rem "Segoe UI", Tahoma, sans-serif; cursor: pointer; transition: background .18s ease, border-color .18s ease, color .18s ease; }
+        .theme-toggle:hover { border-color: var(--brand); color: var(--brand); }
+        .theme-toggle svg { width: 16px; height: 16px; }
+        .module-svg { display: block; width: 21px; height: 21px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+        .brand-mark { width: 20px; height: 20px; fill: currentColor; stroke: none; }
+        .card-icon { width: 42px; height: 42px; }
+        .hidden-module-icon { width: 38px; height: 38px; }
+        .hidden-module-icon .module-svg { width: 19px; height: 19px; }
+        a:focus-visible, button:focus-visible, input:focus-visible { outline: 3px solid color-mix(in srgb, var(--brand) 55%, transparent); outline-offset: 2px; }
+        @media (max-width: 900px) { .toolbar-tools { justify-content: flex-start; } }
+        @media (max-width: 620px) {
+            .theme-toggle { width: 100%; }
+            .toolbar-tools { gap: 9px; }
+            .system-status { min-height: 28px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+        }
     </style>
 </head>
 <body>
+
+    <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">
+        <symbol id="icon-brand" viewBox="0 0 24 24"><path d="M13.5 1 4 13h6l-.5 10L20 10h-6z"/></symbol>
+        <symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></symbol>
+        <symbol id="icon-megaphone" viewBox="0 0 24 24"><path d="M3 11v2a2 2 0 0 0 2 2h2l4 5h3l-2-6 8-4V5l-8 4H5a2 2 0 0 0-2 2Z"/><path d="M19 8a4 4 0 0 1 0 8"/></symbol>
+        <symbol id="icon-mobile" viewBox="0 0 24 24"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M10 5h4M11 18h2"/><path d="M9 10h6m-6 3h6"/></symbol>
+        <symbol id="icon-gamepad" viewBox="0 0 24 24"><path d="M6 9h12a4 4 0 0 1 3.8 5.3l-1 3A2.5 2.5 0 0 1 17 18l-2-2H9l-2 2a2.5 2.5 0 0 1-3.8-.7l-1-3A4 4 0 0 1 6 9Z"/><path d="M7 12v4m-2-2h4m7-1h.01M18 15h.01"/></symbol>
+        <symbol id="icon-home" viewBox="0 0 24 24"><path d="m3 10 9-7 9 7v10a1 1 0 0 1-1 1h-6v-7h-4v7H4a1 1 0 0 1-1-1z"/></symbol>
+        <symbol id="icon-wallet" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4H20v16H6a3 3 0 0 1-3-3V7a.5.5 0 0 1 .5-.5Z"/><path d="M3 8h17m-5 5h5m-5 0a1 1 0 1 0 0 .01"/></symbol>
+        <symbol id="icon-signal" viewBox="0 0 24 24"><path d="M5 19a10 10 0 0 1 14 0M8 15a6 6 0 0 1 8 0m-5-9v8m-2 5h4m-2-13 2-3"/></symbol>
+        <symbol id="icon-chart" viewBox="0 0 24 24"><path d="M4 19V5m0 14h17"/><path d="m7 15 4-4 3 2 6-7"/><path d="M16 6h4v4"/></symbol>
+        <symbol id="icon-bank" viewBox="0 0 24 24"><path d="m3 9 9-6 9 6v2H3zM5 11v8m5-8v8m8-8v8m-13 2h14m-16 2h18"/></symbol>
+        <symbol id="icon-store" viewBox="0 0 24 24"><path d="M4 10v10h16V10M3 10l2-6h14l2 6a3 3 0 0 1-5 2 3 3 0 0 1-4 0 3 3 0 0 1-4 0 3 3 0 0 1-5-2Z"/><path d="M9 20v-5h6v5"/></symbol>
+        <symbol id="icon-boxes" viewBox="0 0 24 24"><path d="m12 3 8 4-8 4-8-4 8-4Z"/><path d="M4 7v9l8 5 8-5V7m-8 4v10m-8-8 8 5 8-5"/></symbol>
+        <symbol id="icon-users" viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2m2-13a4 4 0 1 0 8 0 4 4 0 0 0-8 0Zm12 13v-2a4 4 0 0 0-3-3.9m-1-11.9a4 4 0 0 1 0 7.7"/></symbol>
+        <symbol id="icon-camera" viewBox="0 0 24 24"><path d="M4 7h4l2-3h4l2 3h4a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2Z"/><circle cx="12" cy="13" r="4"/></symbol>
+        <symbol id="icon-cash" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 9a2 2 0 0 1-2 2m12-2a2 2 0 0 0 2 2m-12 4a2 2 0 0 1-2-2m12 2a2 2 0 0 0 2-2"/><circle cx="12" cy="12" r="2.5"/></symbol>
+        <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
+        <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/></symbol>
+    </svg>
 
     <!-- ===== HEADER ===== -->
     <header class="ceo-header">
         <div class="header-top">
             <h1 class="company-name">
-                <i class="fas fa-bolt"></i> TOKTOK GC
+                <svg class="brand-mark" aria-hidden="true"><use href="#icon-brand"></use></svg> TOKTOK GC
             </h1>
             <div class="ceo-badge">
                 <i class="fas fa-crown"></i> ADMIN 1
             </div>
         </div>
+        <nav class="side-nav" aria-label="Navegación del panel">
+            <a href="#main-modules"><i class="fas fa-th-large"></i> Módulos principales</a>
+            <a href="#extra-modules"><i class="fas fa-layer-group"></i> Módulos extra</a>
+        </nav>
     </header>
 
     <!-- ===== CONTENIDO PRINCIPAL ===== -->
     <main class="main-content">
+        <div class="workspace-toolbar">
+            <div>
+                <h2 class="workspace-title">Centro de operaciones</h2>
+                <p class="workspace-subtitle">Acceso centralizado a las herramientas de TOKTOK GC</p>
+            </div>
+            <div class="toolbar-tools">
+                <input class="module-search" id="moduleSearch" type="search" placeholder="Buscar módulo..." aria-label="Buscar módulo">
+                <button class="theme-toggle" id="themeToggle" type="button" aria-pressed="false" aria-label="Cambiar al tema oscuro">
+                    <svg class="module-svg" aria-hidden="true"><use href="#icon-moon"></use></svg>
+                    <span>Tema oscuro</span>
+                </button>
+                <span class="system-status">Sistema disponible</span>
+            </div>
+        </div>
         <h2 class="section-title">
-            <i class="fas fa-th-large"></i> Módulos Principales
+            <i class="fas fa-th-large"></i> Aplicaciones principales
         </h2>
 
         <!-- Tarjetas principales (solo ADMIN 1) -->
-        <div class="ceo-grid">
+        <div class="ceo-grid" id="main-modules">
             <!-- TokTok Admin -->
-            <a href="admin-toktok/index.html" class="ceo-card">
+            <a href="RUTAS/admin principal.html" class="ceo-card" data-module="principal">
                 <div class="card-header">
                     <div class="card-icon">
-                        <i class="fas fa-tachometer-alt"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-dashboard"></use></svg>
                     </div>
-                    <div class="card-badge">CORE</div>
+                    <div class="card-badge">PRINCIPAL</div>
                 </div>
                 <div>
-                    <div class="card-title">TokTok Admin</div>
-                    <div class="card-desc">Panel administrativo principal</div>
+                    <div class="card-title">Panel principal</div>
+                    <div class="card-desc">Administración general de TOKTOK GC</div>
                 </div>
             </a>
 
             <!-- Publicidad -->
-            <a href="admin-toktok/dashboard_pro" class="ceo-card">
+            <a href="RUTAS/admin publicidad.html" class="ceo-card" data-module="publicidad">
                 <div class="card-header">
                     <div class="card-icon">
-                        <i class="fas fa-bullhorn"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-megaphone"></use></svg>
                     </div>
                     <div class="card-badge">PUBLICIDAD</div>
                 </div>
                 <div>
-                    <div class="card-title">Publicidad totok</div>
-                    <div class="card-desc">Anuncios url</div>
+                    <div class="card-title">Publicidad</div>
+                    <div class="card-desc">Gestión de campañas y anuncios</div>
                 </div>
             </a>
 
             <!-- Recargas -->
-            <a href="admin-toktok/dashboard_recargas" class="ceo-card">
+            <a href="RUTAS/admin recargas.html" class="ceo-card" data-module="recargas">
                 <div class="card-header">
                     <div class="card-icon">
-                        <i class="fas fa-mobile-alt"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-mobile"></use></svg>
                     </div>
                     <div class="card-badge">RECARGAS</div>
                 </div>
@@ -411,10 +613,10 @@
             </a>
 
             <!-- ✅ NUEVO: Admin Juegos -->
-            <a href="EXTENCIONES/admin juegos.html" class="ceo-card">
+            <a href="RUTAS/admin juegos.html" class="ceo-card" data-module="juegos">
                 <div class="card-header">
                     <div class="card-icon">
-                        <i class="fas fa-gamepad"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-gamepad"></use></svg>
                     </div>
                     <div class="card-badge">JUEGOS</div>
                 </div>
@@ -425,10 +627,10 @@
             </a>
 
             <!-- ✅ NUEVO: Admin Plan Hogar -->
-            <a href="EXTENCIONES/admin plan hogar.html" class="ceo-card">
+            <a href="RUTAS/admin plan hogar.html" class="ceo-card" data-module="plan hogar">
                 <div class="card-header">
                     <div class="card-icon">
-                        <i class="fas fa-home"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-home"></use></svg>
                     </div>
                     <div class="card-badge">PLAN HOGAR</div>
                 </div>
@@ -437,33 +639,34 @@
                     <div class="card-desc">Administración de planes hogar</div>
                 </div>
             </a>
-            <a href="EXTENCIONES/admin yape.html" class="ceo-card">
+            <a href="RUTAS/admin yape.html" class="ceo-card" data-module="yape">
                 <div class="card-header">
                     <div class="card-icon">
-                        <i class="fas fa-home"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-wallet"></use></svg>
                     </div>
                     <div class="card-badge">PROMO YAPE</div>
                 </div>
                 <div>
                     <div class="card-title">Admin Promo Yape</div>
-                    <div class="card-desc">Administración</div>
+                    <div class="card-desc">Gestión de promociones y operaciones Yape</div>
                 </div>
             </a>
         </div>
 
         <!-- Módulos ocultos -->
-        <div class="hidden-modules-section">
-            <button class="hidden-modules-btn" id="hiddenModulesBtn">
+        <section class="hidden-modules-section" id="extra-modules">
+            <h2 class="section-title"><i class="fas fa-layer-group"></i> Herramientas adicionales</h2>
+            <button class="hidden-modules-btn" id="hiddenModulesBtn" aria-expanded="false" aria-controls="hiddenModulesList">
                 <i class="fas fa-chevron-down"></i>
-                Módulos Ocultos
+                Mostrar módulos extra
                 <span class="hidden-modules-count">11</span>
             </button>
 
             <div class="hidden-modules-list" id="hiddenModulesList">
                 <!-- Entel -->
-                <a href="EXTENCIONES/admin-entel.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/admin-entel.html" class="hidden-module-item" data-module="entel">
                     <div class="hidden-module-icon icon-entel">
-                        <i class="fas fa-signal"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-signal"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Entel</div>
@@ -473,9 +676,9 @@
                 </a>
 
                 <!-- Tigo -->
-                <a href="EXTENCIONES/admin-tigo.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/admin-tigo.html" class="hidden-module-item" data-module="tigo">
                     <div class="hidden-module-icon icon-tigo">
-                        <i class="fas fa-signal"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-signal"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Tigo</div>
@@ -485,9 +688,9 @@
                 </a>
 
                 <!-- Viva -->
-                <a href="EXTENCIONES/admin-viva.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/admin-viva.html" class="hidden-module-item" data-module="viva">
                     <div class="hidden-module-icon icon-viva">
-                        <i class="fas fa-signal"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-signal"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Viva</div>
@@ -497,9 +700,9 @@
                 </a>
 
                 <!-- Reportes -->
-                <a href="EXTENCIONES/reportes.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/admin-reportes.html" class="hidden-module-item" data-module="reportes">
                     <div class="hidden-module-icon icon-reportes">
-                        <i class="fas fa-chart-bar"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-chart"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Reportes</div>
@@ -509,9 +712,9 @@
                 </a>
 
                 <!-- Banco BCP -->
-                <a href="EXTENCIONES/admin-bcp.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/admin-bcp.html" class="hidden-module-item" data-module="bcp">
                     <div class="hidden-module-icon icon-bcp">
-                        <i class="fas fa-university"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-bank"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Banco BCP</div>
@@ -521,9 +724,9 @@
                 </a>
 
                 <!-- Tienda -->
-                <a href="EXTENCIONES/admin-tienda.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/admin-tienda.html" class="hidden-module-item" data-module="tienda">
                     <div class="hidden-module-icon icon-tienda">
-                        <i class="fas fa-shopping-bag"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-store"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Tienda</div>
@@ -533,9 +736,9 @@
                 </a>
 
                 <!-- Juegos -->
-                <a href="EXTENCIONES/admin-juegos.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/juegos.html" class="hidden-module-item" data-module="juegos extra">
                     <div class="hidden-module-icon icon-juegos">
-                        <i class="fas fa-gamepad"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-gamepad"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Juegos</div>
@@ -544,22 +747,22 @@
                     <i class="fas fa-chevron-right hidden-module-arrow"></i>
                 </a>
 
-                <!-- Incubadora -->
-                <a href="EXTENCIONES/admin-incubadora.html" class="hidden-module-item">
+                <!-- Inventario -->
+                <a href="RUTAS/EXTRAS/inventario-esc.html" class="hidden-module-item" data-module="inventario">
                     <div class="hidden-module-icon icon-inventario">
-                        <i class="fas fa-flask"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-boxes"></use></svg>
                     </div>
                     <div class="hidden-module-info">
-                        <div class="hidden-module-name">Incubadora</div>
+                        <div class="hidden-module-name">Inventario</div>
                         <div class="hidden-module-desc">Gestión de inventario</div>
                     </div>
                     <i class="fas fa-chevron-right hidden-module-arrow"></i>
                 </a>
 
                 <!-- Asistencia -->
-                <a href="EXTENCIONES/admin-asistencia.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/asistencia.html" class="hidden-module-item" data-module="asistencia">
                     <div class="hidden-module-icon icon-asistencia">
-                        <i class="fas fa-user-clock"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-users"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Asistencia</div>
@@ -569,9 +772,9 @@
                 </a>
 
                 <!-- Monitoreo GC -->
-                <a href="EXTENCIONES/monitoreo-gc.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/monitoreo.html" class="hidden-module-item" data-module="monitoreo">
                     <div class="hidden-module-icon icon-monitoreo">
-                        <i class="fas fa-video"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-camera"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Monitoreo GC</div>
@@ -581,9 +784,9 @@
                 </a>
 
                 <!-- Cajas -->
-                <a href="EXTENCIONES/admin-cajas.html" class="hidden-module-item">
+                <a href="RUTAS/EXTRAS/caja.html" class="hidden-module-item" data-module="caja">
                     <div class="hidden-module-icon icon-cajas">
-                        <i class="fas fa-cash-register"></i>
+                        <svg class="module-svg" aria-hidden="true"><use href="#icon-cash"></use></svg>
                     </div>
                     <div class="hidden-module-info">
                         <div class="hidden-module-name">Cajas</div>
@@ -592,7 +795,8 @@
                     <i class="fas fa-chevron-right hidden-module-arrow"></i>
                 </a>
             </div>
-        </div>
+        </section>
+        <footer class="workspace-footer">TOKTOK GC · Panel de administración</footer>
     </main>
 
     <script>
@@ -604,6 +808,7 @@
         hiddenModulesBtn.addEventListener('click', function() {
             hiddenModulesList.classList.toggle('show');
             hiddenModulesBtn.classList.toggle('active');
+            hiddenModulesBtn.setAttribute('aria-expanded', hiddenModulesList.classList.contains('show'));
             
             if (hiddenModulesList.classList.contains('show')) {
                 chevronIcon.style.transform = 'rotate(180deg)';
@@ -612,10 +817,65 @@
             }
         });
 
+        const moduleSearch = document.getElementById('moduleSearch');
+        const moduleLinks = document.querySelectorAll('[data-module]');
+        const themeToggle = document.getElementById('themeToggle');
+
+        function setTheme(theme, savePreference = true) {
+            const isDark = theme === 'dark';
+            document.documentElement.dataset.theme = isDark ? 'dark' : 'light';
+            document.documentElement.style.colorScheme = isDark ? 'dark' : 'light';
+            document.body.classList.toggle('theme-dark', isDark);
+            themeToggle.setAttribute('aria-pressed', String(isDark));
+            themeToggle.setAttribute('aria-label', `Cambiar al tema ${isDark ? 'claro' : 'oscuro'}`);
+            themeToggle.querySelector('span').textContent = `Tema ${isDark ? 'claro' : 'oscuro'}`;
+            themeToggle.querySelector('use').setAttribute('href', `#icon-${isDark ? 'sun' : 'moon'}`);
+
+            if (savePreference) {
+                try {
+                    localStorage.setItem('toktok-theme', isDark ? 'dark' : 'light');
+                } catch (error) {
+                    console.warn('No se pudo guardar la preferencia de tema.', error);
+                }
+            }
+        }
+
+        try {
+            setTheme(localStorage.getItem('toktok-theme') || 'light', false);
+        } catch (error) {
+            setTheme('light', false);
+        }
+
+        themeToggle.addEventListener('click', function() {
+            setTheme(document.body.classList.contains('theme-dark') ? 'light' : 'dark');
+        });
+
+        moduleSearch.addEventListener('input', function() {
+            const query = moduleSearch.value.trim().toLocaleLowerCase('es');
+            let matchingExtras = false;
+
+            moduleLinks.forEach(link => {
+                const searchableText = `${link.dataset.module} ${link.textContent}`.toLocaleLowerCase('es');
+                const matches = searchableText.includes(query);
+                link.hidden = !matches;
+                if (matches && link.classList.contains('hidden-module-item')) matchingExtras = true;
+            });
+
+            if (query && matchingExtras) {
+                hiddenModulesList.classList.add('show');
+                hiddenModulesBtn.classList.add('active');
+                hiddenModulesBtn.setAttribute('aria-expanded', 'true');
+            } else if (!query) {
+                hiddenModulesList.classList.remove('show');
+                hiddenModulesBtn.classList.remove('active');
+                hiddenModulesBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+
         // Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/sw.js')
+                navigator.serviceWorker.register(new URL('./sw.js', window.location.href))
                     .then(registration => console.log('SW registrado:', registration.scope))
                     .catch(error => console.log('Error SW:', error));
             });
