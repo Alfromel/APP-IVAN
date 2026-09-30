@@ -249,6 +249,19 @@
       return;
     }
 
+    // Si GANÓ, actualizamos la transacción de 'recarga' a 'deposito'
+    if (accion === "ganado") {
+      const { error: errTx } = await sb.from("transacciones")
+        .update({ tipo: "deposito" })
+        .eq("tipo", "recarga")
+        .eq("descripcion", "YAPE PROMO - GANASTE 4 BS");
+
+      if (errTx) {
+        console.error("Error actualizando transacciones:", errTx);
+        toast("⚠️ Participación marcada, pero falló actualizar transacción", "err");
+      }
+    }
+
     toast(accion === "ganado" ? "✅ Depósito de 4 Bs acreditado" : "❌ Marcado como perdido", "ok");
     cargar();
   }
