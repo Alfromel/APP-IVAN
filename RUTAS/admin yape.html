@@ -4,76 +4,172 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — Participaciones YAPE</title>
-<script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  * { -webkit-tap-highlight-color: transparent; }
-  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
+  html, body { width: 100%; height: 100%; overflow: hidden; background: #000000; }
+  .app { width: 100vw; height: 100vh; display: flex; overflow: hidden; background: #000000; }
+
+  /* SIDEBAR */
+  .sidebar { width: 260px; background: #080808; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s ease; overflow: hidden; }
+  .sidebar.collapsed { width: 72px; }
+  .sidebar-brand { padding: 20px 22px; display: flex; align-items: center; gap: 12px; color: #f0f0f5; font-weight: 700; font-size: 17px; white-space: nowrap; flex-shrink: 0; }
+  .sidebar-brand i { color: #a855f7; font-size: 26px; min-width: 28px; text-align: center; }
+  .sidebar-brand span.accent { color: #a855f7; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; overflow-y: auto; }
+  .nav-item { display: flex; align-items: center; gap: 14px; padding: 11px 14px; border-radius: 10px; color: #9a9ab0; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; background: transparent; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; position: relative; }
+  .nav-item i { font-size: 17px; min-width: 22px; text-align: center; color: #6a6a85; }
+  .nav-item:hover { background: #181818; color: #d0d0e0; }
+  .nav-item.active { background: #202020; color: #fff; }
+  .nav-item.active i { color: #a855f7; }
+  .nav-item .pill { position: absolute; right: 10px; background: #dc2626; color: #ffffff; font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 10px; }
+  .sidebar.collapsed .nav-item span, .sidebar.collapsed .sidebar-brand span, .sidebar.collapsed .nav-item .pill { display: none; }
+  .sidebar.collapsed .nav-item { justify-content: center; padding: 11px 0; }
+  .sidebar-footer { padding: 16px 18px; border-top: 1px solid #242424; display: flex; align-items: center; gap: 12px; color: #6a6a85; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
+  .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #a855f7; font-weight: 700; flex-shrink: 0; }
+  .sidebar.collapsed .sidebar-footer span { display: none; }
+  .sidebar.collapsed .sidebar-footer { justify-content: center; }
+
+  /* MAIN */
+  .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #000000; }
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px; background: #080808; flex-shrink: 0; }
+  .topbar-left { display: flex; align-items: center; gap: 16px; }
+  .toggle-btn { background: transparent; border: none; color: #8a8aa0; font-size: 18px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
+  .toggle-btn:hover { background: #181818; color: #fff; }
+  .topbar h1 { color: #e8e8f0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .topbar h1 i { color: #a855f7; font-size: 20px; }
+  .topbar-right .badge { background: #181818; color: #8a8aa0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+
+  /* PAGE HEADER */
+  .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
+  .page-header h2 { color: #f0f0f5; font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+  .page-header h2 i { color: #a855f7; }
+  .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+  /* BUTTONS */
+  .btn { background: #181818; border: none; color: #d0d0e0; padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.15s; white-space: nowrap; }
+  .btn:hover { background: #2a2a2a; color: #fff; }
+  .btn-primary { background: #a855f7; color: #ffffff; }
+  .btn-primary:hover { background: #9333ea; }
+  .btn-success { background: #16a34a; color: #fff; }
+  .btn-success:hover { background: #15803d; }
+  .btn-danger { background: #dc2626; color: #ffffff; }
+  .btn-danger:hover { background: #b91c1c; }
+  .btn-gray { background: #475569; color: #fff; }
+  .btn-gray:hover { background: #334155; }
+  .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
+  /* STATS */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: #101010; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
+  .stat-card .label { color: #8a8aa0; font-size: 12px; font-weight: 500; text-transform: uppercase; }
+  .stat-card .value { color: #fff; font-size: 28px; font-weight: 700; }
+  .stat-card .icon-wrap { display: flex; justify-content: space-between; align-items: center; }
+  .stat-card .icon-wrap i { font-size: 22px; opacity: 0.85; }
+
+  /* FILTER TABS */
+  .filter-tabs { display: flex; gap: 6px; background: #101010; padding: 6px; border-radius: 12px; margin-bottom: 16px; overflow-x: auto; }
+  .filter-tabs::-webkit-scrollbar { display: none; }
+  .filter-tab { background: transparent; border: none; color: #8a8aa0; padding: 8px 14px; border-radius: 8px; font-size: 12.5px; font-weight: 600; cursor: pointer; white-space: nowrap; display: inline-flex; align-items: center; gap: 6px; transition: all 0.15s; }
+  .filter-tab:hover { color: #d0d0e0; }
+  .filter-tab.active { background: #202020; color: #fff; }
+  .filter-tab .count { background: #333333; color: #b0b0c8; font-size: 10px; padding: 1px 7px; border-radius: 10px; font-weight: 700; }
+  .filter-tab.active .count { background: #a855f7; color: #ffffff; }
+
+  /* LISTA (cards tipo usuario) */
+  .user-list { display: flex; flex-direction: column; gap: 12px; }
+  .user-card { background: #101010; border: 1px solid #1e1e1e; border-radius: 14px; padding: 16px 18px; transition: border 0.15s; }
+  .user-card:hover { border-color: #2e2e2e; }
+  .user-row { display: flex; align-items: flex-start; gap: 14px; }
+  .user-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, #a855f7, #6b21a8); display: flex; align-items: center; justify-content: center; color: #fff; font-weight: 700; font-size: 15px; flex-shrink: 0; }
+  .user-info { flex: 1; min-width: 0; }
+  .user-name-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 3px; }
+  .user-name { font-weight: 600; font-size: 14.5px; color: #e8e8f0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-contact { font-size: 12.5px; color: #8a8aa0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .user-meta { font-size: 11.5px; color: #6a6a85; margin-top: 5px; }
+
+  /* BADGES */
+  .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+  .tag.pendiente { background: rgba(251,191,36,0.15); color: #fbbf24; }
+  .tag.ganado { background: rgba(74,222,128,0.15); color: #4ade80; }
+  .tag.perdido { background: rgba(160,160,192,0.15); color: #a0a0c0; }
+
+  /* ACTION BUTTONS (dentro de card) */
+  .card-actions { display: flex; gap: 10px; margin-top: 14px; }
+  .btn-win { flex: 1; height: 42px; border-radius: 10px; background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4); color: #4ade80; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; }
+  .btn-win:hover { background: rgba(34,197,94,0.25); }
+  .btn-lose { flex: 1; height: 42px; border-radius: 10px; background: rgba(220,38,38,0.12); border: 1px solid rgba(220,38,38,0.35); color: #f87171; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.15s; }
+  .btn-lose:hover { background: rgba(220,38,38,0.22); }
+  .btn-win:disabled, .btn-lose:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* EMPTY / LOADING */
+  .empty-state { padding: 60px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
+  .empty-state i { font-size: 42px; display: block; margin-bottom: 14px; opacity: 0.4; color: #a855f7; }
+  .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
+  .loading i { animation: spin 1s linear infinite; color: #a855f7; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* TOASTS */
+  .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
+  .toast { background: #181818; color: #e0e0f0; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0,0,0,0.5); animation: slideIn 0.25s ease; min-width: 260px; }
+  .toast.success { border-left: 3px solid #4ade80; }
+  .toast.error { border-left: 3px solid #dc2626; }
+  .toast.info { border-left: 3px solid #a855f7; }
+  @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* RESPONSIVE */
+  @media (max-width: 800px) {
+    .sidebar { width: 72px; }
+    .sidebar .nav-item span, .sidebar .sidebar-brand span, .sidebar-footer span, .sidebar .nav-item .pill { display: none; }
+    .sidebar .nav-item { justify-content: center; padding: 11px 0; }
+    .sidebar-footer { justify-content: center; }
+    .content { padding: 16px; }
+    .topbar { padding: 12px 16px; }
+  }
 </style>
 </head>
-<body class="bg-slate-950 text-slate-100 min-h-screen">
+<body>
 
-  <header class="sticky top-0 z-20 backdrop-blur-xl bg-slate-950/80 border-b border-slate-800">
-    <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-      <div class="flex items-center gap-3">
-        <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-violet-600 to-purple-900
-                    flex items-center justify-center shadow-lg shadow-violet-900/50">
-          <svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.5"
-               stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-            <path d="M12 2L4 7v10l8 5 8-5V7z"/>
-            <path d="M9 12l2 2 4-4"/>
-          </svg>
-        </div>
-        <div>
-          <h1 class="text-[15px] font-bold tracking-tight">Admin YAPE</h1>
-          <p class="text-[11px] text-slate-500">Panel de participaciones</p>
-        </div>
+<div class="app">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <i class="fas fa-bolt"></i>
+      <span>YAPE<span class="accent"> Admin</span></span>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-section="dashboard"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
+      <button class="nav-item" data-section="participaciones"><i class="fas fa-ticket-alt"></i><span>Participaciones</span><span class="pill" id="pill-pending">0</span></button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="avatar">A</div>
+      <span>Administrador</span>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></button>
+        <h1><i class="fas fa-shield-halved"></i> <span id="pageTitle">Panel de Participaciones</span></h1>
       </div>
-      <button id="refrescar" class="px-3.5 h-9 rounded-lg bg-slate-800 hover:bg-slate-700
-                                    text-[13px] font-medium transition flex items-center gap-2">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4">
-          <path d="M21 12a9 9 0 11-3-6.7L21 8"/>
-          <path d="M21 3v5h-5"/>
-        </svg>
-        Refrescar
-      </button>
+      <div class="topbar-right">
+        <span class="badge" id="connStatus"><i class="fas fa-circle" style="color:#4ade80;font-size:8px;margin-right:6px;"></i>Conectado</span>
+      </div>
     </div>
-  </header>
-
-  <div class="max-w-5xl mx-auto px-4 pt-6">
-    <div class="flex gap-2 overflow-x-auto pb-1">
-      <button data-filtro="pendiente" class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Pendientes</button>
-      <button data-filtro="ganado"    class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Ganados</button>
-      <button data-filtro="perdido"   class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Perdidos</button>
-      <button data-filtro="all"       class="tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition">Todos</button>
-    </div>
-  </div>
-
-  <div class="max-w-5xl mx-auto px-4 pt-4 grid grid-cols-3 gap-3">
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-      <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Pendientes</div>
-      <div id="statPend" class="text-2xl font-bold text-yellow-400 mt-1">0</div>
-    </div>
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-      <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Ganados</div>
-      <div id="statWon" class="text-2xl font-bold text-green-400 mt-1">0</div>
-    </div>
-    <div class="bg-slate-900 border border-slate-800 rounded-xl p-4">
-      <div class="text-[11px] uppercase tracking-wide text-slate-500 font-semibold">Perdidos</div>
-      <div id="statLost" class="text-2xl font-bold text-slate-400 mt-1">0</div>
-    </div>
-  </div>
-
-  <main class="max-w-5xl mx-auto px-4 py-6">
-    <div id="lista" class="space-y-3">
-      <div class="text-center py-12 text-slate-500 text-sm">Cargando...</div>
+    <div class="content" id="content">
+      <div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>
     </div>
   </main>
+</div>
 
-  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl
-                        text-sm font-medium shadow-2xl opacity-0 pointer-events-none
-                        transition-opacity duration-300 z-50"></div>
+<div class="toast-container" id="toastContainer"></div>
 
 <script>
 (function () {
@@ -84,26 +180,27 @@
 
   const { createClient } = supabase;
   const sb = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  const $ = (id) => document.getElementById(id);
+  const $ = (s) => document.querySelector(s);
+  const content = $('#content');
 
-  let filtroActual = "pendiente";
+  let currentSection = 'dashboard';
+  let filtroActual = 'pendiente';
   let autoTimer = null;
   let cache = [];
 
-  function toast(msg, tipo) {
-    const t = $("toast");
-    const colores = {
-      ok:   "bg-green-500 text-white",
-      err:  "bg-red-500 text-white",
-      info: "bg-slate-700 text-white"
-    };
-    t.className = "fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-xl " +
-                  "text-sm font-medium shadow-2xl transition-opacity duration-300 z-50 " +
-                  (colores[tipo] || colores.info);
-    t.textContent = msg;
-    t.style.opacity = "1";
-    clearTimeout(t._timer);
-    t._timer = setTimeout(() => { t.style.opacity = "0"; }, 2500);
+  /* ---------- HELPERS ---------- */
+  function toast(msg, type = 'info') {
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    const icons = { success: 'fa-check-circle', error: 'fa-exclamation-circle', info: 'fa-info-circle' };
+    t.innerHTML = `<i class="fas ${icons[type] || icons.info}"></i> ${msg}`;
+    $('#toastContainer').appendChild(t);
+    setTimeout(() => t.remove(), 3500);
+  }
+
+  function escapeHtml(s) {
+    if (s === null || s === undefined) return '';
+    return String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
   }
 
   function fmtFecha(iso) {
@@ -116,7 +213,20 @@
     });
   }
 
-  async function cargar() {
+  /* ---------- NAV ---------- */
+  document.querySelectorAll('.nav-item').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentSection = btn.dataset.section;
+      if (currentSection === 'dashboard') renderDashboard();
+      else if (currentSection === 'participaciones') renderParticipaciones();
+    });
+  });
+  $('#toggleSidebar').addEventListener('click', () => $('#sidebar').classList.toggle('collapsed'));
+
+  /* ---------- DATA ---------- */
+  async function cargarParticipaciones() {
     let query = sb.from("yape_participaciones")
       .select("id, usuario_id, estado, revisado_en, creado_en")
       .order("creado_en", { ascending: false })
@@ -125,10 +235,7 @@
     if (filtroActual !== "all") query = query.eq("estado", filtroActual);
 
     const { data, error } = await query;
-    if (error) {
-      $("lista").innerHTML = `<div class="text-center py-12 text-red-400 text-sm">Error: ${error.message}</div>`;
-      return;
-    }
+    if (error) throw error;
 
     const ids = [...new Set((data || []).map(d => d.usuario_id).filter(Boolean))];
     let perfiles = {};
@@ -140,26 +247,126 @@
     }
 
     cache = (data || []).map(d => ({ ...d, perfil: perfiles[d.usuario_id] || {} }));
-    render();
-    actualizarStats();
   }
 
-  async function actualizarStats() {
+  async function cargarStats() {
     const [p, w, l] = await Promise.all([
       sb.from("yape_participaciones").select("id", { count: "exact", head: true }).eq("estado", "pendiente"),
       sb.from("yape_participaciones").select("id", { count: "exact", head: true }).eq("estado", "ganado"),
       sb.from("yape_participaciones").select("id", { count: "exact", head: true }).eq("estado", "perdido"),
     ]);
-    $("statPend").textContent = p.count || 0;
-    $("statWon").textContent  = w.count || 0;
-    $("statLost").textContent = l.count || 0;
+    return { pend: p.count || 0, won: w.count || 0, lost: l.count || 0 };
   }
 
-  function render() {
-    const cont = $("lista");
+  /* ---------- DASHBOARD ---------- */
+  async function renderDashboard() {
+    content.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>`;
+    try {
+      const stats = await cargarStats();
+      document.getElementById('pill-pending').textContent = stats.pend;
+
+      content.innerHTML = `
+        <div class="page-header">
+          <h2><i class="fas fa-chart-pie"></i> Dashboard</h2>
+          <span class="badge" style="background:#181818;color:#8a8aa0;padding:6px 14px;border-radius:20px;font-size:12px;">Resumen general</span>
+        </div>
+        <div class="stats-grid">
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Pendientes</span><i class="fas fa-clock" style="color:#fbbf24"></i></div><span class="value" style="color:#fbbf24;">${stats.pend}</span></div>
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Ganados</span><i class="fas fa-trophy" style="color:#4ade80"></i></div><span class="value" style="color:#4ade80;">${stats.won}</span></div>
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Perdidos</span><i class="fas fa-times-circle" style="color:#a0a0c0"></i></div><span class="value" style="color:#a0a0c0;">${stats.lost}</span></div>
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Total</span><i class="fas fa-list" style="color:#a855f7"></i></div><span class="value" style="color:#a855f7;">${stats.pend + stats.won + stats.lost}</span></div>
+        </div>
+        <div class="empty-state">
+          <i class="fas fa-bolt"></i>
+          Ve a <b style="color:#a855f7;">Participaciones</b> para revisar y aprobar premios YAPE.
+        </div>
+      `;
+    } catch (err) {
+      console.error(err);
+      content.innerHTML = `<div class="empty-state" style="color:#dc2626;"><i class="fas fa-exclamation-circle"></i>Error: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  /* ---------- PARTICIPACIONES ---------- */
+  async function renderParticipaciones() {
+    content.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>`;
+    try {
+      const stats = await cargarStats();
+      document.getElementById('pill-pending').textContent = stats.pend;
+
+      const counts = { pendiente: stats.pend, ganado: stats.won, perdido: stats.lost, all: stats.pend + stats.won + stats.lost };
+
+      content.innerHTML = `
+        <div class="page-header">
+          <h2><i class="fas fa-ticket-alt"></i> Participaciones</h2>
+          <div class="header-actions">
+            <button class="btn" id="btnRefreshReq"><i class="fas fa-sync"></i> Refrescar</button>
+          </div>
+        </div>
+
+        <div class="stats-grid" style="margin-bottom:16px;">
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Pendientes</span><i class="fas fa-clock" style="color:#fbbf24"></i></div><span class="value" style="color:#fbbf24;">${stats.pend}</span></div>
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Ganados</span><i class="fas fa-trophy" style="color:#4ade80"></i></div><span class="value" style="color:#4ade80;">${stats.won}</span></div>
+          <div class="stat-card"><div class="icon-wrap"><span class="label">Perdidos</span><i class="fas fa-times-circle" style="color:#a0a0c0"></i></div><span class="value" style="color:#a0a0c0;">${stats.lost}</span></div>
+        </div>
+
+        <div class="filter-tabs" id="filterTabs">
+          <button class="filter-tab" data-filtro="pendiente">Pendientes <span class="count">${counts.pendiente}</span></button>
+          <button class="filter-tab" data-filtro="ganado">Ganados <span class="count">${counts.ganado}</span></button>
+          <button class="filter-tab" data-filtro="perdido">Perdidos <span class="count">${counts.perdido}</span></button>
+          <button class="filter-tab" data-filtro="all">Todos <span class="count">${counts.all}</span></button>
+        </div>
+
+        <div id="lista" class="user-list">
+          <div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>
+        </div>
+      `;
+
+      // Activar tab actual
+      document.querySelectorAll('.filter-tab').forEach(b => {
+        if (b.dataset.filtro === filtroActual) b.classList.add('active');
+        b.addEventListener('click', () => {
+          document.querySelectorAll('.filter-tab').forEach(x => x.classList.remove('active'));
+          b.classList.add('active');
+          filtroActual = b.dataset.filtro;
+          cargarYRenderLista();
+        });
+      });
+
+      document.getElementById('btnRefreshReq').onclick = () => {
+        toast('Actualizando...', 'info');
+        renderParticipaciones();
+      };
+
+      await cargarYRenderLista();
+    } catch (err) {
+      console.error(err);
+      content.innerHTML = `<div class="empty-state" style="color:#dc2626;"><i class="fas fa-exclamation-circle"></i>Error: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  async function cargarYRenderLista() {
+    const lista = document.getElementById('lista');
+    if (!lista) return;
+    lista.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>`;
+    try {
+      await cargarParticipaciones();
+      renderLista();
+    } catch (err) {
+      console.error(err);
+      lista.innerHTML = `<div class="empty-state" style="color:#dc2626;"><i class="fas fa-exclamation-circle"></i>Error: ${escapeHtml(err.message)}</div>`;
+    }
+  }
+
+  function renderLista() {
+    const cont = document.getElementById('lista');
+    if (!cont) return;
+
     if (!cache.length) {
-      cont.innerHTML = `<div class="text-center py-12 text-slate-500 text-sm">
-        No hay participaciones ${filtroActual !== "all" ? "en este estado" : ""}.</div>`;
+      cont.innerHTML = `<div class="empty-state">
+        <i class="fas fa-inbox"></i>
+        No hay participaciones ${filtroActual !== 'all' ? 'en este estado' : ''}.
+      </div>`;
       return;
     }
 
@@ -169,50 +376,31 @@
       const st      = p.estado;
 
       let badge = "";
-      if (st === "pendiente") badge = `<span class="px-2.5 py-1 rounded-md bg-yellow-500/15 text-yellow-400 text-[11px] font-bold uppercase tracking-wide">Pendiente</span>`;
-      if (st === "ganado")    badge = `<span class="px-2.5 py-1 rounded-md bg-green-500/15 text-green-400 text-[11px] font-bold uppercase tracking-wide">Ganó</span>`;
-      if (st === "perdido")   badge = `<span class="px-2.5 py-1 rounded-md bg-slate-500/15 text-slate-400 text-[11px] font-bold uppercase tracking-wide">Perdió</span>`;
+      if (st === "pendiente") badge = `<span class="tag pendiente">Pendiente</span>`;
+      if (st === "ganado")    badge = `<span class="tag ganado">Ganó</span>`;
+      if (st === "perdido")   badge = `<span class="tag perdido">Perdió</span>`;
 
       const botones = st === "pendiente" ? `
-        <div class="flex gap-2 mt-3">
-          <button data-id="${p.id}" data-accion="ganado"
-                  class="flex-1 h-10 rounded-lg bg-green-500/15 border border-green-500/40
-                         text-green-400 text-[13px] font-bold hover:bg-green-500/25 transition
-                         flex items-center justify-center gap-1.5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                 stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
-              <path d="M20 6L9 17l-5-5"/>
-            </svg>
-            GANÓ 4 BS
+        <div class="card-actions">
+          <button class="btn-win" data-id="${p.id}" data-accion="ganado">
+            <i class="fas fa-check"></i> GANÓ 4 BS
           </button>
-          <button data-id="${p.id}" data-accion="perdido"
-                  class="flex-1 h-10 rounded-lg bg-slate-700/40 border border-slate-600/40
-                         text-slate-300 text-[13px] font-bold hover:bg-slate-700/60 transition
-                         flex items-center justify-center gap-1.5">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-                 stroke-linecap="round" stroke-linejoin="round" class="w-3.5 h-3.5">
-              <path d="M18 6L6 18M6 6l12 12"/>
-            </svg>
-            PERDIÓ
+          <button class="btn-lose" data-id="${p.id}" data-accion="perdido">
+            <i class="fas fa-times"></i> PERDIÓ
           </button>
         </div>` : "";
 
       return `
-        <div class="bg-slate-900 border border-slate-800 rounded-xl p-4 hover:border-slate-700 transition">
-          <div class="flex items-start gap-3">
-            <div class="w-10 h-10 rounded-full bg-gradient-to-br from-violet-600 to-purple-900
-                        flex items-center justify-center text-white font-bold text-sm shrink-0">
-              ${inicial}
-            </div>
-            <div class="flex-1 min-w-0">
-              <div class="flex items-center justify-between gap-2 mb-0.5">
-                <div class="font-semibold text-[14px] truncate">${nombre}</div>
+        <div class="user-card">
+          <div class="user-row">
+            <div class="user-avatar">${inicial}</div>
+            <div class="user-info">
+              <div class="user-name-row">
+                <div class="user-name">${escapeHtml(nombre)}</div>
                 ${badge}
               </div>
-              <div class="text-[12px] text-slate-500 truncate">
-                ${p.perfil.email || p.perfil.phone || "sin contacto"}
-              </div>
-              <div class="text-[11px] text-slate-600 mt-1 tabular-nums">
+              <div class="user-contact">${escapeHtml(p.perfil.email || p.perfil.phone || "sin contacto")}</div>
+              <div class="user-meta">
                 📅 ${fmtFecha(p.creado_en)}
                 ${p.revisado_en ? ` · ✅ Revisado ${fmtFecha(p.revisado_en)}` : ""}
               </div>
@@ -243,7 +431,7 @@
       .eq("id", id);
 
     if (error) {
-      toast("Error: " + error.message, "err");
+      toast("Error: " + error.message, "error");
       boton.disabled = false;
       boton.style.opacity = "1";
       return;
@@ -258,45 +446,50 @@
 
       if (errTx) {
         console.error("Error actualizando transacciones:", errTx);
-        toast("⚠️ Participación marcada, pero falló actualizar transacción", "err");
+        toast("⚠️ Participación marcada, pero falló actualizar transacción", "error");
       }
     }
 
-    toast(accion === "ganado" ? "✅ Depósito de 4 Bs acreditado" : "❌ Marcado como perdido", "ok");
-    cargar();
+    toast(accion === "ganado" ? "✅ Depósito de 4 Bs acreditado" : "❌ Marcado como perdido", "success");
+
+    // Refrescar solo la lista y stats
+    await cargarYRenderLista();
+    const stats = await cargarStats();
+    document.getElementById('pill-pending').textContent = stats.pend;
+    // Actualizar counters en tabs y cards
+    const tabs = document.querySelectorAll('.filter-tab');
+    const counts = { pendiente: stats.pend, ganado: stats.won, perdido: stats.lost, all: stats.pend + stats.won + stats.lost };
+    tabs.forEach(t => {
+      const c = t.querySelector('.count');
+      if (c) c.textContent = counts[t.dataset.filtro];
+    });
+    const vals = document.querySelectorAll('.stats-grid .stat-card .value');
+    if (vals[0]) vals[0].textContent = stats.pend;
+    if (vals[1]) vals[1].textContent = stats.won;
+    if (vals[2]) vals[2].textContent = stats.lost;
   }
 
-  function actualizarTabs() {
-    document.querySelectorAll(".tab-btn").forEach(b => {
-      const activo = b.dataset.filtro === filtroActual;
-      b.className = "tab-btn px-4 h-9 rounded-lg text-[13px] font-semibold transition " +
-        (activo
-          ? "bg-violet-600 text-white shadow-lg shadow-violet-900/40"
-          : "bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-slate-200");
-    });
-  }
-
-  document.querySelectorAll(".tab-btn").forEach(b => {
-    b.addEventListener("click", () => {
-      filtroActual = b.dataset.filtro;
-      actualizarTabs();
-      cargar();
-    });
-  });
-
-  $("refrescar").addEventListener("click", () => {
-    toast("Actualizando...", "info");
-    cargar();
-  });
-
+  /* ---------- AUTO REFRESH ---------- */
   function iniciarAuto() {
     if (autoTimer) clearInterval(autoTimer);
-    autoTimer = setInterval(cargar, 10000);
+    autoTimer = setInterval(() => {
+      if (currentSection === 'participaciones') cargarYRenderLista();
+    }, 15000);
   }
 
-  actualizarTabs();
-  cargar();
-  iniciarAuto();
+  /* ---------- INIT ---------- */
+  (async function init() {
+    try {
+      const { error } = await sb.from("yape_participaciones").select("id", { count: "exact", head: true });
+      if (error) throw error;
+      await renderDashboard();
+      iniciarAuto();
+    } catch (err) {
+      console.error(err);
+      $('#connStatus').innerHTML = '<i class="fas fa-circle" style="color:#dc2626;font-size:8px;margin-right:6px;"></i>Error';
+      content.innerHTML = `<div class="empty-state" style="color:#dc2626;"><i class="fas fa-exclamation-circle"></i>Error al conectar: ${escapeHtml(err.message)}</div>`;
+    }
+  })();
 })();
 </script>
 </body>
