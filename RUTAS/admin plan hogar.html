@@ -54,6 +54,10 @@
   .btn-danger:hover { background: #a16207; }
   .btn-gray { background: #475569; color: #fff; }
   .btn-gray:hover { background: #334155; }
+  .btn-reward { background: #7c3aed; color: #fff; }
+  .btn-reward:hover { background: #6d28d9; }
+  .btn-rewarded { background: #0ea5e9; color: #fff; }
+  .btn-rewarded:hover { background: #0284c7; }
   .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
 
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
@@ -89,6 +93,7 @@
   .tag.confirmado { background: #14331f; color: #4ade80; }
   .tag.cancelado { background: #3a300f; color: #facc15; }
   .tag.sincob { background: #333333; color: #a0a0c0; }
+  .tag.recompensado { background: #0e2a4a; color: #60a5fa; }
   .actions-cell { display: flex; gap: 6px; }
   .empty-state { padding: 40px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
   .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
@@ -201,9 +206,6 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const TELEGRAM_BOT_TOKEN = '7596286871:AAGFe3sHy-GhykyM_xsFwDU8qrt6SWXSWHY';
-const TELEGRAM_CHAT_ID = '-5155315945';
-
 let currentSection = 'dashboard';
 let currentFilter = 'all';
 let currentData = [];
@@ -217,17 +219,18 @@ let searchTerm = '';
 const $ = (s) => document.querySelector(s);
 const content = $('#content');
 
+// ✅ SCHEMA ADAPTADO EXACTAMENTE A TU SQL
 const SCHEMA = {
   categories: {
     table: 'package_categories', label: 'Categorías', singular: 'Categoría', icon: 'fa-tags', pk: 'id',
     columns: [
       { key: 'id', label: 'ID', type: 'readonly' },
       { key: 'name', label: 'Nombre', type: 'text', required: true },
-      { key: 'description', label: 'Descripción', type: 'textarea', full: true },
+      { key: 'icon', label: 'Ícono (FontAwesome)', type: 'text' },
       { key: 'display_order', label: 'Orden', type: 'number' },
       { key: 'is_active', label: 'Activo', type: 'boolean' },
     ],
-    listFields: ['name', 'display_order', 'is_active'],
+    listFields: ['name', 'icon', 'display_order', 'is_active'],
   },
   packages: {
     table: 'internet_packages', label: 'Paquetes', singular: 'Paquete', icon: 'fa-box', pk: 'id',
@@ -241,7 +244,6 @@ const SCHEMA = {
       { key: 'speed_mbps', label: 'Velocidad (Mbps)', type: 'number', required: true },
       { key: 'price', label: 'Precio (Bs)', type: 'number', step: '0.01', required: true },
       { key: 'installation_fee', label: 'Instalación (Bs)', type: 'number', step: '0.01' },
-      { key: 'contract_months', label: 'Meses de Contrato', type: 'number' },
       { key: 'discount_percentage', label: 'Descuento (%)', type: 'number' },
       { key: 'features', label: 'Características (una por línea)', type: 'textarea', full: true },
       { key: 'is_featured', label: 'Destacado', type: 'boolean' },
@@ -250,17 +252,6 @@ const SCHEMA = {
     listFields: ['name', 'category_id', 'speed_mbps', 'price', 'discount_percentage', 'is_featured', 'is_active'],
   },
 };
-
-// ✅ Genera un slug a partir del nombre
-function generateSlug(text) {
-  return String(text || '')
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z0-9\s-]/g, '')
-    .trim()
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-');
-}
 
 function toast(msg, type = 'info') {
   const t = document.createElement('div');
@@ -283,7 +274,8 @@ const STATUS_MAP = {
   'pending': { class: 'pendiente', label: '⏳ Pendiente' },
   'confirmed': { class: 'confirmado', label: '✅ Confirmado' },
   'cancelled': { class: 'cancelado', label: '❌ Cancelado' },
-  'no_coverage': { class: 'sincob', label: '📡 Sin Cobertura' }
+  'no_coverage': { class: 'sincob', label: '📡 Sin Cobertura' },
+  'rewarded': { class: 'recompensado', label: '🎁 Recompensado' }
 };
 
 document.querySelectorAll('.nav-item').forEach(btn => {
@@ -335,7 +327,7 @@ async function updatePendingPill() {
 
 async function renderDashboard() {
   await loadCategoriesCache();
-  const [cats, packs, reqs, pending, confirmed, cancelled, noCov] = await Promise.all([
+  const [cats, packs, reqs, pending, confirmed, cancelled, noCov, rewarded] = await Promise.all([
     db.from('package_categories').select('*', { count: 'exact', head: true }),
     db.from('internet_packages').select('*', { count: 'exact', head: true }),
     db.from('request_status').select('*', { count: 'exact', head: true }),
@@ -343,6 +335,7 @@ async function renderDashboard() {
     db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'confirmed'),
     db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'cancelled'),
     db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'no_coverage'),
+    db.from('request_status').select('*', { count: 'exact', head: true }).eq('status', 'rewarded'),
   ]);
 
   const cards = [
@@ -351,6 +344,7 @@ async function renderDashboard() {
     { label: 'Solicitudes', value: reqs.count || 0, icon: 'fa-file-alt', color: '#60a5fa' },
     { label: 'Pendientes', value: pending.count || 0, icon: 'fa-clock', color: '#f59e0b' },
     { label: 'Confirmadas', value: confirmed.count || 0, icon: 'fa-check-circle', color: '#4ade80' },
+    { label: 'Recompensadas', value: rewarded.count || 0, icon: 'fa-gift', color: '#0ea5e9' },
     { label: 'Canceladas', value: cancelled.count || 0, icon: 'fa-times-circle', color: '#facc15' },
     { label: 'Sin Cobertura', value: noCov.count || 0, icon: 'fa-signal', color: '#a0a0c0' },
   ];
@@ -397,6 +391,7 @@ async function renderRequests() {
     confirmed: allRequests.filter(r => r.status === 'confirmed').length,
     cancelled: allRequests.filter(r => r.status === 'cancelled').length,
     no_coverage: allRequests.filter(r => r.status === 'no_coverage').length,
+    rewarded: allRequests.filter(r => r.status === 'rewarded').length,
   };
   document.getElementById('pill-pending').textContent = counts.pending;
 
@@ -408,6 +403,7 @@ async function renderRequests() {
     <div class="stats-grid" style="margin-bottom:16px;">
       <div class="stat-card"><div class="icon-wrap"><span class="label">Pendientes</span><i class="fas fa-clock" style="color:#f59e0b"></i></div><span class="value">${counts.pending}</span></div>
       <div class="stat-card"><div class="icon-wrap"><span class="label">Confirmadas</span><i class="fas fa-check-circle" style="color:#4ade80"></i></div><span class="value">${counts.confirmed}</span></div>
+      <div class="stat-card"><div class="icon-wrap"><span class="label">Recompensadas</span><i class="fas fa-gift" style="color:#0ea5e9"></i></div><span class="value">${counts.rewarded}</span></div>
       <div class="stat-card"><div class="icon-wrap"><span class="label">Canceladas</span><i class="fas fa-times-circle" style="color:#facc15"></i></div><span class="value">${counts.cancelled}</span></div>
       <div class="stat-card"><div class="icon-wrap"><span class="label">Sin Cobertura</span><i class="fas fa-signal" style="color:#a0a0c0"></i></div><span class="value">${counts.no_coverage}</span></div>
     </div>
@@ -415,6 +411,7 @@ async function renderRequests() {
       <button class="filter-tab active" data-status="all">Todas <span class="count">${counts.all}</span></button>
       <button class="filter-tab" data-status="pending">Pendientes <span class="count">${counts.pending}</span></button>
       <button class="filter-tab" data-status="confirmed">Confirmadas <span class="count">${counts.confirmed}</span></button>
+      <button class="filter-tab" data-status="rewarded">Recompensadas <span class="count">${counts.rewarded}</span></button>
       <button class="filter-tab" data-status="cancelled">Canceladas <span class="count">${counts.cancelled}</span></button>
       <button class="filter-tab" data-status="no_coverage">Sin Cobertura <span class="count">${counts.no_coverage}</span></button>
     </div>
@@ -445,8 +442,7 @@ function paintRequests() {
       const p = profilesMap[r.user_id] || {};
       return (p.full_name || '').toLowerCase().includes(searchTerm) ||
              (p.email || '').toLowerCase().includes(searchTerm) ||
-             (p.phone || '').toLowerCase().includes(searchTerm) ||
-             (r.package_name || '').toLowerCase().includes(searchTerm);
+             (p.phone || '').toLowerCase().includes(searchTerm);
     });
   }
   if (!filtered.length) {
@@ -455,7 +451,7 @@ function paintRequests() {
   }
   list.innerHTML = `
     <div class="table-wrap"><div class="table-scroll"><table>
-      <thead><tr><th>Cliente</th><th>Contacto</th><th>Paquete</th><th>Monto</th><th>Estado</th><th>Fecha</th><th style="text-align:right;">Acciones</th></tr></thead>
+      <thead><tr><th>Cliente</th><th>Contacto</th><th>ID Solicitud</th><th>Estado</th><th>Fecha</th><th style="text-align:right;">Acciones</th></tr></thead>
       <tbody>
         ${filtered.map(req => {
           const st = STATUS_MAP[req.status] || STATUS_MAP['pending'];
@@ -474,8 +470,7 @@ function paintRequests() {
               </div>
             </td>
             <td><span style="color:#c0c0d0;">📞 ${escapeHtml(p.phone || '—')}</span></td>
-            <td><div style="color:#e0e0f0;">${escapeHtml(req.package_name || '—')}</div><div style="font-size:11.5px;color:#8a8aa0;">${formatCurrency(req.monthly_price)}/mes</div></td>
-            <td><span style="color:#60a5fa;font-weight:600;">${formatCurrency(req.total_first_payment)}</span></td>
+            <td><span style="font-family:monospace;color:#60a5fa;">#${req.id.slice(0, 8)}</span></td>
             <td><span class="tag ${st.class}">${st.label}</span></td>
             <td><span style="color:#8a8aa0;font-size:12px;">${dateStr}</span></td>
             <td><div class="actions-cell" style="justify-content:flex-end;"><button class="btn btn-sm" data-view="${req.id}"><i class="fas fa-eye"></i></button></div></td>
@@ -487,11 +482,22 @@ function paintRequests() {
   document.querySelectorAll('[data-view]').forEach(b => b.onclick = () => openRequestDetail(b.dataset.view));
 }
 
-function openRequestDetail(id) {
+async function openRequestDetail(id) {
   const req = allRequests.find(r => r.id === id);
   if (!req) return;
   const st = STATUS_MAP[req.status] || STATUS_MAP['pending'];
   const p = profilesMap[req.user_id] || {};
+
+  // ✅ Recompensas = depósitos con request_id
+  const { data: rewards } = await db
+    .from('transacciones')
+    .select('*')
+    .eq('request_id', req.id)
+    .eq('tipo', 'deposito')
+    .order('creado_en', { ascending: false });
+
+  const rewardTotal = (rewards || []).reduce((s, r) => s + Number(r.monto || 0), 0);
+
   const body = document.getElementById('modalBody');
   const title = document.getElementById('modalTitle');
   const footer = document.getElementById('modalFooter');
@@ -506,27 +512,37 @@ function openRequestDetail(id) {
       <div class="detail-row"><span class="detail-label">Nombre</span><span class="detail-value">${escapeHtml(p.full_name || '—')}</span></div>
       <div class="detail-row"><span class="detail-label">Email</span><span class="detail-value">${escapeHtml(p.email || '—')}</span></div>
       <div class="detail-row"><span class="detail-label">Teléfono</span><span class="detail-value">${escapeHtml(p.phone || '—')}</span></div>
-    </div>
-
-    <div class="detail-section">
-      <div class="detail-section-title">Paquete</div>
-      <div class="detail-row"><span class="detail-label">Plan</span><span class="detail-value">${escapeHtml(req.package_name || '—')}</span></div>
-      <div class="detail-row"><span class="detail-label">Precio mensual</span><span class="detail-value">${formatCurrency(req.monthly_price)}</span></div>
-      <div class="detail-row"><span class="detail-label">Instalación</span><span class="detail-value">${formatCurrency(req.installation_fee)}</span></div>
-      <div class="detail-row"><span class="detail-label">Primer pago</span><span class="detail-value" style="color:#60a5fa;font-weight:700;">${formatCurrency(req.total_first_payment)}</span></div>
+      <div class="detail-row"><span class="detail-label">User ID</span><span class="detail-value" style="font-family:monospace;font-size:11px;">${req.user_id}</span></div>
     </div>
 
     <div class="detail-section">
       <div class="detail-section-title">Fechas</div>
       <div class="detail-row"><span class="detail-label">Creada</span><span class="detail-value">${new Date(req.created_at).toLocaleString('es-BO')}</span></div>
-      ${req.updated_at ? `<div class="detail-row"><span class="detail-label">Actualizada</span><span class="detail-value">${new Date(req.updated_at).toLocaleString('es-BO')}</span></div>` : ''}
+      ${req.confirmed_at ? `<div class="detail-row"><span class="detail-label">Confirmada</span><span class="detail-value">${new Date(req.confirmed_at).toLocaleString('es-BO')}</span></div>` : ''}
+      ${req.rewarded_at ? `<div class="detail-row"><span class="detail-label">Recompensada</span><span class="detail-value">${new Date(req.rewarded_at).toLocaleString('es-BO')}</span></div>` : ''}
     </div>
 
-    ${req.status_message ? `<div class="detail-section" style="background:#3a2a1a;"><div class="detail-section-title" style="color:#fbbf24;">Mensaje de estado</div><p style="font-size:13px;color:#fde68a;">${escapeHtml(req.status_message)}</p></div>` : ''}
+    <div class="detail-section" style="background:#1a0e2e;border:1px solid #4c1d95;">
+      <div class="detail-section-title" style="color:#c084fc;">💰 Recompensas del vendedor</div>
+      <div class="detail-row"><span class="detail-label">Total pagado</span><span class="detail-value" style="color:#c084fc;font-weight:700;">${formatCurrency(rewardTotal)}</span></div>
+      <div class="detail-row"><span class="detail-label">Cantidad</span><span class="detail-value">${(rewards || []).length} depósito(s)</span></div>
+      <div class="detail-row"><span class="detail-label">Estado recompensa</span><span class="detail-value">${req.reward_status === 'paid' ? '✅ Pagado' : req.reward_status === 'available' ? '🟣 Disponible' : '—'}</span></div>
+      ${(rewards || []).length ? `
+        <div style="margin-top:10px;padding-top:10px;border-top:1px dashed #4c1d95;">
+          <div class="detail-section-title" style="color:#c084fc;">Historial</div>
+          ${(rewards || []).map(r => `
+            <div class="detail-row">
+              <span class="detail-label">${new Date(r.creado_en).toLocaleDateString('es-BO')} ${new Date(r.creado_en).toLocaleTimeString('es-BO',{hour:'2-digit',minute:'2-digit'})}</span>
+              <span class="detail-value" style="color:#c084fc;">+ ${formatCurrency(r.monto)}</span>
+            </div>
+          `).join('')}
+        </div>
+      ` : ''}
+    </div>
 
     <div class="detail-section" style="background:#0f1a2e;border:1px solid #1e3a5f;">
-      <div class="detail-section-title" style="color:#60a5fa;">ℹ️ Más detalles</div>
-      <p style="font-size:12.5px;color:#93c5fd;line-height:1.5;">Las fotos (CI, selfie), dirección, coordenadas y demás datos se envían directamente al <b>Bot de Telegram</b> al momento de crear la solicitud.</p>
+      <div class="detail-section-title" style="color:#60a5fa;">ℹ️ Información</div>
+      <p style="font-size:12.5px;color:#93c5fd;line-height:1.5;">Los datos del cliente (fotos, dirección, teléfonos, coordenadas) fueron enviados al Bot de Telegram al crear la solicitud. Aquí solo se gestionan los estados.</p>
     </div>
 
     <div class="field field-full">
@@ -540,6 +556,14 @@ function openRequestDetail(id) {
         <button class="btn btn-gray" data-act="no_coverage"><i class="fas fa-signal"></i> S/Cobertura</button>
         <button class="btn btn-danger" data-act="cancelled"><i class="fas fa-times"></i> Cancelar</button>
       </div>
+    ` : req.status === 'confirmed' ? `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px;">
+        <button class="btn btn-reward" data-act="reward"><i class="fas fa-gift"></i> Dar Recompensa</button>
+        <button class="btn btn-rewarded" data-act="rewarded"><i class="fas fa-check-double"></i> Marcar Recompensado</button>
+      </div>
+      <div style="margin-top:8px;"><button class="btn" style="width:100%;" data-act="pending"><i class="fas fa-undo"></i> Volver a Pendiente</button></div>
+    ` : req.status === 'rewarded' ? `
+      <div style="margin-top:4px;"><button class="btn" style="width:100%;" data-act="confirmed"><i class="fas fa-undo"></i> Volver a Confirmado</button></div>
     ` : `
       <div style="margin-top:4px;"><button class="btn" style="width:100%;" data-act="pending"><i class="fas fa-undo"></i> Volver a Pendiente</button></div>
     `}
@@ -557,38 +581,16 @@ function openRequestDetail(id) {
   openModal('modalOverlay');
 }
 
-// ✅ Eliminar UNA sola solicitud
 async function deleteSingleRequest(id) {
   const req = allRequests.find(r => r.id === id);
   if (!req) return;
   const p = profilesMap[req.user_id] || {};
-  if (!confirm(`¿Eliminar la solicitud de ${p.full_name || 'este cliente'}? Esta acción no se puede deshacer.`)) return;
+
+  if (!confirm(`¿Eliminar la solicitud #${req.id.slice(0, 8)} de ${p.full_name || 'este cliente'}?\n\nTambién se eliminarán sus recompensas asociadas.\n\nEsta acción no se puede deshacer.`)) return;
 
   try {
-    // Eliminar transacción asociada si existe
-    const { data: txs } = await db
-      .from('transactions')
-      .select('id')
-      .eq('user_id', req.user_id)
-      .eq('type', 'withdrawal')
-      .eq('metadata->>request_id', req.id);
-
-    let idsToDelete = (txs || []).map(t => t.id);
-
-    if (!idsToDelete.length) {
-      const { data: txsAlt } = await db
-        .from('transactions')
-        .select('id')
-        .eq('user_id', req.user_id)
-        .eq('type', 'withdrawal')
-        .ilike('description', `%#${req.id.slice(0, 8)}%`);
-      idsToDelete = (txsAlt || []).map(t => t.id);
-    }
-
-    if (idsToDelete.length) {
-      await db.from('transactions').delete().in('id', idsToDelete);
-    }
-
+    // ✅ Borra solo los depósitos (recompensas) de esta solicitud
+    await db.from('transacciones').delete().eq('request_id', req.id).eq('tipo', 'deposito');
     const { error } = await db.from('request_status').delete().eq('id', req.id);
     if (error) throw error;
 
@@ -597,7 +599,7 @@ async function deleteSingleRequest(id) {
     await renderRequests();
   } catch (err) {
     console.error(err);
-    toast(err.message, 'error');
+    toast('Error al eliminar: ' + err.message, 'error');
   }
 }
 
@@ -607,71 +609,87 @@ async function execAction(type, id) {
   const p = profilesMap[req.user_id] || {};
   const msg = document.getElementById('actionMsg')?.value.trim() || null;
 
+  // 💰 DAR RECOMPENSA (tipo = 'deposito')
+  if (type === 'reward') {
+    const amount = prompt('💰 Monto de la recompensa (Bs):\n\nEjemplo: 50');
+    if (!amount) return;
+    const monto = parseFloat(amount);
+    if (isNaN(monto) || monto <= 0) { toast('Monto inválido', 'error'); return; }
+
+    try {
+      const { error } = await db.from('transacciones').insert([{
+        usuario_id: req.user_id,
+        monto: monto,
+        tipo: 'deposito',
+        descripcion: `Recompensa solicitud #${req.id.slice(0, 8)}`,
+        estado: 'completado',
+        request_id: req.id,
+        metadata: { request_id: req.id, admin_action: true, reward: true }
+      }]);
+      if (error) throw error;
+
+      const { data: allRew } = await db
+        .from('transacciones')
+        .select('monto')
+        .eq('request_id', req.id)
+        .eq('tipo', 'deposito');
+      const total = (allRew || []).reduce((s, r) => s + Number(r.monto || 0), 0);
+      await db.from('request_status').update({ reward_total: total, reward_status: 'available' }).eq('id', req.id);
+
+      toast(`Recompensa de ${formatCurrency(monto)} registrada`, 'success');
+      closeModal('modalOverlay');
+      await renderRequests();
+    } catch (err) {
+      console.error(err);
+      toast(err.message, 'error');
+    }
+    return;
+  }
+
+  // 🎁 MARCAR RECOMPENSADO
+  if (type === 'rewarded') {
+    if (!confirm(`¿Marcar esta solicitud como RECOMPENSADA?\n\nSe cerrará el ciclo de recompensas de ${p.full_name || 'este vendedor'}.`)) return;
+    try {
+      const { error } = await db.from('request_status').update({
+        status: 'rewarded',
+        reward_status: 'paid',
+        rewarded_at: new Date().toISOString(),
+        status_message: msg || 'Recompensas completadas'
+      }).eq('id', req.id);
+      if (error) throw error;
+
+      toast('Solicitud marcada como recompensada', 'success');
+      closeModal('modalOverlay');
+      await renderRequests();
+    } catch (err) {
+      console.error(err);
+      toast(err.message, 'error');
+    }
+    return;
+  }
+
+  // 🔄 CAMBIOS DE ESTADO NORMALES
   const labels = { 'confirmed': 'confirmar', 'cancelled': 'cancelar', 'no_coverage': 'marcar sin cobertura', 'pending': 'volver a pendiente' };
   if (!confirm(`¿Estás seguro de ${labels[type]} la solicitud de ${p.full_name || 'este cliente'}?`)) return;
 
   try {
-    const { error: updErr } = await db.from('request_status').update({
-      status: type, status_message: msg, updated_at: new Date().toISOString()
-    }).eq('id', req.id);
-    if (updErr) throw updErr;
+    const updatePayload = { status: type, status_message: msg, updated_at: new Date().toISOString() };
 
-    let txDeleted = false;
-    if (type === 'cancelled' || type === 'no_coverage') {
-      const { data: txs, error: findErr } = await db
-        .from('transactions')
-        .select('id')
-        .eq('user_id', req.user_id)
-        .eq('type', 'withdrawal')
-        .eq('metadata->>request_id', req.id);
-
-      if (findErr) console.error('Error buscando transacción:', findErr);
-
-      let idsToDelete = (txs || []).map(t => t.id);
-
-      if (!idsToDelete.length) {
-        const { data: txsAlt } = await db
-          .from('transactions')
-          .select('id')
-          .eq('user_id', req.user_id)
-          .eq('type', 'withdrawal')
-          .ilike('description', `%#${req.id.slice(0, 8)}%`);
-        idsToDelete = (txsAlt || []).map(t => t.id);
-      }
-
-      if (idsToDelete.length) {
-        const { error: delErr } = await db.from('transactions').delete().in('id', idsToDelete);
-        if (delErr) throw delErr;
-        txDeleted = true;
-      }
+    if (type === 'confirmed') {
+      updatePayload.confirmed_at = new Date().toISOString();
+      updatePayload.reward_status = 'available';
     }
 
-    const emoji = { 'confirmed': '✅', 'cancelled': '❌', 'no_coverage': '📡', 'pending': '⏳' };
-    const tgMsg = `
-${emoji[type]} <b>SOLICITUD ${type.toUpperCase()}</b>
+    if (type === 'pending') {
+      updatePayload.reward_status = 'none';
+      updatePayload.confirmed_at = null;
+      updatePayload.rewarded_at = null;
+    }
 
-🆔 #${req.id.slice(0, 8)}
-👤 ${p.full_name || 'Cliente'}
-📧 ${p.email || 'No'}
-📞 ${p.phone || 'No'}
-📦 ${req.package_name}
-💰 ${formatCurrency(req.total_first_payment)}
+    const { error: updErr } = await db.from('request_status').update(updatePayload).eq('id', req.id);
+    if (updErr) throw updErr;
 
-${txDeleted ? '💸 <b>Transacción eliminada — saldo restaurado al cliente.</b>' : ''}
-${msg ? `💬 <b>Mensaje:</b> ${msg}` : ''}
-⏰ ${new Date().toLocaleString('es-BO')}`;
-
-    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: TELEGRAM_CHAT_ID, text: tgMsg, parse_mode: 'HTML' })
-    });
-
-    toast(
-      txDeleted
-        ? 'Solicitud cancelada y saldo restaurado'
-        : 'Solicitud actualizada',
-      'success'
-    );
+    toast('Solicitud actualizada', 'success');
     closeModal('modalOverlay');
     await renderRequests();
   } catch (err) {
@@ -805,11 +823,6 @@ async function saveRecord() {
 
   if (!valid) return;
 
-  // ✅ Auto-generar slug para categorías
-  if (currentTableKey === 'categories' && payload.name) {
-    payload.slug = generateSlug(payload.name);
-  }
-
   const saveBtn = document.getElementById('modalSave');
   saveBtn.disabled = true;
   saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
@@ -838,96 +851,19 @@ async function saveRecord() {
 
 async function deleteRecord(tableKey, id) {
   const schema = SCHEMA[tableKey];
+  if (!confirm(`¿Eliminar este registro de ${schema.label}?\n\nEsta acción no se puede deshacer.`)) return;
 
-  // ✅ Si es un paquete, verificar solicitudes asociadas
-  if (tableKey === 'packages') {
-    const { data: relatedReqs, error: checkErr } = await db
-      .from('request_status')
-      .select('id, user_id, package_name')
-      .eq('package_id', id);
-
-    if (checkErr) {
-      console.error(checkErr);
-      toast('Error al verificar solicitudes: ' + checkErr.message, 'error');
-      return;
-    }
-
-    const count = (relatedReqs || []).length;
-
-    if (count > 0) {
-      // Preguntar si quiere eliminar también las solicitudes asociadas
-      const confirmMsg =
-        `⚠️ Este paquete tiene ${count} solicitud(es) asociada(s).\n\n` +
-        `¿Quieres ELIMINAR TAMBIÉN esas ${count} solicitud(es) y luego el paquete?\n\n` +
-        `• Aceptar = elimina las solicitudes y el paquete\n` +
-        `• Cancelar = no elimina nada`;
-
-      if (!confirm(confirmMsg)) {
-        toast('Operación cancelada. No se eliminó nada.', 'info');
-        return;
-      }
-
-      // Confirmar de nuevo (doble verificación porque es destructivo)
-      if (!confirm(`¿Estás SEGURO? Se eliminarán ${count} solicitud(es) + el paquete. Esta acción no se puede deshacer.`)) {
-        toast('Operación cancelada.', 'info');
-        return;
-      }
-
-      try {
-        // 1) Eliminar transacciones asociadas a esas solicitudes
-        for (const req of relatedReqs) {
-          const { data: txs } = await db
-            .from('transactions')
-            .select('id')
-            .eq('user_id', req.user_id)
-            .eq('type', 'withdrawal')
-            .eq('metadata->>request_id', req.id);
-
-          let idsToDelete = (txs || []).map(t => t.id);
-
-          if (!idsToDelete.length) {
-            const { data: txsAlt } = await db
-              .from('transactions')
-              .select('id')
-              .eq('user_id', req.user_id)
-              .eq('type', 'withdrawal')
-              .ilike('description', `%#${req.id.slice(0, 8)}%`);
-            idsToDelete = (txsAlt || []).map(t => t.id);
-          }
-
-          if (idsToDelete.length) {
-            await db.from('transactions').delete().in('id', idsToDelete);
-          }
-        }
-
-        // 2) Eliminar las solicitudes
-        const { error: delReqErr } = await db.from('request_status').delete().eq('package_id', id);
-        if (delReqErr) throw delReqErr;
-
-        // 3) Eliminar el paquete
-        const { error: delPkgErr } = await db.from(schema.table).delete().eq(schema.pk, id);
-        if (delPkgErr) throw delPkgErr;
-
-        toast(`Paquete y ${count} solicitud(es) eliminadas correctamente`, 'success');
-        categoriesCache = [];
-        await renderSection(tableKey);
-      } catch (err) {
-        console.error(err);
-        toast('Error al eliminar: ' + err.message, 'error');
-      }
-      return;
-    }
-  }
-
-  // Eliminación normal (sin dependencias)
-  if (!confirm(`¿Eliminar registro de ${schema.label}?`)) return;
   try {
     const { error } = await db.from(schema.table).delete().eq(schema.pk, id);
     if (error) throw error;
-    toast('Registro eliminado', 'success');
+
+    toast('Registro eliminado correctamente', 'success');
     categoriesCache = [];
     await renderSection(tableKey);
-  } catch (err) { console.error(err); toast(err.message, 'error'); }
+  } catch (err) {
+    console.error(err);
+    toast('Error al eliminar: ' + err.message, 'error');
+  }
 }
 
 document.getElementById('modalClose').onclick = () => closeModal('modalOverlay');
