@@ -99,6 +99,9 @@
     transition: border-color 0.15s;
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color: #f54e4e; }
+  .field input.error { border-color: #f87171; }
+  .field .error-msg { color: #f87171; font-size: 11.5px; margin-top: 2px; display: none; }
+  .field.has-error .error-msg { display: block; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
   @media (max-width: 500px) { .field-row { grid-template-columns: 1fr; } }
 
@@ -148,12 +151,24 @@
     color: #6a6a85; font-size: 12px; pointer-events: none;
   }
 
+  /* FILTER SELECT */
+  .filter-select {
+    background: #0f0f1a; border: 1px solid #232334; border-radius: 10px;
+    padding: 8px 12px; color: #e0e0f0; font-size: 12.5px;
+    outline: none; cursor: pointer;
+  }
+  .filter-select:focus { border-color: #f54e4e; }
+
   /* TABLE */
   .table-wrap { overflow-x: auto; }
-  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 600px; }
-  th { text-align: left; padding: 13px 18px; color: #8a8aa0; font-weight: 600; font-size: 11.5px; text-transform: uppercase; background: #10101c; white-space: nowrap; letter-spacing: 0.4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 700px; }
+  th { text-align: left; padding: 13px 18px; color: #8a8aa0; font-weight: 600; font-size: 11.5px; text-transform: uppercase; background: #10101c; white-space: nowrap; letter-spacing: 0.4px; cursor: pointer; user-select: none; }
+  th:hover { color: #f0f0f5; }
+  th .sort-icon { margin-left: 6px; color: #4a4a60; font-size: 10px; }
+  th.sorted .sort-icon { color: #f54e4e; }
   td { padding: 12px 18px; color: #c0c0d0; vertical-align: middle; }
   tr:hover td { background: #16162a; }
+  tr.editing td { background: #1e1a2a; border-left: 3px solid #f54e4e; }
   .thumb { width: 60px; height: 42px; object-fit: cover; border-radius: 8px; border: 1px solid #232334; display: block; background: #0b0b12; }
   .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; background: #1e1e30; color: #b0b0c8; }
   .tag.activo { background: #14331f; color: #4ade80; }
@@ -210,28 +225,6 @@
     .content { padding: 16px; }
     .topbar { padding: 12px 16px; }
   }
-
-  /* USUARIOS - PIN */
-  .pin-display { display: flex; align-items: center; gap: 10px; }
-  .pin-digits { display: flex; gap: 6px; }
-  .pin-digit {
-    width: 44px; height: 50px; border-radius: 10px; background: #0f0f1a;
-    border: 1px solid #232334; color: #e0e0f0; font-size: 20px; font-weight: 700;
-    text-align: center; outline: none; transition: border-color 0.15s;
-    font-family: inherit;
-  }
-  .pin-digit:focus { border-color: #f54e4e; }
-  .pin-digit.filled { border-color: #4ade80; }
-  .pin-status { font-size: 12.5px; display: flex; align-items: center; gap: 6px; margin-top: 4px; }
-  .pin-status.ok { color: #4ade80; }
-  .pin-status.warn { color: #f0c65b; }
-  .pin-status.err { color: #f87171; }
-  .user-card { display: flex; align-items: center; gap: 14px; padding: 14px 18px; background: #0f0f1a; border-radius: 12px; border: 1px solid #1d1d2b; }
-  .user-avatar { width: 42px; height: 42px; border-radius: 50%; background: #2a2a3a; display: flex; align-items: center; justify-content: center; color: #f54e4e; font-weight: 700; font-size: 16px; flex-shrink: 0; }
-  .user-info { flex: 1; min-width: 0; }
-  .user-info .name { color: #f0f0f5; font-weight: 600; font-size: 14px; }
-  .user-info .email { color: #6a6a85; font-size: 12.5px; overflow: hidden; text-overflow: ellipsis; }
-  .user-info .role { color: #8a8aa0; font-size: 11.5px; margin-top: 2px; }
 </style>
 </head>
 <body>
@@ -245,8 +238,6 @@
     <nav class="sidebar-nav">
       <div class="nav-section">Publicidad</div>
       <button class="nav-item active" data-page="ads"><i class="fas fa-rectangle-ad"></i><span>Anuncios</span></button>
-      <div class="nav-section">Usuarios</div>
-      <button class="nav-item" data-page="users"><i class="fas fa-users"></i><span>Usuarios</span></button>
     </nav>
     <div class="sidebar-footer">
       <div class="avatar">A</div>
@@ -266,9 +257,6 @@
     </div>
 
     <div class="content" id="page-content">
-      <!-- ============================================ -->
-      <!-- PÁGINA: ANUNCIOS (original)                  -->
-      <!-- ============================================ -->
       <div id="page-ads" class="main-content">
         <!-- COLUMNA IZQUIERDA -->
         <div style="display:flex; flex-direction:column; gap:20px;">
@@ -304,11 +292,16 @@
                 <span class="counter-badge" id="active-counter">0 / 3</span>
               </div>
               <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+                <select class="filter-select" id="filter-status">
+                  <option value="all">Todos</option>
+                  <option value="activo">Activos</option>
+                  <option value="inactivo">Inactivos</option>
+                </select>
                 <div class="search-box">
                   <i class="fas fa-search"></i>
                   <input type="text" id="search-input" placeholder="Buscar por título...">
                 </div>
-                <button class="btn btn-sm" id="btn-refresh-list"><i class="fas fa-sync"></i></button>
+                <button class="btn btn-sm" id="btn-refresh-list" title="Refrescar"><i class="fas fa-sync"></i></button>
               </div>
             </div>
             <div id="ads-list" class="table-wrap">
@@ -332,19 +325,22 @@
               <input type="hidden" id="ad-id" value="">
 
               <div class="field-row">
-                <div class="field">
+                <div class="field" id="field-title">
                   <label for="ad-title">Título del Anuncio *</label>
                   <input type="text" id="ad-title" placeholder="Ej: Promoción Especial" required maxlength="200">
+                  <span class="error-msg">Mínimo 3 caracteres</span>
                 </div>
-                <div class="field">
+                <div class="field" id="field-order">
                   <label for="ad-order">Orden de Visualización</label>
                   <input type="number" id="ad-order" placeholder="1, 2, 3..." min="1" value="1">
+                  <span class="error-msg">Debe ser un número mayor a 0</span>
                 </div>
               </div>
 
-              <div class="field">
+              <div class="field" id="field-url">
                 <label for="ad-image-url">URL de la Imagen *</label>
                 <input type="url" id="ad-image-url" placeholder="https://ejemplo.com/imagen.jpg" required>
+                <span class="error-msg">Ingresa una URL válida (http o https)</span>
               </div>
 
               <div class="field">
@@ -366,120 +362,6 @@
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      </div>
-
-      <!-- ============================================ -->
-      <!-- PÁGINA: USUARIOS (con edición de PIN)        -->
-      <!-- ============================================ -->
-      <div id="page-users" style="display:none;">
-        <div class="main-content" style="grid-template-columns: 1fr 1fr;">
-          <!-- Columna izquierda: Info del usuario -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title"><i class="fas fa-user-shield"></i> Mi Perfil</div>
-              <span class="tag" id="user-role-tag">Usuario</span>
-            </div>
-            <div class="card-body">
-              <div class="user-card" id="user-card">
-                <div class="user-avatar" id="user-avatar">?</div>
-                <div class="user-info">
-                  <div class="name" id="user-name">Cargando...</div>
-                  <div class="email" id="user-email">—</div>
-                  <div class="role" id="user-role">—</div>
-                </div>
-              </div>
-
-              <!-- ESTADO DEL PIN + BOTÓN EDITAR -->
-              <div style="background:#0f0f1a;border:1px solid #1d1d2b;border-radius:12px;padding:14px 18px;display:flex;flex-direction:column;gap:10px;">
-                <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;">
-                  <div style="display:flex;align-items:center;gap:10px;">
-                    <i class="fas fa-key" style="color:#f54e4e;font-size:18px;"></i>
-                    <div>
-                      <div style="color:#f0f0f5;font-weight:600;font-size:14px;">PIN de seguridad</div>
-                      <div style="color:#6a6a85;font-size:12px;" id="pin-summary">—</div>
-                    </div>
-                  </div>
-                  <span class="tag" id="pin-state-tag">—</span>
-                </div>
-                <button type="button" class="btn btn-primary" id="btn-edit-pin" style="align-self:flex-start;">
-                  <i class="fas fa-pen"></i>
-                  <span id="btn-edit-pin-text">Editar PIN</span>
-                </button>
-              </div>
-
-              <div style="font-size:12.5px;color:#6a6a85;line-height:1.6;padding:4px 2px;">
-                <i class="fas fa-info-circle" style="color:#60a5fa;"></i>
-                El PIN se usa para verificar operaciones sensibles dentro de la app.
-              </div>
-            </div>
-          </div>
-
-          <!-- Columna derecha: Formulario de PIN (oculto hasta pulsar Editar) -->
-          <div class="card" id="pin-card" style="display:none;">
-            <div class="card-header">
-              <div class="card-title" id="pin-form-title"><i class="fas fa-lock"></i> Cambiar PIN</div>
-              <button type="button" class="btn btn-sm" id="btn-close-pin" title="Cerrar">
-                <i class="fas fa-times"></i>
-              </button>
-            </div>
-            <div class="card-body">
-              <form id="pin-form" style="display:flex; flex-direction:column; gap:16px;">
-                <div class="field">
-                  <label>Nuevo PIN (4 dígitos)</label>
-                  <div class="pin-display">
-                    <div class="pin-digits" id="pin-new-group">
-                      <input type="password" class="pin-digit" id="pin-1" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                      <input type="password" class="pin-digit" id="pin-2" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                      <input type="password" class="pin-digit" id="pin-3" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                      <input type="password" class="pin-digit" id="pin-4" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="field">
-                  <label>Confirmar PIN</label>
-                  <div class="pin-display">
-                    <div class="pin-digits" id="pin-confirm-group">
-                      <input type="password" class="pin-digit" id="pin-c1" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                      <input type="password" class="pin-digit" id="pin-c2" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                      <input type="password" class="pin-digit" id="pin-c3" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                      <input type="password" class="pin-digit" id="pin-c4" maxlength="1" inputmode="numeric" pattern="[0-9]" autocomplete="off">
-                    </div>
-                  </div>
-                </div>
-
-                <div class="pin-status" id="pin-status">
-                  <i class="fas fa-circle-info"></i>
-                  <span>Ingresa un PIN de 4 dígitos</span>
-                </div>
-
-                <div class="form-actions">
-                  <button type="submit" class="btn btn-primary" id="btn-save-pin">
-                    <i class="fas fa-shield-halved"></i>
-                    <span id="pin-submit-text">Guardar PIN</span>
-                  </button>
-                  <button type="button" class="btn btn-secondary" id="btn-clear-pin">
-                    <i class="fas fa-eraser"></i> Limpiar
-                  </button>
-                  <button type="button" class="btn btn-secondary" id="btn-cancel-pin">
-                    <i class="fas fa-times"></i> Cancelar
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-
-          <!-- Mensaje informativo cuando el formulario está oculto -->
-          <div class="card" id="pin-info-card">
-            <div class="card-body" style="align-items:center;text-align:center;padding:36px 22px;gap:10px;">
-              <i class="fas fa-lock" style="font-size:38px;color:#2a2a3a;"></i>
-              <div style="color:#8a8aa0;font-size:14px;font-weight:500;">PIN de seguridad</div>
-              <div style="color:#6a6a85;font-size:12.5px;max-width:280px;line-height:1.5;">
-                Pulsa el botón <strong style="color:#f54e4e;">Editar PIN</strong> en la tarjeta de perfil para crear o cambiar tu PIN de 4 dígitos.
-              </div>
-            </div>
           </div>
         </div>
       </div>
@@ -509,10 +391,11 @@
 
 <script>
 // =============================================
-// SUPABASE
+// SUPABASE - CREDENCIALES ACTUALIZADAS
 // =============================================
-const SUPABASE_URL = 'https://aleadadisazocjovibeh.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E';
+const SUPABASE_URL = 'https://fmhjuisoibynjgfrqvgj.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_M7yramCIWbPyxnH3xwJNEQ_p77ModBz';
+
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
   auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
 });
@@ -526,8 +409,9 @@ const MAX_ACTIVOS = 3;
 let adsList = [];
 let filteredAds = [];
 let deleteTargetId = null;
-let currentUser = null;
-let currentUserProfile = null;
+let editingId = null;
+let sortBy = 'orden';
+let sortDir = 'asc';
 
 // =============================================
 // HELPERS
@@ -570,6 +454,15 @@ function updateCounter() {
   el.classList.toggle('full', active >= MAX_ACTIVOS);
 }
 
+function validateUrl(url) {
+  try {
+    const u = new URL(url);
+    return ['http:', 'https:'].includes(u.protocol);
+  } catch {
+    return false;
+  }
+}
+
 // =============================================
 // CARGA DE DATOS
 // =============================================
@@ -590,9 +483,8 @@ async function loadAds() {
     if (error) throw error;
 
     adsList = data || [];
-    filteredAds = [...adsList];
+    applyFilters();
     updateCounter();
-    renderAdsList();
     setStatus(true, 'Conectado');
   } catch (error) {
     console.error('Error loading ads:', error);
@@ -608,39 +500,77 @@ async function loadAds() {
 }
 
 // =============================================
+// FILTROS Y BÚSQUEDA
+// =============================================
+function applyFilters() {
+  const term = $('search-input').value.toLowerCase().trim();
+  const status = $('filter-status').value;
+
+  filteredAds = adsList.filter(ad => {
+    const matchTerm = !term || String(ad.titulo || '').toLowerCase().includes(term);
+    const matchStatus = status === 'all' 
+      || (status === 'activo' && ad.activo) 
+      || (status === 'inactivo' && !ad.activo);
+    return matchTerm && matchStatus;
+  });
+
+  // Ordenamiento
+  filteredAds.sort((a, b) => {
+    let va, vb;
+    if (sortBy === 'orden') { va = a.orden ?? 0; vb = b.orden ?? 0; }
+    else if (sortBy === 'titulo') { va = (a.titulo || '').toLowerCase(); vb = (b.titulo || '').toLowerCase(); }
+    else if (sortBy === 'creado_en') { va = new Date(a.creado_en || 0); vb = new Date(b.creado_en || 0); }
+    else if (sortBy === 'activo') { va = a.activo ? 1 : 0; vb = b.activo ? 1 : 0; }
+
+    if (va < vb) return sortDir === 'asc' ? -1 : 1;
+    if (va > vb) return sortDir === 'asc' ? 1 : -1;
+    return 0;
+  });
+
+  renderAdsList();
+}
+
+// =============================================
 // RENDER LISTA
 // =============================================
 function renderAdsList() {
   const container = $('ads-list');
 
   if (!filteredAds.length) {
-    const hayBusqueda = $('search-input').value.trim() !== '';
+    const hayBusqueda = $('search-input').value.trim() !== '' || $('filter-status').value !== 'all';
     container.innerHTML = `
       <div class="empty-state">
         <i class="fas fa-${hayBusqueda ? 'search' : 'images'}"></i>
         <span style="color:#8a8aa0;font-weight:500;">${hayBusqueda ? 'Sin resultados' : 'No hay anuncios creados'}</span>
-        <span style="font-size:12px;">${hayBusqueda ? 'Prueba con otro término' : 'Agrega tu primer anuncio usando el formulario'}</span>
+        <span style="font-size:12px;">${hayBusqueda ? 'Prueba con otro filtro' : 'Agrega tu primer anuncio usando el formulario'}</span>
       </div>`;
     return;
   }
 
   const fallbackImg = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='42'%3E%3Crect width='60' height='42' fill='%232a2a3a'/%3E%3Ctext x='30' y='25' text-anchor='middle' fill='%236a6a85' font-size='8' font-family='Arial'%3ESin imagen%3C/text%3E%3C/svg%3E";
 
+  const sortIcon = (field) => {
+    if (sortBy !== field) return '<i class="fas fa-sort sort-icon"></i>';
+    return sortDir === 'asc' 
+      ? '<i class="fas fa-sort-up sort-icon"></i>' 
+      : '<i class="fas fa-sort-down sort-icon"></i>';
+  };
+
   container.innerHTML = `
     <table>
       <thead>
         <tr>
           <th>Imagen</th>
-          <th>Título</th>
-          <th>Orden</th>
-          <th>Estado</th>
-          <th>Creado</th>
+          <th data-sort="titulo" class="${sortBy === 'titulo' ? 'sorted' : ''}">Título ${sortIcon('titulo')}</th>
+          <th data-sort="orden" class="${sortBy === 'orden' ? 'sorted' : ''}">Orden ${sortIcon('orden')}</th>
+          <th data-sort="activo" class="${sortBy === 'activo' ? 'sorted' : ''}">Estado ${sortIcon('activo')}</th>
+          <th data-sort="creado_en" class="${sortBy === 'creado_en' ? 'sorted' : ''}">Creado ${sortIcon('creado_en')}</th>
           <th style="text-align:right;">Acciones</th>
         </tr>
       </thead>
       <tbody>
         ${filteredAds.map(ad => `
-          <tr>
+          <tr class="${String(editingId) === String(ad.id) ? 'editing' : ''}">
             <td>
               <img src="${escapeHtml(ad.imagen_url || '')}" alt=""
                 class="thumb"
@@ -660,6 +590,9 @@ function renderAdsList() {
                 <button class="btn btn-sm" data-action="preview" data-id="${escapeHtml(ad.id)}" title="Vista previa">
                   <i class="fas fa-eye"></i>
                 </button>
+                <button class="btn btn-sm" data-action="toggle" data-id="${escapeHtml(ad.id)}" title="${ad.activo ? 'Desactivar' : 'Activar'}">
+                  <i class="fas fa-${ad.activo ? 'toggle-on' : 'toggle-off'}"></i>
+                </button>
                 <button class="btn btn-sm" data-action="edit" data-id="${escapeHtml(ad.id)}" title="Editar">
                   <i class="fas fa-pen"></i>
                 </button>
@@ -674,6 +607,21 @@ function renderAdsList() {
     </table>
   `;
 
+  // Eventos de ordenamiento
+  container.querySelectorAll('th[data-sort]').forEach(th => {
+    th.addEventListener('click', () => {
+      const field = th.dataset.sort;
+      if (sortBy === field) {
+        sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+      } else {
+        sortBy = field;
+        sortDir = 'asc';
+      }
+      applyFilters();
+    });
+  });
+
+  // Eventos de acciones
   container.querySelectorAll('[data-action="edit"]').forEach(btn => {
     btn.addEventListener('click', () => editAd(btn.dataset.id));
   });
@@ -690,6 +638,45 @@ function renderAdsList() {
       }
     });
   });
+  container.querySelectorAll('[data-action="toggle"]').forEach(btn => {
+    btn.addEventListener('click', () => toggleActive(btn.dataset.id));
+  });
+}
+
+// =============================================
+// TOGGLE ACTIVO DESDE LA LISTA
+// =============================================
+async function toggleActive(id) {
+  const ad = adsList.find(a => String(a.id) === String(id));
+  if (!ad) return;
+
+  const nuevoEstado = !ad.activo;
+
+  // Si se va a activar, verificar el límite
+  if (nuevoEstado) {
+    const activosActuales = adsList.filter(a => a.activo && String(a.id) !== String(id)).length;
+    if (activosActuales >= MAX_ACTIVOS) {
+      toast(`Ya hay ${MAX_ACTIVOS} anuncios activos. Desactiva uno primero.`, 'error');
+      return;
+    }
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from(TABLA)
+      .update({ activo: nuevoEstado })
+      .eq('id', id);
+
+    if (error) throw error;
+
+    ad.activo = nuevoEstado;
+    updateCounter();
+    applyFilters();
+    toast(`Anuncio ${nuevoEstado ? 'activado' : 'desactivado'}`, 'success');
+  } catch (error) {
+    console.error('Error toggling:', error);
+    toast('Error al cambiar estado: ' + error.message, 'error');
+  }
 }
 
 // =============================================
@@ -730,6 +717,8 @@ function editAd(id) {
   const ad = adsList.find(a => String(a.id) === String(id));
   if (!ad) { toast('Anuncio no encontrado', 'error'); return; }
 
+  editingId = id;
+
   $('ad-id').value = ad.id;
   $('ad-title').value = ad.titulo || '';
   $('ad-image-url').value = ad.imagen_url || '';
@@ -746,6 +735,8 @@ function editAd(id) {
   $('submit-text').textContent = 'Actualizar Anuncio';
   $('cancel-edit').style.display = 'inline-flex';
 
+  clearErrors();
+  applyFilters();
   $('ad-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
 }
 
@@ -753,6 +744,7 @@ function editAd(id) {
 // RESET
 // =============================================
 function resetForm() {
+  editingId = null;
   $('ad-id').value = '';
   $('ad-title').value = '';
   $('ad-image-url').value = '';
@@ -764,10 +756,13 @@ function resetForm() {
   updateActiveLabel();
 
   previewImage('');
+  clearErrors();
 
   $('form-title').innerHTML = '<i class="fas fa-plus-circle"></i> Agregar Nuevo Anuncio';
   $('submit-text').textContent = 'Guardar Anuncio';
   $('cancel-edit').style.display = 'none';
+
+  applyFilters();
 }
 
 function updateActiveLabel() {
@@ -775,6 +770,23 @@ function updateActiveLabel() {
   const label = $('ad-active-label');
   label.textContent = isActive ? 'Anuncio Activo' : 'Anuncio Inactivo';
   label.style.color = isActive ? '#4ade80' : '#8a8aa0';
+}
+
+// =============================================
+// VALIDACIÓN
+// =============================================
+function clearErrors() {
+  document.querySelectorAll('#ad-form .field').forEach(f => f.classList.remove('has-error'));
+  document.querySelectorAll('#ad-form input').forEach(i => i.classList.remove('error'));
+}
+
+function showFieldError(fieldId) {
+  const field = $(fieldId);
+  if (field) {
+    field.classList.add('has-error');
+    const input = field.querySelector('input');
+    if (input) input.classList.add('error');
+  }
 }
 
 // =============================================
@@ -792,168 +804,6 @@ function closeDeleteModal() {
 }
 
 // =============================================
-// NAVEGACIÓN ENTRE PÁGINAS
-// =============================================
-function switchPage(page) {
-  document.querySelectorAll('.sidebar-nav .nav-item').forEach(btn => {
-    btn.classList.toggle('active', btn.dataset.page === page);
-  });
-
-  const pageAds = $('page-ads');
-  const pageUsers = $('page-users');
-  const title = $('page-title');
-
-  if (page === 'users') {
-    pageAds.style.display = 'none';
-    pageUsers.style.display = 'block';
-    title.innerHTML = '<i class="fas fa-users"></i> Gestión de Usuarios';
-    loadUserProfile();
-  } else {
-    pageAds.style.display = 'grid';
-    pageUsers.style.display = 'none';
-    title.innerHTML = '<i class="fas fa-bullhorn"></i> Panel de Publicidad';
-  }
-}
-
-// =============================================
-// USUARIOS - CARGA DE PERFIL Y PIN
-// =============================================
-async function loadUserProfile() {
-  try {
-    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
-    if (authError) throw authError;
-
-    if (!user) {
-      $('user-name').textContent = 'No autenticado';
-      $('user-email').textContent = 'Inicia sesión para gestionar tu PIN';
-      $('user-role').textContent = '';
-      $('user-avatar').textContent = '?';
-      $('user-role-tag').textContent = 'Invitado';
-      $('pin-state-tag').textContent = '—';
-      $('pin-state-tag').className = 'tag';
-      $('pin-summary').textContent = 'Inicia sesión para gestionar tu PIN';
-      return;
-    }
-
-    currentUser = user;
-
-    const { data: profile, error: profileError } = await supabaseClient
-      .from('user_profiles')
-      .select('*')
-      .eq('id', user.id)
-      .maybeSingle();
-
-    if (profileError) throw profileError;
-
-    currentUserProfile = profile || null;
-
-    const email = user.email || '—';
-    const name = profile?.nombre || profile?.full_name || email.split('@')[0] || 'Usuario';
-    const role = profile?.rol || profile?.role || 'Usuario';
-
-    $('user-name').textContent = name;
-    $('user-email').textContent = email;
-    $('user-role').textContent = role;
-    $('user-avatar').textContent = (name[0] || '?').toUpperCase();
-    $('user-role-tag').textContent = role;
-
-    const hasPin = !!(profile && profile.pin_hash);
-    const pinTag = $('pin-state-tag');
-    const pinSummary = $('pin-summary');
-    const btnEditText = $('btn-edit-pin-text');
-
-    if (hasPin) {
-      pinTag.textContent = 'PIN configurado';
-      pinTag.className = 'tag activo';
-      pinSummary.textContent = 'Tu PIN está configurado y activo.';
-      btnEditText.textContent = 'Cambiar PIN';
-    } else {
-      pinTag.textContent = 'Sin PIN';
-      pinTag.className = 'tag inactivo';
-      pinSummary.textContent = 'Aún no has configurado un PIN.';
-      btnEditText.textContent = 'Crear PIN';
-    }
-  } catch (error) {
-    console.error('Error loading user profile:', error);
-    toast('Error al cargar el perfil: ' + error.message, 'error');
-  }
-}
-
-// =============================================
-// MOSTRAR / OCULTAR FORMULARIO DE PIN
-// =============================================
-function openPinForm() {
-  $('pin-card').style.display = 'flex';
-  $('pin-info-card').style.display = 'none';
-  clearPinInputs();
-  const hasPin = !!(currentUserProfile && currentUserProfile.pin_hash);
-  $('pin-form-title').innerHTML = `<i class="fas fa-lock"></i> ${hasPin ? 'Cambiar PIN' : 'Crear PIN'}`;
-  setTimeout(() => $('pin-1')?.focus(), 100);
-}
-
-function closePinForm() {
-  $('pin-card').style.display = 'none';
-  $('pin-info-card').style.display = 'flex';
-  clearPinInputs();
-}
-
-// =============================================
-// PIN - MANEJO DE INPUTS
-// =============================================
-function setupPinGroup(groupId) {
-  const group = document.getElementById(groupId);
-  if (!group) return;
-  const inputs = group.querySelectorAll('.pin-digit');
-  inputs.forEach((input, idx) => {
-    input.addEventListener('input', function() {
-      this.value = this.value.replace(/\D/g, '').slice(0, 1);
-      this.classList.toggle('filled', this.value !== '');
-      if (this.value && idx < inputs.length - 1) {
-        inputs[idx + 1].focus();
-      }
-    });
-    input.addEventListener('keydown', function(e) {
-      if (e.key === 'Backspace' && !this.value && idx > 0) {
-        inputs[idx - 1].focus();
-        inputs[idx - 1].value = '';
-        inputs[idx - 1].classList.remove('filled');
-      }
-    });
-    input.addEventListener('paste', function(e) {
-      e.preventDefault();
-      const text = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '').slice(0, 4);
-      for (let i = 0; i < 4; i++) {
-        if (text[i]) {
-          inputs[i].value = text[i];
-          inputs[i].classList.add('filled');
-        }
-      }
-      if (text.length === 4) inputs[3].focus();
-    });
-  });
-}
-
-function getPinValue(groupId) {
-  const group = document.getElementById(groupId);
-  if (!group) return '';
-  let pin = '';
-  group.querySelectorAll('.pin-digit').forEach(i => { pin += i.value; });
-  return pin;
-}
-
-function clearPinInputs() {
-  document.querySelectorAll('#page-users .pin-digit').forEach(input => {
-    input.value = '';
-    input.classList.remove('filled');
-  });
-  const statusEl = $('pin-status');
-  if (statusEl) {
-    statusEl.className = 'pin-status';
-    statusEl.innerHTML = '<i class="fas fa-circle-info"></i><span>Ingresa un PIN de 4 dígitos</span>';
-  }
-}
-
-// =============================================
 // EVENTOS
 // =============================================
 document.addEventListener('DOMContentLoaded', () => {
@@ -964,30 +814,20 @@ document.addEventListener('DOMContentLoaded', () => {
     $('sidebar').classList.toggle('collapsed');
   });
 
-  document.querySelectorAll('.sidebar-nav .nav-item').forEach(btn => {
-    btn.addEventListener('click', () => switchPage(btn.dataset.page));
-  });
-
   $('btn-refresh-list').addEventListener('click', () => {
     toast('Actualizando...', 'info');
     loadAds();
   });
 
-  $('search-input').addEventListener('input', (e) => {
-    const term = e.target.value.toLowerCase().trim();
-    filteredAds = term
-      ? adsList.filter(ad =>
-          String(ad.titulo || '').toLowerCase().includes(term) ||
-          String(ad.orden || '').includes(term)
-        )
-      : [...adsList];
-    renderAdsList();
-  });
+  $('search-input').addEventListener('input', applyFilters);
+  $('filter-status').addEventListener('change', applyFilters);
 
   $('ad-image-url').addEventListener('input', function() {
     const url = this.value.trim();
-    if (url.length > 8 && /^https?:\/\//i.test(url)) {
+    if (url.length > 8 && validateUrl(url)) {
       previewImage(url);
+      $('field-url').classList.remove('has-error');
+      this.classList.remove('error');
     } else if (!url) {
       previewImage('');
     }
@@ -1004,6 +844,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   $('ad-form').addEventListener('submit', async function(e) {
     e.preventDefault();
+    clearErrors();
 
     const id = $('ad-id').value;
     const titulo = $('ad-title').value.trim();
@@ -1011,11 +852,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const orden = parseInt($('ad-order').value) || 1;
     const activo = $('ad-active').value === 'true';
 
-    if (!titulo || !imagen_url) {
-      toast('Por favor complete todos los campos obligatorios', 'error');
+    // Validaciones
+    let hasErrors = false;
+
+    if (!titulo || titulo.length < 3) {
+      showFieldError('field-title');
+      hasErrors = true;
+    }
+
+    if (!imagen_url || !validateUrl(imagen_url)) {
+      showFieldError('field-url');
+      hasErrors = true;
+    }
+
+    if (orden < 0) {
+      showFieldError('field-order');
+      hasErrors = true;
+    }
+
+    if (hasErrors) {
+      toast('Por favor corrige los errores del formulario', 'error');
       return;
     }
 
+    // Verificar límite de activos
     if (activo) {
       const otrosActivos = adsList.filter(a => a.activo && String(a.id) !== String(id)).length;
       if (otrosActivos >= MAX_ACTIVOS) {
@@ -1071,6 +931,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (error) throw error;
       toast('Anuncio eliminado correctamente', 'success');
       closeDeleteModal();
+      if (String(editingId) === String(deleteTargetId)) resetForm();
       await loadAds();
     } catch (error) {
       console.error('Error deleting ad:', error);
@@ -1087,89 +948,6 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && $('delete-modal').classList.contains('show')) {
       closeDeleteModal();
-    }
-  });
-
-  // =============================================
-  // EVENTOS DE USUARIOS / PIN
-  // =============================================
-  setupPinGroup('pin-new-group');
-  setupPinGroup('pin-confirm-group');
-
-  // Botón EDITAR PIN
-  $('btn-edit-pin').addEventListener('click', openPinForm);
-
-  // Botón CERRAR formulario PIN (X de la cabecera)
-  $('btn-close-pin').addEventListener('click', closePinForm);
-
-  // Botón CANCELAR del formulario
-  $('btn-cancel-pin').addEventListener('click', closePinForm);
-
-  // Botón LIMPIAR
-  $('btn-clear-pin').addEventListener('click', clearPinInputs);
-
-  // Submit del formulario PIN
-  $('pin-form').addEventListener('submit', async function(e) {
-    e.preventDefault();
-
-    const pin = getPinValue('pin-new-group');
-    const confirmPin = getPinValue('pin-confirm-group');
-    const statusEl = $('pin-status');
-
-    if (pin.length !== 4 || !/^\d{4}$/.test(pin)) {
-      statusEl.className = 'pin-status err';
-      statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>El PIN debe tener exactamente 4 dígitos.</span>';
-      toast('El PIN debe tener exactamente 4 dígitos', 'error');
-      return;
-    }
-
-    if (pin !== confirmPin) {
-      statusEl.className = 'pin-status err';
-      statusEl.innerHTML = '<i class="fas fa-exclamation-circle"></i><span>Los PIN no coinciden. Verifica e intenta de nuevo.</span>';
-      toast('Los PIN no coinciden', 'error');
-      return;
-    }
-
-    const btn = $('btn-save-pin');
-    const txt = $('pin-submit-text');
-    btn.disabled = true;
-    txt.textContent = 'Guardando...';
-
-    try {
-      const { error } = await supabaseClient.rpc('set_my_pin', { p_pin: pin });
-      if (error) throw error;
-
-      statusEl.className = 'pin-status ok';
-      statusEl.innerHTML = '<i class="fas fa-check-circle"></i><span>PIN actualizado correctamente.</span>';
-      $('pin-state-tag').textContent = 'PIN configurado';
-      $('pin-state-tag').className = 'tag activo';
-      $('pin-summary').textContent = 'Tu PIN está configurado y activo.';
-      $('btn-edit-pin-text').textContent = 'Cambiar PIN';
-
-      if (!currentUserProfile) currentUserProfile = {};
-      currentUserProfile.pin_hash = 'set';
-
-      toast('PIN actualizado correctamente', 'success');
-
-      setTimeout(() => {
-        closePinForm();
-      }, 900);
-    } catch (error) {
-      console.error('Error setting PIN:', error);
-      let msg = error.message || 'Error desconocido';
-      if (msg.includes('Debes verificar tu correo')) {
-        msg = 'Debes verificar tu correo electrónico antes de cambiar el PIN.';
-      } else if (msg.includes('4 dígitos')) {
-        msg = 'El PIN debe tener exactamente 4 dígitos.';
-      } else if (msg.includes('No se encontró el perfil')) {
-        msg = 'No se encontró tu perfil de usuario. Contacta al administrador.';
-      }
-      statusEl.className = 'pin-status err';
-      statusEl.innerHTML = `<i class="fas fa-exclamation-circle"></i><span>${escapeHtml(msg)}</span>`;
-      toast('Error al guardar PIN: ' + msg, 'error');
-    } finally {
-      btn.disabled = false;
-      txt.textContent = 'Guardar PIN';
     }
   });
 });
