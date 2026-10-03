@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Game Admin | Panel Pro</title>
+<title>TOKTOK Admin | Panel Pro</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
@@ -15,18 +15,18 @@
   .sidebar { width: 260px; background: #080808; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s ease; overflow: hidden; }
   .sidebar.collapsed { width: 72px; }
   .sidebar-brand { padding: 20px 22px; display: flex; align-items: center; gap: 12px; color: #f0f0f5; font-weight: 700; font-size: 17px; white-space: nowrap; flex-shrink: 0; }
-  .sidebar-brand i { color: #f97316; font-size: 26px; min-width: 28px; text-align: center; }
-  .sidebar-brand span.accent { color: #f97316; }
+  .sidebar-brand i { color: #e51c32; font-size: 26px; min-width: 28px; text-align: center; }
+  .sidebar-brand span.accent { color: #e51c32; }
   .sidebar-nav { flex: 1; display: flex; flex-direction: column; gap: 2px; padding: 8px 10px; overflow-y: auto; overflow-x: hidden; }
   .nav-item { display: flex; align-items: center; gap: 14px; padding: 11px 14px; border-radius: 10px; color: #9a9ab0; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.15s; border: none; background: transparent; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
   .nav-item i { font-size: 17px; min-width: 22px; text-align: center; color: #6a6a85; }
   .nav-item:hover { background: #181818; color: #d0d0e0; }
   .nav-item.active { background: #202020; color: #fff; }
-  .nav-item.active i { color: #f97316; }
+  .nav-item.active i { color: #e51c32; }
   .sidebar.collapsed .nav-item span, .sidebar.collapsed .sidebar-brand span { display: none; }
   .sidebar.collapsed .nav-item { justify-content: center; padding: 11px 0; }
   .sidebar-footer { padding: 16px 18px; border-top: 1px solid #242424; display: flex; align-items: center; gap: 12px; color: #6a6a85; font-size: 13px; white-space: nowrap; flex-shrink: 0; }
-  .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #f97316; font-weight: 700; flex-shrink: 0; }
+  .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #e51c32; font-weight: 700; flex-shrink: 0; }
   .sidebar.collapsed .sidebar-footer span { display: none; }
   .sidebar.collapsed .sidebar-footer { justify-content: center; }
 
@@ -36,18 +36,18 @@
   .toggle-btn { background: transparent; border: none; color: #8a8aa0; font-size: 18px; cursor: pointer; padding: 6px 8px; border-radius: 8px; }
   .toggle-btn:hover { background: #181818; color: #fff; }
   .topbar h1 { color: #e8e8f0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-  .topbar h1 i { color: #f97316; font-size: 20px; }
+  .topbar h1 i { color: #e51c32; font-size: 20px; }
   .topbar-right .badge { background: #181818; color: #8a8aa0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; }
   .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
 
   .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
   .page-header h2 { color: #f0f0f5; font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-  .page-header h2 i { color: #f97316; }
+  .page-header h2 i { color: #e51c32; }
   .header-actions { display: flex; gap: 10px; flex-wrap: wrap; }
   .btn { background: #181818; border: none; color: #d0d0e0; padding: 9px 18px; border-radius: 10px; font-size: 13px; font-weight: 500; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; transition: all 0.15s; white-space: nowrap; }
   .btn:hover { background: #2a2a2a; color: #fff; }
-  .btn-primary { background: #f97316; color: #000000; }
-  .btn-primary:hover { background: #ea580c; }
+  .btn-primary { background: #e51c32; color: #ffffff; }
+  .btn-primary:hover { background: #c1121f; }
   .btn-success { background: #16a34a; color: #fff; }
   .btn-success:hover { background: #15803d; }
   .btn-danger { background: #c2410c; color: #000000; }
@@ -69,10 +69,8 @@
   tr:hover td { background: #16162a; }
   .tag { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11.5px; font-weight: 500; background: #202020; color: #b0b0c8; }
   .tag.activo { background: #14331f; color: #4ade80; }
-  .tag.inactivo { background: #3a240f; color: #f97316; }
-  .tag.medio { background: #3a2a1a; color: #fbbf24; }
-  .tag.alto { background: #3a240f; color: #f97316; }
-  .tag.bajo { background: #1a2a3a; color: #60a5fa; }
+  .tag.inactivo { background: #3a240f; color: #e51c32; }
+  .tag.sku { background: #1a2a3a; color: #60a5fa; font-family: 'Courier New', monospace; }
   .actions-cell { display: flex; gap: 6px; }
   .empty-state { padding: 40px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
   .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
@@ -85,7 +83,7 @@
   .modal.modal-wide { max-width: 950px; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #242424; flex-shrink: 0; }
   .modal-header h3 { color: #f0f0f5; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
-  .modal-header h3 i { color: #f97316; }
+  .modal-header h3 i { color: #e51c32; }
   .modal-close { background: transparent; border: none; color: #8a8aa0; font-size: 20px; cursor: pointer; padding: 4px 8px; border-radius: 8px; }
   .modal-close:hover { background: #181818; color: #fff; }
   .modal-body { padding: 20px 24px; overflow-y: auto; display: flex; flex-direction: column; gap: 14px; }
@@ -94,10 +92,10 @@
   .field { display: flex; flex-direction: column; gap: 6px; }
   .field label { color: #9a9ab0; font-size: 12.5px; font-weight: 500; text-transform: capitalize; }
   .field input, .field select, .field textarea { background: #080808; border: 1px solid #282828; border-radius: 10px; padding: 10px 14px; color: #e0e0f0; font-size: 13.5px; outline: none; font-family: inherit; width: 100%; }
-  .field input:focus, .field select:focus, .field textarea:focus { border-color: #f97316; }
+  .field input:focus, .field select:focus, .field textarea:focus { border-color: #e51c32; }
   .field textarea { resize: vertical; min-height: 70px; }
   .field-checkbox { flex-direction: row; align-items: center; gap: 10px; }
-  .field-checkbox input { width: auto; accent-color: #f97316; }
+  .field-checkbox input { width: auto; accent-color: #e51c32; }
   .field input[readonly] { opacity: 0.85; cursor: not-allowed; background: #0a0a14; }
   .field-hint { font-size: 11px; color: #6a6a85; margin-top: -2px; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #242424; flex-shrink: 0; }
@@ -105,7 +103,7 @@
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
   .toast { background: #181818; color: #e0e0f0; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); animation: slideIn 0.25s ease; min-width: 260px; }
   .toast.success { border-left: 3px solid #4ade80; }
-  .toast.error { border-left: 3px solid #f97316; }
+  .toast.error { border-left: 3px solid #e51c32; }
   .toast.info { border-left: 3px solid #60a5fa; }
   @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
@@ -131,7 +129,7 @@
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-brand">
       <i class="fas fa-gamepad"></i>
-      <span>Game<span class="accent"> Admin</span></span>
+      <span>TOK<span class="accent">TOK</span></span>
     </div>
     <nav class="sidebar-nav">
       <button class="nav-item active" data-section="dashboard"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
@@ -140,7 +138,7 @@
       <button class="nav-item" data-section="requirements"><i class="fas fa-list-check"></i><span>Requisitos</span></button>
     </nav>
     <div class="sidebar-footer">
-      <div class="avatar">A</div>
+      <div class="avatar">T</div>
       <span>Administrador</span>
     </div>
   </aside>
@@ -187,7 +185,7 @@ const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // =============================================
-// ESQUEMA ADAPTADO A TUS TABLAS EN ESPAÑOL
+// ESQUEMA
 // =============================================
 const SCHEMA = {
   categories: {
@@ -202,9 +200,12 @@ const SCHEMA = {
       { key: 'descripcion', label: 'Descripción', type: 'textarea', full: true },
       { key: 'icono', label: 'Icono (Font Awesome)', type: 'text', placeholder: 'fa-gamepad' },
       { key: 'color', label: 'Color', type: 'color' },
+      { key: 'game_id_razer', label: 'Game ID Razer', type: 'text', placeholder: 'Ej: 101' },
+      { key: 'requiere_validador', label: 'Requiere Validador', type: 'boolean' },
+      { key: 'requiere_server_id', label: 'Requiere Server ID', type: 'boolean' },
       { key: 'activo', label: 'Activo', type: 'boolean' },
     ],
-    listFields: ['id', 'nombre', 'descripcion', 'icono', 'color', 'activo'],
+    listFields: ['id', 'nombre', 'icono', 'color', 'game_id_razer', 'activo'],
   },
   packages: {
     table: 'paquetes_juegos',
@@ -223,10 +224,11 @@ const SCHEMA = {
       { key: 'porcentaje_descuento', label: 'Descuento (%)', type: 'number' },
       { key: 'stock', label: 'Stock', type: 'number' },
       { key: 'imagen_url', label: 'URL de Imagen', type: 'text', full: true },
+      { key: 'sku_razer', label: 'SKU Razer', type: 'text', placeholder: 'Ej: 23802', required: true },
       { key: 'destacado', label: 'Destacado', type: 'boolean' },
       { key: 'activo', label: 'Activo', type: 'boolean' },
     ],
-    listFields: ['id', 'nombre', 'categoria_id', 'precio', 'porcentaje_descuento', 'stock', 'destacado', 'activo'],
+    listFields: ['id', 'nombre', 'categoria_id', 'precio', 'porcentaje_descuento', 'stock', 'sku_razer', 'destacado', 'activo'],
   },
   requirements: {
     table: 'requisitos_categorias_juegos',
@@ -238,8 +240,8 @@ const SCHEMA = {
     columns: [
       { key: 'id', label: 'ID', type: 'readonly' },
       { key: 'categoria_id', label: 'Categoría', type: 'select-fk', fk: 'categories', required: true },
-      { key: 'nombre_campo', label: 'Nombre del Campo', type: 'text', required: true },
-      { key: 'etiqueta_campo', label: 'Etiqueta', type: 'text', required: true },
+      { key: 'nombre_campo', label: 'Nombre del Campo', type: 'text', required: true, placeholder: 'Ej: player_id' },
+      { key: 'etiqueta_campo', label: 'Etiqueta', type: 'text', required: true, placeholder: 'Ej: ID de Jugador' },
       { key: 'tipo_campo', label: 'Tipo', type: 'select', options: ['text','email','number','select','textarea','tel','date'] },
       { key: 'opciones_campo', label: 'Opciones (JSON o separadas por coma)', type: 'text', full: true, placeholder: 'op1,op2,op3' },
       { key: 'placeholder', label: 'Placeholder', type: 'text' },
@@ -319,7 +321,7 @@ async function renderSection(section) {
     content.innerHTML = `<div class="empty-state">Sección no encontrada</div>`;
   } catch (err) {
     console.error(err);
-    content.innerHTML = `<div class="empty-state" style="color:#f97316;">Error: ${escapeHtml(err.message)}</div>`;
+    content.innerHTML = `<div class="empty-state" style="color:#e51c32;">Error: ${escapeHtml(err.message)}</div>`;
     toast(err.message, 'error');
   }
 }
@@ -333,7 +335,7 @@ async function loadCategoriesCache() {
 }
 
 async function renderDashboard() {
-  categoriesCache = []; // forzar recarga
+  categoriesCache = [];
   await loadCategoriesCache();
   const [cats, packs, reqs] = await Promise.all([
     db.from('categorias_juegos').select('*', { count: 'exact', head: true }),
@@ -341,28 +343,31 @@ async function renderDashboard() {
     db.from('requisitos_categorias_juegos').select('*', { count: 'exact', head: true }),
   ]);
   const { count: featured } = await db.from('paquetes_juegos').select('*', { count: 'exact', head: true }).eq('destacado', true);
+  const { count: conSku } = await db.from('paquetes_juegos').select('*', { count: 'exact', head: true }).not('sku_razer', 'is', null);
 
-  const { data: allPackages } = await db.from('paquetes_juegos').select('categoria_id, activo');
+  const { data: allPackages } = await db.from('paquetes_juegos').select('categoria_id, activo, sku_razer');
   const { data: allReqs } = await db.from('requisitos_categorias_juegos').select('categoria_id');
 
   const cards = [
-    { label: 'Categorías', value: cats.count || 0, icon: 'fa-gamepad', color: '#f97316' },
+    { label: 'Categorías', value: cats.count || 0, icon: 'fa-gamepad', color: '#e51c32' },
     { label: 'Paquetes', value: packs.count || 0, icon: 'fa-box', color: '#fbbf24' },
-    { label: 'Requisitos', value: reqs.count || 0, icon: 'fa-list-check', color: '#4ade80' },
+    { label: 'Con SKU Razer', value: conSku || 0, icon: 'fa-barcode', color: '#60a5fa' },
     { label: 'Destacados', value: featured || 0, icon: 'fa-star', color: '#a78bfa' },
   ];
 
   const summaryRows = categoriesCache.map(cat => {
     const p = (allPackages || []).filter(x => x.categoria_id === cat.id).length;
+    const pConSku = (allPackages || []).filter(x => x.categoria_id === cat.id && x.sku_razer).length;
     const r = (allReqs || []).filter(x => x.categoria_id === cat.id).length;
     return `
       <tr>
         <td>
-          <i class="fas ${cat.icono || 'fa-gamepad'}" style="color:${cat.color || '#f97316'};margin-right:10px;"></i>
+          <i class="fas ${cat.icono || 'fa-gamepad'}" style="color:${cat.color || '#e51c32'};margin-right:10px;"></i>
           ${escapeHtml(cat.nombre)}
         </td>
-        <td>${p}</td>
+        <td>${p} <span style="color:#6a6a85;font-size:11px;">(${pConSku} con SKU)</span></td>
         <td>${r}</td>
+        <td>${cat.game_id_razer ? `<span class="tag sku">${escapeHtml(cat.game_id_razer)}</span>` : '—'}</td>
         <td>${cat.activo ? '<span class="tag activo">Activo</span>' : '<span class="tag inactivo">Inactivo</span>'}</td>
       </tr>
     `;
@@ -392,11 +397,12 @@ async function renderDashboard() {
               <th>Categoría</th>
               <th>Paquetes</th>
               <th>Requisitos</th>
+              <th>Game ID Razer</th>
               <th>Estado</th>
             </tr>
           </thead>
           <tbody>
-            ${summaryRows || `<tr><td colspan="4" class="empty-state">No hay categorías</td></tr>`}
+            ${summaryRows || `<tr><td colspan="5" class="empty-state">No hay categorías</td></tr>`}
           </tbody>
         </table>
       </div>
@@ -407,7 +413,7 @@ async function renderDashboard() {
 async function renderTable(tableKey) {
   currentTableKey = tableKey;
   const schema = SCHEMA[tableKey];
-  categoriesCache = []; // forzar recarga
+  categoriesCache = [];
   await loadCategoriesCache();
 
   let query = db.from(schema.table).select(schema.joinSelect || '*');
@@ -485,9 +491,10 @@ function renderCell(row, fieldKey, schema) {
   if (fieldKey === 'destacado') return value ? '<span class="tag activo">⭐ Destacado</span>' : '<span class="tag">Normal</span>';
   if (fieldKey === 'activo') return value ? '<span class="tag activo">Activo</span>' : '<span class="tag inactivo">Inactivo</span>';
   if (fieldKey === 'color') return `<span style="display:inline-block;width:22px;height:22px;background:${escapeHtml(value)};border-radius:6px;vertical-align:middle;"></span> ${escapeHtml(value)}`;
-  if (fieldKey === 'icono') return `<i class="fas ${escapeHtml(value)}" style="color:#f97316;font-size:16px;"></i> ${escapeHtml(value)}`;
+  if (fieldKey === 'icono') return `<i class="fas ${escapeHtml(value)}" style="color:#e51c32;font-size:16px;"></i> ${escapeHtml(value)}`;
   if (fieldKey === 'tipo_campo') return `<span class="tag">${escapeHtml(value)}</span>`;
-  if (fieldKey === 'precio' || fieldKey === 'precio_original') return `$${escapeHtml(value)}`;
+  if (fieldKey === 'precio' || fieldKey === 'precio_original') return `Bs ${escapeHtml(value)}`;
+  if (fieldKey === 'sku_razer') return `<span class="tag sku">${escapeHtml(value)}</span>`;
 
   return escapeHtml(value);
 }
@@ -536,6 +543,8 @@ function openModal(tableKey, row) {
       html += `<div class="field${full}"><label>${col.label}</label>
         <input type="${inputType}" data-key="${col.key}" value="${escapeHtml(val ?? '')}" ${col.required ? 'required' : ''} ${step} ${ph}>
         ${col.key === 'opciones_campo' ? '<span class="field-hint">Separa por comas: opcion1,opcion2,opcion3</span>' : ''}
+        ${col.key === 'sku_razer' ? '<span class="field-hint">Ej: 23802, 23803, etc. (código de Razer)</span>' : ''}
+        ${col.key === 'game_id_razer' ? '<span class="field-hint">Ej: 101 para Free Fire</span>' : ''}
       </div>`;
     }
   });
@@ -578,9 +587,7 @@ modalSave.onclick = async () => {
       if (val !== null && isNaN(val)) val = null;
     } else val = el.value === '' ? null : el.value;
 
-    // Conversión especial: opciones_campo → JSONB
     if (key === 'opciones_campo' && val) {
-      // Si el usuario escribió "a,b,c" lo convertimos a array JSON
       val = val.split(',').map(x => x.trim()).filter(x => x);
     }
 
@@ -607,7 +614,7 @@ modalSave.onclick = async () => {
       toast('Registro creado', 'success');
     }
     const table = currentTableKey;
-    categoriesCache = []; // invalidar caché
+    categoriesCache = [];
     closeModal();
     await renderSection(table);
   } catch (err) {
@@ -647,8 +654,8 @@ async function deleteRecord(tableKey, id) {
     await renderDashboard();
   } catch (err) {
     console.error(err);
-    $('#connStatus').innerHTML = '<i class="fas fa-circle" style="color:#f97316;font-size:8px;margin-right:6px;"></i>Error de conexión';
-    content.innerHTML = `<div class="empty-state" style="color:#f97316;">
+    $('#connStatus').innerHTML = '<i class="fas fa-circle" style="color:#e51c32;font-size:8px;margin-right:6px;"></i>Error de conexión';
+    content.innerHTML = `<div class="empty-state" style="color:#e51c32;">
       <i class="fas fa-exclamation-circle" style="font-size:36px;display:block;margin-bottom:12px;"></i>
       Error al conectar con Supabase: ${escapeHtml(err.message)}
     </div>`;
