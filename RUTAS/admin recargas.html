@@ -647,14 +647,14 @@
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
-                                <label for="paquete-precio" class="form-label">Precio Referencial (Bs)</label>
+                                <label for="paquete-precio" class="form-label">Precio Visual (Bs)</label>
                                 <input type="number" class="form-control" id="paquete-precio" step="0.01" min="0" required>
-                                <small class="text-muted">Precio Ref</small>
+                                <small class="text-muted">Precio que ve el usuario en la app</small>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="paquete-precio-final" class="form-label">Precio Final / Cobro (Bs)</label>
                                 <input type="number" class="form-control" id="paquete-precio-final" step="0.01" min="0">
-                                <small class="text-warning">Precio que se descuenta del saldo </small>
+                                <small class="text-warning">⚠ Precio real que se descuenta del saldo (oculto al usuario)</small>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -680,8 +680,8 @@
         // ============================================================
         // SUPABASE
         // ============================================================
-        const SUPABASE_URL = 'https://aleadadisazocjovibeh.supabase.co';
-        const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsZWFkYWRpc2F6b2Nqb3ZpYmVoIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0NDE5NjMsImV4cCI6MjA3NTAxNzk2M30.z82tP0C-UiiNuzP_jqrQf4LBusFqrDi1WYbdnuTh47E';
+        const SUPABASE_URL = 'https://fmhjuisoibynjgfrqvgj.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_M7yramCIWbPyxnH3xwJNEQ_p77ModBz';
         const db = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
         
         // ============================================================
