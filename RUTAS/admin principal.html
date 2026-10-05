@@ -366,7 +366,6 @@ let currentData = [];
 let editingId = null;
 let currentTableKey = null;
 let cache = { users: [], transactions: [], userBalances: {} };
-let pinEditingUserId = null;
 
 const $ = (s) => document.querySelector(s);
 const content = $('#contentArea');
@@ -376,14 +375,6 @@ const modalBody = $('#modalBody');
 const modalSave = $('#modalSave');
 const modalClose = $('#modalClose');
 const modalCancel = $('#modalCancel');
-
-// PIN modal
-const pinModalOverlay = $('#pinModalOverlay');
-const pinModalClose = $('#pinModalClose');
-const pinModalCancel = $('#pinModalCancel');
-const pinModalSave = $('#pinModalSave');
-const pinInput = $('#pinInput');
-const pinUserName = $('#pinUserName');
 
 // =============================================
 // UTILIDADES
@@ -744,7 +735,6 @@ function renderRows(tableKey, rows) {
       ${schema.listFields.map(f => `<td>${renderCell(row, f, schema)}</td>`).join('')}
       <td>
         <div class="actions-cell" style="justify-content:flex-end;">
-          ${tableKey === 'users' ? `<button class="table-action-btn pin" data-pin="${row[schema.pk]}" title="Cambiar PIN"><i class="fas fa-key"></i></button>` : ''}
           ${tableKey === 'users' ? `<button class="table-action-btn" data-clear-history="${row[schema.pk]}" title="Borrar historial y conservar saldo"><i class="fas fa-eraser"></i></button>` : ''}
           <button class="table-action-btn edit" data-edit="${row[schema.pk]}" title="Editar"><i class="fas fa-pen"></i></button>
           <button class="table-action-btn delete" data-del="${row[schema.pk]}" title="Eliminar"><i class="fas fa-trash"></i></button>
@@ -764,7 +754,6 @@ function bindRowActions(tableKey) {
   });
   document.querySelectorAll('[data-del]').forEach(b => { b.onclick = () => deleteRecord(tableKey, b.dataset.del); });
   document.querySelectorAll('[data-clear-history]').forEach(b => { b.onclick = () => clearUserTransactionHistory(b.dataset.clearHistory); });
-  document.querySelectorAll('[data-pin]').forEach(b => { b.onclick = () => openPinModal(b.dataset.pin); });
 }
 
 function renderCell(row, fieldKey, schema) {
@@ -916,51 +905,6 @@ async function clearUserTransactionHistory(userId) {
     renderTable('users');
   } catch (err) { console.error(err); toast(err.message, 'error'); }
 }
-
-// =============================================
-// MODAL CAMBIAR PIN
-// =============================================
-function openPinModal(userId) {
-  const user = cache.users.find(u => String(u.id) === String(userId));
-  if (!user) { toast('Usuario no encontrado', 'error'); return; }
-  pinEditingUserId = userId;
-  pinUserName.textContent = user.full_name || user.email || userId;
-  pinInput.value = user.pin || '';
-  pinModalOverlay.classList.add('show');
-  setTimeout(() => { pinInput.focus(); pinInput.select(); }, 100);
-}
-function closePinModal() {
-  pinModalOverlay.classList.remove('show');
-  pinEditingUserId = null;
-  pinInput.value = '';
-}
-pinModalClose.onclick = closePinModal;
-pinModalCancel.onclick = closePinModal;
-pinModalOverlay.onclick = (e) => { if (e.target === pinModalOverlay) closePinModal(); };
-pinInput.addEventListener('input', () => { pinInput.value = pinInput.value.replace(/\D/g, '').slice(0, 4); });
-pinInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); pinModalSave.click(); } });
-
-pinModalSave.onclick = async () => {
-  if (!pinEditingUserId) return;
-  const pin = pinInput.value.trim();
-  if (!/^[0-9]{4}$/.test(pin)) { toast('El PIN debe tener exactamente 4 dígitos', 'error'); pinInput.focus(); return; }
-  try {
-    pinModalSave.disabled = true;
-    pinModalSave.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
-    const { error } = await db.rpc('admin_set_user_pin', { p_user_id: pinEditingUserId, p_pin: pin });
-    if (error) throw error;
-    toast('PIN actualizado correctamente', 'success');
-    closePinModal();
-    await loadAllData();
-    if (currentSection === 'users') renderTable('users');
-  } catch (err) {
-    console.error('Error guardando PIN:', err);
-    toast('Error al guardar PIN: ' + err.message, 'error');
-  } finally {
-    pinModalSave.disabled = false;
-    pinModalSave.innerHTML = '<i class="fas fa-check"></i> Guardar PIN';
-  }
-};
 
 // =============================================
 // TRANSFERIR
