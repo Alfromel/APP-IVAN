@@ -11,7 +11,6 @@
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000000; }
   body { display: flex; align-items: stretch; justify-content: stretch; }
   .app { width: 100vw; height: 100vh; display: flex; overflow: hidden; background: #000000; }
-
   .sidebar { width: 260px; background: #080808; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s ease; overflow: hidden; }
   .sidebar.collapsed { width: 72px; }
   .sidebar-brand { padding: 20px 22px; display: flex; align-items: center; gap: 12px; color: #f0f0f5; font-weight: 700; font-size: 17px; white-space: nowrap; flex-shrink: 0; }
@@ -29,7 +28,6 @@
   .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #10b981; font-weight: 700; flex-shrink: 0; }
   .sidebar.collapsed .sidebar-footer span { display: none; }
   .sidebar.collapsed .sidebar-footer { justify-content: center; }
-
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #000000; }
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px; background: #080808; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 16px; }
@@ -39,7 +37,6 @@
   .topbar h1 i { color: #10b981; font-size: 20px; }
   .topbar-right .badge { background: #181818; color: #8a8aa0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; }
   .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
-
   .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
   .page-header h2 { color: #f0f0f5; font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
   .page-header h2 i { color: #10b981; }
@@ -51,14 +48,12 @@
   .btn-danger { background: #c2410c; color: #000000; }
   .btn-danger:hover { background: #9a3412; }
   .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
-
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
   .stat-card { background: #101010; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
   .stat-card .label { color: #8a8aa0; font-size: 12px; font-weight: 500; text-transform: uppercase; }
   .stat-card .value { color: #fff; font-size: 28px; font-weight: 700; }
   .stat-card .icon-wrap { display: flex; justify-content: space-between; align-items: center; }
   .stat-card .icon-wrap i { font-size: 22px; opacity: 0.7; }
-
   .table-wrap { background: #101010; border-radius: 14px; overflow: hidden; }
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 700px; }
@@ -69,12 +64,14 @@
   .tag.activo { background: #14331f; color: #4ade80; }
   .tag.inactivo { background: #3a240f; color: #10b981; }
   .tag.sku { background: #1a2a3a; color: #60a5fa; font-family: 'Courier New', monospace; }
+  .tag.tipo-blanca { background: #14331f; color: #4ade80; }
+  .tag.tipo-negra { background: #3a0f0f; color: #ef4444; }
+  .tag.tipo-esekaus { background: #2a1a3a; color: #a78bfa; }
   .actions-cell { display: flex; gap: 6px; }
   .empty-state { padding: 40px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
   .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
   .loading i { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(6px); }
   .modal-overlay.show { display: flex; }
   .modal { background: #101010; border-radius: 16px; width: 100%; max-width: 640px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); }
@@ -95,18 +92,15 @@
   .field-checkbox input { width: auto; accent-color: #10b981; }
   .field-hint { font-size: 11px; color: #6a6a85; margin-top: -2px; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #242424; flex-shrink: 0; }
-
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
   .toast { background: #181818; color: #e0e0f0; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); animation: slideIn 0.25s ease; min-width: 260px; }
   .toast.success { border-left: 3px solid #4ade80; }
   .toast.error { border-left: 3px solid #10b981; }
   .toast.info { border-left: 3px solid #60a5fa; }
   @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
-
   @media (max-width: 800px) {
     .sidebar { width: 72px; }
     .sidebar .nav-item span, .sidebar .sidebar-brand span, .sidebar-footer span { display: none; }
@@ -131,6 +125,11 @@
       <button class="nav-item active" data-section="dashboard"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
       <button class="nav-item" data-section="categories"><i class="fas fa-gamepad"></i><span>Categorías</span></button>
       <button class="nav-item" data-section="packages"><i class="fas fa-box"></i><span>Paquetes</span></button>
+      <button class="nav-item" data-section="ips_control"><i class="fas fa-shield-alt"></i><span>IPs Control</span></button>
+      <button class="nav-item" data-section="ips_usuarios"><i class="fas fa-map-marker-alt"></i><span>IPs Usuarios</span></button>
+      <button class="nav-item" data-section="compras_tokens"><i class="fas fa-key"></i><span>Tokens</span></button>
+      <button class="nav-item" data-section="log_recargas_juegos"><i class="fas fa-history"></i><span>Log Recargas</span></button>
+      <button class="nav-item" data-section="configuracion_seguridad"><i class="fas fa-cog"></i><span>Config Seguridad</span></button>
     </nav>
     <div class="sidebar-footer">
       <div class="avatar">T</div>
@@ -186,7 +185,7 @@ const SCHEMA = {
     columns: [
       { key: 'id', label: 'ID', type: 'readonly' },
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
-      { key: 'icono', label: 'Icono (Font Awesome)', type: 'text', placeholder: 'fa-gamepad' },
+      { key: 'icono', label: 'Icono (Font Awesome)', type: 'text', placeholder: 'fa-fire' },
       { key: 'color', label: 'Color', type: 'color' },
       { key: 'game_id_razer', label: 'Game ID Razer', type: 'text', placeholder: 'Ej: 101' },
       { key: 'activo', label: 'Activo', type: 'boolean' },
@@ -204,8 +203,9 @@ const SCHEMA = {
       { key: 'id', label: 'ID', type: 'readonly' },
       { key: 'categoria_id', label: 'Categoría', type: 'select-fk', fk: 'categories', required: true },
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
+      { key: 'descripcion', label: 'Descripción', type: 'textarea', full: true },
       { key: 'precio_referencia', label: 'Precio de Referencia', type: 'number', step: '0.01', required: true, hint: 'Precio "de antes" (se muestra tachado)' },
-      { key: 'precio_final', label: 'Precio Final', type: 'number', step: '0.01', required: true, hint: 'Precio que se le cobra al usuario' },
+      { key: 'precio_final', label: 'Precio Final', type: 'number', step: '0.01', required: true, hint: 'Precio que se cobra al usuario' },
       { key: 'porcentaje_descuento', label: 'Descuento (%)', type: 'number', hint: 'Se calcula automáticamente' },
       { key: 'stock', label: 'Stock', type: 'number' },
       { key: 'imagen_url', label: 'URL de Imagen', type: 'text', full: true },
@@ -214,6 +214,88 @@ const SCHEMA = {
       { key: 'activo', label: 'Activo', type: 'boolean' },
     ],
     listFields: ['id', 'nombre', 'categoria_id', 'precio_referencia', 'precio_final', 'porcentaje_descuento', 'stock', 'sku_razer', 'destacado', 'activo'],
+  },
+  ips_control: {
+    table: 'ips_control',
+    label: 'Control de IPs',
+    singular: 'IP',
+    icon: 'fa-shield-alt',
+    pk: 'id',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'ip', label: 'IP', type: 'text', required: true, placeholder: 'Ej: 190.129.45.12' },
+      { key: 'tipo', label: 'Tipo', type: 'select', options: ['blanca', 'negra', 'esekaus'], required: true },
+      { key: 'motivo', label: 'Motivo', type: 'text' },
+      { key: 'nota', label: 'Nota', type: 'textarea', full: true },
+      { key: 'activo', label: 'Activo', type: 'boolean' },
+    ],
+    listFields: ['id', 'ip', 'tipo', 'motivo', 'activo'],
+  },
+  ips_usuarios: {
+    table: 'ips_usuarios',
+    label: 'IPs Usuarios',
+    singular: 'IP Usuario',
+    icon: 'fa-map-marker-alt',
+    pk: 'id',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'user_id', label: 'User ID', type: 'text', required: true },
+      { key: 'ip', label: 'IP', type: 'text' },
+      { key: 'user_agent', label: 'User Agent', type: 'text', full: true },
+      { key: 'es_sospechosa', label: 'Sospechosa', type: 'boolean' },
+      { key: 'veces_usada', label: 'Veces Usada', type: 'number' },
+    ],
+    listFields: ['id', 'user_id', 'ip', 'es_sospechosa', 'veces_usada', 'ultima_vez'],
+  },
+  compras_tokens: {
+    table: 'compras_tokens',
+    label: 'Tokens Anti-replay',
+    singular: 'Token',
+    icon: 'fa-key',
+    pk: 'id',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'user_id', label: 'User ID', type: 'text' },
+      { key: 'token', label: 'Token', type: 'text' },
+      { key: 'usado', label: 'Usado', type: 'boolean' },
+    ],
+    listFields: ['id', 'user_id', 'token', 'usado', 'creado_en', 'expira_en'],
+  },
+  log_recargas_juegos: {
+    table: 'log_recargas_juegos',
+    label: 'Log de Recargas',
+    singular: 'Log',
+    icon: 'fa-history',
+    pk: 'id',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'user_id', label: 'User ID', type: 'text' },
+      { key: 'package_nombre', label: 'Paquete', type: 'text' },
+      { key: 'precio_cobrado', label: 'Precio', type: 'number' },
+      { key: 'saldo_antes', label: 'Saldo Antes', type: 'number' },
+      { key: 'saldo_despues', label: 'Saldo Después', type: 'number' },
+      { key: 'ip_usuario', label: 'IP', type: 'text' },
+      { key: 'razer_reference_id', label: 'Ref Razer', type: 'text' },
+      { key: 'razer_order_number', label: 'Nº Orden Razer', type: 'text' },
+      { key: 'estado', label: 'Estado', type: 'text' },
+      { key: 'motivo_rechazo', label: 'Motivo', type: 'text', full: true },
+    ],
+    listFields: ['id', 'user_id', 'package_nombre', 'precio_cobrado', 'estado', 'creado_en'],
+  },
+  configuracion_seguridad: {
+    table: 'configuracion_seguridad',
+    label: 'Configuración de Seguridad',
+    singular: 'Config',
+    icon: 'fa-cog',
+    pk: 'id',
+    columns: [
+      { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'modo_ip', label: 'Modo IP', type: 'select', options: ['blacklist', 'whitelist', 'off'] },
+      { key: 'bloquear_esekaus', label: 'Bloquear Esekaus', type: 'boolean' },
+      { key: 'max_ips_por_dia', label: 'Máx IPs por Día', type: 'number' },
+      { key: 'max_compras_por_hora', label: 'Máx Compras por Hora', type: 'number' },
+    ],
+    listFields: ['id', 'modo_ip', 'bloquear_esekaus', 'max_ips_por_dia', 'max_compras_por_hora'],
   },
 };
 
@@ -285,34 +367,23 @@ async function loadCategoriesCache() {
 async function renderDashboard() {
   categoriesCache = [];
   await loadCategoriesCache();
-  const [cats, packs] = await Promise.all([
+  const [cats, packs, ipsC, ipsU, tokens, logs] = await Promise.all([
     db.from('categorias_juegos').select('*', { count: 'exact', head: true }),
     db.from('paquetes_juegos').select('*', { count: 'exact', head: true }),
+    db.from('ips_control').select('*', { count: 'exact', head: true }),
+    db.from('ips_usuarios').select('*', { count: 'exact', head: true }),
+    db.from('compras_tokens').select('*', { count: 'exact', head: true }),
+    db.from('log_recargas_juegos').select('*', { count: 'exact', head: true }),
   ]);
-  const { count: featured } = await db.from('paquetes_juegos').select('*', { count: 'exact', head: true }).eq('destacado', true);
-  const { count: conSku } = await db.from('paquetes_juegos').select('*', { count: 'exact', head: true }).not('sku_razer', 'is', null);
-
-  const { data: allPackages } = await db.from('paquetes_juegos').select('categoria_id, activo, sku_razer');
 
   const cards = [
     { label: 'Categorías', value: cats.count || 0, icon: 'fa-gamepad', color: '#10b981' },
     { label: 'Paquetes', value: packs.count || 0, icon: 'fa-box', color: '#fbbf24' },
-    { label: 'Con SKU Razer', value: conSku || 0, icon: 'fa-barcode', color: '#60a5fa' },
-    { label: 'Destacados', value: featured || 0, icon: 'fa-star', color: '#a78bfa' },
+    { label: 'IPs Control', value: ipsC.count || 0, icon: 'fa-shield-alt', color: '#60a5fa' },
+    { label: 'IPs Usuarios', value: ipsU.count || 0, icon: 'fa-map-marker-alt', color: '#a78bfa' },
+    { label: 'Tokens', value: tokens.count || 0, icon: 'fa-key', color: '#f472b6' },
+    { label: 'Log Recargas', value: logs.count || 0, icon: 'fa-history', color: '#4ade80' },
   ];
-
-  const summaryRows = categoriesCache.map(cat => {
-    const p = (allPackages || []).filter(x => x.categoria_id === cat.id).length;
-    const pConSku = (allPackages || []).filter(x => x.categoria_id === cat.id && x.sku_razer).length;
-    return `
-      <tr>
-        <td><i class="fas ${cat.icono || 'fa-gamepad'}" style="color:${cat.color || '#10b981'};margin-right:10px;"></i>${escapeHtml(cat.nombre)}</td>
-        <td>${p} <span style="color:#6a6a85;font-size:11px;">(${pConSku} con SKU)</span></td>
-        <td>${cat.game_id_razer ? `<span class="tag sku">${escapeHtml(cat.game_id_razer)}</span>` : '—'}</td>
-        <td>${cat.activo ? '<span class="tag activo">Activo</span>' : '<span class="tag inactivo">Inactivo</span>'}</td>
-      </tr>
-    `;
-  }).join('');
 
   content.innerHTML = `
     <div class="page-header"><h2><i class="fas fa-chart-pie"></i> Dashboard</h2></div>
@@ -324,14 +395,6 @@ async function renderDashboard() {
         </div>
       `).join('')}
     </div>
-    <div class="table-wrap">
-      <div class="table-scroll">
-        <table>
-          <thead><tr><th>Categoría</th><th>Paquetes</th><th>Game ID Razer</th><th>Estado</th></tr></thead>
-          <tbody>${summaryRows || `<tr><td colspan="4" class="empty-state">No hay categorías</td></tr>`}</tbody>
-        </table>
-      </div>
-    </div>
   `;
 }
 
@@ -339,10 +402,12 @@ async function renderTable(tableKey) {
   currentTableKey = tableKey;
   const schema = SCHEMA[tableKey];
   categoriesCache = [];
-  await loadCategoriesCache();
+  if (tableKey === 'packages') await loadCategoriesCache();
 
   let query = db.from(schema.table).select(schema.joinSelect || '*');
-  query = query.order('creado_en', { ascending: false }).limit(200);
+  if (schema.table !== 'configuracion_seguridad') {
+    query = query.order('creado_en', { ascending: false }).limit(200);
+  }
   const { data, error } = await query;
   if (error) throw error;
   currentData = data || [];
@@ -408,10 +473,16 @@ function renderCell(row, fieldKey, schema) {
   if (fieldKey === 'porcentaje_descuento' && Number(value) > 0) return `<span class="tag activo">-${value}%</span>`;
   if (fieldKey === 'destacado') return value ? '<span class="tag activo">⭐ Destacado</span>' : '<span class="tag">Normal</span>';
   if (fieldKey === 'activo') return value ? '<span class="tag activo">Activo</span>' : '<span class="tag inactivo">Inactivo</span>';
+  if (fieldKey === 'tipo') {
+    const cls = value === 'blanca' ? 'tipo-blanca' : value === 'negra' ? 'tipo-negra' : 'tipo-esekaus';
+    return `<span class="tag ${cls}">${escapeHtml(value)}</span>`;
+  }
   if (fieldKey === 'color') return `<span style="display:inline-block;width:22px;height:22px;background:${escapeHtml(value)};border-radius:6px;vertical-align:middle;"></span> ${escapeHtml(value)}`;
   if (fieldKey === 'icono') return `<i class="fas ${escapeHtml(value)}" style="color:#10b981;font-size:16px;"></i> ${escapeHtml(value)}`;
-  if (fieldKey === 'precio' || fieldKey === 'precio_original' || fieldKey === 'precio_referencia' || fieldKey === 'precio_final') return `Bs ${escapeHtml(value)}`;
+  if (fieldKey === 'precio_referencia' || fieldKey === 'precio_final' || fieldKey === 'precio_cobrado' || fieldKey === 'saldo_antes' || fieldKey === 'saldo_despues') return `Bs ${escapeHtml(value)}`;
   if (fieldKey === 'sku_razer') return `<span class="tag sku">${escapeHtml(value)}</span>`;
+  if (fieldKey === 'creado_en' || fieldKey === 'ultima_vez' || fieldKey === 'expira_en') return new Date(value).toLocaleString('es-BO');
+  if (fieldKey === 'razer_reference_id' || fieldKey === 'token') return `<span style="font-family:'Courier New',monospace;font-size:11px;color:#60a5fa">${escapeHtml(String(value).substring(0, 20))}...</span>`;
   return escapeHtml(value);
 }
 
@@ -430,9 +501,11 @@ function openModal(tableKey, row) {
     const full = col.full || col.type === 'textarea' ? ' field-full' : '';
     if (col.type === 'readonly') return;
 
-    if (col.type === 'select') {
+    if (col.type === 'textarea') {
+      html += `<div class="field${full}"><label>${col.label}</label><textarea data-key="${col.key}" ${col.required ? 'required' : ''}>${escapeHtml(val ?? '')}</textarea></div>`;
+    } else if (col.type === 'select') {
       html += `<div class="field${full}"><label>${col.label}</label>
-        <select data-key="${col.key}">
+        <select data-key="${col.key}" ${col.required ? 'required' : ''}>
           <option value="">— Seleccionar —</option>
           ${col.options.map(o => `<option value="${o}" ${val === o ? 'selected' : ''}>${o}</option>`).join('')}
         </select></div>`;
@@ -446,14 +519,12 @@ function openModal(tableKey, row) {
     } else if (col.type === 'boolean') {
       html += `<div class="field field-checkbox${full}"><input type="checkbox" data-key="${col.key}" id="chk_${col.key}" ${val ? 'checked' : ''}><label for="chk_${col.key}">${col.label}</label></div>`;
     } else {
-      const inputType = col.type === 'number' ? 'number' : col.type === 'color' ? 'color' : col.type === 'email' ? 'email' : col.type === 'date' ? 'date' : 'text';
+      const inputType = col.type === 'number' ? 'number' : col.type === 'color' ? 'color' : col.type === 'email' ? 'email' : 'text';
       const step = col.step ? `step="${col.step}"` : '';
       const ph = col.placeholder ? `placeholder="${col.placeholder}"` : '';
       html += `<div class="field${full}"><label>${col.label}</label>
         <input type="${inputType}" data-key="${col.key}" value="${escapeHtml(val ?? '')}" ${col.required ? 'required' : ''} ${step} ${ph}>
         ${col.hint ? `<span class="field-hint">${col.hint}</span>` : ''}
-        ${col.key === 'sku_razer' ? '<span class="field-hint">Ej: 23802, 23803, etc.</span>' : ''}
-        ${col.key === 'game_id_razer' ? '<span class="field-hint">Ej: 101 para Free Fire</span>' : ''}
       </div>`;
     }
   });
@@ -502,7 +573,7 @@ modalSave.onclick = async () => {
 
   if (!valid) return;
 
-  // Calcular descuento y precios si es paquete
+  // Calcular descuento automático en paquetes
   if (currentTableKey === 'packages') {
     const ref = Number(payload.precio_referencia) || 0;
     const fin = Number(payload.precio_final) || 0;
@@ -512,8 +583,6 @@ modalSave.onclick = async () => {
       toast('El precio final no puede ser mayor al de referencia', 'error');
       return;
     }
-    payload.precio = fin;
-    payload.precio_original = ref;
   }
 
   try {
