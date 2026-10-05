@@ -11,7 +11,6 @@
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000000; }
   body { display: flex; align-items: stretch; justify-content: stretch; }
   .app { width: 100vw; height: 100vh; display: flex; overflow: hidden; background: #000000; }
-
   .sidebar { width: 260px; background: #080808; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s ease; overflow: hidden; }
   .sidebar.collapsed { width: 72px; }
   .sidebar-brand { padding: 20px 22px; display: flex; align-items: center; gap: 12px; color: #f0f0f5; font-weight: 700; font-size: 17px; white-space: nowrap; flex-shrink: 0; }
@@ -29,7 +28,6 @@
   .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #10b981; font-weight: 700; flex-shrink: 0; }
   .sidebar.collapsed .sidebar-footer span { display: none; }
   .sidebar.collapsed .sidebar-footer { justify-content: center; }
-
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #000000; }
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px; background: #080808; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 16px; }
@@ -42,7 +40,6 @@
   .btn-guide { background: #10b981; color: #0a0a0a; border: none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
   .btn-guide:hover { background: #059669; }
   .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
-
   .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
   .page-header h2 { color: #f0f0f5; font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
   .page-header h2 i { color: #10b981; }
@@ -54,14 +51,12 @@
   .btn-danger { background: #c2410c; color: #000000; }
   .btn-danger:hover { background: #9a3412; }
   .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
-
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
   .stat-card { background: #101010; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
   .stat-card .label { color: #8a8aa0; font-size: 12px; font-weight: 500; text-transform: uppercase; }
   .stat-card .value { color: #fff; font-size: 28px; font-weight: 700; }
   .stat-card .icon-wrap { display: flex; justify-content: space-between; align-items: center; }
   .stat-card .icon-wrap i { font-size: 22px; opacity: 0.7; }
-
   .table-wrap { background: #101010; border-radius: 14px; overflow: hidden; }
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 700px; }
@@ -77,12 +72,12 @@
   .tag.tipo-esekaus { background: #2a1a3a; color: #a78bfa; }
   .tag.estado-completado { background: #14331f; color: #4ade80; }
   .tag.estado-rechazado { background: #3a0f0f; color: #ef4444; }
+  .tag.orden { background: #2a2a3a; color: #fbbf24; font-family: 'Courier New', monospace; font-weight: 700; }
   .actions-cell { display: flex; gap: 6px; }
   .empty-state { padding: 40px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
   .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
   .loading i { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
-
   .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(6px); }
   .modal-overlay.show { display: flex; }
   .modal { background: #101010; border-radius: 16px; width: 100%; max-width: 640px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); }
@@ -104,14 +99,12 @@
   .field-checkbox input { width: auto; accent-color: #10b981; }
   .field-hint { font-size: 11px; color: #6a6a85; margin-top: -2px; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #242424; flex-shrink: 0; }
-
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
   .toast { background: #181818; color: #e0e0f0; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); animation: slideIn 0.25s ease; min-width: 260px; }
   .toast.success { border-left: 3px solid #4ade80; }
   .toast.error { border-left: 3px solid #10b981; }
   .toast.info { border-left: 3px solid #60a5fa; }
   @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-
   .guide-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #242424; }
   .guide-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
   .guide-section h4 { color: #10b981; font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
@@ -123,11 +116,9 @@
   .guide-section code { background: #0a0a0a; color: #4ade80; padding: 2px 8px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; }
   .guide-section .tip { background: #0d1a16; border-left: 3px solid #10b981; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 12.5px; color: #b0b0c0; }
   .guide-section .warn { background: #1a0d0d; border-left: 3px solid #ef4444; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 12.5px; color: #f0a0a0; }
-
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
-
   @media (max-width: 800px) {
     .sidebar { width: 72px; }
     .sidebar .nav-item span, .sidebar .sidebar-brand span, .sidebar-footer span { display: none; }
@@ -208,63 +199,48 @@
     <div class="modal-body">
       <div class="guide-section">
         <h4><i class="fas fa-chart-pie"></i> Dashboard</h4>
-        <p>Vista general con contadores de todas las tablas del sistema.</p>
+        <p>Vista general con contadores de todas las tablas.</p>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-gamepad"></i> Categorías</h4>
         <p>Agrupaciones de juegos (Free Fire, Razer Gold, etc).</p>
         <ul>
           <li><strong>Nombre:</strong> Nombre del juego</li>
-          <li><strong>Icono:</strong> Icono de Font Awesome (ej: <code>fa-fire</code>)</li>
-          <li><strong>Color:</strong> Color identificador</li>
+          <li><strong>Icono:</strong> Icono Font Awesome</li>
           <li><strong>Game ID Razer:</strong> ID interno (Free Fire = 101)</li>
-          <li><strong>Activo:</strong> Si aparece en la tienda</li>
         </ul>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-box"></i> Paquetes</h4>
-        <p>Los productos que los usuarios compran. Cada uno tiene:</p>
+        <p>Los productos que los usuarios compran.</p>
         <ul>
-          <li><strong>Precio de Referencia:</strong> Precio "normal" (aparece tachado en la tienda)</li>
-          <li><strong>Precio Final:</strong> El que se cobra al usuario ✅</li>
-          <li><strong>Descuento (%):</strong> OPCIONAL. Si lo ponés, se muestra el badge <code>-X%</code> y el precio de referencia aparece tachado. Si lo dejás vacío o en 0, no se muestra descuento.</li>
+          <li><strong>Orden:</strong> Número para ordenar (1, 2, 3...). Menor = primero.</li>
+          <li><strong>Precio de Referencia:</strong> Precio "normal" (aparece pequeño)</li>
+          <li><strong>Precio Final:</strong> El que se cobra ✅</li>
+          <li><strong>Descuento (%):</strong> OPCIONAL. En 0 = sin badge de descuento</li>
           <li><strong>SKU Razer:</strong> Obligatorio (ej: 23802)</li>
-          <li><strong>Stock:</strong> Cantidad disponible</li>
         </ul>
-        <div class="tip">💡 Si querés que NO se muestre descuento, dejá el <strong>Descuento</strong> en 0 o vacío. Los precios se muestran igual, pero sin tachado.</div>
-        <div class="warn">⚠️ El <strong>SKU Razer</strong> es obligatorio. Sin él, la compra falla.</div>
+        <div class="tip">💡 El <strong>orden</strong> te permite poner el paquete más importante primero (ej: el de 100+10 con orden 1).</div>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-shield-alt"></i> IPs Control</h4>
-        <p>Listas de IPs bloqueadas o permitidas.</p>
-        <ul>
-          <li><strong>Blanca:</strong> IPs autorizadas</li>
-          <li><strong>Negra:</strong> IPs bloqueadas (fraudes)</li>
-          <li><strong>Esekaus:</strong> Bloqueo inmediato (fraude confirmado)</li>
-        </ul>
+        <p>Listas de IPs bloqueadas o permitidas (blanca/negra/esekaus).</p>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-map-marker-alt"></i> IPs Usuarios</h4>
-        <p>Historial de IPs que usó cada usuario.</p>
+        <p>Historial de IPs de cada usuario.</p>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-key"></i> Tokens</h4>
-        <p>Tokens únicos generados por compra (anti-replay).</p>
+        <p>Tokens anti-replay generados por compra.</p>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-history"></i> Log Recargas</h4>
-        <p>Auditoría completa de todas las recargas.</p>
+        <p>Auditoría de todas las recargas.</p>
       </div>
-
       <div class="guide-section">
         <h4><i class="fas fa-cog"></i> Config Seguridad</h4>
-        <p>Configuración global del sistema de seguridad.</p>
+        <p>Modo IPs y límites de seguridad.</p>
       </div>
     </div>
     <div class="modal-footer">
@@ -307,10 +283,11 @@ const SCHEMA = {
     joinSelect: '*, categorias_juegos(nombre)',
     columns: [
       { key: 'id', label: 'ID', type: 'readonly' },
+      { key: 'orden', label: 'Orden', type: 'number', hint: 'Menor = primero (1, 2, 3...)' },
       { key: 'categoria_id', label: 'Categoría', type: 'select-fk', fk: 'categories', required: true },
       { key: 'nombre', label: 'Nombre', type: 'text', required: true },
       { key: 'descripcion', label: 'Descripción', type: 'textarea', full: true },
-      { key: 'precio_referencia', label: 'Precio de Referencia', type: 'number', step: '0.01', required: true, hint: 'Precio "de antes" (aparece tachado en la tienda)' },
+      { key: 'precio_referencia', label: 'Precio de Referencia', type: 'number', step: '0.01', required: true, hint: 'Precio "de antes" (aparece chico)' },
       { key: 'precio_final', label: 'Precio Final', type: 'number', step: '0.01', required: true, hint: 'Precio que se cobra al usuario' },
       { key: 'porcentaje_descuento', label: 'Descuento (%) — OPCIONAL', type: 'number', hint: 'Dejalo en 0 para NO mostrar descuento' },
       { key: 'stock', label: 'Stock', type: 'number' },
@@ -319,7 +296,7 @@ const SCHEMA = {
       { key: 'destacado', label: 'Destacado', type: 'boolean' },
       { key: 'activo', label: 'Activo', type: 'boolean' },
     ],
-    listFields: ['id', 'nombre', 'categoria_id', 'precio_referencia', 'precio_final', 'porcentaje_descuento', 'stock', 'sku_razer', 'destacado', 'activo'],
+    listFields: ['id', 'orden', 'nombre', 'categoria_id', 'precio_referencia', 'precio_final', 'porcentaje_descuento', 'stock', 'sku_razer', 'destacado', 'activo'],
   },
   ips_control: {
     table: 'ips_control',
@@ -527,6 +504,8 @@ async function renderTable(tableKey) {
     // no ordenar
   } else if (schema.table === 'ips_usuarios') {
     query = query.order('ultima_vez', { ascending: false }).limit(200);
+  } else if (schema.table === 'packages') {
+    query = query.order('orden', { ascending: true }).limit(200);
   } else {
     query = query.order('creado_en', { ascending: false }).limit(200);
   }
@@ -593,6 +572,7 @@ function renderCell(row, fieldKey, schema) {
   }
   if (value === null || value === undefined || value === '') return '—';
   if (col?.type === 'boolean') return value ? '<span class="tag activo">Sí</span>' : '<span class="tag inactivo">No</span>';
+  if (fieldKey === 'orden') return `<span class="tag orden">${escapeHtml(value)}</span>`;
   if (fieldKey === 'porcentaje_descuento') {
     const d = Number(value) || 0;
     return d > 0 ? `<span class="tag activo">-${d}%</span>` : '<span class="tag">Sin dcto</span>';
@@ -705,19 +685,15 @@ modalSave.onclick = async () => {
 
   if (!valid) return;
 
-  // En paquetes, el descuento es OPCIONAL
   if (currentTableKey === 'packages') {
-    const desc = Number(payload.porcentaje_descuento) || 0;
     const ref = Number(payload.precio_referencia) || 0;
     const fin = Number(payload.precio_final) || 0;
-
     if (ref > 0 && fin > 0 && ref < fin) {
       toast('El precio final no puede ser mayor al de referencia', 'error');
       return;
     }
-    if (!desc) {
-      payload.porcentaje_descuento = 0;
-    }
+    if (!payload.porcentaje_descuento) payload.porcentaje_descuento = 0;
+    if (!payload.orden) payload.orden = 0;
   }
 
   try {
