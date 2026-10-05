@@ -11,6 +11,7 @@
   html, body { width: 100%; height: 100%; overflow: hidden; background: #000000; }
   body { display: flex; align-items: stretch; justify-content: stretch; }
   .app { width: 100vw; height: 100vh; display: flex; overflow: hidden; background: #000000; }
+
   .sidebar { width: 260px; background: #080808; display: flex; flex-direction: column; flex-shrink: 0; transition: width 0.2s ease; overflow: hidden; }
   .sidebar.collapsed { width: 72px; }
   .sidebar-brand { padding: 20px 22px; display: flex; align-items: center; gap: 12px; color: #f0f0f5; font-weight: 700; font-size: 17px; white-space: nowrap; flex-shrink: 0; }
@@ -28,6 +29,7 @@
   .sidebar-footer .avatar { width: 34px; height: 34px; border-radius: 50%; background: #333333; display: flex; align-items: center; justify-content: center; color: #10b981; font-weight: 700; flex-shrink: 0; }
   .sidebar.collapsed .sidebar-footer span { display: none; }
   .sidebar.collapsed .sidebar-footer { justify-content: center; }
+
   .main { flex: 1; display: flex; flex-direction: column; overflow: hidden; background: #000000; }
   .topbar { display: flex; align-items: center; justify-content: space-between; padding: 14px 26px; background: #080808; flex-shrink: 0; }
   .topbar-left { display: flex; align-items: center; gap: 16px; }
@@ -35,8 +37,12 @@
   .toggle-btn:hover { background: #181818; color: #fff; }
   .topbar h1 { color: #e8e8f0; font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
   .topbar h1 i { color: #10b981; font-size: 20px; }
+  .topbar-right { display: flex; align-items: center; gap: 10px; }
   .topbar-right .badge { background: #181818; color: #8a8aa0; padding: 6px 14px; border-radius: 20px; font-size: 12px; font-weight: 500; }
+  .btn-guide { background: #10b981; color: #0a0a0a; border: none; padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-guide:hover { background: #059669; }
   .content { flex: 1; overflow-y: auto; padding: 24px 28px 40px; }
+
   .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 12px; }
   .page-header h2 { color: #f0f0f5; font-size: 22px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
   .page-header h2 i { color: #10b981; }
@@ -48,12 +54,14 @@
   .btn-danger { background: #c2410c; color: #000000; }
   .btn-danger:hover { background: #9a3412; }
   .btn-sm { padding: 6px 10px; font-size: 12px; border-radius: 8px; }
+
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 24px; }
   .stat-card { background: #101010; border-radius: 14px; padding: 18px 20px; display: flex; flex-direction: column; gap: 4px; }
   .stat-card .label { color: #8a8aa0; font-size: 12px; font-weight: 500; text-transform: uppercase; }
   .stat-card .value { color: #fff; font-size: 28px; font-weight: 700; }
   .stat-card .icon-wrap { display: flex; justify-content: space-between; align-items: center; }
   .stat-card .icon-wrap i { font-size: 22px; opacity: 0.7; }
+
   .table-wrap { background: #101010; border-radius: 14px; overflow: hidden; }
   .table-scroll { overflow-x: auto; }
   table { width: 100%; border-collapse: collapse; font-size: 13.5px; min-width: 700px; }
@@ -67,14 +75,18 @@
   .tag.tipo-blanca { background: #14331f; color: #4ade80; }
   .tag.tipo-negra { background: #3a0f0f; color: #ef4444; }
   .tag.tipo-esekaus { background: #2a1a3a; color: #a78bfa; }
+  .tag.estado-completado { background: #14331f; color: #4ade80; }
+  .tag.estado-rechazado { background: #3a0f0f; color: #ef4444; }
   .actions-cell { display: flex; gap: 6px; }
   .empty-state { padding: 40px 20px; text-align: center; color: #6a6a85; font-size: 14px; }
   .loading { display: flex; align-items: center; justify-content: center; padding: 60px; color: #8a8aa0; gap: 12px; font-size: 14px; }
   .loading i { animation: spin 1s linear infinite; }
   @keyframes spin { to { transform: rotate(360deg); } }
+
   .modal-overlay { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.75); display: none; align-items: center; justify-content: center; z-index: 1000; padding: 20px; backdrop-filter: blur(6px); }
   .modal-overlay.show { display: flex; }
   .modal { background: #101010; border-radius: 16px; width: 100%; max-width: 640px; max-height: 92vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7); }
+  .modal.modal-wide { max-width: 900px; }
   .modal-header { display: flex; justify-content: space-between; align-items: center; padding: 18px 24px; border-bottom: 1px solid #242424; flex-shrink: 0; }
   .modal-header h3 { color: #f0f0f5; font-size: 17px; font-weight: 600; display: flex; align-items: center; gap: 10px; }
   .modal-header h3 i { color: #10b981; }
@@ -92,15 +104,31 @@
   .field-checkbox input { width: auto; accent-color: #10b981; }
   .field-hint { font-size: 11px; color: #6a6a85; margin-top: -2px; }
   .modal-footer { display: flex; justify-content: flex-end; gap: 10px; padding: 16px 24px; border-top: 1px solid #242424; flex-shrink: 0; }
+
   .toast-container { position: fixed; bottom: 24px; right: 24px; z-index: 2000; display: flex; flex-direction: column; gap: 10px; }
   .toast { background: #181818; color: #e0e0f0; padding: 12px 20px; border-radius: 12px; font-size: 13.5px; display: flex; align-items: center; gap: 10px; box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5); animation: slideIn 0.25s ease; min-width: 260px; }
   .toast.success { border-left: 3px solid #4ade80; }
   .toast.error { border-left: 3px solid #10b981; }
   .toast.info { border-left: 3px solid #60a5fa; }
   @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+  /* GUÍA */
+  .guide-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #242424; }
+  .guide-section:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+  .guide-section h4 { color: #10b981; font-size: 15px; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+  .guide-section h4 i { font-size: 16px; }
+  .guide-section p { color: #b0b0c0; font-size: 13px; line-height: 1.6; margin-bottom: 8px; }
+  .guide-section ul { list-style: none; padding-left: 0; margin: 8px 0; }
+  .guide-section ul li { color: #b0b0c0; font-size: 13px; padding: 6px 0 6px 24px; position: relative; line-height: 1.5; }
+  .guide-section ul li:before { content: '▸'; color: #10b981; position: absolute; left: 8px; font-weight: 700; }
+  .guide-section code { background: #0a0a0a; color: #4ade80; padding: 2px 8px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 12px; }
+  .guide-section .tip { background: #0d1a16; border-left: 3px solid #10b981; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 12.5px; color: #b0b0c0; }
+  .guide-section .warn { background: #1a0d0d; border-left: 3px solid #ef4444; padding: 10px 14px; border-radius: 6px; margin: 10px 0; font-size: 12.5px; color: #f0a0a0; }
+
   ::-webkit-scrollbar { width: 8px; height: 8px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
+
   @media (max-width: 800px) {
     .sidebar { width: 72px; }
     .sidebar .nav-item span, .sidebar .sidebar-brand span, .sidebar-footer span { display: none; }
@@ -110,6 +138,7 @@
     .topbar { padding: 12px 16px; }
     .page-header h2 { font-size: 18px; }
     .fields-grid { grid-template-columns: 1fr; }
+    .btn-guide span { display: none; }
   }
 </style>
 </head>
@@ -144,6 +173,10 @@
         <h1><i class="fas fa-shield-halved"></i> <span id="pageTitle">Panel de Administración</span></h1>
       </div>
       <div class="topbar-right">
+        <button class="btn-guide" id="btnGuide">
+          <i class="fas fa-book-open"></i>
+          <span>Guía</span>
+        </button>
         <span class="badge" id="connStatus"><i class="fas fa-circle" style="color:#4ade80;font-size:8px;margin-right:6px;"></i>Conectado</span>
       </div>
     </div>
@@ -153,6 +186,7 @@
   </main>
 </div>
 
+<!-- MODAL CRUD -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal" id="modalBox">
     <div class="modal-header">
@@ -163,6 +197,148 @@
     <div class="modal-footer">
       <button class="btn" id="modalCancel">Cancelar</button>
       <button class="btn btn-primary" id="modalSave"><i class="fas fa-save"></i> Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL GUÍA -->
+<div class="modal-overlay" id="guideOverlay">
+  <div class="modal modal-wide" id="guideBox">
+    <div class="modal-header">
+      <h3><i class="fas fa-book-open"></i> Guía del Panel de Administración</h3>
+      <button class="modal-close" id="guideClose"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="guide-section">
+        <h4><i class="fas fa-chart-pie"></i> Dashboard</h4>
+        <p>Vista general con contadores de todas las tablas del sistema. Te muestra cuántas categorías, paquetes, IPs, tokens y recargas tenés registradas.</p>
+        <ul>
+          <li><strong>Categorías:</strong> Total de juegos configurados</li>
+          <li><strong>Paquetes:</strong> Total de productos disponibles</li>
+          <li><strong>IPs Control:</strong> IPs en lista blanca/negra/esekaus</li>
+          <li><strong>IPs Usuarios:</strong> Historial de IPs por usuario</li>
+          <li><strong>Tokens:</strong> Tokens anti-replay generados</li>
+          <li><strong>Log Recargas:</strong> Total de recargas procesadas</li>
+        </ul>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-gamepad"></i> Categorías</h4>
+        <p>Agrupaciones de juegos (ej: Free Fire, Razer Gold, Mobile Legends). Cada categoría puede tener múltiples paquetes.</p>
+        <ul>
+          <li><strong>Nombre:</strong> Nombre visible del juego</li>
+          <li><strong>Icono:</strong> Icono de Font Awesome (ej: <code>fa-fire</code>)</li>
+          <li><strong>Color:</strong> Color identificador</li>
+          <li><strong>Game ID Razer:</strong> ID interno de Razer (Free Fire = 101)</li>
+          <li><strong>Activo:</strong> Si se muestra en la tienda</li>
+        </ul>
+        <div class="tip">💡 El Game ID Razer es necesario solo si usás la API de recarga directa. Para Free Fire es <code>101</code>.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-box"></i> Paquetes</h4>
+        <p>Los productos que los usuarios pueden comprar. Cada paquete se asocia a una categoría.</p>
+        <ul>
+          <li><strong>Categoría:</strong> A qué juego pertenece</li>
+          <li><strong>Nombre:</strong> Ej: "Free Fire: 100+10 Diamantes"</li>
+          <li><strong>Precio de Referencia:</strong> El precio "tachado" (más alto)</li>
+          <li><strong>Precio Final:</strong> El precio que se cobra realmente</li>
+          <li><strong>Descuento (%):</strong> Se calcula automáticamente</li>
+          <li><strong>Stock:</strong> Cantidad disponible</li>
+          <li><strong>Imagen URL:</strong> Link a la imagen del producto</li>
+          <li><strong>SKU Razer:</strong> Código interno de Razer (ej: 23802)</li>
+          <li><strong>Destacado:</strong> Aparece primero en la tienda</li>
+          <li><strong>Activo:</strong> Si se muestra a los usuarios</li>
+        </ul>
+        <div class="tip">💡 El descuento se calcula: <code>(referencia - final) / referencia × 100</code></div>
+        <div class="warn">⚠️ El <strong>SKU Razer</strong> es obligatorio. Sin él, la compra falla al procesar con Razer.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-shield-alt"></i> IPs Control</h4>
+        <p>Listas de control de direcciones IP para bloquear o permitir usuarios.</p>
+        <ul>
+          <li><strong>Blanca:</strong> IPs autorizadas (modo whitelist)</li>
+          <li><strong>Negra:</strong> IPs bloqueadas (fraudes sospechosos)</li>
+          <li><strong>Esekaus:</strong> IPs con fraude CONFIRMADO (bloqueo inmediato)</li>
+          <li><strong>Motivo:</strong> Por qué se agregó la IP</li>
+          <li><strong>Nota:</strong> Información adicional</li>
+        </ul>
+        <div class="warn">⚠️ El tipo <strong>Esekaus</strong> siempre bloquea, sin importar el modo configurado.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-map-marker-alt"></i> IPs Usuarios</h4>
+        <p>Historial automático de las IPs que usó cada usuario al conectarse.</p>
+        <ul>
+          <li><strong>User ID:</strong> ID del usuario</li>
+          <li><strong>IP:</strong> Dirección usada</li>
+          <li><strong>User Agent:</strong> Navegador/dispositivo</li>
+          <li><strong>Sospechosa:</strong> Se marca si usa muchas IPs</li>
+          <li><strong>Veces usada:</strong> Cuántas veces entró con esa IP</li>
+        </ul>
+        <div class="tip">💡 Si ves que un usuario tiene muchas IPs diferentes en poco tiempo, puede ser una cuenta comprometida.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-key"></i> Tokens (Anti-replay)</h4>
+        <p>Tokens únicos generados por cada compra. Evitan que una misma transacción se duplique.</p>
+        <ul>
+          <li><strong>User ID:</strong> Usuario que hizo la compra</li>
+          <li><strong>Token:</strong> Código único generado</li>
+          <li><strong>Usado:</strong> Si ya se procesó</li>
+          <li><strong>Creado/Expira:</strong> Fechas de vigencia (10 min)</li>
+        </ul>
+        <div class="tip">💡 Los tokens se marcan como usados automáticamente al confirmar una compra. Si se intenta reusar, Razer lo rechaza.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-history"></i> Log Recargas</h4>
+        <p>Auditoría completa de todas las recargas procesadas.</p>
+        <ul>
+          <li><strong>Package:</strong> Producto recargado</li>
+          <li><strong>Precio:</strong> Monto cobrado</li>
+          <li><strong>Saldo antes/después:</strong> Estado del saldo</li>
+          <li><strong>IP:</strong> Desde dónde se hizo</li>
+          <li><strong>Ref/Order Razer:</strong> IDs de Razer</li>
+          <li><strong>Estado:</strong> Completado o rechazado</li>
+          <li><strong>Motivo rechazo:</strong> Si falló, por qué</li>
+        </ul>
+        <div class="tip">💡 Este log es tu registro legal de todas las transacciones. No borres nada de acá.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-cog"></i> Config Seguridad</h4>
+        <p>Configuración global del sistema de seguridad.</p>
+        <ul>
+          <li><strong>Modo IP:</strong>
+            <ul style="margin-top:6px">
+              <li><code>blacklist</code> - Todos pasan, excepto los bloqueados (recomendado)</li>
+              <li><code>whitelist</code> - Solo IPs autorizadas pasan</li>
+              <li><code>off</code> - Sin control de IP</li>
+            </ul>
+          </li>
+          <li><strong>Bloquear Esekaus:</strong> Siempre activar</li>
+          <li><strong>Máx IPs por día:</strong> Cuántas IPs puede usar un usuario en 24h antes de marcarse como sospechoso</li>
+          <li><strong>Máx compras por hora:</strong> Límite de compras para evitar spam</li>
+        </ul>
+        <div class="warn">⚠️ Solo hay UN registro de configuración. No lo borres, solo editá sus valores.</div>
+      </div>
+
+      <div class="guide-section">
+        <h4><i class="fas fa-lightbulb"></i> Consejos Generales</h4>
+        <ul>
+          <li>Creá primero las <strong>Categorías</strong>, después los <strong>Paquetes</strong></li>
+          <li>Siempre poné el <strong>SKU Razer</strong> correcto en cada paquete</li>
+          <li>El <strong>precio de referencia</strong> debe ser mayor al <strong>final</strong></li>
+          <li>Revisá el <strong>Log Recargas</strong> para detectar fraudes</li>
+          <li>Si ves IPs repetidas en <strong>IPs Control</strong>, agrupalas</li>
+          <li>Los <strong>tokens</strong> viejos se pueden borrar (no sirven después de expirar)</li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" id="guideCloseBtn">Entendido</button>
     </div>
   </div>
 </div>
@@ -312,6 +488,10 @@ const modalBody = $('#modalBody');
 const modalSave = $('#modalSave');
 const modalClose = $('#modalClose');
 const modalCancel = $('#modalCancel');
+const guideOverlay = $('#guideOverlay');
+const guideClose = $('#guideClose');
+const guideCloseBtn = $('#guideCloseBtn');
+const btnGuide = $('#btnGuide');
 
 function toast(msg, type = 'info') {
   const t = document.createElement('div');
@@ -343,6 +523,14 @@ document.querySelectorAll('.nav-item').forEach(btn => {
 $('#toggleSidebar').addEventListener('click', () => {
   $('#sidebar').classList.toggle('collapsed');
 });
+
+// GUÍA
+function openGuide() { guideOverlay.classList.add('show'); }
+function closeGuide() { guideOverlay.classList.remove('show'); }
+btnGuide.onclick = openGuide;
+guideClose.onclick = closeGuide;
+guideCloseBtn.onclick = closeGuide;
+guideOverlay.onclick = (e) => { if (e.target === guideOverlay) closeGuide(); };
 
 async function renderSection(section) {
   content.innerHTML = `<div class="loading"><i class="fas fa-spinner"></i> Cargando...</div>`;
@@ -405,9 +593,18 @@ async function renderTable(tableKey) {
   if (tableKey === 'packages') await loadCategoriesCache();
 
   let query = db.from(schema.table).select(schema.joinSelect || '*');
-  if (schema.table !== 'configuracion_seguridad') {
+
+  // Ordenar según la columna de fecha correcta de cada tabla
+  if (schema.table === 'configuracion_seguridad') {
+    // no ordenar
+  } else if (schema.table === 'ips_usuarios') {
+    query = query.order('ultima_vez', { ascending: false }).limit(200);
+  } else if (schema.table === 'ips_control') {
+    query = query.order('creado_en', { ascending: false }).limit(200);
+  } else {
     query = query.order('creado_en', { ascending: false }).limit(200);
   }
+
   const { data, error } = await query;
   if (error) throw error;
   currentData = data || [];
@@ -477,11 +674,17 @@ function renderCell(row, fieldKey, schema) {
     const cls = value === 'blanca' ? 'tipo-blanca' : value === 'negra' ? 'tipo-negra' : 'tipo-esekaus';
     return `<span class="tag ${cls}">${escapeHtml(value)}</span>`;
   }
+  if (fieldKey === 'estado') {
+    const cls = value === 'completado' ? 'estado-completado' : 'estado-rechazado';
+    return `<span class="tag ${cls}">${escapeHtml(value)}</span>`;
+  }
   if (fieldKey === 'color') return `<span style="display:inline-block;width:22px;height:22px;background:${escapeHtml(value)};border-radius:6px;vertical-align:middle;"></span> ${escapeHtml(value)}`;
   if (fieldKey === 'icono') return `<i class="fas ${escapeHtml(value)}" style="color:#10b981;font-size:16px;"></i> ${escapeHtml(value)}`;
   if (fieldKey === 'precio_referencia' || fieldKey === 'precio_final' || fieldKey === 'precio_cobrado' || fieldKey === 'saldo_antes' || fieldKey === 'saldo_despues') return `Bs ${escapeHtml(value)}`;
   if (fieldKey === 'sku_razer') return `<span class="tag sku">${escapeHtml(value)}</span>`;
-  if (fieldKey === 'creado_en' || fieldKey === 'ultima_vez' || fieldKey === 'expira_en') return new Date(value).toLocaleString('es-BO');
+  if (fieldKey === 'creado_en' || fieldKey === 'ultima_vez' || fieldKey === 'expira_en') {
+    try { return new Date(value).toLocaleString('es-BO'); } catch { return escapeHtml(value); }
+  }
   if (fieldKey === 'razer_reference_id' || fieldKey === 'token') return `<span style="font-family:'Courier New',monospace;font-size:11px;color:#60a5fa">${escapeHtml(String(value).substring(0, 20))}...</span>`;
   return escapeHtml(value);
 }
@@ -573,7 +776,6 @@ modalSave.onclick = async () => {
 
   if (!valid) return;
 
-  // Calcular descuento automático en paquetes
   if (currentTableKey === 'packages') {
     const ref = Number(payload.precio_referencia) || 0;
     const fin = Number(payload.precio_final) || 0;
