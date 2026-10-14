@@ -18,13 +18,12 @@
             theme: {
                 extend: {
                     colors: {
-                        /* Paleta profesional: primario, secundario, complemento */
-                        primary:   '#1E3A8A',   // Azul corporativo profundo
+                        primary:   '#1E3A8A',
                         'primary-light': '#2563EB',
                         'primary-dark':  '#172554',
-                        secondary: '#0F766E',   // Verde petróleo serio
+                        secondary: '#0F766E',
                         'secondary-light': '#14B8A6',
-                        accent:    '#B45309',   // Ámbar oscuro (complemento)
+                        accent:    '#B45309',
                         'accent-light': '#F59E0B',
                         dark:      '#0B1220',
                         sidebar:   '#0F172A',
@@ -40,11 +39,18 @@
         }
     </script>
     <style>
-        * { font-family: 'Inter', system-ui, sans-serif; }
+        * { font-family: 'Inter', system-ui, sans-serif; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden; /* sin scroll global */
+        }
+
         body {
             background: #0B1220;
             color: #E2E8F0;
             -webkit-font-smoothing: antialiased;
+            position: relative;
         }
         body::before {
             content: '';
@@ -56,27 +62,40 @@
             pointer-events: none;
             z-index: 0;
         }
-        .module-svg {
-            display: block;
-            width: 22px;
-            height: 22px;
-            fill: none;
-            stroke: currentColor;
-            stroke-width: 1.6;
-            stroke-linecap: round;
-            stroke-linejoin: round;
-        }
-        .brand-mark {
-            width: 22px; height: 22px;
-            fill: currentColor; stroke: none;
-        }
-        /* Scrollbar sutil */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
+
+        .module-svg { display: block; width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+        .brand-mark { width: 22px; height: 22px; fill: currentColor; stroke: none; }
+
+        ::-webkit-scrollbar { width: 7px; height: 7px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #334155; }
 
-        /* Tarjetas corporativas */
+        /* ============ LAYOUT SIN SCROLL GLOBAL ============ */
+        .app-shell {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+            z-index: 1;
+        }
+        .main-col {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            overflow: hidden;
+        }
+        .main-body {
+            flex: 1;
+            overflow: hidden; /* NO scroll por defecto */
+            padding: 20px 24px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ============ TARJETAS CORPORATIVAS ============ */
         .corp-card {
             background: #111C33;
             border: 1px solid #1E293B;
@@ -88,8 +107,8 @@
             color: inherit;
             display: flex;
             flex-direction: column;
-            min-height: 150px;
-            padding: 20px;
+            padding: 16px 18px;
+            min-height: 0;
         }
         .corp-card::after {
             content: '';
@@ -102,48 +121,51 @@
         .corp-card:hover {
             background: #16233F;
             border-color: #2A3B5C;
-            transform: translateY(-3px);
+            transform: translateY(-2px);
             box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
         }
         .corp-card .corp-icon {
-            width: 44px; height: 44px;
-            border-radius: 10px;
+            width: 38px; height: 38px;
+            border-radius: 9px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-bottom: 14px;
+            margin-bottom: 10px;
+            flex-shrink: 0;
         }
+        .corp-card .corp-icon .module-svg { width: 19px; height: 19px; }
         .corp-card .corp-badge {
             position: absolute;
-            top: 16px; right: 16px;
-            font-size: 0.62rem;
+            top: 14px; right: 14px;
+            font-size: 0.58rem;
             font-weight: 700;
             letter-spacing: 0.08em;
-            padding: 4px 9px;
+            padding: 3px 8px;
             border-radius: 4px;
             text-transform: uppercase;
         }
         .corp-card .corp-title {
-            font-size: 1rem;
+            font-size: 0.92rem;
             font-weight: 700;
             color: #F1F5F9;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
+            line-height: 1.2;
         }
         .corp-card .corp-desc {
-            font-size: 0.78rem;
+            font-size: 0.72rem;
             color: #94A3B8;
-            line-height: 1.45;
+            line-height: 1.35;
         }
         .corp-card .corp-arrow {
             position: absolute;
-            bottom: 16px; right: 16px;
-            width: 30px; height: 30px;
+            bottom: 12px; right: 12px;
+            width: 26px; height: 26px;
             border-radius: 50%;
             background: rgba(255,255,255,0.05);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 0.7rem;
+            font-size: 0.62rem;
             color: #94A3B8;
             transition: all .25s ease;
         }
@@ -153,7 +175,7 @@
             transform: translateX(2px);
         }
 
-        /* Sidebar */
+        /* ============ SIDEBAR ============ */
         .side-link {
             display: flex;
             align-items: center;
@@ -166,44 +188,35 @@
             transition: all .2s ease;
             text-decoration: none;
         }
-        .side-link:hover {
-            background: rgba(37, 99, 235, 0.08);
-            color: #E2E8F0;
-        }
+        .side-link:hover { background: rgba(37, 99, 235, 0.08); color: #E2E8F0; }
         .side-link.active {
             background: linear-gradient(90deg, rgba(30,58,138,0.85) 0%, rgba(15,118,110,0.55) 100%);
             color: #fff;
             box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.4);
         }
 
-        /* Botón colapsable */
+        /* ============ BOTÓN COLAPSABLE ============ */
         .collapse-btn {
             width: 100%;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 13px 16px;
+            padding: 11px 15px;
             background: #111C33;
             border: 1px solid #1E293B;
             border-radius: 9px;
             color: #E2E8F0;
-            font-size: 0.85rem;
+            font-size: 0.83rem;
             font-weight: 600;
             cursor: pointer;
             transition: all .2s ease;
+            flex-shrink: 0;
         }
-        .collapse-btn:hover {
-            background: #16233F;
-            border-color: #2A3B5C;
-        }
-        .collapse-btn .chevron {
-            transition: transform .3s ease;
-        }
-        .collapse-btn.open .chevron {
-            transform: rotate(180deg);
-        }
+        .collapse-btn:hover { background: #16233F; border-color: #2A3B5C; }
+        .collapse-btn .chevron { transition: transform .3s ease; }
+        .collapse-btn.open .chevron { transform: rotate(180deg); }
 
-        /* Lista módulos extra */
+        /* ============ LISTA MÓDULOS EXTRA CON SCROLL INTERNO ============ */
         .extra-list {
             display: none;
             margin-top: 10px;
@@ -211,44 +224,52 @@
             border: 1px solid #1E293B;
             border-radius: 9px;
             overflow: hidden;
+            flex: 1;
+            min-height: 0;
         }
-        .extra-list.show { display: block; animation: slideDown .25s ease; }
+        .extra-list.show {
+            display: flex;
+            flex-direction: column;
+            animation: slideDown .25s ease;
+        }
+        .extra-list-scroll {
+            overflow-y: auto;
+            overflow-x: hidden;
+            flex: 1;
+            min-height: 0;
+            scrollbar-gutter: stable;
+        }
         @keyframes slideDown {
             from { opacity: 0; transform: translateY(-6px); }
             to { opacity: 1; transform: translateY(0); }
         }
+
         .extra-item {
             display: flex;
             align-items: center;
-            gap: 14px;
-            padding: 13px 16px;
+            gap: 13px;
+            padding: 11px 15px;
             border-bottom: 1px solid #1E293B;
             text-decoration: none;
             color: #CBD5E1;
             transition: background .2s ease;
+            flex-shrink: 0;
         }
         .extra-item:last-child { border-bottom: none; }
         .extra-item:hover { background: #16233F; color: #F1F5F9; }
         .extra-item .extra-icon {
-            width: 34px; height: 34px;
+            width: 32px; height: 32px;
             border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
         }
-        .extra-item .extra-icon .module-svg { width: 17px; height: 17px; }
-        .extra-item .extra-name {
-            font-size: 0.84rem;
-            font-weight: 600;
-            color: inherit;
-        }
-        .extra-item .extra-desc {
-            font-size: 0.7rem;
-            color: #7A8AA3;
-        }
+        .extra-item .extra-icon .module-svg { width: 16px; height: 16px; }
+        .extra-item .extra-name { font-size: 0.82rem; font-weight: 600; color: inherit; }
+        .extra-item .extra-desc { font-size: 0.68rem; color: #7A8AA3; }
 
-        /* Barra de búsqueda y toggle */
+        /* ============ BUSCADOR Y TOGGLE ============ */
         .search-input {
             width: 100%;
             background: #111C33;
@@ -261,10 +282,7 @@
             transition: border-color .2s ease, box-shadow .2s ease;
         }
         .search-input::placeholder { color: #64748B; }
-        .search-input:focus {
-            border-color: #2563EB;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
-        }
+        .search-input:focus { border-color: #2563EB; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18); }
         .toggle-btn {
             display: inline-flex;
             align-items: center;
@@ -279,19 +297,16 @@
             cursor: pointer;
             transition: all .2s ease;
         }
-        .toggle-btn:hover {
-            background: #16233F;
-            border-color: #2A3B5C;
-            color: #F1F5F9;
-        }
+        .toggle-btn:hover { background: #16233F; border-color: #2A3B5C; color: #F1F5F9; }
 
-        /* Banner */
+        /* ============ BANNER ============ */
         .banner {
             position: relative;
             border-radius: 12px;
             overflow: hidden;
             background: linear-gradient(120deg, #172554 0%, #0F766E 100%);
             border: 1px solid #1E293B;
+            flex-shrink: 0;
         }
         .banner::before {
             content: '';
@@ -302,21 +317,22 @@
                 radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.18) 0%, transparent 50%);
         }
 
-        /* Modo claro */
-        body.theme-light {
-            background: #F1F5F9;
-            color: #0F172A;
+        /* ============ GRID ADAPTATIVO POR ALTURA ============ */
+        .cards-grid {
+            display: grid;
+            gap: 12px;
+            flex: 1;
+            min-height: 0;
         }
+
+        /* ============ MODO CLARO ============ */
+        body.theme-light { background: #F1F5F9; color: #0F172A; }
         body.theme-light::before { display: none; }
         body.theme-light .corp-card,
         body.theme-light .collapse-btn,
         body.theme-light .extra-list,
         body.theme-light .search-input,
-        body.theme-light .toggle-btn {
-            background: #FFFFFF;
-            border-color: #E2E8F0;
-            color: #0F172A;
-        }
+        body.theme-light .toggle-btn { background: #FFFFFF; border-color: #E2E8F0; color: #0F172A; }
         body.theme-light .corp-card:hover { background: #F8FAFC; }
         body.theme-light .corp-card .corp-title { color: #0F172A; }
         body.theme-light .corp-card .corp-desc { color: #475569; }
@@ -325,23 +341,29 @@
         body.theme-light .extra-item .extra-desc { color: #64748B; }
         body.theme-light .side-link { color: #475569; }
         body.theme-light .side-link:hover { background: rgba(37,99,235,0.08); color: #0F172A; }
-        body.theme-light aside {
-            background: #FFFFFF !important;
-            border-color: #E2E8F0 !important;
-        }
+        body.theme-light aside { background: #FFFFFF !important; border-color: #E2E8F0 !important; }
         body.theme-light .text-slate-300,
-        body.theme-light .text-slate-400,
-        body.theme-light .text-\[\#94A3B8\] { color: #475569 !important; }
-        body.theme-light .border-\[\#1E293B\] { border-color: #E2E8F0 !important; }
-        body.theme-light .bg-\[\#111C33\] { background: #FFFFFF !important; }
-        body.theme-light .banner { color: #fff; }
+        body.theme-light .text-slate-400 { color: #475569 !important; }
 
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 1024px) {
+            .corp-card .corp-desc { font-size: 0.68rem; }
+            .corp-card .corp-title { font-size: 0.85rem; }
+        }
+        @media (max-width: 768px) {
+            .main-body { padding: 14px; }
+            .corp-card { padding: 13px 14px; }
+            .corp-card .corp-icon { width: 32px; height: 32px; margin-bottom: 8px; }
+            .corp-card .corp-icon .module-svg { width: 16px; height: 16px; }
+            .corp-card .corp-desc { display: none; }
+            .corp-card .corp-title { font-size: 0.8rem; }
+        }
         @media (max-width: 640px) {
-            .corp-card { min-height: 130px; padding: 16px; }
+            aside { display: none; }
         }
     </style>
 </head>
-<body class="min-h-screen">
+<body>
 
     <!-- SVG sprites -->
     <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">
@@ -363,30 +385,27 @@
         <symbol id="icon-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></symbol>
         <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
         <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/></symbol>
-        <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
     </svg>
 
-    <div class="flex min-h-screen relative z-10">
+    <div class="app-shell">
 
         <!-- ============ SIDEBAR ============ -->
         <aside class="w-64 flex-shrink-0 flex flex-col border-r border-[#1E293B] bg-[#0F172A]">
 
-            <!-- Logo -->
-            <div class="px-5 py-6 border-b border-[#1E293B]">
+            <div class="px-5 py-5 border-b border-[#1E293B] flex-shrink-0">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white">
                         <svg class="brand-mark" aria-hidden="true"><use href="#icon-brand"></use></svg>
                     </div>
                     <div>
                         <h1 class="text-lg font-bold tracking-tight text-white">TOKTOK <span class="text-[#14B8A6]">GC</span></h1>
-                        <p class="text-[0.65rem] uppercase tracking-[0.15em] text-[#64748B] font-semibold">Centro de Operaciones</p>
+                        <p class="text-[0.62rem] uppercase tracking-[0.15em] text-[#64748B] font-semibold">Centro de Operaciones</p>
                     </div>
                 </div>
             </div>
 
-            <!-- Navegación: SOLO dos secciones -->
-            <nav class="flex-1 px-3 py-6">
-                <p class="px-3 mb-3 text-[0.65rem] uppercase tracking-[0.18em] text-[#64748B] font-bold">Navegación</p>
+            <nav class="flex-1 px-3 py-5 overflow-hidden">
+                <p class="px-3 mb-3 text-[0.62rem] uppercase tracking-[0.18em] text-[#64748B] font-bold">Navegación</p>
                 <div class="space-y-1.5">
                     <a href="#main-modules" class="side-link active">
                         <i class="fa fa-th-large w-5 text-center"></i>
@@ -399,21 +418,20 @@
                 </div>
             </nav>
 
-            <!-- Footer del sidebar -->
-            <div class="px-5 py-4 border-t border-[#1E293B]">
-                <div class="flex items-center gap-2 text-[0.7rem] text-[#64748B]">
+            <div class="px-5 py-4 border-t border-[#1E293B] flex-shrink-0">
+                <div class="flex items-center gap-2 text-[0.68rem] text-[#64748B]">
                     <span class="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
                     <span>Sistema operativo</span>
                 </div>
-                <p class="mt-2 text-[0.65rem] text-[#475569]">v2.4 · TOKTOK GC</p>
+                <p class="mt-1.5 text-[0.62rem] text-[#475569]">v2.4 · TOKTOK GC</p>
             </div>
         </aside>
 
         <!-- ============ CONTENIDO PRINCIPAL ============ -->
-        <main class="flex-1 overflow-y-auto">
+        <div class="main-col">
 
             <!-- Barra superior -->
-            <div class="sticky top-0 z-20 bg-[#0B1220]/85 backdrop-blur-md border-b border-[#1E293B] px-6 py-4">
+            <div class="flex-shrink-0 bg-[#0B1220]/85 backdrop-blur-md border-b border-[#1E293B] px-6 py-3.5">
                 <div class="flex items-center justify-between gap-4 flex-wrap">
                     <div class="flex-1 max-w-md min-w-[200px] relative">
                         <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B] text-sm"></i>
@@ -432,135 +450,115 @@
                             <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold">I</div>
                             <div class="hidden sm:block">
                                 <p class="text-sm font-semibold text-white leading-tight">Iván Rojas Pusari</p>
-                                <p class="text-[0.7rem] text-[#64748B]">Administrador</p>
+                                <p class="text-[0.68rem] text-[#64748B]">Administrador</p>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="px-6 py-7 max-w-[1400px] mx-auto">
+            <!-- Cuerpo -->
+            <div class="main-body">
 
                 <!-- Banner -->
-                <div class="banner mb-7 p-7 relative">
-                    <div class="relative flex justify-between items-center flex-wrap gap-5">
+                <div class="banner mb-5 p-5 relative flex-shrink-0">
+                    <div class="relative flex justify-between items-center flex-wrap gap-4">
                         <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-[0.7rem] font-semibold tracking-wide text-[#E2E8F0] mb-3">
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-[0.68rem] font-semibold tracking-wide text-[#E2E8F0] mb-2">
                                 <i class="fa fa-crown text-[#F59E0B]"></i>
                                 ACCESO PRIVILEGIADO
                             </div>
-                            <h2 class="text-3xl font-bold text-white tracking-tight">Centro de operaciones</h2>
-                            <p class="mt-2 text-[#CBD5E1] text-sm max-w-xl">
+                            <h2 class="text-2xl font-bold text-white tracking-tight">Centro de operaciones</h2>
+                            <p class="mt-1 text-[#CBD5E1] text-xs max-w-xl">
                                 Acceso centralizado a las herramientas administrativas de TOKTOK GC.
                             </p>
                         </div>
                         <div class="text-right">
-                            <p class="text-[0.7rem] uppercase tracking-[0.2em] text-[#94A3B8] font-semibold">Operando en</p>
-                            <p class="text-3xl font-bold text-white tracking-tight mt-1">Bolivia</p>
-                            <p class="text-[0.7rem] text-[#14B8A6] font-semibold mt-1">Juntos movemos</p>
+                            <p class="text-[0.65rem] uppercase tracking-[0.2em] text-[#94A3B8] font-semibold">Operando en</p>
+                            <p class="text-2xl font-bold text-white tracking-tight mt-0.5">Bolivia</p>
+                            <p class="text-[0.68rem] text-[#14B8A6] font-semibold mt-0.5">Juntos movemos</p>
                         </div>
                     </div>
                 </div>
 
                 <!-- ============ MÓDULOS PRINCIPALES ============ -->
-                <section id="main-modules" class="mb-9">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold uppercase tracking-[0.12em] text-[#E2E8F0] flex items-center gap-2">
+                <section id="main-modules" class="flex-shrink-0 mb-4">
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="text-xs font-bold uppercase tracking-[0.12em] text-[#E2E8F0] flex items-center gap-2">
                             <i class="fa fa-th-large text-[#14B8A6]"></i>
                             Módulos principales
                         </h3>
-                        <span class="text-[0.7rem] text-[#64748B] font-medium">7 aplicaciones</span>
+                        <span class="text-[0.68rem] text-[#64748B] font-medium">7 aplicaciones</span>
                     </div>
 
-                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-2.5">
 
-                        <!-- Panel principal -->
                         <a href="RUTAS/admin principal.html" data-module="principal" class="corp-card" style="--accent-color:#1E3A8A;">
                             <span class="corp-badge bg-[#1E3A8A]/20 text-[#93C5FD]">PRINCIPAL</span>
-                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]">
-                                <svg class="module-svg"><use href="#icon-dashboard"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-dashboard"></use></svg></div>
                             <div class="corp-title">Panel principal</div>
                             <div class="corp-desc">Administración general de TOKTOK GC</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
 
-                        <!-- Publicidad -->
                         <a href="RUTAS/admin publicidad.html" data-module="publicidad" class="corp-card" style="--accent-color:#0F766E;">
                             <span class="corp-badge bg-[#0F766E]/20 text-[#5EEAD4]">PUBLICIDAD</span>
-                            <div class="corp-icon bg-[#0F766E]/15 text-[#2DD4BF]">
-                                <svg class="module-svg"><use href="#icon-megaphone"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-megaphone"></use></svg></div>
                             <div class="corp-title">Publicidad</div>
                             <div class="corp-desc">Gestión de campañas y anuncios</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
 
-                        <!-- Recargas -->
                         <a href="RUTAS/admin recargas.html" data-module="recargas" class="corp-card" style="--accent-color:#B45309;">
                             <span class="corp-badge bg-[#B45309]/20 text-[#FCD34D]">RECARGAS</span>
-                            <div class="corp-icon bg-[#B45309]/15 text-[#FBBF24]">
-                                <svg class="module-svg"><use href="#icon-mobile"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-mobile"></use></svg></div>
                             <div class="corp-title">TokTok Recargas</div>
                             <div class="corp-desc">Administración de recargas</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
 
-                        <!-- Admin Juegos -->
                         <a href="RUTAS/admin juegos.html" data-module="juegos" class="corp-card" style="--accent-color:#1E3A8A;">
                             <span class="corp-badge bg-[#1E3A8A]/20 text-[#93C5FD]">JUEGOS</span>
-                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]">
-                                <svg class="module-svg"><use href="#icon-gamepad"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-gamepad"></use></svg></div>
                             <div class="corp-title">Admin Juegos</div>
                             <div class="corp-desc">Gestión de plataforma de juegos</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
 
-                        <!-- Plan Hogar -->
                         <a href="RUTAS/admin plan hogar.html" data-module="plan hogar" class="corp-card" style="--accent-color:#0F766E;">
                             <span class="corp-badge bg-[#0F766E]/20 text-[#5EEAD4]">PLAN HOGAR</span>
-                            <div class="corp-icon bg-[#0F766E]/15 text-[#2DD4BF]">
-                                <svg class="module-svg"><use href="#icon-home"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-home"></use></svg></div>
                             <div class="corp-title">Admin Plan Hogar</div>
                             <div class="corp-desc">Administración de planes hogar</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
 
-                        <!-- Promo Yape -->
                         <a href="RUTAS/admin yape.html" data-module="yape" class="corp-card" style="--accent-color:#B45309;">
                             <span class="corp-badge bg-[#B45309]/20 text-[#FCD34D]">PROMO YAPE</span>
-                            <div class="corp-icon bg-[#B45309]/15 text-[#FBBF24]">
-                                <svg class="module-svg"><use href="#icon-wallet"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-wallet"></use></svg></div>
                             <div class="corp-title">Admin Promo Yape</div>
                             <div class="corp-desc">Promociones y operaciones Yape</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
 
-                        <!-- Tarjetas (ancho completo) -->
-                        <a href="RUTAS/admin tarjetas.html" data-module="tarjetas" class="corp-card md:col-span-2 lg:col-span-3" style="--accent-color:#1E3A8A;">
+                        <a href="RUTAS/admin tarjetas.html" data-module="tarjetas" class="corp-card" style="--accent-color:#1E3A8A;">
                             <span class="corp-badge bg-[#1E3A8A]/20 text-[#93C5FD]">TARJETAS</span>
-                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]">
-                                <svg class="module-svg"><use href="#icon-card"></use></svg>
-                            </div>
+                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-card"></use></svg></div>
                             <div class="corp-title">Admin Tarjetas</div>
-                            <div class="corp-desc">Gestión de tarjetas y operaciones relacionadas</div>
+                            <div class="corp-desc">Gestión de tarjetas y operaciones</div>
                             <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
                         </a>
                     </div>
                 </section>
 
                 <!-- ============ MÓDULOS EXTRA ============ -->
-                <section id="extra-modules">
-                    <div class="flex items-center justify-between mb-4">
-                        <h3 class="text-sm font-bold uppercase tracking-[0.12em] text-[#E2E8F0] flex items-center gap-2">
+                <section id="extra-modules" class="flex flex-col flex-1 min-h-0">
+                    <div class="flex items-center justify-between mb-3 flex-shrink-0">
+                        <h3 class="text-xs font-bold uppercase tracking-[0.12em] text-[#E2E8F0] flex items-center gap-2">
                             <i class="fa fa-puzzle-piece text-[#14B8A6]"></i>
                             Módulos extra
                         </h3>
-                        <span class="text-[0.7rem] text-[#64748B] font-medium">11 herramientas</span>
+                        <span class="text-[0.68rem] text-[#64748B] font-medium">11 herramientas</span>
                     </div>
 
                     <button id="hiddenModulesBtn" class="collapse-btn" aria-expanded="false" aria-controls="hiddenModulesList">
@@ -568,90 +566,85 @@
                             <i class="fa fa-chevron-down chevron text-[#14B8A6]"></i>
                             <span>Mostrar módulos extra</span>
                         </span>
-                        <span class="px-2.5 py-1 rounded-md bg-[#0F766E]/20 text-[#5EEAD4] text-[0.7rem] font-bold">11</span>
+                        <span class="px-2.5 py-1 rounded-md bg-[#0F766E]/20 text-[#5EEAD4] text-[0.68rem] font-bold">11</span>
                     </button>
 
                     <div id="hiddenModulesList" class="extra-list">
+                        <div class="extra-list-scroll">
 
-                        <a href="RUTAS/EXTRAS/admin-entel.html" data-module="entel" class="extra-item">
-                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Entel</div><div class="extra-desc">Gestión operadora Entel</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/admin-entel.html" data-module="entel" class="extra-item">
+                                <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Entel</div><div class="extra-desc">Gestión operadora Entel</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/admin-tigo.html" data-module="tigo" class="extra-item">
-                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Tigo</div><div class="extra-desc">Gestión operadora Tigo</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/admin-tigo.html" data-module="tigo" class="extra-item">
+                                <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Tigo</div><div class="extra-desc">Gestión operadora Tigo</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/admin-viva.html" data-module="viva" class="extra-item">
-                            <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Viva</div><div class="extra-desc">Gestión operadora Viva</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/admin-viva.html" data-module="viva" class="extra-item">
+                                <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Viva</div><div class="extra-desc">Gestión operadora Viva</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/admin-reportes.html" data-module="reportes" class="extra-item">
-                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-chart"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Reportes</div><div class="extra-desc">Métricas y estadísticas</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/admin-reportes.html" data-module="reportes" class="extra-item">
+                                <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-chart"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Reportes</div><div class="extra-desc">Métricas y estadísticas</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/admin-bcp.html" data-module="bcp" class="extra-item">
-                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-bank"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Banco BCP</div><div class="extra-desc">Operaciones bancarias</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/admin-bcp.html" data-module="bcp" class="extra-item">
+                                <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-bank"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Banco BCP</div><div class="extra-desc">Operaciones bancarias</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/admin-tienda.html" data-module="tienda" class="extra-item">
-                            <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-store"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Tienda</div><div class="extra-desc">Gestión de productos</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/admin-tienda.html" data-module="tienda" class="extra-item">
+                                <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-store"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Tienda</div><div class="extra-desc">Gestión de productos</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/juegos.html" data-module="juegos extra" class="extra-item">
-                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-gamepad"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Juegos</div><div class="extra-desc">Plataforma de juegos</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/juegos.html" data-module="juegos extra" class="extra-item">
+                                <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-gamepad"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Juegos</div><div class="extra-desc">Plataforma de juegos</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/inventario-esc.html" data-module="inventario" class="extra-item">
-                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-boxes"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Inventario</div><div class="extra-desc">Gestión de inventario</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/inventario-esc.html" data-module="inventario" class="extra-item">
+                                <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-boxes"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Inventario</div><div class="extra-desc">Gestión de inventario</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/asistencia.html" data-module="asistencia" class="extra-item">
-                            <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-users"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Asistencia</div><div class="extra-desc">Control de personal</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/asistencia.html" data-module="asistencia" class="extra-item">
+                                <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-users"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Asistencia</div><div class="extra-desc">Control de personal</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/monitoreo.html" data-module="monitoreo" class="extra-item">
-                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-camera"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Monitoreo GC</div><div class="extra-desc">Supervisión en tiempo real</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/monitoreo.html" data-module="monitoreo" class="extra-item">
+                                <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-camera"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Monitoreo GC</div><div class="extra-desc">Supervisión en tiempo real</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
 
-                        <a href="RUTAS/EXTRAS/caja.html" data-module="caja" class="extra-item">
-                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-cash"></use></svg></div>
-                            <div class="flex-1"><div class="extra-name">Cajas</div><div class="extra-desc">Arqueo y movimientos</div></div>
-                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
-                        </a>
+                            <a href="RUTAS/EXTRAS/caja.html" data-module="caja" class="extra-item">
+                                <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-cash"></use></svg></div>
+                                <div class="flex-1"><div class="extra-name">Cajas</div><div class="extra-desc">Arqueo y movimientos</div></div>
+                                <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                            </a>
+                        </div>
                     </div>
                 </section>
-
-                <!-- Footer -->
-                <footer class="mt-10 pt-5 border-t border-[#1E293B] flex justify-between flex-wrap gap-2 text-[0.72rem] text-[#64748B]">
-                    <p>TOKTOK GC · Panel de administración</p>
-                    <p>Propietario: Iván Rojas Pusari</p>
-                </footer>
             </div>
-        </main>
+        </div>
     </div>
 
     <script>
-        // Toggle módulos extra
         const hiddenModulesBtn = document.getElementById('hiddenModulesBtn');
         const hiddenModulesList = document.getElementById('hiddenModulesList');
 
@@ -661,7 +654,6 @@
             hiddenModulesBtn.setAttribute('aria-expanded', hiddenModulesList.classList.contains('show'));
         });
 
-        // Búsqueda
         const moduleSearch = document.getElementById('moduleSearch');
         const moduleLinks = document.querySelectorAll('[data-module]');
 
@@ -687,7 +679,6 @@
             }
         });
 
-        // Tema claro / oscuro
         const themeToggle = document.getElementById('themeToggle');
 
         function setTheme(theme, save = true) {
@@ -696,21 +687,17 @@
             themeToggle.setAttribute('aria-pressed', String(!isDark));
             themeToggle.querySelector('span').textContent = isDark ? 'Tema claro' : 'Tema oscuro';
             themeToggle.querySelector('use').setAttribute('href', isDark ? '#icon-moon' : '#icon-sun');
-            if (save) {
-                try { localStorage.setItem('toktok-theme', theme); } catch(e){}
-            }
+            if (save) { try { localStorage.setItem('toktok-theme', theme); } catch(e){} }
         }
 
-        try {
-            setTheme(localStorage.getItem('toktok-theme') || 'dark', false);
-        } catch(e) { setTheme('dark', false); }
+        try { setTheme(localStorage.getItem('toktok-theme') || 'dark', false); }
+        catch(e) { setTheme('dark', false); }
 
         themeToggle.addEventListener('click', () => {
             const current = document.body.classList.contains('theme-light') ? 'light' : 'dark';
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
 
-        // Service Worker
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(new URL('./sw.js', window.location.href))
