@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>TOKTOK GC · Centro de Operaciones</title>
-    <meta name="theme-color" content="#0A0E27">
+    <meta name="theme-color" content="#0B1220">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="TOKTOK CEO">
@@ -18,15 +18,19 @@
             theme: {
                 extend: {
                     colors: {
-                        dark: '#0A0E27',
-                        sidebar: '#0F1433',
-                        primary: '#6C5CE7',
-                        secondary: '#00B894',
-                        accent: '#F9A825',
-                        games: '#0984E3',
-                        hogar: '#E84393',
-                        yape: '#A29BFE',
-                        tarjetas: '#00CEC9',
+                        /* Paleta profesional: primario, secundario, complemento */
+                        primary:   '#1E3A8A',   // Azul corporativo profundo
+                        'primary-light': '#2563EB',
+                        'primary-dark':  '#172554',
+                        secondary: '#0F766E',   // Verde petróleo serio
+                        'secondary-light': '#14B8A6',
+                        accent:    '#B45309',   // Ámbar oscuro (complemento)
+                        'accent-light': '#F59E0B',
+                        dark:      '#0B1220',
+                        sidebar:   '#0F172A',
+                        surface:   '#111C33',
+                        line:      '#1E293B',
+                        muted:     '#94A3B8',
                     },
                     fontFamily: {
                         sans: ['Inter', 'system-ui', 'sans-serif'],
@@ -35,42 +39,22 @@
             }
         }
     </script>
-    <style type="text/tailwindcss">
-        @layer utilities {
-            .bg-glass {
-                background: rgba(255, 255, 255, 0.05);
-                backdrop-filter: blur(10px);
-            }
-            .card-gradient-purple {
-                background: linear-gradient(135deg, #4B36CC 0%, #2D1B99 100%);
-            }
-            .card-gradient-teal {
-                background: linear-gradient(135deg, #00B894 0%, #007A63 100%);
-            }
-            .card-gradient-orange {
-                background: linear-gradient(135deg, #F9A825 0%, #C27E00 100%);
-            }
-            .card-gradient-blue {
-                background: linear-gradient(135deg, #0984E3 0%, #0066B3 100%);
-            }
-            .card-gradient-pink {
-                background: linear-gradient(135deg, #E84393 0%, #B82F74 100%);
-            }
-            .card-gradient-violet {
-                background: linear-gradient(135deg, #6C5CE7 0%, #4B36CC 100%);
-            }
-            .card-gradient-cyan {
-                background: linear-gradient(135deg, #00CEC9 0%, #009E9A 100%);
-            }
-            .sidebar-item-active {
-                background: linear-gradient(90deg, #6C5CE7 0%, #4B36CC 100%);
-            }
-        }
-    </style>
     <style>
-        /* Estilos para elementos que Tailwind no cubre directamente */
+        * { font-family: 'Inter', system-ui, sans-serif; }
         body {
-            font-family: 'Inter', system-ui, sans-serif;
+            background: #0B1220;
+            color: #E2E8F0;
+            -webkit-font-smoothing: antialiased;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at 15% 10%, rgba(30, 58, 138, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 85% 90%, rgba(15, 118, 110, 0.10) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
         }
         .module-svg {
             display: block;
@@ -78,118 +62,288 @@
             height: 22px;
             fill: none;
             stroke: currentColor;
-            stroke-width: 1.7;
+            stroke-width: 1.6;
             stroke-linecap: round;
             stroke-linejoin: round;
         }
         .brand-mark {
-            width: 22px;
-            height: 22px;
-            fill: currentColor;
-            stroke: none;
+            width: 22px; height: 22px;
+            fill: currentColor; stroke: none;
         }
-        /* Ajuste para las tarjetas con gradiente: el icono y badges usan blanco */
-        .ceo-card .card-icon {
-            background: rgba(255, 255, 255, 0.2);
+        /* Scrollbar sutil */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #1E293B; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+
+        /* Tarjetas corporativas */
+        .corp-card {
+            background: #111C33;
+            border: 1px solid #1E293B;
+            border-radius: 10px;
+            transition: all .25s ease;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            min-height: 150px;
+            padding: 20px;
+        }
+        .corp-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 3px; height: 100%;
+            background: var(--accent-color, #1E3A8A);
+            opacity: 0.9;
+        }
+        .corp-card:hover {
+            background: #16233F;
+            border-color: #2A3B5C;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.6);
+        }
+        .corp-card .corp-icon {
+            width: 44px; height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 14px;
+        }
+        .corp-card .corp-badge {
+            position: absolute;
+            top: 16px; right: 16px;
+            font-size: 0.62rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            padding: 4px 9px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+        .corp-card .corp-title {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #F1F5F9;
+            margin-bottom: 6px;
+        }
+        .corp-card .corp-desc {
+            font-size: 0.78rem;
+            color: #94A3B8;
+            line-height: 1.45;
+        }
+        .corp-card .corp-arrow {
+            position: absolute;
+            bottom: 16px; right: 16px;
+            width: 30px; height: 30px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.05);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: #94A3B8;
+            transition: all .25s ease;
+        }
+        .corp-card:hover .corp-arrow {
+            background: var(--accent-color, #1E3A8A);
             color: #fff;
+            transform: translateX(2px);
         }
-        .ceo-card .card-badge {
-            background: rgba(255, 255, 255, 0.2);
+
+        /* Sidebar */
+        .side-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 11px 14px;
+            border-radius: 8px;
+            color: #94A3B8;
+            font-size: 0.88rem;
+            font-weight: 600;
+            transition: all .2s ease;
+            text-decoration: none;
+        }
+        .side-link:hover {
+            background: rgba(37, 99, 235, 0.08);
+            color: #E2E8F0;
+        }
+        .side-link.active {
+            background: linear-gradient(90deg, rgba(30,58,138,0.85) 0%, rgba(15,118,110,0.55) 100%);
             color: #fff;
+            box-shadow: inset 0 0 0 1px rgba(37, 99, 235, 0.4);
         }
-        /* Modo claro: Tailwind maneja bg-dark pero necesitamos sobreescribir algunos */
+
+        /* Botón colapsable */
+        .collapse-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 13px 16px;
+            background: #111C33;
+            border: 1px solid #1E293B;
+            border-radius: 9px;
+            color: #E2E8F0;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+        .collapse-btn:hover {
+            background: #16233F;
+            border-color: #2A3B5C;
+        }
+        .collapse-btn .chevron {
+            transition: transform .3s ease;
+        }
+        .collapse-btn.open .chevron {
+            transform: rotate(180deg);
+        }
+
+        /* Lista módulos extra */
+        .extra-list {
+            display: none;
+            margin-top: 10px;
+            background: #111C33;
+            border: 1px solid #1E293B;
+            border-radius: 9px;
+            overflow: hidden;
+        }
+        .extra-list.show { display: block; animation: slideDown .25s ease; }
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .extra-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 13px 16px;
+            border-bottom: 1px solid #1E293B;
+            text-decoration: none;
+            color: #CBD5E1;
+            transition: background .2s ease;
+        }
+        .extra-item:last-child { border-bottom: none; }
+        .extra-item:hover { background: #16233F; color: #F1F5F9; }
+        .extra-item .extra-icon {
+            width: 34px; height: 34px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .extra-item .extra-icon .module-svg { width: 17px; height: 17px; }
+        .extra-item .extra-name {
+            font-size: 0.84rem;
+            font-weight: 600;
+            color: inherit;
+        }
+        .extra-item .extra-desc {
+            font-size: 0.7rem;
+            color: #7A8AA3;
+        }
+
+        /* Barra de búsqueda y toggle */
+        .search-input {
+            width: 100%;
+            background: #111C33;
+            border: 1px solid #1E293B;
+            border-radius: 8px;
+            padding: 9px 14px 9px 38px;
+            color: #E2E8F0;
+            font-size: 0.85rem;
+            outline: none;
+            transition: border-color .2s ease, box-shadow .2s ease;
+        }
+        .search-input::placeholder { color: #64748B; }
+        .search-input:focus {
+            border-color: #2563EB;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+        }
+        .toggle-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 9px 14px;
+            background: #111C33;
+            border: 1px solid #1E293B;
+            border-radius: 8px;
+            color: #CBD5E1;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s ease;
+        }
+        .toggle-btn:hover {
+            background: #16233F;
+            border-color: #2A3B5C;
+            color: #F1F5F9;
+        }
+
+        /* Banner */
+        .banner {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: linear-gradient(120deg, #172554 0%, #0F766E 100%);
+            border: 1px solid #1E293B;
+        }
+        .banner::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background:
+                radial-gradient(circle at 90% 20%, rgba(245, 158, 11, 0.10) 0%, transparent 50%),
+                radial-gradient(circle at 10% 90%, rgba(37, 99, 235, 0.18) 0%, transparent 50%);
+        }
+
+        /* Modo claro */
         body.theme-light {
-            background: #eef2f1;
-            color: #172522;
+            background: #F1F5F9;
+            color: #0F172A;
         }
-        body.theme-light .bg-sidebar {
-            background: #ffffff;
+        body.theme-light::before { display: none; }
+        body.theme-light .corp-card,
+        body.theme-light .collapse-btn,
+        body.theme-light .extra-list,
+        body.theme-light .search-input,
+        body.theme-light .toggle-btn {
+            background: #FFFFFF;
+            border-color: #E2E8F0;
+            color: #0F172A;
         }
-        body.theme-light .ceo-card {
-            background: #ffffff !important;
-            color: #172522;
-        }
-        body.theme-light .ceo-card .card-icon {
-            background: #e8f4f0;
-            color: #167c68;
-        }
-        body.theme-light .ceo-card .card-badge {
-            background: #f0f4f2;
-            color: #71807b;
-        }
-        body.theme-light .hidden-modules-btn {
-            background: #ffffff;
-            border-color: #dfe7e4;
-            color: #44544f;
-        }
-        body.theme-light .hidden-module-item {
-            color: #44544f;
-        }
-        body.theme-light .hidden-module-item:hover {
-            background: #f6faf8;
-        }
-        body.theme-light .workspace-title,
-        body.theme-light .card-title {
-            color: #172522;
-        }
-        body.theme-light .workspace-subtitle,
-        body.theme-light .card-desc,
-        body.theme-light .hidden-module-desc {
-            color: #788782;
-        }
-        body.theme-light .module-search {
-            background: #ffffff;
-            border-color: #dfe7e4;
-            color: #172522;
-        }
-        body.theme-light .system-status {
-            color: #5d6e68;
-        }
-        body.theme-light .section-title {
-            color: #33443e;
-        }
-        /* Sidebar en modo claro */
+        body.theme-light .corp-card:hover { background: #F8FAFC; }
+        body.theme-light .corp-card .corp-title { color: #0F172A; }
+        body.theme-light .corp-card .corp-desc { color: #475569; }
+        body.theme-light .extra-item { color: #334155; border-color: #E2E8F0; }
+        body.theme-light .extra-item:hover { background: #F1F5F9; color: #0F172A; }
+        body.theme-light .extra-item .extra-desc { color: #64748B; }
+        body.theme-light .side-link { color: #475569; }
+        body.theme-light .side-link:hover { background: rgba(37,99,235,0.08); color: #0F172A; }
         body.theme-light aside {
-            background: #ffffff !important;
-            border-right: 1px solid #dfe7e4;
+            background: #FFFFFF !important;
+            border-color: #E2E8F0 !important;
         }
-        body.theme-light aside .text-gray-400 {
-            color: #788782 !important;
-        }
-        body.theme-light aside a:not(.sidebar-item-active) {
-            color: #53625d;
-        }
-        body.theme-light aside a:not(.sidebar-item-active):hover {
-            background: #eaf5f1;
-        }
-        body.theme-light .border-white\/10 {
-            border-color: #dfe7e4 !important;
-        }
-        body.theme-light .bg-white\/5 {
-            background: #f5f8f7 !important;
-        }
-        body.theme-light .bg-white\/10 {
-            background: #f0f4f2 !important;
-        }
-        body.theme-light .text-gray-300 {
-            color: #44544f !important;
-        }
-        body.theme-light .text-gray-400 {
-            color: #788782 !important;
-        }
-        body.theme-light .border-white\/10 {
-            border-color: #dfe7e4 !important;
-        }
-        /* Footer */
-        body.theme-light footer {
-            color: #82908b;
-            border-color: #dfe7e4;
+        body.theme-light .text-slate-300,
+        body.theme-light .text-slate-400,
+        body.theme-light .text-\[\#94A3B8\] { color: #475569 !important; }
+        body.theme-light .border-\[\#1E293B\] { border-color: #E2E8F0 !important; }
+        body.theme-light .bg-\[\#111C33\] { background: #FFFFFF !important; }
+        body.theme-light .banner { color: #fff; }
+
+        @media (max-width: 640px) {
+            .corp-card { min-height: 130px; padding: 16px; }
         }
     </style>
 </head>
-<body class="bg-dark text-white font-sans min-h-screen transition-colors duration-300">
+<body class="min-h-screen">
 
-    <!-- Iconos SVG ocultos -->
+    <!-- SVG sprites -->
     <svg aria-hidden="true" focusable="false" width="0" height="0" style="position:absolute;overflow:hidden">
         <symbol id="icon-brand" viewBox="0 0 24 24"><path d="M13.5 1 4 13h6l-.5 10L20 10h-6z"/></symbol>
         <symbol id="icon-dashboard" viewBox="0 0 24 24"><rect x="3" y="3" width="8" height="8" rx="1.5"/><rect x="13" y="3" width="8" height="5" rx="1.5"/><rect x="13" y="10" width="8" height="11" rx="1.5"/><rect x="3" y="13" width="8" height="8" rx="1.5"/></symbol>
@@ -209,377 +363,290 @@
         <symbol id="icon-card" viewBox="0 0 24 24"><rect x="2" y="5" width="20" height="14" rx="2.5"/><path d="M2 10h20M6 15h4"/></symbol>
         <symbol id="icon-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4M2 12h2m16 0h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></symbol>
         <symbol id="icon-moon" viewBox="0 0 24 24"><path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.5 8.5 0 1 0 20.5 14.2Z"/></symbol>
+        <symbol id="icon-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
     </svg>
 
-    <div class="flex h-screen overflow-hidden">
-        <!-- Barra Lateral -->
-        <aside class="w-64 bg-sidebar flex flex-col flex-shrink-0">
+    <div class="flex min-h-screen relative z-10">
+
+        <!-- ============ SIDEBAR ============ -->
+        <aside class="w-64 flex-shrink-0 flex flex-col border-r border-[#1E293B] bg-[#0F172A]">
+
             <!-- Logo -->
-            <div class="p-4 flex items-center gap-3 border-b border-white/10">
-                <div class="w-10 h-10 rounded-lg bg-primary flex items-center justify-center text-xl font-bold">
-                    <svg class="brand-mark" aria-hidden="true"><use href="#icon-brand"></use></svg>
-                </div>
-                <div>
-                    <h1 class="text-xl font-bold">TokTok <span class="text-primary">GC</span></h1>
-                    <p class="text-xs text-gray-400">Gestión • Control • Resultados</p>
+            <div class="px-5 py-6 border-b border-[#1E293B]">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white">
+                        <svg class="brand-mark" aria-hidden="true"><use href="#icon-brand"></use></svg>
+                    </div>
+                    <div>
+                        <h1 class="text-lg font-bold tracking-tight text-white">TOKTOK <span class="text-[#14B8A6]">GC</span></h1>
+                        <p class="text-[0.65rem] uppercase tracking-[0.15em] text-[#64748B] font-semibold">Centro de Operaciones</p>
+                    </div>
                 </div>
             </div>
 
-            <!-- Navegación -->
-            <nav class="flex-1 py-6 px-3">
-                <ul class="space-y-2">
-                    <li>
-                        <a href="#main-modules" class="sidebar-item-active flex items-center gap-3 px-4 py-3 rounded-lg font-medium">
-                            <i class="fa fa-th-large w-5 text-center"></i>
-                            Módulos principales
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#extra-modules" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors">
-                            <i class="fa fa-puzzle-piece w-5 text-center text-gray-400"></i>
-                            Módulos extra
-                        </a>
-                    </li>
-                    <li class="pt-4">
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors">
-                            <i class="fa fa-users w-5 text-center text-gray-400"></i>
-                            Usuarios
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors">
-                            <i class="fa fa-bar-chart w-5 text-center text-gray-400"></i>
-                            Reportes
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors">
-                            <i class="fa fa-cog w-5 text-center text-gray-400"></i>
-                            Configuración
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-white/5 transition-colors">
-                            <i class="fa fa-question-circle w-5 text-center text-gray-400"></i>
-                            Ayuda
-                        </a>
-                    </li>
-                </ul>
+            <!-- Navegación: SOLO dos secciones -->
+            <nav class="flex-1 px-3 py-6">
+                <p class="px-3 mb-3 text-[0.65rem] uppercase tracking-[0.18em] text-[#64748B] font-bold">Navegación</p>
+                <div class="space-y-1.5">
+                    <a href="#main-modules" class="side-link active">
+                        <i class="fa fa-th-large w-5 text-center"></i>
+                        <span>Módulos principales</span>
+                    </a>
+                    <a href="#extra-modules" class="side-link">
+                        <i class="fa fa-puzzle-piece w-5 text-center"></i>
+                        <span>Módulos extra</span>
+                    </a>
+                </div>
             </nav>
 
-            <!-- Ilustración inferior -->
-            <div class="mt-auto p-4 relative">
-                <div class="absolute bottom-0 left-0 w-full h-40 bg-gradient-to-t from-primary/20 to-transparent -z-10"></div>
-                <div class="flex justify-center">
-                    <img src="https://picsum.photos/id/0/200/300" alt="Ilustración" class="w-4/5 rounded-lg opacity-80">
+            <!-- Footer del sidebar -->
+            <div class="px-5 py-4 border-t border-[#1E293B]">
+                <div class="flex items-center gap-2 text-[0.7rem] text-[#64748B]">
+                    <span class="w-1.5 h-1.5 rounded-full bg-[#14B8A6]"></span>
+                    <span>Sistema operativo</span>
                 </div>
+                <p class="mt-2 text-[0.65rem] text-[#475569]">v2.4 · TOKTOK GC</p>
             </div>
         </aside>
 
-        <!-- Contenido Principal -->
-        <main class="flex-1 overflow-y-auto p-6">
-            <!-- Barra Superior -->
-            <div class="flex justify-between items-center mb-6 flex-wrap gap-4">
-                <div class="flex-1 max-w-md min-w-[200px]">
-                    <div class="relative">
-                        <input type="search" id="moduleSearch" placeholder="Buscar módulo..." class="w-full bg-white/5 border border-white/10 rounded-lg py-2 px-4 pl-10 focus:outline-none focus:ring-2 focus:ring-primary/50 text-white placeholder-gray-400">
-                        <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        <!-- ============ CONTENIDO PRINCIPAL ============ -->
+        <main class="flex-1 overflow-y-auto">
+
+            <!-- Barra superior -->
+            <div class="sticky top-0 z-20 bg-[#0B1220]/85 backdrop-blur-md border-b border-[#1E293B] px-6 py-4">
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <div class="flex-1 max-w-md min-w-[200px] relative">
+                        <i class="fa fa-search absolute left-3 top-1/2 -translate-y-1/2 text-[#64748B] text-sm"></i>
+                        <input type="search" id="moduleSearch" class="search-input" placeholder="Buscar módulo...">
+                    </div>
+                    <div class="flex items-center gap-3 flex-wrap">
+                        <button id="themeToggle" class="toggle-btn" aria-pressed="false">
+                            <svg class="module-svg" style="width:15px;height:15px;" aria-hidden="true"><use href="#icon-moon"></use></svg>
+                            <span>Tema claro</span>
+                        </button>
+                        <div class="flex items-center gap-2 text-xs text-[#94A3B8]">
+                            <span class="w-2 h-2 rounded-full bg-[#14B8A6]"></span>
+                            <span class="hidden sm:inline">Sistema disponible</span>
+                        </div>
+                        <div class="flex items-center gap-3 pl-3 border-l border-[#1E293B]">
+                            <div class="w-9 h-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold">I</div>
+                            <div class="hidden sm:block">
+                                <p class="text-sm font-semibold text-white leading-tight">Iván Rojas Pusari</p>
+                                <p class="text-[0.7rem] text-[#64748B]">Administrador</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
-                <div class="flex items-center gap-4 flex-wrap">
-                    <button id="themeToggle" class="flex items-center gap-2 bg-white/5 px-4 py-2 rounded-lg hover:bg-white/10 transition-colors" aria-pressed="false" aria-label="Cambiar al tema claro">
-                        <svg class="module-svg" style="width:18px;height:18px;" aria-hidden="true"><use href="#icon-moon"></use></svg>
-                        <span>Tema claro</span>
-                    </button>
-                    <div class="flex items-center gap-2 text-sm">
-                        <span class="w-2 h-2 bg-green-400 rounded-full"></span>
-                        <span class="text-gray-300">Sistema disponible</span>
-                    </div>
-                    <div class="flex items-center gap-3 bg-white/5 px-3 py-2 rounded-lg">
-                        <div class="w-8 h-8 rounded-full bg-primary/30 flex items-center justify-center">I</div>
+            </div>
+
+            <div class="px-6 py-7 max-w-[1400px] mx-auto">
+
+                <!-- Banner -->
+                <div class="banner mb-7 p-7 relative">
+                    <div class="relative flex justify-between items-center flex-wrap gap-5">
                         <div>
-                            <p class="text-sm font-medium">Iván Rojas Pusari</p>
-                            <p class="text-xs text-gray-400">Administrador</p>
-                        </div>
-                        <i class="fa fa-chevron-down text-xs text-gray-400"></i>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Banner Principal -->
-            <div class="relative rounded-xl overflow-hidden mb-8 bg-gradient-to-r from-indigo-900/50 to-blue-900/50">
-                <div class="absolute inset-0 bg-[url('https://picsum.photos/id/1036/1600/300')] bg-cover bg-center opacity-40"></div>
-                <div class="relative p-6 flex justify-between items-center flex-wrap gap-4">
-                    <div>
-                        <div class="flex items-center gap-3 mb-2">
-                            <div class="w-10 h-10 rounded-full bg-primary/30 flex items-center justify-center text-lg">
-                                <i class="fa fa-crown text-yellow-300"></i>
+                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 border border-white/10 text-[0.7rem] font-semibold tracking-wide text-[#E2E8F0] mb-3">
+                                <i class="fa fa-crown text-[#F59E0B]"></i>
+                                ACCESO PRIVILEGIADO
                             </div>
-                            <div>
-                                <h2 class="text-2xl font-bold">Centro de operaciones</h2>
-                                <p class="text-gray-300">Acceso centralizado a las herramientas de TOKTOK GC</p>
+                            <h2 class="text-3xl font-bold text-white tracking-tight">Centro de operaciones</h2>
+                            <p class="mt-2 text-[#CBD5E1] text-sm max-w-xl">
+                                Acceso centralizado a las herramientas administrativas de TOKTOK GC.
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-[0.7rem] uppercase tracking-[0.2em] text-[#94A3B8] font-semibold">Operando en</p>
+                            <p class="text-3xl font-bold text-white tracking-tight mt-1">Bolivia</p>
+                            <p class="text-[0.7rem] text-[#14B8A6] font-semibold mt-1">Juntos movemos</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============ MÓDULOS PRINCIPALES ============ -->
+                <section id="main-modules" class="mb-9">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold uppercase tracking-[0.12em] text-[#E2E8F0] flex items-center gap-2">
+                            <i class="fa fa-th-large text-[#14B8A6]"></i>
+                            Módulos principales
+                        </h3>
+                        <span class="text-[0.7rem] text-[#64748B] font-medium">7 aplicaciones</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+
+                        <!-- Panel principal -->
+                        <a href="RUTAS/admin principal.html" data-module="principal" class="corp-card" style="--accent-color:#1E3A8A;">
+                            <span class="corp-badge bg-[#1E3A8A]/20 text-[#93C5FD]">PRINCIPAL</span>
+                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]">
+                                <svg class="module-svg"><use href="#icon-dashboard"></use></svg>
                             </div>
-                        </div>
-                        <div class="flex items-center gap-3 mt-4 bg-white/10 w-fit px-4 py-2 rounded-full">
-                            <i class="fa fa-user-circle-o text-gray-300"></i>
-                            <span>Propietario del sistema:</span>
-                            <span class="font-semibold text-primary">Iván Rojas Pusari</span>
-                        </div>
+                            <div class="corp-title">Panel principal</div>
+                            <div class="corp-desc">Administración general de TOKTOK GC</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
+
+                        <!-- Publicidad -->
+                        <a href="RUTAS/admin publicidad.html" data-module="publicidad" class="corp-card" style="--accent-color:#0F766E;">
+                            <span class="corp-badge bg-[#0F766E]/20 text-[#5EEAD4]">PUBLICIDAD</span>
+                            <div class="corp-icon bg-[#0F766E]/15 text-[#2DD4BF]">
+                                <svg class="module-svg"><use href="#icon-megaphone"></use></svg>
+                            </div>
+                            <div class="corp-title">Publicidad</div>
+                            <div class="corp-desc">Gestión de campañas y anuncios</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
+
+                        <!-- Recargas -->
+                        <a href="RUTAS/admin recargas.html" data-module="recargas" class="corp-card" style="--accent-color:#B45309;">
+                            <span class="corp-badge bg-[#B45309]/20 text-[#FCD34D]">RECARGAS</span>
+                            <div class="corp-icon bg-[#B45309]/15 text-[#FBBF24]">
+                                <svg class="module-svg"><use href="#icon-mobile"></use></svg>
+                            </div>
+                            <div class="corp-title">TokTok Recargas</div>
+                            <div class="corp-desc">Administración de recargas</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
+
+                        <!-- Admin Juegos -->
+                        <a href="RUTAS/admin juegos.html" data-module="juegos" class="corp-card" style="--accent-color:#1E3A8A;">
+                            <span class="corp-badge bg-[#1E3A8A]/20 text-[#93C5FD]">JUEGOS</span>
+                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]">
+                                <svg class="module-svg"><use href="#icon-gamepad"></use></svg>
+                            </div>
+                            <div class="corp-title">Admin Juegos</div>
+                            <div class="corp-desc">Gestión de plataforma de juegos</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
+
+                        <!-- Plan Hogar -->
+                        <a href="RUTAS/admin plan hogar.html" data-module="plan hogar" class="corp-card" style="--accent-color:#0F766E;">
+                            <span class="corp-badge bg-[#0F766E]/20 text-[#5EEAD4]">PLAN HOGAR</span>
+                            <div class="corp-icon bg-[#0F766E]/15 text-[#2DD4BF]">
+                                <svg class="module-svg"><use href="#icon-home"></use></svg>
+                            </div>
+                            <div class="corp-title">Admin Plan Hogar</div>
+                            <div class="corp-desc">Administración de planes hogar</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
+
+                        <!-- Promo Yape -->
+                        <a href="RUTAS/admin yape.html" data-module="yape" class="corp-card" style="--accent-color:#B45309;">
+                            <span class="corp-badge bg-[#B45309]/20 text-[#FCD34D]">PROMO YAPE</span>
+                            <div class="corp-icon bg-[#B45309]/15 text-[#FBBF24]">
+                                <svg class="module-svg"><use href="#icon-wallet"></use></svg>
+                            </div>
+                            <div class="corp-title">Admin Promo Yape</div>
+                            <div class="corp-desc">Promociones y operaciones Yape</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
+
+                        <!-- Tarjetas (ancho completo) -->
+                        <a href="RUTAS/admin tarjetas.html" data-module="tarjetas" class="corp-card md:col-span-2 lg:col-span-3" style="--accent-color:#1E3A8A;">
+                            <span class="corp-badge bg-[#1E3A8A]/20 text-[#93C5FD]">TARJETAS</span>
+                            <div class="corp-icon bg-[#1E3A8A]/15 text-[#60A5FA]">
+                                <svg class="module-svg"><use href="#icon-card"></use></svg>
+                            </div>
+                            <div class="corp-title">Admin Tarjetas</div>
+                            <div class="corp-desc">Gestión de tarjetas y operaciones relacionadas</div>
+                            <span class="corp-arrow"><i class="fa fa-chevron-right"></i></span>
+                        </a>
                     </div>
-                    <div class="text-right">
-                        <p class="text-2xl italic font-light">Juntos movemos</p>
-                        <p class="text-3xl font-bold text-white">Copacabana</p>
+                </section>
+
+                <!-- ============ MÓDULOS EXTRA ============ -->
+                <section id="extra-modules">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-bold uppercase tracking-[0.12em] text-[#E2E8F0] flex items-center gap-2">
+                            <i class="fa fa-puzzle-piece text-[#14B8A6]"></i>
+                            Módulos extra
+                        </h3>
+                        <span class="text-[0.7rem] text-[#64748B] font-medium">11 herramientas</span>
                     </div>
-                </div>
-            </div>
 
-            <!-- Aplicaciones Principales -->
-            <section class="mb-8" id="main-modules">
-                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fa fa-th-large text-primary"></i>
-                    APLICACIONES PRINCIPALES
-                </h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <!-- Panel Principal -->
-                    <a href="RUTAS/admin principal.html" data-module="principal" class="card-gradient-purple rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">PRINCIPAL</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-dashboard"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">Panel principal</h4>
-                        <p class="text-sm text-white/70 mb-4">Administración general de TOKTOK GC</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-
-                    <!-- Publicidad -->
-                    <a href="RUTAS/admin publicidad.html" data-module="publicidad" class="card-gradient-teal rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">PUBLICIDAD</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-megaphone"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">Publicidad</h4>
-                        <p class="text-sm text-white/70 mb-4">Gestión de campañas y anuncios</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-
-                    <!-- Recargas -->
-                    <a href="RUTAS/admin recargas.html" data-module="recargas" class="card-gradient-orange rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">RECARGAS</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-mobile"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">TokTok Recargas</h4>
-                        <p class="text-sm text-white/70 mb-4">Administración de recargas</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-
-                    <!-- Admin Juegos -->
-                    <a href="RUTAS/admin juegos.html" data-module="juegos" class="card-gradient-blue rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">JUEGOS</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-gamepad"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">Admin Juegos</h4>
-                        <p class="text-sm text-white/70 mb-4">Gestión de plataforma de juegos</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-
-                    <!-- Admin Plan Hogar -->
-                    <a href="RUTAS/admin plan hogar.html" data-module="plan hogar" class="card-gradient-pink rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">PLAN HOGAR</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-home"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">Admin Plan Hogar</h4>
-                        <p class="text-sm text-white/70 mb-4">Administración de planes hogar</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-
-                    <!-- Admin Promo Yape -->
-                    <a href="RUTAS/admin yape.html" data-module="yape" class="card-gradient-violet rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">PROMO YAPE</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-wallet"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">Admin Promo Yape</h4>
-                        <p class="text-sm text-white/70 mb-4">Gestión de promociones y operaciones Yape</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-
-                    <!-- Admin Tarjetas -->
-                    <a href="RUTAS/admin tarjetas.html" data-module="tarjetas" class="card-gradient-cyan rounded-xl p-5 relative overflow-hidden group hover:scale-[1.02] transition-transform text-white no-underline md:col-span-2 lg:col-span-3">
-                        <span class="absolute top-3 right-3 bg-white/20 px-3 py-1 rounded-full text-xs font-medium">TARJETAS</span>
-                        <div class="w-12 h-12 rounded-lg bg-white/20 flex items-center justify-center text-xl mb-3">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-card"></use></svg>
-                        </div>
-                        <h4 class="text-lg font-bold">Admin Tarjetas</h4>
-                        <p class="text-sm text-white/70 mb-4">Gestión de tarjetas y operaciones relacionadas</p>
-                        <span class="absolute bottom-4 right-4 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center group-hover:bg-white/30 transition-colors">
-                            <i class="fa fa-chevron-right text-xs"></i>
-                        </span>
-                    </a>
-                </div>
-            </section>
-
-            <!-- Módulos extra -->
-            <section id="extra-modules">
-                <h3 class="text-lg font-semibold mb-4 flex items-center gap-2">
-                    <i class="fa fa-puzzle-piece text-primary"></i>
-                    HERRAMIENTAS ADICIONALES
-                </h3>
-                <div class="bg-white/5 rounded-xl p-4 border border-white/10">
-                    <button id="hiddenModulesBtn" class="w-full flex items-center justify-between cursor-pointer bg-transparent border-0 text-white" aria-expanded="false" aria-controls="hiddenModulesList">
-                        <div class="flex items-center gap-3">
-                            <i class="fa fa-chevron-down text-primary transition-transform duration-300" id="chevronIcon"></i>
-                            <i class="fa fa-puzzle-piece text-gray-400"></i>
+                    <button id="hiddenModulesBtn" class="collapse-btn" aria-expanded="false" aria-controls="hiddenModulesList">
+                        <span class="flex items-center gap-3">
+                            <i class="fa fa-chevron-down chevron text-[#14B8A6]"></i>
                             <span>Mostrar módulos extra</span>
-                        </div>
-                        <span class="bg-primary/20 text-primary px-3 py-1 rounded-full text-sm font-medium">11</span>
+                        </span>
+                        <span class="px-2.5 py-1 rounded-md bg-[#0F766E]/20 text-[#5EEAD4] text-[0.7rem] font-bold">11</span>
                     </button>
-                </div>
 
-                <div id="hiddenModulesList" class="hidden mt-4 bg-white/5 rounded-xl border border-white/10 overflow-hidden">
-                    <!-- Entel -->
-                    <a href="RUTAS/EXTRAS/admin-entel.html" data-module="entel" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-red-500/20 text-red-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-signal"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Entel</div>
-                            <div class="text-xs text-gray-400">Gestión operadora Entel</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Tigo -->
-                    <a href="RUTAS/EXTRAS/admin-tigo.html" data-module="tigo" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-signal"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Tigo</div>
-                            <div class="text-xs text-gray-400">Gestión operadora Tigo</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Viva -->
-                    <a href="RUTAS/EXTRAS/admin-viva.html" data-module="viva" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-signal"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Viva</div>
-                            <div class="text-xs text-gray-400">Gestión operadora Viva</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Reportes -->
-                    <a href="RUTAS/EXTRAS/admin-reportes.html" data-module="reportes" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-chart"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Reportes</div>
-                            <div class="text-xs text-gray-400">Métricas y estadísticas</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Banco BCP -->
-                    <a href="RUTAS/EXTRAS/admin-bcp.html" data-module="bcp" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-green-500/20 text-green-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-bank"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Banco BCP</div>
-                            <div class="text-xs text-gray-400">Operaciones bancarias</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Tienda -->
-                    <a href="RUTAS/EXTRAS/admin-tienda.html" data-module="tienda" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-orange-500/20 text-orange-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-store"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Tienda</div>
-                            <div class="text-xs text-gray-400">Gestión de productos</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Juegos -->
-                    <a href="RUTAS/EXTRAS/juegos.html" data-module="juegos extra" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-purple-500/20 text-purple-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-gamepad"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Juegos</div>
-                            <div class="text-xs text-gray-400">Plataforma de juegos</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Inventario -->
-                    <a href="RUTAS/EXTRAS/inventario-esc.html" data-module="inventario" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-blue-500/20 text-blue-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-boxes"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Inventario</div>
-                            <div class="text-xs text-gray-400">Gestión de inventario</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Asistencia -->
-                    <a href="RUTAS/EXTRAS/asistencia.html" data-module="asistencia" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-slate-500/20 text-slate-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-users"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Asistencia</div>
-                            <div class="text-xs text-gray-400">Control de personal</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Monitoreo GC -->
-                    <a href="RUTAS/EXTRAS/monitoreo.html" data-module="monitoreo" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline border-b border-white/5">
-                        <div class="w-9 h-9 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-camera"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Monitoreo GC</div>
-                            <div class="text-xs text-gray-400">Supervisión en tiempo real</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                    <!-- Cajas -->
-                    <a href="RUTAS/EXTRAS/caja.html" data-module="caja" class="hidden-module-item flex items-center gap-4 px-5 py-4 hover:bg-white/10 transition-colors text-white no-underline last:border-b-0">
-                        <div class="w-9 h-9 rounded-lg bg-amber-500/20 text-amber-400 flex items-center justify-center flex-shrink-0">
-                            <svg class="module-svg" aria-hidden="true"><use href="#icon-cash"></use></svg>
-                        </div>
-                        <div class="flex-1">
-                            <div class="text-sm font-semibold">Cajas</div>
-                            <div class="text-xs text-gray-400">Arqueo y movimientos</div>
-                        </div>
-                        <i class="fa fa-chevron-right text-gray-400 text-xs"></i>
-                    </a>
-                </div>
-            </section>
+                    <div id="hiddenModulesList" class="extra-list">
 
-            <!-- Pie de página -->
-            <footer class="mt-8 pt-4 border-t border-white/10 flex justify-between text-xs text-gray-400 flex-wrap gap-2">
-                <p>TOKTOK GC - Panel de administración</p>
-                <p>Propietario: Iván Rojas Pusari</p>
-            </footer>
+                        <a href="RUTAS/EXTRAS/admin-entel.html" data-module="entel" class="extra-item">
+                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Entel</div><div class="extra-desc">Gestión operadora Entel</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/admin-tigo.html" data-module="tigo" class="extra-item">
+                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Tigo</div><div class="extra-desc">Gestión operadora Tigo</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/admin-viva.html" data-module="viva" class="extra-item">
+                            <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-signal"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Viva</div><div class="extra-desc">Gestión operadora Viva</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/admin-reportes.html" data-module="reportes" class="extra-item">
+                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-chart"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Reportes</div><div class="extra-desc">Métricas y estadísticas</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/admin-bcp.html" data-module="bcp" class="extra-item">
+                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-bank"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Banco BCP</div><div class="extra-desc">Operaciones bancarias</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/admin-tienda.html" data-module="tienda" class="extra-item">
+                            <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-store"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Tienda</div><div class="extra-desc">Gestión de productos</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/juegos.html" data-module="juegos extra" class="extra-item">
+                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-gamepad"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Juegos</div><div class="extra-desc">Plataforma de juegos</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/inventario-esc.html" data-module="inventario" class="extra-item">
+                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-boxes"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Inventario</div><div class="extra-desc">Gestión de inventario</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/asistencia.html" data-module="asistencia" class="extra-item">
+                            <div class="extra-icon bg-[#B45309]/15 text-[#FBBF24]"><svg class="module-svg"><use href="#icon-users"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Asistencia</div><div class="extra-desc">Control de personal</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/monitoreo.html" data-module="monitoreo" class="extra-item">
+                            <div class="extra-icon bg-[#1E3A8A]/15 text-[#60A5FA]"><svg class="module-svg"><use href="#icon-camera"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Monitoreo GC</div><div class="extra-desc">Supervisión en tiempo real</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+
+                        <a href="RUTAS/EXTRAS/caja.html" data-module="caja" class="extra-item">
+                            <div class="extra-icon bg-[#0F766E]/15 text-[#2DD4BF]"><svg class="module-svg"><use href="#icon-cash"></use></svg></div>
+                            <div class="flex-1"><div class="extra-name">Cajas</div><div class="extra-desc">Arqueo y movimientos</div></div>
+                            <i class="fa fa-chevron-right text-[#475569] text-xs"></i>
+                        </a>
+                    </div>
+                </section>
+
+                <!-- Footer -->
+                <footer class="mt-10 pt-5 border-t border-[#1E293B] flex justify-between flex-wrap gap-2 text-[0.72rem] text-[#64748B]">
+                    <p>TOKTOK GC · Panel de administración</p>
+                    <p>Propietario: Iván Rojas Pusari</p>
+                </footer>
+            </div>
         </main>
     </div>
 
@@ -587,13 +654,11 @@
         // Toggle módulos extra
         const hiddenModulesBtn = document.getElementById('hiddenModulesBtn');
         const hiddenModulesList = document.getElementById('hiddenModulesList');
-        const chevronIcon = document.getElementById('chevronIcon');
 
-        hiddenModulesBtn.addEventListener('click', function() {
-            hiddenModulesList.classList.toggle('hidden');
-            hiddenModulesBtn.classList.toggle('active');
-            hiddenModulesBtn.setAttribute('aria-expanded', !hiddenModulesList.classList.contains('hidden'));
-            chevronIcon.style.transform = hiddenModulesList.classList.contains('hidden') ? 'rotate(0deg)' : 'rotate(180deg)';
+        hiddenModulesBtn.addEventListener('click', () => {
+            hiddenModulesList.classList.toggle('show');
+            hiddenModulesBtn.classList.toggle('open');
+            hiddenModulesBtn.setAttribute('aria-expanded', hiddenModulesList.classList.contains('show'));
         });
 
         // Búsqueda
@@ -605,71 +670,42 @@
             let matchingExtras = false;
 
             moduleLinks.forEach(link => {
-                const searchableText = `${link.dataset.module} ${link.textContent}`.toLocaleLowerCase('es');
-                const matches = searchableText.includes(query);
+                const text = `${link.dataset.module} ${link.textContent}`.toLocaleLowerCase('es');
+                const matches = text.includes(query);
                 link.style.display = matches ? '' : 'none';
-                if (matches && link.classList.contains('hidden-module-item')) matchingExtras = true;
+                if (matches && link.classList.contains('extra-item')) matchingExtras = true;
             });
 
             if (query && matchingExtras) {
-                hiddenModulesList.classList.remove('hidden');
-                hiddenModulesBtn.classList.add('active');
+                hiddenModulesList.classList.add('show');
+                hiddenModulesBtn.classList.add('open');
                 hiddenModulesBtn.setAttribute('aria-expanded', 'true');
-                chevronIcon.style.transform = 'rotate(180deg)';
             } else if (!query) {
-                hiddenModulesList.classList.add('hidden');
-                hiddenModulesBtn.classList.remove('active');
+                hiddenModulesList.classList.remove('show');
+                hiddenModulesBtn.classList.remove('open');
                 hiddenModulesBtn.setAttribute('aria-expanded', 'false');
-                chevronIcon.style.transform = 'rotate(0deg)';
             }
         });
 
-        // Tema claro/oscuro
+        // Tema claro / oscuro
         const themeToggle = document.getElementById('themeToggle');
 
-        function setTheme(theme, savePreference = true) {
+        function setTheme(theme, save = true) {
             const isDark = theme === 'dark';
-            if (isDark) {
-                document.body.classList.remove('theme-light');
-                document.body.classList.add('bg-dark', 'text-white');
-                document.body.style.backgroundColor = '#0A0E27';
-                document.body.style.color = '#ffffff';
-                // Restaurar fondos oscuros de sidebar
-                const aside = document.querySelector('aside');
-                aside.style.backgroundColor = '';
-                aside.style.borderRight = '';
-                themeToggle.querySelector('span').textContent = 'Tema claro';
-                themeToggle.querySelector('use').setAttribute('href', '#icon-sun');
-                themeToggle.setAttribute('aria-label', 'Cambiar al tema claro');
-            } else {
-                document.body.classList.add('theme-light');
-                document.body.classList.remove('bg-dark', 'text-white');
-                document.body.style.backgroundColor = '#eef2f1';
-                document.body.style.color = '#172522';
-                // Forzar sidebar claro
-                const aside = document.querySelector('aside');
-                aside.style.backgroundColor = '#ffffff';
-                aside.style.borderRight = '1px solid #dfe7e4';
-                themeToggle.querySelector('span').textContent = 'Tema oscuro';
-                themeToggle.querySelector('use').setAttribute('href', '#icon-moon');
-                themeToggle.setAttribute('aria-label', 'Cambiar al tema oscuro');
-            }
+            document.body.classList.toggle('theme-light', !isDark);
             themeToggle.setAttribute('aria-pressed', String(!isDark));
-
-            if (savePreference) {
-                try {
-                    localStorage.setItem('toktok-theme', theme);
-                } catch (e) {}
+            themeToggle.querySelector('span').textContent = isDark ? 'Tema claro' : 'Tema oscuro';
+            themeToggle.querySelector('use').setAttribute('href', isDark ? '#icon-moon' : '#icon-sun');
+            if (save) {
+                try { localStorage.setItem('toktok-theme', theme); } catch(e){}
             }
         }
 
         try {
             setTheme(localStorage.getItem('toktok-theme') || 'dark', false);
-        } catch (e) {
-            setTheme('dark', false);
-        }
+        } catch(e) { setTheme('dark', false); }
 
-        themeToggle.addEventListener('click', function() {
+        themeToggle.addEventListener('click', () => {
             const current = document.body.classList.contains('theme-light') ? 'light' : 'dark';
             setTheme(current === 'dark' ? 'light' : 'dark');
         });
@@ -678,8 +714,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register(new URL('./sw.js', window.location.href))
-                    .then(reg => console.log('SW registrado:', reg.scope))
-                    .catch(err => console.log('Error SW:', err));
+                    .then(r => console.log('SW registrado:', r.scope))
+                    .catch(e => console.log('Error SW:', e));
             });
         }
     </script>
