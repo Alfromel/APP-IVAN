@@ -1,11 +1,8 @@
-const CACHE_NAME = 'toktok-pwa-v1.0';
+const CACHE_NAME = 'toktok-pwa-v1.2';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/EXTENCIONES/R.T.html',
-  '/EXTENCIONES/R.A.J.html',
-  'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
-  // Agrega aquí otros recursos que quieras cachear
+  './',
+  './index.html',
+  './manifest.json'
 ];
 
 // Instalación del Service Worker
@@ -75,7 +72,7 @@ self.addEventListener('fetch', event => {
             // En caso de error, puedes devolver una página de fallback
             // Por ejemplo, si estás offline
             if (event.request.destination === 'document') {
-              return caches.match('/offline.html');
+              return caches.match(new URL('index.html', self.registration.scope));
             }
           });
       })
