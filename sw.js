@@ -1,80 +1,76 @@
-const CACHE_NAME = 'toktok-pwa-v1.2';
+const CACHE_NAME = 'toktok-pwa-v1.3'; // ⚠️ Súbelo en cada deploy a producción
 const urlsToCache = [
   './',
   './index.html',
   './manifest.json'
 ];
 
-// Instalación del Service Worker
+// ---------- INSTALL ----------
 self.addEventListener('install', event => {
   console.log('Service Worker: Instalado');
-  
   event.waitUntil(
     caches.open(CACHE_NAME)
-      .then(cache => {
-        console.log('Service Worker: Cacheando archivos');
-        return cache.addAll(urlsToCache);
-      })
+      .then(cache => cache.addAll(urlsToCache))
       .then(() => self.skipWaiting())
   );
 });
 
-// Activación del Service Worker
+// ---------- ACTIVATE ----------
 self.addEventListener('activate', event => {
   console.log('Service Worker: Activado');
-  
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cache => {
           if (cache !== CACHE_NAME) {
-            console.log('Service Worker: Limpiando cache antiguo');
+            console.log('Service Worker: Limpiando cache antiguo:', cache);
             return caches.delete(cache);
           }
         })
       );
-    })
+    }).then(() => self.clients.claim())
   );
 });
 
-// Interceptar solicitudes de fetch
+// ---------- FETCH ----------
 self.addEventListener('fetch', event => {
-  console.log('Service Worker: Fetching', event.request.url);
-  
-  event.respondWith(
-    caches.match(event.request)
-      .then(response => {
-        // Devuelve el recurso desde cache si está disponible
-        if (response) {
+  const { request } = event;
+  const url = new URL(request.url);
+
+  // Solo GET
+  if (request.method !== 'GET') return;
+
+  // Ignorar peticiones a otros dominios (APIs externas, etc.)
+  if (url.origin !== self.location.origin) return;
+
+  // 🟢 HTML → Network First (siempre lo más fresco)
+  if (request.destination === 'document' || url.pathname.endsWith('.html')) {
+    event.respondWith(
+      fetch(request)
+        .then(response => {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
           return response;
-        }
-        
-        // Si no está en cache, haz la solicitud a la red
-        return fetch(event.request)
-          .then(response => {
-            // Verifica si la respuesta es válida
-            if (!response || response.status !== 200 || response.type !== 'basic') {
-              return response;
-            }
-            
-            // Clona la respuesta
-            const responseToCache = response.clone();
-            
-            // Abre el cache y guarda la respuesta
-            caches.open(CACHE_NAME)
-              .then(cache => {
-                cache.put(event.request, responseToCache);
-              });
-              
-            return response;
-          })
-          .catch(() => {
-            // En caso de error, puedes devolver una página de fallback
-            // Por ejemplo, si estás offline
-            if (event.request.destination === 'document') {
-              return caches.match(new URL('index.html', self.registration.scope));
-            }
-          });
-      })
+        })
+        .catch(() => caches.match(request).then(r => r || caches.match('./index.html')))
+    );
+    return;
+  }
+
+  // 🔵 JS / CSS / Imágenes → Cache First + revalidación en background
+  event.respondWith(
+    caches.match(request).then(cached => {
+      const fetchPromise = fetch(request)
+        .then(response => {
+          if (response && response.status === 200 && response.type === 'basic') {
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then(cache => cache.put(request, copy));
+          }
+          return response;
+        })
+        .catch(() => cached); // si falla la red, usa el caché
+
+      return cached || fetchPromise; // devuelve caché al instante, actualiza en background
+    })
   );
 });
