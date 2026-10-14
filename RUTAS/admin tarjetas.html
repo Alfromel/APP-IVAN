@@ -3,262 +3,136 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Tarjetas | TOKTOK GC</title>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<title>Admin Tarjetas - TokTok</title>
+<link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  :root{
-    --bg-900:#0a0705;--bg-850:#0f0b08;--bg-800:#14100c;--bg-750:#1a1510;--bg-700:#221a13;
-    --line:#2a2118;--line-strong:#3a2e22;
-    --coffee-50:#faf3ea;--coffee-100:#f0dfc8;--coffee-200:#e2c29a;--coffee-300:#d4a373;
-    --coffee-400:#c08a52;--coffee-500:#a97142;--coffee-600:#8a5a34;--coffee-700:#6b4426;
-    --coffee-800:#4a2f1a;--coffee-900:#2b1b0f;
-    --text-100:#f5ede2;--text-200:#e0d5c5;--text-300:#b8a892;--text-400:#8a7a66;--text-500:#5f5346;
-    --success:#4ade80;--success-bg:#14331f;--warning:#eab308;--warning-bg:#3a300f;
-    --danger:#f87171;--danger-bg:#3a1a1a;--info:#60a5fa;--info-bg:#0e2a4a;
-    --purple:#c084fc;--purple-bg:#2a1a3e;
-    --scroll:#3a2e22;--shadow:0 8px 30px rgba(0,0,0,.5);
-    --shadow-glow:0 4px 14px rgba(192,138,82,.25);
-  }
-  body.theme-light{
-    --bg-900:#fbf7f2;--bg-850:#ffffff;--bg-800:#ffffff;--bg-750:#f5ede2;--bg-700:#ede0cd;
-    --line:#e6d8c3;--line-strong:#d4bfa3;
-    --text-100:#2b1b0f;--text-200:#4a2f1a;--text-300:#6b4426;--text-400:#8a7a66;--text-500:#a89984;
-    --success:#059669;--success-bg:#d1fae5;--warning:#b45309;--warning-bg:#fef3c7;
-    --danger:#dc2626;--danger-bg:#fee2e2;--info:#2563eb;--info-bg:#dbeafe;
-    --purple:#7c3aed;--purple-bg:#ede9fe;
-    --scroll:#d4bfa3;--shadow:0 8px 30px rgba(107,68,38,.12);
-    --shadow-glow:0 4px 14px rgba(192,138,82,.3);
-  }
-  *{margin:0;padding:0;box-sizing:border-box;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;}
-  html,body{width:100%;height:100%;overflow:hidden;background:var(--bg-900);transition:background .3s;}
-  .app{width:100vw;height:100vh;display:flex;overflow:hidden;background:var(--bg-900);}
-
-  .sidebar{width:260px;background:var(--bg-850);display:flex;flex-direction:column;flex-shrink:0;transition:width .2s ease,background .3s;overflow:hidden;border-right:1px solid var(--line);}
-  .sidebar.collapsed{width:72px;}
-  .sidebar-brand{padding:20px 22px;display:flex;align-items:center;gap:12px;color:var(--text-100);font-weight:700;font-size:17px;white-space:nowrap;flex-shrink:0;border-bottom:1px solid var(--line);}
-  .sidebar-brand i{color:var(--coffee-400);font-size:26px;min-width:28px;text-align:center;filter:drop-shadow(0 0 8px rgba(212,163,115,.4));}
-  .sidebar-brand span.accent{color:var(--coffee-400);}
-  .sidebar-nav{flex:1;display:flex;flex-direction:column;gap:2px;padding:12px 10px;overflow-y:auto;}
-  .nav-item{display:flex;align-items:center;gap:14px;padding:11px 14px;border-radius:10px;color:var(--text-300);font-size:14px;font-weight:500;cursor:pointer;transition:all .15s;border:none;background:transparent;text-align:left;width:100%;white-space:nowrap;overflow:hidden;position:relative;}
-  .nav-item i{font-size:17px;min-width:22px;text-align:center;color:var(--text-400);}
-  .nav-item:hover{background:var(--bg-750);color:var(--text-100);}
-  .nav-item:hover i{color:var(--coffee-400);}
-  .nav-item.active{background:linear-gradient(135deg,rgba(212,163,115,.15),rgba(169,113,66,.1));color:var(--text-100);border:1px solid rgba(212,163,115,.25);}
-  .nav-item.active i{color:var(--coffee-400);}
-  .sidebar.collapsed .nav-item span,.sidebar.collapsed .sidebar-brand span{display:none;}
-  .sidebar.collapsed .nav-item{justify-content:center;padding:11px 0;}
-  .sidebar-footer{padding:16px 18px;border-top:1px solid var(--line);display:flex;align-items:center;gap:12px;color:var(--text-400);font-size:13px;white-space:nowrap;flex-shrink:0;}
-  .sidebar-footer .avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--coffee-500),var(--coffee-700));display:flex;align-items:center;justify-content:center;color:var(--coffee-50);font-weight:700;flex-shrink:0;box-shadow:0 0 0 2px rgba(212,163,115,.2);}
-  .sidebar.collapsed .sidebar-footer span{display:none;}
-  .sidebar.collapsed .sidebar-footer{justify-content:center;}
-
-  .main{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg-900);}
-  .topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 26px;background:var(--bg-850);flex-shrink:0;border-bottom:1px solid var(--line);transition:background .3s;}
-  .topbar-left{display:flex;align-items:center;gap:16px;}
-  .toggle-btn{background:transparent;border:none;color:var(--text-300);font-size:18px;cursor:pointer;padding:6px 8px;border-radius:8px;transition:all .15s;}
-  .toggle-btn:hover{background:var(--bg-750);color:var(--coffee-400);}
-  .topbar h1{color:var(--text-100);font-size:18px;font-weight:600;display:flex;align-items:center;gap:10px;}
-  .topbar h1 i{color:var(--coffee-400);font-size:20px;}
-  .topbar-right{display:flex;align-items:center;gap:10px;}
-  .topbar-right .badge{background:var(--bg-750);color:var(--text-300);padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;border:1px solid var(--line);}
-  .theme-btn{background:var(--bg-750);border:1px solid var(--line);color:var(--text-200);width:36px;height:36px;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .2s;}
-  .theme-btn:hover{border-color:var(--coffee-400);color:var(--coffee-400);}
-  .content{flex:1;overflow-y:auto;padding:24px 28px 40px;}
-
-  .page-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:12px;}
-  .page-header h2{color:var(--text-100);font-size:22px;font-weight:600;display:flex;align-items:center;gap:10px;}
-  .page-header h2 i{color:var(--coffee-400);}
-
-  .btn{background:var(--bg-750);border:1px solid var(--line);color:var(--text-200);padding:9px 18px;border-radius:10px;font-size:13px;font-weight:500;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:all .15s;white-space:nowrap;}
-  .btn:hover{background:var(--bg-700);color:var(--text-100);border-color:var(--line-strong);}
-  .btn-primary{background:linear-gradient(135deg,var(--coffee-400),var(--coffee-600));color:#1a0f06;font-weight:700;border:none;box-shadow:var(--shadow-glow);}
-  .btn-primary:hover{background:linear-gradient(135deg,var(--coffee-300),var(--coffee-500));box-shadow:0 6px 20px rgba(192,138,82,.4);}
-  .btn-danger{background:var(--danger-bg);color:var(--danger);border-color:rgba(248,113,113,.25);}
-  .btn-danger:hover{background:rgba(248,113,113,.2);}
-  .btn-success{background:var(--success-bg);color:var(--success);border-color:rgba(74,222,128,.25);}
-  .btn-success:hover{background:rgba(74,222,128,.2);}
-  .btn-ghost{background:var(--bg-750);color:var(--text-200);border:1px solid var(--line);}
-  .btn-ghost:hover{background:var(--bg-700);color:var(--coffee-400);border-color:var(--coffee-400);}
-  .btn-sm{padding:6px 10px;font-size:12px;border-radius:8px;}
-
-  .card{background:var(--bg-800);border:1px solid var(--line);border-radius:14px;padding:20px;margin-bottom:20px;transition:background .3s,border .3s;}
-  .card h3{font-size:16px;font-weight:700;margin:0 0 16px;color:var(--text-100);display:flex;align-items:center;gap:8px;}
-  .card h3 i{color:var(--coffee-400);}
-
-  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
-  .prod-card{background:var(--bg-750);border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:transform .15s,border .15s,background .3s;}
-  .prod-card:hover{transform:translateY(-3px);border-color:var(--coffee-400);}
-  .prod-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:var(--bg-850);}
-  .prod-body{padding:14px;}
-  .prod-name{font-weight:700;font-size:14px;margin-bottom:4px;color:var(--text-100);}
-  .prod-price{color:var(--coffee-400);font-weight:800;font-size:16px;margin:8px 0;}
-  .prod-cat{font-size:11px;color:var(--text-400);margin-bottom:6px;}
-  .prod-creds{font-size:11px;color:var(--text-400);margin-bottom:10px;white-space:pre-wrap;max-height:60px;overflow:hidden;background:var(--bg-800);padding:8px;border-radius:8px;border:1px solid var(--line);}
-  .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;}
-  .badge-disponible{background:var(--success-bg);color:var(--success);}
-  .badge-comprado{background:var(--danger-bg);color:var(--danger);}
-
-  .cat-item{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;background:var(--bg-750);border:1px solid var(--line);border-radius:12px;margin-bottom:10px;transition:border .15s;}
-  .cat-item:hover{border-color:var(--coffee-400);}
-  .cat-item .cat-name{font-weight:700;color:var(--text-100);}
-  .cat-item .cat-desc{font-size:12px;color:var(--text-400);margin-top:2px;}
-
-  .form-group{margin-bottom:14px;}
-  .label{display:block;font-size:12px;font-weight:600;color:var(--text-400);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
-  .input,.select,.textarea{width:100%;padding:11px 14px;background:var(--bg-750);border:1px solid var(--line);border-radius:10px;color:var(--text-100);font-size:14px;font-family:inherit;transition:border .15s,background .3s;}
-  .input:focus,.select:focus,.textarea:focus{outline:none;border-color:var(--coffee-400);}
-  .textarea{min-height:90px;resize:vertical;}
-  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
-  .flex-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
-  .flex-row .form-group{flex:1;min-width:180px;}
-
-  .toast-container{position:fixed;bottom:24px;right:24px;z-index:2000;display:flex;flex-direction:column;gap:10px;}
-  .toast{background:var(--bg-800);color:var(--text-100);padding:12px 20px;border-radius:12px;font-size:13.5px;display:flex;align-items:center;gap:10px;box-shadow:var(--shadow);animation:slideIn .25s ease;min-width:260px;border-left:3px solid var(--coffee-400);}
-  .toast.success{border-left-color:var(--success);}
-  .toast.error{border-left-color:var(--danger);}
-  @keyframes slideIn{from{transform:translateX(100%);opacity:0;}to{transform:translateX(0);opacity:1;}}
-
-  ::-webkit-scrollbar{width:8px;height:8px;}
-  ::-webkit-scrollbar-track{background:transparent;}
-  ::-webkit-scrollbar-thumb{background:var(--scroll);border-radius:10px;}
-  ::-webkit-scrollbar-thumb:hover{background:var(--coffee-500);}
-
-  .empty-state{padding:40px 20px;text-align:center;color:var(--text-400);font-size:14px;}
-
-  @media(max-width:800px){
-    .sidebar{width:72px;}
-    .sidebar .nav-item span,.sidebar .sidebar-brand span,.sidebar-footer span{display:none;}
-    .sidebar .nav-item{justify-content:center;padding:11px 0;}
-    .sidebar-footer{justify-content:center;}
-    .content{padding:16px;}
-    .topbar{padding:12px 16px;}
-    .grid-2{grid-template-columns:1fr;}
-    .page-header h2{font-size:18px;}
-  }
+body{font-family:'Inter',sans-serif;background:#0a0a0a;color:#fff;margin:0;}
+.container{max-width:1100px;margin:0 auto;padding:20px;}
+.header{display:flex;justify-content:space-between;align-items:center;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.08);margin-bottom:24px;}
+.title{font-size:22px;font-weight:700;background:linear-gradient(90deg,#a855f7,#6366f1);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.tabs{display:flex;gap:8px;margin-bottom:24px;flex-wrap:wrap;}
+.tab{padding:10px 18px;border-radius:10px;background:#1c1c1c;color:#aaa;border:1px solid rgba(255,255,255,.08);cursor:pointer;font-weight:600;font-size:14px;}
+.tab.active{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;border-color:transparent;}
+.card{background:#141414;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:20px;margin-bottom:20px;}
+.label{display:block;font-size:12px;font-weight:600;color:#aaa;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px;}
+.input,.select,.textarea{width:100%;padding:12px 14px;background:#1c1c1c;border:1px solid rgba(255,255,255,.1);border-radius:10px;color:#fff;font-size:14px;font-family:inherit;}
+.input:focus,.select:focus,.textarea:focus{outline:none;border-color:#8b5cf6;}
+.textarea{min-height:90px;resize:vertical;}
+.btn{padding:12px 20px;border-radius:10px;font-weight:700;font-size:14px;border:0;cursor:pointer;display:inline-flex;align-items:center;gap:8px;transition:transform .15s;}
+.btn:active{transform:scale(.97);}
+.btn:disabled{opacity:.5;cursor:not-allowed;}
+.btn-primary{background:linear-gradient(135deg,#6d28d9,#8b5cf6);color:#fff;}
+.btn-danger{background:#dc2626;color:#fff;}
+.btn-success{background:#059669;color:#fff;}
+.btn-ghost{background:#1c1c1c;color:#fff;border:1px solid rgba(255,255,255,.1);}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;}
+.prod-card{background:#1c1c1c;border:1px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden;}
+.prod-card img{width:100%;aspect-ratio:1;object-fit:cover;display:block;background:#0a0a0a;}
+.prod-body{padding:12px;}
+.prod-name{font-weight:700;font-size:14px;margin-bottom:4px;}
+.prod-price{color:#a855f7;font-weight:800;font-size:16px;margin-bottom:8px;}
+.badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:10px;font-weight:700;text-transform:uppercase;}
+.badge-disponible{background:rgba(5,150,105,.15);color:#10b981;}
+.badge-comprado{background:rgba(220,38,38,.15);color:#ef4444;}
+.cat-item{display:flex;justify-content:space-between;align-items:center;padding:14px;background:#1c1c1c;border:1px solid rgba(255,255,255,.08);border-radius:12px;margin-bottom:10px;}
+.toast{position:fixed;top:20px;right:20px;padding:12px 18px;border-radius:12px;background:#059669;color:#fff;font-weight:600;z-index:1000;box-shadow:0 10px 30px rgba(0,0,0,.4);}
+.toast.error{background:#dc2626;}
+.flex-row{display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap;}
+.flex-row .form-group{flex:1;min-width:180px;}
+.form-group{margin-bottom:14px;}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:640px){.grid-2{grid-template-columns:1fr;}}
 </style>
 </head>
 <body>
+<div class="container">
+  <div class="header">
+    <div class="title"><i class="fas fa-shield-alt mr-2"></i>Admin Tarjetas</div>
+    <a href="tarjetas.html" class="btn btn-ghost"><i class="fas fa-arrow-left"></i>Ver tienda</a>
+  </div>
 
-<div class="app">
-  <aside class="sidebar" id="sidebar">
-    <div class="sidebar-brand">
-      <i class="fas fa-credit-card"></i>
-      <span>Admin<span class="accent"> Tarjetas</span></span>
-    </div>
-    <nav class="sidebar-nav">
-      <button class="nav-item active" data-section="productos"><i class="fas fa-box"></i><span>Productos</span></button>
-      <button class="nav-item" data-section="categorias"><i class="fas fa-tags"></i><span>Categorías</span></button>
-    </nav>
-    <div class="sidebar-footer">
-      <div class="avatar">A</div>
-      <span>Administrador</span>
-    </div>
-  </aside>
+  <div class="tabs">
+    <button class="tab active" data-tab="productos"><i class="fas fa-box"></i> Productos</button>
+    <button class="tab" data-tab="categorias"><i class="fas fa-tags"></i> Categorías</button>
+  </div>
 
-  <main class="main">
-    <div class="topbar">
-      <div class="topbar-left">
-        <button class="toggle-btn" id="toggleSidebar"><i class="fas fa-bars"></i></button>
-        <h1><i class="fas fa-shield-halved"></i> <span id="pageTitle">Admin Tarjetas</span></h1>
+  <!-- CATEGORÍAS -->
+  <div id="tab-categorias" style="display:none;">
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:700;margin:0 0 16px;"><i class="fas fa-plus-circle mr-2 text-purple-400"></i>Nueva categoría</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="label">Nombre</label>
+          <input id="catNombre" class="input" placeholder="Ej: Streaming">
+        </div>
+        <div class="form-group">
+          <label class="label">Descripción</label>
+          <input id="catDesc" class="input" placeholder="Opcional">
+        </div>
       </div>
-      <div class="topbar-right">
-        <button class="theme-btn" id="themeBtn" title="Cambiar tema">
-          <i class="fas fa-moon" id="themeIcon"></i>
-        </button>
-        <a href="tarjetas.html" class="btn btn-ghost btn-sm"><i class="fas fa-arrow-left"></i> Ver tienda</a>
-        <span class="badge"><i class="fas fa-circle" style="color:#4ade80;font-size:8px;margin-right:6px;"></i>Conectado</span>
+      <button class="btn btn-primary" id="addCatBtn"><i class="fas fa-save"></i>Guardar categoría</button>
+    </div>
+
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:700;margin:0 0 16px;"><i class="fas fa-list mr-2 text-purple-400"></i>Categorías existentes</h3>
+      <div id="catList"></div>
+    </div>
+  </div>
+
+  <!-- PRODUCTOS -->
+  <div id="tab-productos">
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:700;margin:0 0 16px;"><i class="fas fa-plus-circle mr-2 text-purple-400"></i>Nuevo producto</h3>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="label">Categoría</label>
+          <select id="prodCategoria" class="select"></select>
+        </div>
+        <div class="form-group">
+          <label class="label">Nombre del producto</label>
+          <input id="prodNombre" class="input" placeholder="Ej: Netflix 1 mes">
+        </div>
       </div>
+      <div class="form-group">
+        <label class="label">URL de portada (imagen)</label>
+        <input id="prodImagen" class="input" placeholder="https://...">
+      </div>
+      <div class="grid-2">
+        <div class="form-group">
+          <label class="label">Precio (Bs)</label>
+          <input id="prodPrecio" type="number" step="0.01" min="0" class="input" placeholder="50.00">
+        </div>
+        <div class="form-group">
+          <label class="label">Descripción (opcional)</label>
+          <input id="prodDesc" class="input" placeholder="Breve descripción">
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="label">Credenciales del producto (lo que verá el comprador)</label>
+        <textarea id="prodCreds" class="textarea" placeholder="Usuario: xxxx&#10;Contraseña: yyyy&#10;PIN: 1234"></textarea>
+      </div>
+      <button class="btn btn-primary" id="addProdBtn"><i class="fas fa-save"></i>Guardar producto</button>
     </div>
 
-    <div class="content" id="content">
-
-      <section id="section-productos">
-        <div class="page-header">
-          <h2><i class="fas fa-box"></i> Gestión de Productos</h2>
+    <div class="card">
+      <h3 style="font-size:16px;font-weight:700;margin:0 0 16px;"><i class="fas fa-boxes mr-2 text-purple-400"></i>Productos registrados</h3>
+      <div class="flex-row" style="margin-bottom:14px;">
+        <div class="form-group" style="margin-bottom:0;">
+          <label class="label">Filtrar por estado</label>
+          <select id="filtroEstado" class="select">
+            <option value="all">Todos</option>
+            <option value="disponible">Disponibles</option>
+            <option value="comprado">Comprados</option>
+          </select>
         </div>
-
-        <div class="card">
-          <h3><i class="fas fa-plus-circle"></i> Nuevo producto</h3>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="label">Categoría</label>
-              <select id="prodCategoria" class="select"></select>
-            </div>
-            <div class="form-group">
-              <label class="label">Nombre del producto</label>
-              <input id="prodNombre" class="input" placeholder="Ej: Netflix 1 mes">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="label">URL de portada (imagen)</label>
-            <input id="prodImagen" class="input" placeholder="https://...">
-          </div>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="label">Precio (Bs)</label>
-              <input id="prodPrecio" type="number" step="0.01" min="0" class="input" placeholder="50.00">
-            </div>
-            <div class="form-group">
-              <label class="label">Descripción (opcional)</label>
-              <input id="prodDesc" class="input" placeholder="Breve descripción">
-            </div>
-          </div>
-          <div class="form-group">
-            <label class="label">Credenciales del producto (lo que verá el comprador)</label>
-            <textarea id="prodCreds" class="textarea" placeholder="Usuario: xxxx&#10;Contraseña: yyyy&#10;PIN: 1234"></textarea>
-          </div>
-          <button class="btn btn-primary" id="addProdBtn"><i class="fas fa-save"></i> Guardar producto</button>
-        </div>
-
-        <div class="card">
-          <h3><i class="fas fa-boxes"></i> Productos registrados</h3>
-          <div class="flex-row" style="margin-bottom:14px;">
-            <div class="form-group" style="margin-bottom:0;">
-              <label class="label">Filtrar por estado</label>
-              <select id="filtroEstado" class="select">
-                <option value="all">Todos</option>
-                <option value="disponible">Disponibles</option>
-                <option value="comprado">Comprados</option>
-              </select>
-            </div>
-          </div>
-          <div id="prodList" class="grid"></div>
-        </div>
-      </section>
-
-      <section id="section-categorias" style="display:none;">
-        <div class="page-header">
-          <h2><i class="fas fa-tags"></i> Gestión de Categorías</h2>
-        </div>
-
-        <div class="card">
-          <h3><i class="fas fa-plus-circle"></i> Nueva categoría</h3>
-          <div class="grid-2">
-            <div class="form-group">
-              <label class="label">Nombre</label>
-              <input id="catNombre" class="input" placeholder="Ej: Streaming">
-            </div>
-            <div class="form-group">
-              <label class="label">Descripción</label>
-              <input id="catDesc" class="input" placeholder="Opcional">
-            </div>
-          </div>
-          <button class="btn btn-primary" id="addCatBtn"><i class="fas fa-save"></i> Guardar categoría</button>
-        </div>
-
-        <div class="card">
-          <h3><i class="fas fa-list"></i> Categorías existentes</h3>
-          <div id="catList"></div>
-        </div>
-      </section>
-
+      </div>
+      <div id="prodList" class="grid"></div>
     </div>
-  </main>
+  </div>
 </div>
 
-<div class="toast-container" id="toastContainer"></div>
-
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const sb = supabase.createClient(
   'https://fmhjuisoibynjgfrqvgj.supabase.co',
@@ -269,42 +143,24 @@ let cats = [], prods = [];
 
 function toast(msg, type='ok'){
   const t = document.createElement('div');
-  t.className = 'toast' + (type==='error'?' error':type==='success'?' success':'');
-  const icon = type==='error'?'fa-exclamation-circle':type==='success'?'fa-check-circle':'fa-info-circle';
-  t.innerHTML = `<i class="fas ${icon}"></i><span>${msg}</span>`;
-  document.getElementById('toastContainer').appendChild(t);
-  setTimeout(()=>t.remove(), 3000);
+  t.className = 'toast' + (type==='error'?' error':'');
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(()=>t.remove(), 2600);
 }
-
 const fmt = (n) => 'Bs ' + parseFloat(n||0).toFixed(2);
 
-document.querySelectorAll('.nav-item').forEach(btn=>{
-  btn.addEventListener('click', ()=>{
-    document.querySelectorAll('.nav-item').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-    const section = btn.dataset.section;
-    document.getElementById('section-productos').style.display = section==='productos'?'':'none';
-    document.getElementById('section-categorias').style.display = section==='categorias'?'':'none';
-    document.getElementById('pageTitle').textContent = section==='productos'?'Admin Tarjetas · Productos':'Admin Tarjetas · Categorías';
+// Tabs
+document.querySelectorAll('.tab').forEach(t=>{
+  t.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+    t.classList.add('active');
+    document.getElementById('tab-productos').style.display = t.dataset.tab==='productos'?'':'none';
+    document.getElementById('tab-categorias').style.display = t.dataset.tab==='categorias'?'':'none';
   });
 });
-document.getElementById('toggleSidebar').addEventListener('click', ()=>document.getElementById('sidebar').classList.toggle('collapsed'));
 
-/* ===== TEMA ===== */
-const themeBtn = document.getElementById('themeBtn');
-const themeIcon = document.getElementById('themeIcon');
-function setTheme(light){
-  document.body.classList.toggle('theme-light', light);
-  themeIcon.className = light ? 'fas fa-sun' : 'fas fa-moon';
-  try{ localStorage.setItem('toktok-theme-cafe', light?'light':'dark'); }catch(e){}
-}
-try{
-  const saved = localStorage.getItem('toktok-theme-cafe');
-  setTheme(saved === 'light');
-}catch(e){ setTheme(false); }
-themeBtn.addEventListener('click', ()=>setTheme(!document.body.classList.contains('theme-light')));
-
-/* ===== CATEGORÍAS ===== */
+// Categorías
 async function loadCats(){
   const { data, error } = await sb.from('categorias_tarjetas').select('*').order('orden',{ascending:true});
   if (error){ toast('Error cargando categorías','error'); return; }
@@ -315,17 +171,14 @@ async function loadCats(){
 
 function renderCats(){
   const el = document.getElementById('catList');
-  if (cats.length===0){
-    el.innerHTML = '<div class="empty-state"><i class="fas fa-inbox" style="font-size:36px;display:block;margin-bottom:12px;opacity:.5;"></i>No hay categorías</div>';
-    return;
-  }
+  if (cats.length===0){ el.innerHTML = '<p style="color:#666;">No hay categorías</p>'; return; }
   el.innerHTML = cats.map(c=>`
     <div class="cat-item">
       <div>
-        <div class="cat-name">${c.nombre}</div>
-        <div class="cat-desc">${c.descripcion||'Sin descripción'}</div>
+        <div style="font-weight:700;">${c.nombre}</div>
+        <div style="font-size:12px;color:#888;">${c.descripcion||'Sin descripción'}</div>
       </div>
-      <button class="btn btn-danger btn-sm" data-del-cat="${c.id}"><i class="fas fa-trash"></i></button>
+      <button class="btn btn-danger" data-del-cat="${c.id}" style="padding:8px 12px;font-size:12px;"><i class="fas fa-trash"></i></button>
     </div>
   `).join('');
   el.querySelectorAll('[data-del-cat]').forEach(b=>{
@@ -346,7 +199,7 @@ document.getElementById('addCatBtn').addEventListener('click', async ()=>{
   if (error){ toast(error.message,'error'); return; }
   document.getElementById('catNombre').value='';
   document.getElementById('catDesc').value='';
-  toast('Categoría creada','success');
+  toast('Categoría creada');
   loadCats();
 });
 
@@ -354,11 +207,11 @@ async function delCat(id){
   if (!confirm('¿Eliminar categoría? Los productos también se eliminarán.')) return;
   const { error } = await sb.from('categorias_tarjetas').delete().eq('id', id);
   if (error){ toast(error.message,'error'); return; }
-  toast('Categoría eliminada','success');
+  toast('Categoría eliminada');
   loadCats(); loadProds();
 }
 
-/* ===== PRODUCTOS ===== */
+// Productos
 async function loadProds(){
   const { data, error } = await sb.from('productos_tarjetas').select('*').order('creado_en',{ascending:false});
   if (error){ toast('Error cargando productos','error'); return; }
@@ -371,7 +224,7 @@ function renderProds(){
   const el = document.getElementById('prodList');
   const list = filtro==='all' ? prods : prods.filter(p=>p.estado===filtro);
   if (list.length===0){
-    el.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-box-open" style="font-size:36px;display:block;margin-bottom:12px;opacity:.5;"></i>No hay productos</div>';
+    el.innerHTML = '<p style="color:#666;grid-column:1/-1;">No hay productos</p>';
     return;
   }
   el.innerHTML = list.map(p=>{
@@ -384,12 +237,12 @@ function renderProds(){
             <div class="prod-name">${p.nombre}</div>
             <span class="badge badge-${p.estado}">${p.estado}</span>
           </div>
-          <div class="prod-cat">${cat?cat.nombre:'Sin categoría'}</div>
+          <div style="font-size:11px;color:#888;margin-bottom:6px;">${cat?cat.nombre:'Sin categoría'}</div>
           <div class="prod-price">${fmt(p.precio)}</div>
-          <div class="prod-creds">${(p.credenciales||'').substring(0,80)}${(p.credenciales||'').length>80?'...':''}</div>
+          <div style="font-size:11px;color:#666;margin-bottom:8px;white-space:pre-wrap;max-height:60px;overflow:hidden;">${(p.credenciales||'').substring(0,80)}${(p.credenciales||'').length>80?'...':''}</div>
           <div style="display:flex;gap:6px;">
-            ${p.estado==='comprado'?`<button class="btn btn-success btn-sm" data-reset="${p.id}" style="flex:1;"><i class="fas fa-undo"></i> Reactivar</button>`:''}
-            <button class="btn btn-danger btn-sm" data-del="${p.id}"><i class="fas fa-trash"></i></button>
+            ${p.estado==='comprado'?`<button class="btn btn-success" data-reset="${p.id}" style="flex:1;padding:8px;font-size:12px;"><i class="fas fa-undo"></i>Reactivar</button>`:''}
+            <button class="btn btn-danger" data-del="${p.id}" style="padding:8px 12px;font-size:12px;"><i class="fas fa-trash"></i></button>
           </div>
         </div>
       </div>
@@ -427,7 +280,7 @@ document.getElementById('addProdBtn').addEventListener('click', async ()=>{
   document.getElementById('prodPrecio').value='';
   document.getElementById('prodDesc').value='';
   document.getElementById('prodCreds').value='';
-  toast('Producto agregado','success');
+  toast('Producto agregado');
   loadProds();
 });
 
@@ -435,7 +288,7 @@ async function delProd(id){
   if (!confirm('¿Eliminar producto?')) return;
   const { error } = await sb.from('productos_tarjetas').delete().eq('id', id);
   if (error){ toast(error.message,'error'); return; }
-  toast('Producto eliminado','success');
+  toast('Producto eliminado');
   loadProds();
 }
 
@@ -445,7 +298,7 @@ async function resetProd(id){
     estado:'disponible', comprado_por:null, comprado_en:null
   }).eq('id', id);
   if (error){ toast(error.message,'error'); return; }
-  toast('Producto reactivado','success');
+  toast('Producto reactivado');
   loadProds();
 }
 
