@@ -77,7 +77,7 @@
     transition: border-color 0.15s;
   }
   .field input:focus, .field select:focus, .field textarea:focus { border-color: #a855f7; }
-  .field input.error { border-color: #f87171; }
+  .field input.error, .field textarea.error, .field select.error { border-color: #f87171; }
   .field .error-msg { color: #f87171; font-size: 11.5px; margin-top: 2px; display: none; }
   .field.has-error .error-msg { display: block; }
   .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
@@ -380,14 +380,14 @@
                 </div>
               </div>
 
-              <div class="field" id="field-creds" style="display:none;">
-                <label for="prodCreds">Credenciales del Producto *</label>
+              <div class="field" id="field-creds">
+                <label for="prodCreds" id="creds-label">Credenciales del Producto *</label>
                 <textarea id="prodCreds" rows="4" placeholder="Usuario: xxxx&#10;Contraseña: yyyy&#10;PIN: 1234"></textarea>
-                <span class="error-msg">Escribe las credenciales</span>
+                <span class="error-msg" id="creds-error-msg">Escribe al menos una credencial</span>
               </div>
-              <div id="creds-hint" style="font-size:11.5px;color:#6a6a85;background:#0f0f1a;border:1px dashed #232334;border-radius:10px;padding:10px 12px;line-height:1.5;">
+              <div id="creds-hint" style="font-size:11.5px;color:#6a6a85;background:#0f0f1a;border:1px dashed #232334;border-radius:10px;padding:10px 12px;line-height:1.5;display:none;">
                 <i class="fas fa-info-circle" style="color:#a855f7;"></i>
-                Las credenciales se agregan desde <strong style="color:#c0c0d0;">Productos Registrados</strong>. Aquí solo se crea el producto.
+                <span id="creds-hint-text">Puedes dejar las credenciales vacías si no deseas modificarlas. Para agregar más credenciales usa el botón <strong style="color:#c0c0d0;">Credenciales</strong> en Productos Registrados.</span>
               </div>
 
               <div class="form-actions">
@@ -841,11 +841,16 @@ function editProd(id) {
   $('prodPrecio').value = p.precio || '';
   $('prodDesc').value = p.descripcion || '';
   $('prodCreds').value = p.credenciales || '';
-  $('field-creds').style.display = 'flex';
-  $('creds-hint').style.display = 'none';
 
-  $('form-title').innerHTML = '<i class="fas fa-pen"></i> Editar Producto';
-  $('submit-text').textContent = 'Actualizar Producto';
+  // Al editar credencial: el campo es visible pero OPCIONAL
+  $('field-creds').style.display = 'flex';
+  $('creds-label').textContent = 'Credenciales del Producto (opcional)';
+  $('creds-error-msg').textContent = '';
+  $('creds-hint').style.display = 'block';
+  $('creds-hint-text').innerHTML = 'Puedes modificar esta credencial o dejarla como está. Para agregar <strong style="color:#c0c0d0;">más credenciales</strong> usa el botón <strong style="color:#c0c0d0;">Credenciales</strong> en Productos Registrados.';
+
+  $('form-title').innerHTML = '<i class="fas fa-pen"></i> Editar Credencial';
+  $('submit-text').textContent = 'Actualizar Credencial';
   $('cancel-edit').style.display = 'inline-flex';
 
   clearErrors();
@@ -854,20 +859,57 @@ function editProd(id) {
   toast('Editando una credencial de "' + (p.nombre || '') + '"', 'info');
 }
 
+function editGroup(nombre, categoriaId, imagen, precio, descripcion) {
+  const items = prods.filter(p =>
+    (p.nombre || '').trim().toLowerCase() === (nombre || '').trim().toLowerCase() &&
+    String(p.categoria_id || '') === String(categoriaId || '') &&
+    parseFloat(p.precio) === parseFloat(precio)
+  );
+  if (!items.length) { toast('Producto no encontrado', 'error'); return; }
+
+  editingId = null;
+  $('prodCategoria').value = categoriaId || '';
+  $('prodNombre').value = nombre || '';
+  $('prodImagen').value = imagen || '';
+  $('prodPrecio').value = precio || '';
+  $('prodDesc').value = descripcion || '';
+  $('prodCreds').value = '';
+
+  // Al editar el producto (grupo): credenciales OPCIONALES y ocultas
+  $('field-creds').style.display = 'none';
+  $('creds-hint').style.display = 'block';
+  $('creds-hint-text').innerHTML = 'Editando datos del producto. Sus ' + items.length + ' credencial(es) no se modifican. Para agregar más credenciales usa el botón <strong style="color:#c0c0d0;">Credenciales</strong> en Productos Registrados.';
+
+  editingGroupKey = {
+    nombre: (nombre || '').trim().toLowerCase(),
+    categoria_id: String(categoriaId || ''),
+    precio: parseFloat(precio)
+  };
+
+  $('form-title').innerHTML = '<i class="fas fa-pen"></i> Editar Producto';
+  $('submit-text').textContent = 'Actualizar Producto';
+  $('cancel-edit').style.display = 'inline-flex';
+  clearErrors();
+  switchTab('productos');
+  toast('Editando "' + (nombre || '') + '"', 'info');
+}
+
 function resetForm() {
   editingId = null;
   editingGroupKey = null;
-  if ($('field-creds')) $('field-creds').style.display = 'none';
-  if ($('creds-hint')) {
-    $('creds-hint').style.display = 'block';
-    $('creds-hint').innerHTML = '<i class="fas fa-info-circle" style="color:#a855f7;"></i> Las credenciales se agregan desde <strong style="color:#c0c0d0;">Productos Registrados</strong>. Aquí solo se crea el producto.';
-  }
+
   $('prodCategoria').value = '';
   $('prodNombre').value = '';
   $('prodImagen').value = '';
   $('prodPrecio').value = '';
   $('prodDesc').value = '';
   $('prodCreds').value = '';
+
+  // Al crear: credenciales VISIBLES y OBLIGATORIAS
+  $('field-creds').style.display = 'flex';
+  $('creds-label').textContent = 'Credenciales del Producto *';
+  $('creds-error-msg').textContent = 'Escribe al menos una credencial';
+  $('creds-hint').style.display = 'none';
 
   clearErrors();
 
@@ -913,7 +955,12 @@ $('prod-form').addEventListener('submit', async function(e) {
   if (!nombre || nombre.length < 3) { showFieldError('field-nombre'); hasErrors = true; }
   if (!imagen_url || !validateUrl(imagen_url)) { showFieldError('field-imagen'); hasErrors = true; }
   if (!precio || precio <= 0) { showFieldError('field-precio'); hasErrors = true; }
-  if (editingId && !credenciales) { showFieldError('field-creds'); hasErrors = true; }
+
+  // Credenciales: OBLIGATORIAS al crear, OPCIONALES al editar
+  if (!editingId && !editingGroupKey && !credenciales) {
+    showFieldError('field-creds');
+    hasErrors = true;
+  }
 
   if (hasErrors) {
     toast('Corrige los errores del formulario', 'error');
@@ -928,12 +975,16 @@ $('prod-form').addEventListener('submit', async function(e) {
 
   try {
     if (editingId) {
+      // Editar una credencial: solo actualiza credenciales si se escribió algo
+      const updateData = { categoria_id, nombre, imagen_url, precio, descripcion };
+      if (credenciales) updateData.credenciales = credenciales;
       const { error } = await supabaseClient.from(TABLA_PROD)
-        .update({ categoria_id, nombre, imagen_url, precio, descripcion, credenciales })
+        .update(updateData)
         .eq('id', editingId);
       if (error) throw error;
-      toast('Producto actualizado correctamente', 'success');
+      toast('Credencial actualizada correctamente', 'success');
     } else if (editingGroupKey) {
+      // Editar producto (grupo): NO toca credenciales
       const ids = prods.filter(p =>
         (p.nombre || '').trim().toLowerCase() === editingGroupKey.nombre &&
         String(p.categoria_id || '') === editingGroupKey.categoria_id &&
@@ -946,7 +997,7 @@ $('prod-form').addEventListener('submit', async function(e) {
       if (error) throw error;
       toast('Producto actualizado (' + ids.length + ' credencial/es)', 'success');
     } else {
-      if (!credenciales) throw new Error('Agrega las credenciales desde Productos Registrados');
+      // Crear producto nuevo: credenciales OBLIGATORIAS
       const { error } = await supabaseClient.from(TABLA_PROD)
         .insert([{ categoria_id, nombre, imagen_url, precio, descripcion, credenciales, estado: 'disponible' }]);
       if (error) throw error;
@@ -1075,6 +1126,7 @@ document.addEventListener('keydown', e => {
 (async () => {
   await loadCats();
   await loadProds();
+  resetForm(); // Estado inicial: crear producto con credenciales obligatorias
 })();
 
 // =============================================
@@ -1183,42 +1235,6 @@ $('confirm-masivo').addEventListener('click', async function() {
     btn.innerHTML = originalHtml;
   }
 });
-
-// =============================================
-// EDITAR GRUPO (PRODUCTO COMPLETO)
-// =============================================
-function editGroup(nombre, categoriaId, imagen, precio, descripcion) {
-  const items = prods.filter(p =>
-    (p.nombre || '').trim().toLowerCase() === (nombre || '').trim().toLowerCase() &&
-    String(p.categoria_id || '') === String(categoriaId || '') &&
-    parseFloat(p.precio) === parseFloat(precio)
-  );
-  if (!items.length) { toast('Producto no encontrado', 'error'); return; }
-
-  editingId = null;
-  $('prodCategoria').value = categoriaId || '';
-  $('prodNombre').value = nombre || '';
-  $('prodImagen').value = imagen || '';
-  $('prodPrecio').value = precio || '';
-  $('prodDesc').value = descripcion || '';
-  $('prodCreds').value = '';
-  $('field-creds').style.display = 'none';
-  $('creds-hint').style.display = 'block';
-  $('creds-hint').innerHTML = '<i class="fas fa-info-circle" style="color:#a855f7;"></i> Editando datos del producto. Sus ' + items.length + ' credencial(es) no se modifican.';
-
-  editingGroupKey = {
-    nombre: (nombre || '').trim().toLowerCase(),
-    categoria_id: String(categoriaId || ''),
-    precio: parseFloat(precio)
-  };
-
-  $('form-title').innerHTML = '<i class="fas fa-pen"></i> Editar Producto';
-  $('submit-text').textContent = 'Actualizar Producto';
-  $('cancel-edit').style.display = 'inline-flex';
-  clearErrors();
-  switchTab('productos');
-  toast('Editando "' + (nombre || '') + '"', 'info');
-}
 
 // =============================================
 // ELIMINAR GRUPO (PRODUCTO COMPLETO)
