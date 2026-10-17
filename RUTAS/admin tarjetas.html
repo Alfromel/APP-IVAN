@@ -158,15 +158,22 @@
   .empty-state i { font-size: 34px; color: #2a2a3a; }
 
   /* GRID PRODUCTOS */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; padding: 20px 22px; }
-  .prod-card { background: #0f0f1a; border: 1px solid #232334; border-radius: 14px; overflow: hidden; transition: all 0.2s; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; padding: 14px 16px; }
+  .prod-card { background: #0f0f1a; border: 1px solid #232334; border-radius: 10px; overflow: hidden; transition: all 0.2s; }
   .prod-card:hover { border-color: #a855f7; transform: translateY(-2px); }
-  .prod-card img { width: 100%; aspect-ratio: 1; object-fit: cover; display: block; background: #0b0b12; }
-  .prod-body { padding: 12px; }
-  .prod-name { font-weight: 700; font-size: 14px; margin-bottom: 4px; color: #e0e0f0; }
-  .prod-price { color: #a855f7; font-weight: 800; font-size: 16px; margin: 8px 0; }
+  .prod-card img { width: 100%; aspect-ratio: 16/10; object-fit: cover; display: block; background: #0b0b12; }
+  .prod-body { padding: 8px 10px; }
+  .prod-name { font-weight: 700; font-size: 12.5px; margin-bottom: 2px; color: #e0e0f0; }
   .prod-cat { font-size: 11px; color: #6a6a85; margin-bottom: 6px; }
   .prod-creds { font-size: 11px; color: #6a6a85; margin-bottom: 10px; white-space: pre-wrap; max-height: 60px; overflow: hidden; background: #13131f; padding: 8px; border-radius: 8px; border: 1px solid #1d1d2b; }
+  .prod-price { color: #a855f7; font-weight: 800; font-size: 13.5px; margin: 2px 0 4px; }
+  .creds-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 8px; max-height: 140px; overflow-y: auto; }
+  .cred-row { display: flex; align-items: center; justify-content: space-between; gap: 6px; background: #13131f; border: 1px solid #1d1d2b; border-radius: 7px; padding: 5px 6px; }
+  .cred-row .cred-num { color: #a855f7; font-weight: 700; font-size: 10px; flex-shrink: 0; }
+  .cred-row .cred-text { flex: 1; min-width: 0; font-size: 10.5px; color: #9a9ab0; white-space: pre-wrap; word-break: break-word; }
+  .cred-row .btn-sm { padding: 3px 6px; font-size: 10px; border-radius: 6px; }
+  .cred-row.comprada { border-color: #3a1a1a; background: #1a1016; }
+  .cred-row.comprada .cred-text { color: #b98a8a; text-decoration: line-through; }
   .badge { display: inline-block; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.4px; }
   .badge-disponible { background: rgba(5,150,105,.15); color: #10b981; }
   .badge-comprado { background: rgba(220,38,38,.15); color: #ef4444; }
@@ -236,8 +243,9 @@
     </div>
     <nav class="sidebar-nav">
       <div class="nav-section">Administración</div>
-      <button class="nav-item active" data-tab="productos"><i class="fas fa-box"></i><span>Productos</span></button>
       <button class="nav-item" data-tab="categorias"><i class="fas fa-tags"></i><span>Categorías</span></button>
+      <button class="nav-item active" data-tab="productos"><i class="fas fa-box"></i><span>Productos</span></button>
+      <button class="nav-item" data-tab="registrados"><i class="fas fa-list"></i><span>Productos Registrados</span></button>
     </nav>
     <div class="sidebar-footer">
       <div class="avatar">A</div>
@@ -260,99 +268,9 @@
 
       <!-- TABS -->
       <div class="tabs">
-        <button class="tab active" data-tab="productos"><i class="fas fa-box"></i> Productos</button>
         <button class="tab" data-tab="categorias"><i class="fas fa-tags"></i> Categorías</button>
-      </div>
-
-      <!-- ================= PRODUCTOS ================= -->
-      <div id="tab-productos" class="main-content">
-        <!-- COLUMNA IZQUIERDA -->
-        <div style="display:flex; flex-direction:column; gap:20px;">
-
-          <!-- LISTA PRODUCTOS -->
-          <div class="card">
-            <div class="card-header">
-              <div class="card-title">
-                <i class="fas fa-list"></i> Productos Registrados
-                <span class="counter-badge" id="prod-counter">0</span>
-              </div>
-              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-                <select class="filter-select" id="filtroEstado">
-                  <option value="all">Todos</option>
-                  <option value="disponible">Disponibles</option>
-                  <option value="comprado">Comprados</option>
-                </select>
-                <div class="search-box">
-                  <i class="fas fa-search"></i>
-                  <input type="text" id="search-input" placeholder="Buscar producto...">
-                </div>
-                <button class="btn btn-sm" id="btn-refresh" title="Refrescar"><i class="fas fa-sync"></i></button>
-              </div>
-            </div>
-            <div id="prodList" class="grid"></div>
-          </div>
-        </div>
-
-        <!-- FORMULARIO -->
-        <div class="card">
-          <div class="card-header">
-            <div class="card-title" id="form-title">
-              <i class="fas fa-plus-circle"></i> Agregar Nuevo Producto
-            </div>
-          </div>
-          <div class="card-body">
-            <form id="prod-form" style="display:flex; flex-direction:column; gap:14px;">
-              <div class="field-row">
-                <div class="field" id="field-categoria">
-                  <label for="prodCategoria">Categoría *</label>
-                  <select id="prodCategoria" required>
-                    <option value="">Selecciona categoría</option>
-                  </select>
-                  <span class="error-msg">Selecciona una categoría</span>
-                </div>
-                <div class="field" id="field-nombre">
-                  <label for="prodNombre">Nombre del Producto *</label>
-                  <input type="text" id="prodNombre" placeholder="Ej: Netflix 1 mes" required maxlength="200">
-                  <span class="error-msg">Mínimo 3 caracteres</span>
-                </div>
-              </div>
-
-              <div class="field" id="field-imagen">
-                <label for="prodImagen">URL de la Imagen *</label>
-                <input type="url" id="prodImagen" placeholder="https://ejemplo.com/imagen.jpg" required>
-                <span class="error-msg">Ingresa una URL válida (http o https)</span>
-              </div>
-
-              <div class="field-row">
-                <div class="field" id="field-precio">
-                  <label for="prodPrecio">Precio (Bs) *</label>
-                  <input type="number" step="0.01" min="0" id="prodPrecio" placeholder="50.00" required>
-                  <span class="error-msg">Ingresa un precio válido</span>
-                </div>
-                <div class="field">
-                  <label for="prodDesc">Descripción (opcional)</label>
-                  <input type="text" id="prodDesc" placeholder="Breve descripción">
-                </div>
-              </div>
-
-              <div class="field" id="field-creds">
-                <label for="prodCreds">Credenciales del Producto *</label>
-                <textarea id="prodCreds" rows="4" placeholder="Usuario: xxxx&#10;Contraseña: yyyy&#10;PIN: 1234"></textarea>
-                <span class="error-msg">Escribe las credenciales</span>
-              </div>
-
-              <div class="form-actions">
-                <button type="submit" class="btn btn-primary" id="btn-submit">
-                  <i class="fas fa-save"></i>
-                  <span id="submit-text">Guardar Producto</span>
-                </button>
-                <button type="button" id="cancel-edit" class="btn btn-secondary" style="display:none;">
-                  <i class="fas fa-times"></i> Cancelar Edición
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <button class="tab active" data-tab="productos"><i class="fas fa-box"></i> Productos</button>
+        <button class="tab" data-tab="registrados"><i class="fas fa-list"></i> Productos Registrados</button>
       </div>
 
       <!-- ================= CATEGORÍAS ================= -->
@@ -400,6 +318,117 @@
         </div>
       </div>
 
+      <!-- ================= PRODUCTOS ================= -->
+      <div id="tab-productos" class="main-content">
+        <!-- LISTA DE PRODUCTOS (solo nombres) -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-list"></i> Productos
+              <span class="counter-badge" id="prod-counter">0</span>
+            </div>
+            <button class="btn btn-sm" id="btn-refresh" title="Refrescar"><i class="fas fa-sync"></i></button>
+          </div>
+          <div class="card-body" style="padding:14px 16px;">
+            <div class="search-box" style="margin-bottom:6px;">
+              <i class="fas fa-search"></i>
+              <input type="text" id="search-input" placeholder="Buscar producto..." style="width:100%;">
+            </div>
+            <div id="prodNameList"></div>
+          </div>
+        </div>
+
+        <!-- FORMULARIO -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title" id="form-title">
+              <i class="fas fa-plus-circle"></i> Agregar Nuevo Producto
+            </div>
+          </div>
+          <div class="card-body">
+            <form id="prod-form" style="display:flex; flex-direction:column; gap:14px;">
+              <div class="field-row">
+                <div class="field" id="field-categoria">
+                  <label for="prodCategoria">Categoría *</label>
+                  <select id="prodCategoria" required>
+                    <option value="">Selecciona categoría</option>
+                  </select>
+                  <span class="error-msg">Selecciona una categoría</span>
+                </div>
+                <div class="field" id="field-nombre">
+                  <label for="prodNombre">Nombre del Producto *</label>
+                  <input type="text" id="prodNombre" placeholder="Ej: Netflix 1 mes" required maxlength="200">
+                  <span class="error-msg">Mínimo 3 caracteres</span>
+                </div>
+              </div>
+
+              <div class="field" id="field-imagen">
+                <label for="prodImagen">URL de la Imagen *</label>
+                <input type="url" id="prodImagen" placeholder="https://ejemplo.com/imagen.jpg" required>
+                <span class="error-msg">Ingresa una URL válida (http o https)</span>
+              </div>
+
+              <div class="field-row">
+                <div class="field" id="field-precio">
+                  <label for="prodPrecio">Precio (Bs) *</label>
+                  <input type="number" step="0.01" min="0" id="prodPrecio" placeholder="50.00" required>
+                  <span class="error-msg">Ingresa un precio válido</span>
+                </div>
+                <div class="field">
+                  <label for="prodDesc">Descripción (opcional)</label>
+                  <input type="text" id="prodDesc" placeholder="Breve descripción">
+                </div>
+              </div>
+
+              <div class="field" id="field-creds" style="display:none;">
+                <label for="prodCreds">Credenciales del Producto *</label>
+                <textarea id="prodCreds" rows="4" placeholder="Usuario: xxxx&#10;Contraseña: yyyy&#10;PIN: 1234"></textarea>
+                <span class="error-msg">Escribe las credenciales</span>
+              </div>
+              <div id="creds-hint" style="font-size:11.5px;color:#6a6a85;background:#0f0f1a;border:1px dashed #232334;border-radius:10px;padding:10px 12px;line-height:1.5;">
+                <i class="fas fa-info-circle" style="color:#a855f7;"></i>
+                Las credenciales se agregan desde <strong style="color:#c0c0d0;">Productos Registrados</strong>. Aquí solo se crea el producto.
+              </div>
+
+              <div class="form-actions">
+                <button type="submit" class="btn btn-primary" id="btn-submit">
+                  <i class="fas fa-save"></i>
+                  <span id="submit-text">Guardar Producto</span>
+                </button>
+                <button type="button" id="cancel-edit" class="btn btn-secondary" style="display:none;">
+                  <i class="fas fa-times"></i> Cancelar Edición
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- ================= PRODUCTOS REGISTRADOS ================= -->
+      <div id="tab-registrados" style="display:none;">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title">
+              <i class="fas fa-list"></i> Productos Registrados
+              <span class="counter-badge" id="prod-counter-full">0</span>
+            </div>
+            <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+              <select class="filter-select" id="filtroEstado-full">
+                <option value="all">Todos</option>
+                <option value="disponible">Disponibles</option>
+                <option value="comprado">Comprados</option>
+              </select>
+              <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="search-input-full" placeholder="Buscar producto...">
+              </div>
+              <button class="btn btn-sm" id="btn-refresh-full" title="Refrescar"><i class="fas fa-sync"></i></button>
+            </div>
+          </div>
+          <div id="prodListFull" class="grid"></div>
+        </div>
+      </div>
+
     </div>
   </main>
 </div>
@@ -424,6 +453,57 @@
 
 <div class="toast-container" id="toastContainer"></div>
 
+<!-- MODAL CARGA MASIVA -->
+<div id="masivo-modal" class="modal-overlay">
+  <div class="modal" style="max-width:620px;">
+    <div class="modal-header">
+      <h3 style="color:#f0f0f5;"><i class="fas fa-layer-group" style="color:#a855f7;"></i> Agregar credenciales masivas</h3>
+      <button class="btn btn-sm" id="masivo-x-btn"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="modal-body">
+      <div class="field" id="field-masivo-categoria" style="margin-bottom:12px;">
+        <label for="masivoCategoria">Categoría *</label>
+        <select id="masivoCategoria"></select>
+        <span class="error-msg">Selecciona una categoría</span>
+      </div>
+      <div class="field" id="field-masivo-nombre" style="margin-bottom:12px;">
+        <label for="masivoNombre">Nombre del Producto *</label>
+        <input type="text" id="masivoNombre" placeholder="Ej: Netflix 1 mes" maxlength="200">
+        <span class="error-msg">Mínimo 3 caracteres</span>
+      </div>
+      <div class="field" id="field-masivo-imagen" style="margin-bottom:12px;">
+        <label for="masivoImagen">URL de la Imagen *</label>
+        <input type="url" id="masivoImagen" placeholder="https://ejemplo.com/imagen.jpg">
+        <span class="error-msg">Ingresa una URL válida (http o https)</span>
+      </div>
+      <div class="field-row" style="margin-bottom:12px;">
+        <div class="field" id="field-masivo-precio">
+          <label for="masivoPrecio">Precio (Bs) *</label>
+          <input type="number" step="0.01" min="0" id="masivoPrecio" placeholder="50.00">
+          <span class="error-msg">Ingresa un precio válido</span>
+        </div>
+        <div class="field">
+          <label for="masivoDesc">Descripción (opcional)</label>
+          <input type="text" id="masivoDesc" placeholder="Breve descripción">
+        </div>
+      </div>
+      <div class="field" id="field-masivo-creds">
+        <label for="masivoCreds">Credenciales (separadas por coma) *</label>
+        <textarea id="masivoCreds" rows="8" placeholder="Usuario: xxxx, Contraseña: yyyy, PIN: 1234, Usuario: aaaa, Contraseña: bbbb"></textarea>
+        <span class="error-msg">Escribe al menos una credencial</span>
+      </div>
+      <div style="margin-top:10px;font-size:12px;color:#6a6a85;">
+        Separa cada credencial con una <strong style="color:#a855f7;">coma (,)</strong>.<br>
+        Detectadas: <strong id="masivo-count" style="color:#4ade80;">0</strong>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button id="cancel-masivo" class="btn">Cancelar</button>
+      <button id="confirm-masivo" class="btn btn-success"><i class="fas fa-upload"></i> Guardar todas</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // =============================================
 // SUPABASE
@@ -445,6 +525,7 @@ let cats = [];
 let prods = [];
 let filteredProds = [];
 let editingId = null;
+let editingGroupKey = null;
 let deleteTargetId = null;
 let searchTerm = '';
 
@@ -496,6 +577,14 @@ function switchTab(tabName) {
   });
   $('tab-productos').style.display = tabName === 'productos' ? 'grid' : 'none';
   $('tab-categorias').style.display = tabName === 'categorias' ? '' : 'none';
+  $('tab-registrados').style.display = tabName === 'registrados' ? 'block' : 'none';
+
+  const titles = {
+    productos: '<i class="fas fa-box"></i> Productos',
+    categorias: '<i class="fas fa-tags"></i> Categorías',
+    registrados: '<i class="fas fa-list"></i> Productos Registrados'
+  };
+  $('page-title').innerHTML = titles[tabName] || titles.productos;
 }
 
 document.querySelectorAll('.tab').forEach(t => {
@@ -525,8 +614,9 @@ async function loadCats() {
 }
 
 async function loadProds() {
-  const listEl = $('prodList');
-  listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-spinner fa-spin"></i><span>Cargando productos...</span></div>`;
+  const loading = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-spinner fa-spin"></i><span>Cargando productos...</span></div>`;
+  $('prodListFull').innerHTML = loading;
+  if ($('prodNameList')) $('prodNameList').innerHTML = loading;
   try {
     const { data, error } = await supabaseClient.from(TABLA_PROD).select('*').order('creado_en', { ascending: false });
     if (error) throw error;
@@ -538,82 +628,176 @@ async function loadProds() {
     console.error(error);
     setStatus(false, 'Error de conexión');
     toast('Error al cargar productos: ' + error.message, 'error');
-    listEl.innerHTML = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-exclamation-triangle" style="color:#fbbf24;"></i><span style="color:#f87171;">No se pudieron cargar los productos</span></div>`;
+    const err = `<div class="empty-state" style="grid-column:1/-1;"><i class="fas fa-exclamation-triangle" style="color:#fbbf24;"></i><span style="color:#f87171;">No se pudieron cargar los productos</span></div>`;
+    $('prodListFull').innerHTML = err;
   }
 }
 
 function updateCounters() {
-  $('prod-counter').textContent = prods.length;
+  $('prod-counter-full').textContent = prods.length;
+  $('prod-counter').textContent = groupProds(prods).length;
   $('cat-counter').textContent = cats.length;
+}
+
+function groupProds(list) {
+  const map = new Map();
+  list.forEach(p => {
+    const key = [p.categoria_id || '', (p.nombre || '').trim().toLowerCase(), p.precio].join('|');
+    if (!map.has(key)) map.set(key, []);
+    map.get(key).push(p);
+  });
+  return Array.from(map.values());
 }
 
 // =============================================
 // FILTROS Y BÚSQUEDA
 // =============================================
 function applyFilters() {
-  const filtro = $('filtroEstado').value;
-  searchTerm = $('search-input').value.trim().toLowerCase();
+  const filtro = $('filtroEstado-full').value;
+  searchTerm = $('search-input-full').value.trim().toLowerCase();
 
   filteredProds = prods.filter(p => {
-    const matchEstado = filtro === 'all' || p.estado === filtro;
     const matchSearch = !searchTerm ||
       (p.nombre || '').toLowerCase().includes(searchTerm) ||
-      (p.descripcion || '').toLowerCase().includes(searchTerm);
-    return matchEstado && matchSearch;
+      (p.descripcion || '').toLowerCase().includes(searchTerm) ||
+      (p.credenciales || '').toLowerCase().includes(searchTerm);
+    return matchSearch;
   });
 
+  if (filtro !== 'all') {
+    filteredProds = groupProds(filteredProds)
+      .filter(g => g.some(p => p.estado === filtro))
+      .flat();
+  }
+
   renderProds();
+  renderProdNames();
 }
 
-$('filtroEstado').addEventListener('change', applyFilters);
-$('search-input').addEventListener('input', applyFilters);
+$('filtroEstado-full').addEventListener('change', applyFilters);
+$('search-input-full').addEventListener('input', applyFilters);
+$('search-input').addEventListener('input', renderProdNames);
+
+// =============================================
+// LISTA DE PRODUCTOS (SOLO NOMBRES)
+// =============================================
+function renderProdNames() {
+  const el = $('prodNameList');
+  if (!el) return;
+
+  const q = $('search-input').value.trim().toLowerCase();
+  let grupos = groupProds(prods);
+  if (q) grupos = grupos.filter(g => (g[0].nombre || '').toLowerCase().includes(q));
+
+  if (!grupos.length) {
+    el.innerHTML = `<div class="empty-state" style="padding:26px 10px;"><i class="fas fa-box-open"></i><span style="font-size:12.5px;">${q ? 'Sin resultados' : 'Aún no hay productos'}</span></div>`;
+    return;
+  }
+
+  el.innerHTML = grupos.map(g => {
+    const first = g[0];
+    const cat = cats.find(c => String(c.id) === String(first.categoria_id));
+    return `
+      <div class="cat-item" style="margin-bottom:8px;padding:10px 12px;">
+        <div style="min-width:0;">
+          <div class="cat-name" style="font-size:13px;">${escapeHtml(first.nombre || '')}</div>
+          <div class="cat-desc">${escapeHtml(cat ? cat.nombre : 'Sin categoría')} · ${fmt(first.precio)} · ${g.length} cred.</div>
+        </div>
+        <button class="btn btn-sm" data-name-edit="${escapeHtml(first.nombre)}" data-cat="${escapeHtml(first.categoria_id)}" data-img="${escapeHtml(first.imagen_url)}" data-price="${escapeHtml(first.precio)}" data-desc="${escapeHtml(first.descripcion || '')}" title="Editar producto"><i class="fas fa-pen"></i></button>
+      </div>`;
+  }).join('');
+
+  el.querySelectorAll('[data-name-edit]').forEach(b => b.addEventListener('click', () => {
+    editGroup(b.dataset.nameEdit, b.dataset.cat, b.dataset.img, b.dataset.price, b.dataset.desc);
+    setTimeout(() => $('prod-form').scrollIntoView({ behavior: 'smooth', block: 'center' }), 80);
+  }));
+}
 
 // =============================================
 // RENDER PRODUCTOS
 // =============================================
 function renderProds() {
-  const el = $('prodList');
+  const fallback = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect width='300' height='300' fill='%2313131f'/%3E%3Ctext x='150' y='155' text-anchor='middle' fill='%236a6a85' font-size='14' font-family='Arial'%3ESin imagen%3C/text%3E%3C/svg%3E";
 
-  if (!filteredProds.length) {
-    const hayFiltro = searchTerm || $('filtroEstado').value !== 'all';
-    el.innerHTML = `
+  const grupos = groupProds(filteredProds);
+
+  const cardHtml = (g) => {
+    const first = g[0];
+    const cat = cats.find(c => String(c.id) === String(first.categoria_id));
+    const isEditing = g.some(p => String(editingId) === String(p.id));
+    const disp = g.filter(p => p.estado === 'disponible').length;
+    const comp = g.filter(p => p.estado === 'comprado').length;
+    const visibles = g.slice().reverse();
+
+    return `
+      <div class="prod-card" style="${isEditing ? 'border-color:#a855f7;' : ''}">
+        <img src="${escapeHtml(first.imagen_url || '')}" alt=""
+          onerror="this.onerror=null; this.src='${fallback}';">
+        <div class="prod-body">
+          <div style="display:flex;justify-content:space-between;align-items:start;gap:6px;">
+            <div class="prod-name">${escapeHtml(first.nombre || '')}</div>
+            <span class="badge badge-${disp > 0 ? 'disponible' : 'comprado'}">${disp} disp.</span>
+          </div>
+          <div class="prod-cat">${escapeHtml(cat ? cat.nombre : 'Sin categoría')}</div>
+          <div class="prod-price">${fmt(first.precio)}</div>
+          <div style="display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;">
+            <span class="tag activo" style="font-size:10px;padding:2px 7px;">${disp} disp.</span>
+            ${comp ? `<span class="tag inactivo" style="font-size:10px;padding:2px 7px;">${comp} comp.</span>` : ''}
+          </div>
+          <div class="creds-list">
+            ${visibles.map((p, i) => `
+              <div class="cred-row ${p.estado === 'comprado' ? 'comprada' : ''}">
+                <span class="cred-num">#${i + 1}</span>
+                <span class="cred-text">${escapeHtml(p.credenciales || '')}</span>
+                ${p.estado === 'comprado'
+                  ? `<button class="btn btn-success btn-sm" data-reset="${escapeHtml(p.id)}" title="Reactivar"><i class="fas fa-undo"></i></button>`
+                  : `<button class="btn btn-sm" data-edit="${escapeHtml(p.id)}" title="Editar credencial"><i class="fas fa-pen"></i></button>
+                     <button class="btn btn-sm btn-danger" data-del="${escapeHtml(p.id)}" title="Eliminar credencial"><i class="fas fa-trash"></i></button>`}
+              </div>
+            `).join('')}
+          </div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;">
+            <button class="btn btn-sm btn-success" data-add="${escapeHtml(first.nombre)}" data-cat="${escapeHtml(first.categoria_id)}" data-img="${escapeHtml(first.imagen_url)}" data-price="${escapeHtml(first.precio)}" data-desc="${escapeHtml(first.descripcion || '')}" style="justify-content:center;font-size:10.5px;"><i class="fas fa-plus"></i> Credenciales</button>
+            <button class="btn btn-sm" data-edit-group="${escapeHtml(first.nombre)}" data-cat="${escapeHtml(first.categoria_id)}" data-img="${escapeHtml(first.imagen_url)}" data-price="${escapeHtml(first.precio)}" data-desc="${escapeHtml(first.descripcion || '')}" style="justify-content:center;font-size:10.5px;" title="Editar producto"><i class="fas fa-pen"></i> Editar</button>
+            <button class="btn btn-sm btn-danger" data-del-group="${escapeHtml(first.nombre)}" data-del-cat="${escapeHtml(first.categoria_id)}" data-del-price="${escapeHtml(first.precio)}" style="grid-column:1/-1;justify-content:center;font-size:10.5px;" title="Eliminar producto completo"><i class="fas fa-trash"></i> Eliminar producto</button>
+          </div>
+        </div>
+      </div>
+    `;
+  };
+
+  const emptyHtml = (hayFiltro) => `
       <div class="empty-state" style="grid-column:1/-1;">
         <i class="fas fa-${hayFiltro ? 'search' : 'box-open'}"></i>
         <span style="color:#8a8aa0;font-weight:500;">${hayFiltro ? 'Sin resultados' : 'No hay productos'}</span>
         <span style="font-size:12px;">${hayFiltro ? 'Prueba con otro filtro' : 'Agrega tu primer producto'}</span>
       </div>`;
-    return;
-  }
 
-  const fallback = "data:image/svg+xml;charset=UTF-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Crect width='300' height='300' fill='%2313131f'/%3E%3Ctext x='150' y='155' text-anchor='middle' fill='%236a6a85' font-size='14' font-family='Arial'%3ESin imagen%3C/text%3E%3C/svg%3E";
+  const bind = (el) => {
+    el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => openDeleteModal(b.dataset.del)));
+    el.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', () => resetProd(b.dataset.reset)));
+    el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editProd(b.dataset.edit)));
+    el.querySelectorAll('[data-add]').forEach(b => b.addEventListener('click', () => {
+      openMasivoModal();
+      $('masivoCategoria').value = b.dataset.cat || '';
+      $('masivoNombre').value = b.dataset.add || '';
+      $('masivoImagen').value = b.dataset.img || '';
+      $('masivoPrecio').value = b.dataset.price || '';
+      $('masivoDesc').value = b.dataset.desc || '';
+    }));
+    el.querySelectorAll('[data-edit-group]').forEach(b => b.addEventListener('click', () => editGroup(b.dataset.editGroup, b.dataset.cat, b.dataset.img, b.dataset.price, b.dataset.desc)));
+    el.querySelectorAll('[data-del-group]').forEach(b => b.addEventListener('click', () => delGroup(b.dataset.delGroup, b.dataset.delCat, b.dataset.delPrice)));
+  };
 
-  el.innerHTML = filteredProds.map(p => {
-    const cat = cats.find(c => String(c.id) === String(p.categoria_id));
-    return `
-      <div class="prod-card" style="${String(editingId) === String(p.id) ? 'border-color:#a855f7;' : ''}">
-        <img src="${escapeHtml(p.imagen_url || '')}" alt=""
-          onerror="this.onerror=null; this.src='${fallback}';">
-        <div class="prod-body">
-          <div style="display:flex;justify-content:space-between;align-items:start;gap:8px;">
-            <div class="prod-name">${escapeHtml(p.nombre || '')}</div>
-            <span class="badge badge-${p.estado}">${p.estado}</span>
-          </div>
-          <div class="prod-cat">${escapeHtml(cat ? cat.nombre : 'Sin categoría')}</div>
-          <div class="prod-price">${fmt(p.precio)}</div>
-          <div class="prod-creds">${escapeHtml((p.credenciales || '').substring(0, 80))}${(p.credenciales || '').length > 80 ? '...' : ''}</div>
-          <div style="display:flex;gap:6px;">
-            ${p.estado === 'comprado' ? `<button class="btn btn-success btn-sm" data-reset="${escapeHtml(p.id)}" style="flex:1;"><i class="fas fa-undo"></i> Reactivar</button>` : ''}
-            <button class="btn btn-sm" data-edit="${escapeHtml(p.id)}" title="Editar"><i class="fas fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" data-del="${escapeHtml(p.id)}" title="Eliminar"><i class="fas fa-trash"></i></button>
-          </div>
-        </div>
-      </div>
-    `;
-  }).join('');
-
-  el.querySelectorAll('[data-del]').forEach(b => b.addEventListener('click', () => openDeleteModal(b.dataset.del)));
-  el.querySelectorAll('[data-reset]').forEach(b => b.addEventListener('click', () => resetProd(b.dataset.reset)));
-  el.querySelectorAll('[data-edit]').forEach(b => b.addEventListener('click', () => editProd(b.dataset.edit)));
+  [
+    { el: $('prodListFull'), filtro: $('filtroEstado-full').value, hay: $('search-input-full').value.trim() || $('filtroEstado-full').value !== 'all' }
+  ].forEach(({ el, filtro, hay }) => {
+    const visibles = !filteredProds.length
+      ? []
+      : grupos.map(g => filtro === 'all' ? g : g.filter(p => p.estado === filtro)).filter(g => g.length);
+    el.innerHTML = visibles.length ? visibles.map(cardHtml).join('') : emptyHtml(hay);
+    bind(el);
+  });
 }
 
 // =============================================
@@ -650,12 +834,15 @@ function editProd(id) {
   if (!p) { toast('Producto no encontrado', 'error'); return; }
 
   editingId = id;
+  editingGroupKey = null;
   $('prodCategoria').value = p.categoria_id || '';
   $('prodNombre').value = p.nombre || '';
   $('prodImagen').value = p.imagen_url || '';
   $('prodPrecio').value = p.precio || '';
   $('prodDesc').value = p.descripcion || '';
   $('prodCreds').value = p.credenciales || '';
+  $('field-creds').style.display = 'flex';
+  $('creds-hint').style.display = 'none';
 
   $('form-title').innerHTML = '<i class="fas fa-pen"></i> Editar Producto';
   $('submit-text').textContent = 'Actualizar Producto';
@@ -663,11 +850,18 @@ function editProd(id) {
 
   clearErrors();
   renderProds();
-  $('prod-form').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  switchTab('registrados');
+  toast('Editando una credencial de "' + (p.nombre || '') + '"', 'info');
 }
 
 function resetForm() {
   editingId = null;
+  editingGroupKey = null;
+  if ($('field-creds')) $('field-creds').style.display = 'none';
+  if ($('creds-hint')) {
+    $('creds-hint').style.display = 'block';
+    $('creds-hint').innerHTML = '<i class="fas fa-info-circle" style="color:#a855f7;"></i> Las credenciales se agregan desde <strong style="color:#c0c0d0;">Productos Registrados</strong>. Aquí solo se crea el producto.';
+  }
   $('prodCategoria').value = '';
   $('prodNombre').value = '';
   $('prodImagen').value = '';
@@ -719,7 +913,7 @@ $('prod-form').addEventListener('submit', async function(e) {
   if (!nombre || nombre.length < 3) { showFieldError('field-nombre'); hasErrors = true; }
   if (!imagen_url || !validateUrl(imagen_url)) { showFieldError('field-imagen'); hasErrors = true; }
   if (!precio || precio <= 0) { showFieldError('field-precio'); hasErrors = true; }
-  if (!credenciales) { showFieldError('field-creds'); hasErrors = true; }
+  if (editingId && !credenciales) { showFieldError('field-creds'); hasErrors = true; }
 
   if (hasErrors) {
     toast('Corrige los errores del formulario', 'error');
@@ -739,7 +933,20 @@ $('prod-form').addEventListener('submit', async function(e) {
         .eq('id', editingId);
       if (error) throw error;
       toast('Producto actualizado correctamente', 'success');
+    } else if (editingGroupKey) {
+      const ids = prods.filter(p =>
+        (p.nombre || '').trim().toLowerCase() === editingGroupKey.nombre &&
+        String(p.categoria_id || '') === editingGroupKey.categoria_id &&
+        parseFloat(p.precio) === editingGroupKey.precio
+      ).map(p => p.id);
+      if (!ids.length) throw new Error('No se encontraron registros de este producto');
+      const { error } = await supabaseClient.from(TABLA_PROD)
+        .update({ categoria_id, nombre, imagen_url, precio, descripcion })
+        .in('id', ids);
+      if (error) throw error;
+      toast('Producto actualizado (' + ids.length + ' credencial/es)', 'success');
     } else {
+      if (!credenciales) throw new Error('Agrega las credenciales desde Productos Registrados');
       const { error } = await supabaseClient.from(TABLA_PROD)
         .insert([{ categoria_id, nombre, imagen_url, precio, descripcion, credenciales, estado: 'disponible' }]);
       if (error) throw error;
@@ -856,6 +1063,7 @@ async function resetProd(id) {
 // =============================================
 $('toggleSidebar').addEventListener('click', () => $('sidebar').classList.toggle('collapsed'));
 $('btn-refresh').addEventListener('click', () => { toast('Actualizando...', 'info'); loadProds(); });
+$('btn-refresh-full').addEventListener('click', () => { toast('Actualizando...', 'info'); loadProds(); });
 
 document.addEventListener('keydown', e => {
   if (e.key === 'Escape' && $('delete-modal').classList.contains('show')) closeDeleteModal();
@@ -868,6 +1076,175 @@ document.addEventListener('keydown', e => {
   await loadCats();
   await loadProds();
 })();
+
+// =============================================
+// CARGA MASIVA DE CREDENCIALES
+// =============================================
+function renderMasivoSelect() {
+  const s = $('masivoCategoria');
+  if (!s) return;
+  s.innerHTML = '<option value="">Selecciona categoría</option>' + cats.map(c => `<option value="${escapeHtml(c.id)}">${escapeHtml(c.nombre)}</option>`).join('');
+}
+
+function parseMasivoCreds(text) {
+  return text
+    .split(',')
+    .map(b => b.split('\n').map(l => l.trim()).filter(l => l.length).join('\n').trim())
+    .filter(b => b.length > 0);
+}
+
+function updateMasivoCount() {
+  const n = parseMasivoCreds($('masivoCreds').value).length;
+  $('masivo-count').textContent = n;
+  return n;
+}
+
+function openMasivoModal() {
+  renderMasivoSelect();
+  $('masivoCategoria').value = $('prodCategoria').value || '';
+  $('masivoNombre').value = $('prodNombre').value.trim();
+  $('masivoImagen').value = $('prodImagen').value.trim();
+  $('masivoPrecio').value = $('prodPrecio').value;
+  $('masivoDesc').value = $('prodDesc').value.trim();
+  $('masivoCreds').value = '';
+  clearMasivoErrors();
+  updateMasivoCount();
+  $('masivo-modal').classList.add('show');
+}
+
+function closeMasivoModal() {
+  $('masivo-modal').classList.remove('show');
+}
+
+function clearMasivoErrors() {
+  document.querySelectorAll('#masivo-modal .field').forEach(f => f.classList.remove('has-error'));
+  document.querySelectorAll('#masivo-modal input, #masivo-modal textarea, #masivo-modal select').forEach(i => i.classList.remove('error'));
+}
+
+function showMasivoError(id) {
+  const field = $(id);
+  if (field) {
+    field.classList.add('has-error');
+    const input = field.querySelector('input, textarea, select');
+    if (input) input.classList.add('error');
+  }
+}
+
+$('cancel-masivo').addEventListener('click', closeMasivoModal);
+$('masivo-x-btn').addEventListener('click', closeMasivoModal);
+$('masivo-modal').addEventListener('click', e => { if (e.target === $('masivo-modal')) closeMasivoModal(); });
+$('masivoCreds').addEventListener('input', updateMasivoCount);
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('masivo-modal').classList.contains('show')) closeMasivoModal();
+});
+
+$('confirm-masivo').addEventListener('click', async function() {
+  clearMasivoErrors();
+
+  const categoria_id = $('masivoCategoria').value;
+  const nombre = $('masivoNombre').value.trim();
+  const imagen_url = $('masivoImagen').value.trim();
+  const precio = parseFloat($('masivoPrecio').value);
+  const descripcion = $('masivoDesc').value.trim();
+  const bloques = parseMasivoCreds($('masivoCreds').value);
+
+  let hasErrors = false;
+  if (!categoria_id) { showMasivoError('field-masivo-categoria'); hasErrors = true; }
+  if (!nombre || nombre.length < 3) { showMasivoError('field-masivo-nombre'); hasErrors = true; }
+  if (!imagen_url || !validateUrl(imagen_url)) { showMasivoError('field-masivo-imagen'); hasErrors = true; }
+  if (!precio || precio <= 0) { showMasivoError('field-masivo-precio'); hasErrors = true; }
+  if (!bloques.length) { showMasivoError('field-masivo-creds'); hasErrors = true; }
+
+  if (hasErrors) {
+    toast('Corrige los errores del formulario', 'error');
+    return;
+  }
+
+  const btn = this;
+  const originalHtml = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+
+  try {
+    const rows = bloques.map(credenciales => ({
+      categoria_id, nombre, imagen_url, precio, descripcion, credenciales, estado: 'disponible'
+    }));
+    const { error } = await supabaseClient.from(TABLA_PROD).insert(rows);
+    if (error) throw error;
+    toast(rows.length + ' producto(s) agregado(s) correctamente', 'success');
+    closeMasivoModal();
+    await loadProds();
+  } catch (error) {
+    console.error(error);
+    toast('Error al guardar: ' + error.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = originalHtml;
+  }
+});
+
+// =============================================
+// EDITAR GRUPO (PRODUCTO COMPLETO)
+// =============================================
+function editGroup(nombre, categoriaId, imagen, precio, descripcion) {
+  const items = prods.filter(p =>
+    (p.nombre || '').trim().toLowerCase() === (nombre || '').trim().toLowerCase() &&
+    String(p.categoria_id || '') === String(categoriaId || '') &&
+    parseFloat(p.precio) === parseFloat(precio)
+  );
+  if (!items.length) { toast('Producto no encontrado', 'error'); return; }
+
+  editingId = null;
+  $('prodCategoria').value = categoriaId || '';
+  $('prodNombre').value = nombre || '';
+  $('prodImagen').value = imagen || '';
+  $('prodPrecio').value = precio || '';
+  $('prodDesc').value = descripcion || '';
+  $('prodCreds').value = '';
+  $('field-creds').style.display = 'none';
+  $('creds-hint').style.display = 'block';
+  $('creds-hint').innerHTML = '<i class="fas fa-info-circle" style="color:#a855f7;"></i> Editando datos del producto. Sus ' + items.length + ' credencial(es) no se modifican.';
+
+  editingGroupKey = {
+    nombre: (nombre || '').trim().toLowerCase(),
+    categoria_id: String(categoriaId || ''),
+    precio: parseFloat(precio)
+  };
+
+  $('form-title').innerHTML = '<i class="fas fa-pen"></i> Editar Producto';
+  $('submit-text').textContent = 'Actualizar Producto';
+  $('cancel-edit').style.display = 'inline-flex';
+  clearErrors();
+  switchTab('productos');
+  toast('Editando "' + (nombre || '') + '"', 'info');
+}
+
+// =============================================
+// ELIMINAR GRUPO (PRODUCTO COMPLETO)
+// =============================================
+async function delGroup(nombre, categoriaId, precio) {
+  const precioNum = parseFloat(precio);
+  const items = prods.filter(p =>
+    (p.nombre || '').trim().toLowerCase() === (nombre || '').trim().toLowerCase() &&
+    String(p.categoria_id || '') === String(categoriaId || '') &&
+    parseFloat(p.precio) === precioNum
+  );
+  if (!items.length) { toast('No se encontraron productos', 'error'); return; }
+  if (!confirm('¿Eliminar "' + nombre + '" y sus ' + items.length + ' credencial(es)?')) return;
+
+  try {
+    const ids = items.map(p => p.id);
+    const { error } = await supabaseClient.from(TABLA_PROD).delete().in('id', ids);
+    if (error) throw error;
+    if (ids.some(id => String(editingId) === String(id))) resetForm();
+    toast(items.length + ' registro(s) eliminado(s)', 'success');
+    await loadProds();
+  } catch (error) {
+    console.error(error);
+    toast('Error al eliminar: ' + error.message, 'error');
+  }
+}
 </script>
 </body>
 </html>
