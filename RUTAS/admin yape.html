@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Admin — Participaciones YAPE</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; }
@@ -124,6 +125,20 @@
   ::-webkit-scrollbar-thumb { background: #333333; border-radius: 10px; }
   ::-webkit-scrollbar-track { background: transparent; }
 
+  /* RECONSTRUIR QR */
+  .recon-wrap { max-width: 720px; margin: 0 auto; }
+  .recon-card { background: #101010; border: 1px solid #1e1e1e; border-radius: 16px; padding: 22px; }
+  .recon-label { display: block; color: #8a8aa0; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 10px; }
+  .recon-textarea { width: 100%; min-height: 120px; resize: vertical; background: #0a0a0a; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px 16px; color: #e8e8f0; font-size: 14px; font-family: inherit; outline: none; transition: border 0.15s; line-height: 1.5; }
+  .recon-textarea:focus { border-color: #a855f7; }
+  .recon-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; }
+  .recon-preview { margin-top: 26px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+  .qr-frame { display: inline-flex; align-items: center; justify-content: center; padding: 18px; background: #fff; border-radius: 16px; box-shadow: 0 10px 30px -10px rgba(0,0,0,.8); min-width: 280px; min-height: 280px; }
+  #qrPreview { display: flex; align-items: center; justify-content: center; width: 240px; height: 240px; }
+  #qrPreview img { display: block !important; width: 240px !important; height: 240px !important; image-rendering: pixelated; }
+  #qrPreview canvas { display: none !important; }
+  .qr-placeholder { width: 240px; height: 240px; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 12px; text-align: center; padding: 16px; border: 2px dashed #cbd5e1; border-radius: 12px; }
+
   /* RESPONSIVE */
   @media (max-width: 800px) {
     .sidebar { width: 72px; }
@@ -146,6 +161,7 @@
     <nav class="sidebar-nav">
       <button class="nav-item active" data-section="dashboard"><i class="fas fa-chart-pie"></i><span>Dashboard</span></button>
       <button class="nav-item" data-section="participaciones"><i class="fas fa-ticket-alt"></i><span>Participaciones</span><span class="pill" id="pill-pending">0</span></button>
+      <button class="nav-item" data-section="reconstruir"><i class="fas fa-qrcode"></i><span>Reconstruir QR</span></button>
     </nav>
     <div class="sidebar-footer">
       <div class="avatar">A</div>
@@ -221,6 +237,7 @@
       currentSection = btn.dataset.section;
       if (currentSection === 'dashboard') renderDashboard();
       else if (currentSection === 'participaciones') renderParticipaciones();
+      else if (currentSection === 'reconstruir') renderReconstruir();
     });
   });
   $('#toggleSidebar').addEventListener('click', () => $('#sidebar').classList.toggle('collapsed'));
@@ -322,7 +339,6 @@
         </div>
       `;
 
-      // Activar tab actual
       document.querySelectorAll('.filter-tab').forEach(b => {
         if (b.dataset.filtro === filtroActual) b.classList.add('active');
         b.addEventListener('click', () => {
@@ -437,7 +453,6 @@
       return;
     }
 
-    // Si GANÓ, actualizamos la transacción de 'recarga' a 'deposito'
     if (accion === "ganado") {
       const { error: errTx } = await sb.from("transacciones")
         .update({ tipo: "deposito" })
@@ -452,11 +467,9 @@
 
     toast(accion === "ganado" ? "✅ Depósito de 4 Bs acreditado" : "❌ Marcado como perdido", "success");
 
-    // Refrescar solo la lista y stats
     await cargarYRenderLista();
     const stats = await cargarStats();
     document.getElementById('pill-pending').textContent = stats.pend;
-    // Actualizar counters en tabs y cards
     const tabs = document.querySelectorAll('.filter-tab');
     const counts = { pendiente: stats.pend, ganado: stats.won, perdido: stats.lost, all: stats.pend + stats.won + stats.lost };
     tabs.forEach(t => {
@@ -467,6 +480,131 @@
     if (vals[0]) vals[0].textContent = stats.pend;
     if (vals[1]) vals[1].textContent = stats.won;
     if (vals[2]) vals[2].textContent = stats.lost;
+  }
+
+  /* ---------- RECONSTRUIR QR ---------- */
+  function renderReconstruir() {
+    content.innerHTML = `
+      <div class="page-header">
+        <h2><i class="fas fa-qrcode"></i> Reconstruir QR</h2>
+        <span class="badge" style="background:#181818;color:#8a8aa0;padding:6px 14px;border-radius:20px;font-size:12px;">Manual · sin base de datos</span>
+      </div>
+
+      <div class="recon-wrap">
+        <div class="recon-card">
+          <label class="recon-label" for="reconInput">Datos del QR (pegados desde Telegram)</label>
+          <textarea id="reconInput" class="recon-textarea"
+            placeholder="Pega aquí el texto del QR que llegó a Telegram…&#10;&#10;Ejemplo:&#10;00020101021226850014br.gov.bcb.pix2563qr.yape.com.pe/qr/xxxxx…"></textarea>
+
+          <div class="recon-actions">
+            <button id="btnGenerar" class="btn btn-primary"><i class="fas fa-magic"></i> Generar QR</button>
+            <button id="btnLimpiarRecon" class="btn"><i class="fas fa-eraser"></i> Limpiar</button>
+            <button id="btnDescargar" class="btn btn-success" disabled><i class="fas fa-download"></i> Descargar PNG</button>
+          </div>
+
+          <div class="recon-preview">
+            <div class="qr-frame">
+              <div id="qrPreview">
+                <div class="qr-placeholder">Aquí aparecerá el QR reconstruido</div>
+              </div>
+            </div>
+            <p id="reconMsg" style="color:#6a6a85;font-size:12px;text-align:center;">Escribe o pega los datos y presiona "Generar QR".</p>
+          </div>
+        </div>
+      </div>
+    `;
+
+    const input = document.getElementById('reconInput');
+    const btnGen = document.getElementById('btnGenerar');
+    const btnLimpiar = document.getElementById('btnLimpiarRecon');
+    const btnDesc = document.getElementById('btnDescargar');
+    const preview = document.getElementById('qrPreview');
+    const msg = document.getElementById('reconMsg');
+
+    let generated = false;
+
+    function generar() {
+      const texto = (input.value || '').trim();
+      if (!texto) {
+        toast('Escribe o pega algún texto para generar el QR', 'error');
+        return;
+      }
+
+      // Limpiar preview anterior
+      preview.innerHTML = '';
+      const holder = document.createElement('div');
+      holder.id = 'qrPreviewInner';
+      preview.appendChild(holder);
+
+      try {
+        new QRCode(holder, {
+          text: texto,
+          width: 240,
+          height: 240,
+          colorDark: '#0b0f1a',
+          colorLight: '#ffffff',
+          correctLevel: QRCode.CorrectLevel.M
+        });
+        generated = true;
+        btnDesc.disabled = false;
+        msg.textContent = 'QR reconstruido correctamente. Puedes descargarlo.';
+        toast('QR generado', 'success');
+      } catch (err) {
+        console.error(err);
+        preview.innerHTML = '<div class="qr-placeholder">No se pudo generar el QR</div>';
+        generated = false;
+        btnDesc.disabled = true;
+        msg.textContent = 'Error al generar el QR.';
+        toast('Error al generar QR', 'error');
+      }
+    }
+
+    function descargar() {
+      if (!generated) return;
+      const inner = document.getElementById('qrPreviewInner');
+      if (!inner) return;
+      const img = inner.querySelector('img');
+      const canvas = inner.querySelector('canvas');
+      const src = img || canvas;
+      if (!src) { toast('Primero genera un QR', 'error'); return; }
+
+      const size = 512, padding = 48, qrSize = size - padding * 2;
+      const exportCanvas = document.createElement('canvas');
+      exportCanvas.width = size;
+      exportCanvas.height = size;
+      const ctx = exportCanvas.getContext('2d');
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+      ctx.imageSmoothingEnabled = false;
+      ctx.drawImage(src, padding, padding, qrSize, qrSize);
+
+      const a = document.createElement('a');
+      a.download = 'qr-reconstruido.png';
+      a.href = exportCanvas.toDataURL('image/png');
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      msg.textContent = 'QR descargado como imagen PNG.';
+      toast('QR descargado', 'success');
+    }
+
+    btnGen.addEventListener('click', generar);
+    btnDesc.addEventListener('click', descargar);
+    btnLimpiar.addEventListener('click', () => {
+      input.value = '';
+      preview.innerHTML = '<div class="qr-placeholder">Aquí aparecerá el QR reconstruido</div>';
+      generated = false;
+      btnDesc.disabled = true;
+      msg.textContent = 'Escribe o pega los datos y presiona "Generar QR".';
+      input.focus();
+    });
+
+    input.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+        e.preventDefault();
+        generar();
+      }
+    });
   }
 
   /* ---------- AUTO REFRESH ---------- */
